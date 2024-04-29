@@ -4,7 +4,7 @@
 sharp-dev-lib是c#中经常用到的工具库，基本都采用扩展的方式，方便客户端调用。
 
 ## 依赖说明
-sharp-dev-lib使用.netstandard2.0框架，依赖第三方库如下：
+sharp-dev-lib使用.netstandard2.1框架，依赖第三方库如下：
 
 * **Newtonsoft.Json (>= 13.0.1)**
     用于对序列化及对json格式美化
