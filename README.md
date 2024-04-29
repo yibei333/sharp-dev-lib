@@ -71,7 +71,7 @@ sharp-dev-lib包含如下表格的工具
 ## 版本说明
 | 时间 |版本  |描述  |
 | --- | --- | --- |
-| 2024-04-29 |v1.1   |添加StringUtil，清理了代码  |
+| 2024-04-29 |v1.1.0 |添加StringUtil，清理了代码  |
 | 2022-07-09 |v1.0.5 |VerifyCodeUtil依赖库由"System.Drawing.Common"变更为"SixLabors.ImageSharp"  |
 | 2022-05-19 |v1.0.4 |HashUtil中GetHexString方法重命名为ToHexString，增加FromHexString方法  |
 | 2022-05-13 |v1.0.3 |增加1个工具（FileUtil）  |
