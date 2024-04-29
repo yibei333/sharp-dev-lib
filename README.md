@@ -25,13 +25,13 @@ sharp-dev-lib使用.netstandard2.1框架，依赖第三方库如下：
 
 2. 在Package Manager中执行命令
 ```
-Install-Package SharpDevLib -Version 1.1
+Install-Package SharpDevLib -Version 1.1.0
 ```
 
 3. 在dotnet cli中执行命令
 
 ```
-dotnet add package SharpDevLib --version 1.1
+dotnet add package SharpDevLib --version 1.1.0
 ```
 
 ## 使用说明
