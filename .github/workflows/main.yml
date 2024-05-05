@@ -1,0 +1,36 @@
+name: release
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - pack/version.txt
+      
+jobs:
+  build:
+    permissions: write-all
+    runs-on: windows-latest 
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: SetVersion
+      id: SetVersion
+      run: |
+        echo "version=$(cat ./pack/version.txt)" >> $ENV:GITHUB_OUTPUT
+
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Build
+      run: dotnet build --configuration Release "./src/SharpDevLib/SharpDevLib.csproj"
+
+    - name: Pack
+      run: dotnet pack --configuration Release --output "./pack" "./src/SharpDevLib/SharpDevLib.csproj"
+
+    - name: Push
+      run: dotnet nuget push "./pack/SharpDevLib.${{steps.SetVersion.outputs.version}}.nupkg" --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate

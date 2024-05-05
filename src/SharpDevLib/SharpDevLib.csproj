@@ -16,7 +16,7 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>1.1</Version>
+		<Version>1.1.1</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -38,10 +38,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="DotNetZip" Version="1.16.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-		<PackageReference Include="SharpCompress" Version="0.31.0" />
-		<PackageReference Include="SixLabors.Fonts" Version="1.0.0-beta17" />
-		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta14" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="SharpCompress" Version="0.37.2" />
+		<PackageReference Include="SixLabors.Fonts" Version="1.0.1" />
+		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0" />
 	</ItemGroup>
 
 </Project>
