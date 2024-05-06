@@ -63,6 +63,8 @@ public static class StringExtension
         return str.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries).Select(x => Guid.TryParse(x, out var y) ? y : Guid.Empty).Where(x => x != Guid.Empty).Distinct().ToList();
     }
 
+    //todo:split to array
+
     /// <summary>
     /// convert string to boolean
     /// </summary>
