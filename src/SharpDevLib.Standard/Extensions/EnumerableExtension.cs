@@ -11,11 +11,7 @@ public static class EnumerableExtension
     /// <typeparam name="T">泛型类型</typeparam>
     /// <param name="source">集合</param>
     /// <returns>去重的集合</returns>
-    public static IEnumerable<T?>? DistinctByObjectValue<T>(this IEnumerable<T?>? source) where T : class
-    {
-        if (source.IsNullOrEmpty()) return source;
-        return source.Distinct(new ObjectValueComparer<T>());
-    }
+    public static IEnumerable<T?> DistinctByObjectValue<T>(this IEnumerable<T?> source) where T : class => source.Distinct(new ObjectValueComparer<T>());
 }
 
 internal class ObjectValueComparer<T> : IEqualityComparer<T?> where T : class
@@ -23,7 +19,7 @@ internal class ObjectValueComparer<T> : IEqualityComparer<T?> where T : class
     public bool Equals(T? x, T? y)
     {
         if (x is null && y is null) return true;
-        return x.Serialize() == y.Serialize();
+        return x?.Serialize() == y?.Serialize();
     }
 
     public int GetHashCode(T? obj)

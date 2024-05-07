@@ -55,9 +55,9 @@ public static class HashUtil
     /// <typeparam name="T">object type</typeparam>
     /// <param name="obj">object to compute</param>
     /// <param name="algorithm">concrete algorithm</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha hash</returns>
-    private static string SHAHash<T>(this T? obj, HashAlgorithm algorithm, WordCase? wordCase = null) where T : class
+    static string SHAHash<T>(this T? obj, HashAlgorithm algorithm, WordCase? wordCase = null) where T : class
     {
         if (obj.IsNull()) return string.Empty;
         return obj.Serialize().SHAHash(algorithm, wordCase);
@@ -68,9 +68,9 @@ public static class HashUtil
     /// </summary>
     /// <param name="str">string value</param>
     /// <param name="algorithm">concrete algorithm</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha hash</returns>
-    private static string SHAHash(this string? str, HashAlgorithm algorithm, WordCase? wordCase = null)
+    static string SHAHash(this string? str, HashAlgorithm algorithm, WordCase? wordCase = null)
     {
         if (str.IsNull()) return string.Empty;
         return Encoding.UTF8.GetBytes(str).SHAHash(algorithm, wordCase);
@@ -81,9 +81,9 @@ public static class HashUtil
     /// </summary>
     /// <param name="bytes">byte array to compute</param>
     /// <param name="algorithm">concrete algorithm</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha hash</returns>
-    private static string SHAHash(this byte[]? bytes, HashAlgorithm algorithm, WordCase? wordCase = null)
+    static string SHAHash(this byte[]? bytes, HashAlgorithm algorithm, WordCase? wordCase = null)
     {
         if (bytes.IsEmpty()) return string.Empty;
         var hashBytes = algorithm.ComputeHash(bytes);
@@ -99,9 +99,9 @@ public static class HashUtil
     /// </summary>
     /// <param name="stream">file stream</param>
     /// <param name="algorithm">concrete algorithm</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha hash</returns>
-    private static string FileSHAHash(this Stream? stream, HashAlgorithm algorithm, WordCase? wordCase = null)
+    static string FileSHAHash(this Stream? stream, HashAlgorithm algorithm, WordCase? wordCase = null)
     {
         if (stream.IsNull() || stream.Length <= 0) return string.Empty;
         using var sha = SHA384.Create();
@@ -118,10 +118,10 @@ public static class HashUtil
     /// </summary>
     /// <param name="filePath">file path</param>
     /// <param name="algorithm">concrete algorithm</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha hash</returns>
     /// <exception cref="FileNotFoundException"></exception>
-    private static string FileSHAHash(this string? filePath, HashAlgorithm algorithm, WordCase? wordCase = null)
+    static string FileSHAHash(this string? filePath, HashAlgorithm algorithm, WordCase? wordCase = null)
     {
         if (!File.Exists(filePath)) throw new FileNotFoundException(filePath);
         using var stream = File.OpenRead(filePath);
@@ -135,9 +135,9 @@ public static class HashUtil
     /// <param name="obj">object to compute</param>
     /// <param name="algorithm">concrete algorithm</param>
     /// <param name="secret">hash secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha hash</returns>
-    private static string HMACSHAHash<T>(this T? obj, KeyedHashAlgorithm algorithm, string secret, WordCase? wordCase = null) where T : class
+    static string HMACSHAHash<T>(this T? obj, KeyedHashAlgorithm algorithm, string secret, WordCase? wordCase = null) where T : class
     {
         if (obj.IsNull()) return string.Empty;
         return obj.Serialize().HMACSHAHash(algorithm, secret, wordCase);
@@ -149,9 +149,9 @@ public static class HashUtil
     /// <param name="str">string value</param>
     /// <param name="algorithm">concrete algorithm</param>
     /// <param name="secret">hmac secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha hash</returns>
-    private static string HMACSHAHash(this string? str, KeyedHashAlgorithm algorithm, string secret, WordCase? wordCase = null)
+    static string HMACSHAHash(this string? str, KeyedHashAlgorithm algorithm, string secret, WordCase? wordCase = null)
     {
         if (str.IsNull()) return string.Empty;
         return Encoding.UTF8.GetBytes(str).HMACSHAHash(algorithm, secret, wordCase);
@@ -163,9 +163,9 @@ public static class HashUtil
     /// <param name="bytes">byte array to compute</param>
     /// <param name="algorithm">concrete algorithm</param>
     /// <param name="secret">hmac secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha hash</returns>
-    private static string HMACSHAHash(this byte[]? bytes, KeyedHashAlgorithm algorithm, string secret, WordCase? wordCase = null)
+    static string HMACSHAHash(this byte[]? bytes, KeyedHashAlgorithm algorithm, string secret, WordCase? wordCase = null)
     {
         if (bytes.IsEmpty()) return string.Empty;
         algorithm.Key = secret.IsNull() ? Array.Empty<byte>() : Encoding.UTF8.GetBytes(secret);
@@ -185,7 +185,7 @@ public static class HashUtil
     /// <typeparam name="T">object type</typeparam>
     /// <param name="obj">object to compute</param>
     /// <param name="length">result length</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>md5 hash</returns>
     public static string MD5Hash<T>(this T? obj, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null) where T : class
     {
@@ -198,7 +198,7 @@ public static class HashUtil
     /// </summary>
     /// <param name="str">string to compute</param>
     /// <param name="length">result length</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>md5 hash</returns>
     public static string MD5Hash(this string? str, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null)
     {
@@ -211,7 +211,7 @@ public static class HashUtil
     /// </summary>
     /// <param name="bytes">byte array to compute</param>
     /// <param name="length">result length</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>md5 hash</returns>
     public static string MD5Hash(this byte[]? bytes, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null)
     {
@@ -230,7 +230,7 @@ public static class HashUtil
     /// </summary>
     /// <param name="stream">file stream</param>
     /// <param name="length">result length</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>md5 hash</returns>
     public static string FileMD5Hash(this Stream? stream, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null)
     {
@@ -250,7 +250,7 @@ public static class HashUtil
     /// </summary>
     /// <param name="filePath">file path</param>
     /// <param name="length">result length</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>md5 hash</returns>
     public static string FileMD5Hash(this string? filePath, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null)
     {
@@ -268,7 +268,7 @@ public static class HashUtil
     /// <param name="obj">object to compute</param>
     /// <param name="secret">hmac secret</param>
     /// <param name="length">result length</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmacmd5 hash</returns>
     public static string HMACMD5Hash<T>(this T? obj, string secret, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null) where T : class
     {
@@ -282,7 +282,7 @@ public static class HashUtil
     /// <param name="str">string value</param>
     /// <param name="secret">hamc secret</param>
     /// <param name="length">result length</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmacmd5 hash</returns>
     public static string HMACMD5Hash(this string? str, string secret, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null)
     {
@@ -296,7 +296,7 @@ public static class HashUtil
     /// <param name="bytes">byte array to compoute</param>
     /// <param name="secret">hamc secret</param>
     /// <param name="length">result length</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmacmd5 hash</returns>
     /// <exception cref="InvalidOperationException"></exception>
     public static string HMACMD5Hash(this byte[]? bytes, string secret, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null)
@@ -320,7 +320,7 @@ public static class HashUtil
     /// </summary>
     /// <typeparam name="T">object type</typeparam>
     /// <param name="obj">object to compute</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha128 hash</returns>
     public static string SHA128Hash<T>(this T? obj, WordCase? wordCase = null) where T : class => obj.SHAHash(SHA1.Create(), wordCase);
 
@@ -328,7 +328,7 @@ public static class HashUtil
     /// sha128 compute a string
     /// </summary>
     /// <param name="str">string value</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha128 hash</returns>
     public static string SHA128Hash(this string? str, WordCase? wordCase = null) => str.SHAHash(SHA1.Create(), wordCase);
 
@@ -336,7 +336,7 @@ public static class HashUtil
     /// sha128 compute a byte array
     /// </summary>
     /// <param name="bytes">byte array to compute</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha128 hash</returns>
     public static string SHA128Hash(this byte[]? bytes, WordCase? wordCase = null) => bytes.SHAHash(SHA1.Create(), wordCase);
 
@@ -344,7 +344,7 @@ public static class HashUtil
     /// sha128 compute a file
     /// </summary>
     /// <param name="stream">file stream</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha128 hash</returns>
     public static string FileSHA128Hash(this Stream? stream, WordCase? wordCase = null) => stream.FileSHAHash(SHA1.Create(), wordCase);
 
@@ -352,7 +352,7 @@ public static class HashUtil
     /// sha128 compute a file
     /// </summary>
     /// <param name="filePath">file path</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha128 hash</returns>
     /// <exception cref="FileNotFoundException"></exception>
     public static string FileSHA128Hash(this string? filePath, WordCase? wordCase = null) => filePath.FileSHAHash(SHA1.Create(), wordCase);
@@ -365,7 +365,7 @@ public static class HashUtil
     /// <typeparam name="T">object type</typeparam>
     /// <param name="obj">object to compute</param>
     /// <param name="secret">hash secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha128 hash</returns>
     public static string HMACSHA128Hash<T>(this T? obj, string secret, WordCase? wordCase = null) where T : class => obj.HMACSHAHash(new HMACSHA1(), secret, wordCase);
 
@@ -374,7 +374,7 @@ public static class HashUtil
     /// </summary>
     /// <param name="str">string value</param>
     /// <param name="secret">hmac secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha128 hash</returns>
     public static string HMACSHA128Hash(this string? str, string secret, WordCase? wordCase = null) => str.HMACSHAHash(new HMACSHA1(), secret, wordCase);
 
@@ -383,7 +383,7 @@ public static class HashUtil
     /// </summary>
     /// <param name="bytes">byte array to compute</param>
     /// <param name="secret">hmac secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha128 hash</returns>
     public static string HMACSHA128Hash(this byte[]? bytes, string secret, WordCase? wordCase = null) => bytes.HMACSHAHash(new HMACSHA1(), secret, wordCase);
     #endregion
@@ -394,7 +394,7 @@ public static class HashUtil
     /// </summary>
     /// <typeparam name="T">object type</typeparam>
     /// <param name="obj">object to compute</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha256 hash</returns>
     public static string SHA256Hash<T>(this T? obj, WordCase? wordCase = null) where T : class => obj.SHAHash(SHA256.Create(), wordCase);
 
@@ -402,7 +402,7 @@ public static class HashUtil
     /// sha256 compute a string
     /// </summary>
     /// <param name="str">string value</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha256 hash</returns>
     public static string SHA256Hash(this string? str, WordCase? wordCase = null) => str.SHAHash(SHA256.Create(), wordCase);
 
@@ -410,7 +410,7 @@ public static class HashUtil
     /// sha256 compute a byte array
     /// </summary>
     /// <param name="bytes">byte array to compute</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha256 hash</returns>
     public static string SHA256Hash(this byte[]? bytes, WordCase? wordCase = null) => bytes.SHAHash(SHA256.Create(), wordCase);
 
@@ -418,7 +418,7 @@ public static class HashUtil
     /// sha256 compute a file
     /// </summary>
     /// <param name="stream">file stream</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha256 hash</returns>
     public static string FileSHA256Hash(this Stream? stream, WordCase? wordCase = null) => stream.FileSHAHash(SHA256.Create(), wordCase);
 
@@ -426,7 +426,7 @@ public static class HashUtil
     /// sha256 compute a file
     /// </summary>
     /// <param name="filePath">file path</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha256 hash</returns>
     /// <exception cref="FileNotFoundException"></exception>
     public static string FileSHA256Hash(this string? filePath, WordCase? wordCase = null) => filePath.FileSHAHash(SHA256.Create(), wordCase);
@@ -439,7 +439,7 @@ public static class HashUtil
     /// <typeparam name="T">object type</typeparam>
     /// <param name="obj">object to compute</param>
     /// <param name="secret">hash secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha256 hash</returns>
     public static string HMACSHA256Hash<T>(this T? obj, string secret, WordCase? wordCase = null) where T : class => obj.HMACSHAHash(new HMACSHA256(), secret, wordCase);
 
@@ -448,7 +448,7 @@ public static class HashUtil
     /// </summary>
     /// <param name="str">string value</param>
     /// <param name="secret">hmac secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha256 hash</returns>
     public static string HMACSHA256Hash(this string? str, string secret, WordCase? wordCase = null) => str.HMACSHAHash(new HMACSHA256(), secret, wordCase);
 
@@ -457,7 +457,7 @@ public static class HashUtil
     /// </summary>
     /// <param name="bytes">byte array to compute</param>
     /// <param name="secret">hmac secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha256 hash</returns>
     public static string HMACSHA256Hash(this byte[]? bytes, string secret, WordCase? wordCase = null) => bytes.HMACSHAHash(new HMACSHA256(), secret, wordCase);
     #endregion
@@ -468,7 +468,7 @@ public static class HashUtil
     /// </summary>
     /// <typeparam name="T">object type</typeparam>
     /// <param name="obj">object to compute</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha384 hash</returns>
     public static string SHA384Hash<T>(this T? obj, WordCase? wordCase = null) where T : class => obj.SHAHash(SHA384.Create(), wordCase);
 
@@ -476,7 +476,7 @@ public static class HashUtil
     /// sha384 compute a string
     /// </summary>
     /// <param name="str">string value</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha384 hash</returns>
     public static string SHA384Hash(this string? str, WordCase? wordCase = null) => str.SHAHash(SHA384.Create(), wordCase);
 
@@ -484,7 +484,7 @@ public static class HashUtil
     /// sha384 compute a byte array
     /// </summary>
     /// <param name="bytes">byte array to compute</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha384 hash</returns>
     public static string SHA384Hash(this byte[]? bytes, WordCase? wordCase = null) => bytes.SHAHash(SHA384.Create(), wordCase);
 
@@ -492,7 +492,7 @@ public static class HashUtil
     /// sha384 compute a file
     /// </summary>
     /// <param name="stream">file stream</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha384 hash</returns>
     public static string FileSHA384Hash(this Stream? stream, WordCase? wordCase = null) => stream.FileSHAHash(SHA384.Create(), wordCase);
 
@@ -500,7 +500,7 @@ public static class HashUtil
     /// sha384 compute a file
     /// </summary>
     /// <param name="filePath">file path</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha384 hash</returns>
     /// <exception cref="FileNotFoundException"></exception>
     public static string FileSHA384Hash(this string? filePath, WordCase? wordCase = null) => filePath.FileSHAHash(SHA384.Create(), wordCase);
@@ -513,7 +513,7 @@ public static class HashUtil
     /// <typeparam name="T">object type</typeparam>
     /// <param name="obj">object to compute</param>
     /// <param name="secret">hash secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha384 hash</returns>
     public static string HMACSHA384Hash<T>(this T? obj, string secret, WordCase? wordCase = null) where T : class => obj.HMACSHAHash(new HMACSHA384(), secret, wordCase);
 
@@ -522,7 +522,7 @@ public static class HashUtil
     /// </summary>
     /// <param name="str">string value</param>
     /// <param name="secret">hmac secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha384 hash</returns>
     public static string HMACSHA384Hash(this string? str, string secret, WordCase? wordCase = null) => str.HMACSHAHash(new HMACSHA384(), secret, wordCase);
 
@@ -531,7 +531,7 @@ public static class HashUtil
     /// </summary>
     /// <param name="bytes">byte array to compute</param>
     /// <param name="secret">hmac secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha384 hash</returns>
     public static string HMACSHA384Hash(this byte[]? bytes, string secret, WordCase? wordCase = null) => bytes.HMACSHAHash(new HMACSHA384(), secret, wordCase);
     #endregion
@@ -542,7 +542,7 @@ public static class HashUtil
     /// </summary>
     /// <typeparam name="T">object type</typeparam>
     /// <param name="obj">object to compute</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha512 hash</returns>
     public static string SHA512Hash<T>(this T? obj, WordCase? wordCase = null) where T : class => obj.SHAHash(SHA512.Create(), wordCase);
 
@@ -550,7 +550,7 @@ public static class HashUtil
     /// sha512 compute a string
     /// </summary>
     /// <param name="str">string value</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha512 hash</returns>
     public static string SHA512Hash(this string? str, WordCase? wordCase = null) => str.SHAHash(SHA512.Create(), wordCase);
 
@@ -558,7 +558,7 @@ public static class HashUtil
     /// sha512 compute a byte array
     /// </summary>
     /// <param name="bytes">byte array to compute</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha512 hash</returns>
     public static string SHA512Hash(this byte[]? bytes, WordCase? wordCase = null) => bytes.SHAHash(SHA512.Create(), wordCase);
 
@@ -566,7 +566,7 @@ public static class HashUtil
     /// sha512 compute a file
     /// </summary>
     /// <param name="stream">file stream</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha512 hash</returns>
     public static string FileSHA512Hash(this Stream? stream, WordCase? wordCase = null) => stream.FileSHAHash(SHA512.Create(), wordCase);
 
@@ -574,7 +574,7 @@ public static class HashUtil
     /// sha512 compute a file
     /// </summary>
     /// <param name="filePath">file path</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>sha512 hash</returns>
     /// <exception cref="FileNotFoundException"></exception>
     public static string FileSHA512Hash(this string? filePath, WordCase? wordCase = null) => filePath.FileSHAHash(SHA512.Create(), wordCase);
@@ -587,7 +587,7 @@ public static class HashUtil
     /// <typeparam name="T">object type</typeparam>
     /// <param name="obj">object to compute</param>
     /// <param name="secret">hash secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha512 hash</returns>
     public static string HMACSHA512Hash<T>(this T? obj, string secret, WordCase? wordCase = null) where T : class => obj.HMACSHAHash(new HMACSHA512(), secret, wordCase);
 
@@ -596,7 +596,7 @@ public static class HashUtil
     /// </summary>
     /// <param name="str">string value</param>
     /// <param name="secret">hmac secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha512 hash</returns>
     public static string HMACSHA512Hash(this string? str, string secret, WordCase? wordCase = null) => str.HMACSHAHash(new HMACSHA512(), secret, wordCase);
 
@@ -605,7 +605,7 @@ public static class HashUtil
     /// </summary>
     /// <param name="bytes">byte array to compute</param>
     /// <param name="secret">hmac secret</param>
-    /// <param name="wordCase">word case</param>
+
     /// <returns>hmac sha512 hash</returns>
     public static string HMACSHA512Hash(this byte[]? bytes, string secret, WordCase? wordCase = null) => bytes.HMACSHAHash(new HMACSHA512(), secret, wordCase);
     #endregion

@@ -1,578 +1,294 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.IO;
-//using System.Linq;
-//using System.Security.Cryptography;
-//using System.Text;
+﻿using System.Security.Cryptography;
+using System.Text;
 
-//namespace SharpDevLib.Standard;
+namespace SharpDevLib.Standard;
 
-///// <summary>
-///// hash util
-///// </summary>
-//public static class HashExtension
-//{
+/// <summary>
+/// 哈希扩展
+/// </summary>
+public static class HashExtension
+{
+    #region MD5
+    /// <summary>
+    /// md5长度
+    /// </summary>
+    public enum MD5Length
+    {
+        /// <summary>
+        /// 16位
+        /// </summary>
+        Sixteen,
+        /// <summary>
+        /// 32位
+        /// </summary>
+        ThirtyTwo
+    }
 
+    /// <summary>
+    /// 字节数组Md5哈希
+    /// </summary>
+    /// <param name="bytes">字节数组</param>
+    /// <param name="length">长度</param>
+    /// <returns>md5哈希值</returns>
+    public static string MD5Hash(this byte[] bytes, MD5Length length = MD5Length.ThirtyTwo)
+    {
+        using var md5 = MD5.Create();
+        var hashBytes = md5.ComputeHash(bytes);
+        var hexString = hashBytes.ToHexString();
+        if (length == MD5Length.Sixteen) hexString = hexString.Substring(8, 16);
+        return hexString;
+    }
 
-//    #region Common
-//    /// <summary>
-//    /// sha compute a object(use serialize)
-//    /// </summary>
-//    /// <typeparam name="T">object type</typeparam>
-//    /// <param name="obj">object to compute</param>
-//    /// <param name="algorithm">concrete algorithm</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha hash</returns>
-//    private static string SHAHash<T>(this T? obj, HashAlgorithm algorithm, WordCase? wordCase = null) where T : class
-//    {
-//        if (obj is null) return string.Empty;
-//        return obj.Serialize().SHAHash(algorithm, wordCase);
-//    }
+    /// <summary>
+    /// 流Md5哈希
+    /// </summary>
+    /// <param name="stream">流</param>
+    /// <param name="length">长度</param>
+    /// <returns>md5哈希值</returns>
+    public static string MD5Hash(this Stream stream, MD5Length length = MD5Length.ThirtyTwo)
+    {
+        stream.Seek(0, SeekOrigin.Begin);
+        using var md5 = MD5.Create();
+        var hashBytes = md5.ComputeHash(stream);
+        var hexString = hashBytes.ToHexString();
+        if (length == MD5Length.Sixteen) hexString = hexString.Substring(8, 16);
+        return hexString;
+    }
 
-//    /// <summary>
-//    /// sha compute a string
-//    /// </summary>
-//    /// <param name="str">string value</param>
-//    /// <param name="algorithm">concrete algorithm</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha hash</returns>
-//    private static string SHAHash(this string? str, HashAlgorithm algorithm, WordCase? wordCase = null)
-//    {
-//        if (str is null) return string.Empty;
-//        return Encoding.UTF8.GetBytes(str).SHAHash(algorithm, wordCase);
-//    }
+    /// <summary>
+    /// 字节数组Md5哈希(HMAC)
+    /// </summary>
+    /// <param name="bytes">字节数组</param>
+    /// <param name="secret">密钥</param>
+    /// <param name="length">长度</param>
+    /// <returns>md5哈希值</returns>
+    public static string MD5Hash(this byte[] bytes, string secret, MD5Length length = MD5Length.ThirtyTwo)
+    {
+        var key = Encoding.UTF8.GetBytes(secret);
+        if (key.Length > 64) throw new InvalidOperationException("md5 secret length should less than equal 64");
+        using var md5 = new HMACMD5(key);
+        var hashBytes = md5.ComputeHash(bytes);
+        var hexString = hashBytes.ToHexString();
+        if (length == MD5Length.Sixteen) hexString = hexString.Substring(8, 16);
+        return hexString;
+    }
 
-//    /// <summary>
-//    /// sha compute a byte array
-//    /// </summary>
-//    /// <param name="bytes">byte array to compute</param>
-//    /// <param name="algorithm">concrete algorithm</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha hash</returns>
-//    private static string SHAHash(this byte[]? bytes, HashAlgorithm algorithm, WordCase? wordCase = null)
-//    {
-//        if (bytes.IsEmpty()) return string.Empty;
-//        var hashBytes = algorithm.ComputeHash(bytes);
-//        algorithm.Dispose();
-//        var hexString = hashBytes.ToHexString();
-//        if (wordCase is null) return hexString;
-//        if (wordCase == WordCase.UpperCase) return hexString.ToUpper();
-//        return hexString.ToLower();
-//    }
+    /// <summary>
+    /// 流Md5哈希(HMAC)
+    /// </summary>
+    /// <param name="stream">流</param>
+    /// <param name="secret">密钥</param>
+    /// <param name="length">长度</param>
+    /// <returns>md5哈希值</returns>
+    public static string MD5Hash(this Stream stream, string secret, MD5Length length = MD5Length.ThirtyTwo)
+    {
+        var key = Encoding.UTF8.GetBytes(secret);
+        if (key.Length > 64) throw new InvalidOperationException("md5 secret length should less than equal 64");
+        using var md5 = new HMACMD5(key);
+        var hashBytes = md5.ComputeHash(stream);
+        var hexString = hashBytes.ToHexString();
+        if (length == MD5Length.Sixteen) hexString = hexString.Substring(8, 16);
+        return hexString;
+    }
+    #endregion
 
-//    /// <summary>
-//    /// sha compute a file
-//    /// </summary>
-//    /// <param name="stream">file stream</param>
-//    /// <param name="algorithm">concrete algorithm</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha hash</returns>
-//    private static string FileSHAHash(this Stream? stream, HashAlgorithm algorithm, WordCase? wordCase = null)
-//    {
-//        if (stream is null || stream.Length <= 0) return string.Empty;
-//        using var sha = SHA384.Create();
-//        var bytes = algorithm.ComputeHash(stream);
-//        algorithm.Dispose();
-//        var hexString = bytes.ToHexString();
-//        if (wordCase is null) return hexString;
-//        if (wordCase == WordCase.UpperCase) return hexString.ToUpper();
-//        return hexString.ToLower();
-//    }
+    #region SHA128
+    /// <summary>
+    /// 字节数组SHA128哈希
+    /// </summary>
+    /// <param name="bytes">字节数组</param>
+    /// <returns>SHA128哈希值</returns>
+    public static string SHA128Hash(this byte[] bytes)
+    {
+        using var sha = SHA1.Create();
+        return sha.ComputeHash(bytes).ToHexString();
+    }
 
-//    /// <summary>
-//    /// sha compute a file
-//    /// </summary>
-//    /// <param name="filePath">file path</param>
-//    /// <param name="algorithm">concrete algorithm</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha hash</returns>
-//    /// <exception cref="FileNotFoundException"></exception>
-//    private static string FileSHAHash(this string? filePath, HashAlgorithm algorithm, WordCase? wordCase = null)
-//    {
-//        if (!File.Exists(filePath)) throw new FileNotFoundException(filePath);
-//        using var stream = File.OpenRead(filePath);
-//        return stream.FileSHAHash(algorithm, wordCase);
-//    }
+    /// <summary>
+    /// 流SHA128哈希
+    /// </summary>
+    /// <param name="stream">流</param>
+    /// <returns>SHA128哈希值</returns>
+    public static string SHA128Hash(this Stream stream)
+    {
+        using var sha = SHA1.Create();
+        return sha.ComputeHash(stream).ToHexString();
+    }
 
-//    /// <summary>
-//    /// hmacsha compute a object(use serialize)
-//    /// </summary>
-//    /// <typeparam name="T">object type</typeparam>
-//    /// <param name="obj">object to compute</param>
-//    /// <param name="algorithm">concrete algorithm</param>
-//    /// <param name="secret">hash secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha hash</returns>
-//    private static string HMACSHAHash<T>(this T? obj, KeyedHashAlgorithm algorithm, string secret, WordCase? wordCase = null) where T : class
-//    {
-//        if (obj is null) return string.Empty;
-//        return obj.Serialize().HMACSHAHash(algorithm, secret, wordCase);
-//    }
+    /// <summary>
+    /// 字节数组SHA128哈希(HMAC)
+    /// </summary>
+    /// <param name="bytes">字节数组</param>
+    /// <param name="secret">密钥</param>
+    /// <returns>SHA128哈希值</returns>
+    public static string SHA128Hash(this byte[] bytes, string secret)
+    {
+        using var sha = new HMACSHA1();
+        sha.Key = secret.ToUtf8Bytes();
+        return sha.ComputeHash(bytes).ToHexString();
+    }
 
-//    /// <summary>
-//    /// hmacsha compute a string
-//    /// </summary>
-//    /// <param name="str">string value</param>
-//    /// <param name="algorithm">concrete algorithm</param>
-//    /// <param name="secret">hmac secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha hash</returns>
-//    private static string HMACSHAHash(this string? str, KeyedHashAlgorithm algorithm, string secret, WordCase? wordCase = null)
-//    {
-//        if (str is null) return string.Empty;
-//        return Encoding.UTF8.GetBytes(str).HMACSHAHash(algorithm, secret, wordCase);
-//    }
+    /// <summary>
+    /// 流SHA128哈希(HMAC)
+    /// </summary>
+    /// <param name="stream">流</param>
+    /// <param name="secret">密钥</param>
+    /// <returns>SHA128哈希值</returns>
+    public static string SHA128Hash(this Stream stream, string secret)
+    {
+        using var sha = new HMACSHA1();
+        sha.Key = secret.ToUtf8Bytes();
+        return sha.ComputeHash(stream).ToHexString();
+    }
+    #endregion
 
-//    /// <summary>
-//    /// hmacsha compute a byte array
-//    /// </summary>
-//    /// <param name="bytes">byte array to compute</param>
-//    /// <param name="algorithm">concrete algorithm</param>
-//    /// <param name="secret">hmac secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha hash</returns>
-//    private static string HMACSHAHash(this byte[]? bytes, KeyedHashAlgorithm algorithm, string secret, WordCase? wordCase = null)
-//    {
-//        if (bytes.IsEmpty()) return string.Empty;
-//        algorithm.Key = secret is null ? Array.Empty<byte>() : Encoding.UTF8.GetBytes(secret);
-//        var hashBytes = algorithm.ComputeHash(bytes);
-//        algorithm.Dispose();
-//        var hexString = hashBytes.ToHexString();
-//        if (wordCase is null) return hexString;
-//        if (wordCase == WordCase.UpperCase) return hexString.ToUpper();
-//        return hexString.ToLower();
-//    }
-//    #endregion
+    #region SHA256
+    /// <summary>
+    /// 字节数组SHA256哈希
+    /// </summary>
+    /// <param name="bytes">字节数组</param>
+    /// <returns>SHA256哈希值</returns>
+    public static string SHA256Hash(this byte[] bytes)
+    {
+        using var sha = SHA256.Create();
+        return sha.ComputeHash(bytes).ToHexString();
+    }
 
-//    #region MD5
-//    /// <summary>
-//    /// md5 compute a object(use serialize)
-//    /// </summary>
-//    /// <typeparam name="T">object type</typeparam>
-//    /// <param name="obj">object to compute</param>
-//    /// <param name="length">result length</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>md5 hash</returns>
-//    public static string MD5Hash<T>(this T? obj, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null) where T : class
-//    {
-//        if (obj is null) return string.Empty;
-//        return obj.Serialize().MD5Hash(length, wordCase);
-//    }
+    /// <summary>
+    /// 流SHA256哈希
+    /// </summary>
+    /// <param name="stream">流</param>
+    /// <returns>SHA256哈希值</returns>
+    public static string SHA256Hash(this Stream stream)
+    {
+        using var sha = SHA256.Create();
+        return sha.ComputeHash(stream).ToHexString();
+    }
 
-//    /// <summary>
-//    /// md5 compute a string
-//    /// </summary>
-//    /// <param name="str">string to compute</param>
-//    /// <param name="length">result length</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>md5 hash</returns>
-//    public static string MD5Hash(this string? str, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null)
-//    {
-//        if (str is null) return string.Empty;
-//        return Encoding.UTF8.GetBytes(str).MD5Hash(length, wordCase);
-//    }
+    /// <summary>
+    /// 字节数组SHA256哈希(HMAC)
+    /// </summary>
+    /// <param name="bytes">字节数组</param>
+    /// <param name="secret">密钥</param>
+    /// <returns>SHA256哈希值</returns>
+    public static string SHA256Hash(this byte[] bytes, string secret)
+    {
+        using var sha = new HMACSHA256();
+        sha.Key = secret.ToUtf8Bytes();
+        return sha.ComputeHash(bytes).ToHexString();
+    }
 
-//    /// <summary>
-//    /// md5 compute a byte array
-//    /// </summary>
-//    /// <param name="bytes">byte array to compute</param>
-//    /// <param name="length">result length</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>md5 hash</returns>
-//    public static string MD5Hash(this byte[]? bytes, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null)
-//    {
-//        if (bytes.IsEmpty()) return string.Empty;
-//        using var md5 = MD5.Create();
-//        var hashBytes = md5.ComputeHash(bytes);
-//        var hexString = hashBytes.ToHexString();
-//        if (length == MD5Length.Sixteen) hexString = hexString.Substring(8, 16);
-//        if (wordCase is null) return hexString;
-//        if (wordCase == WordCase.UpperCase) return hexString.ToUpper();
-//        return hexString.ToLower();
-//    }
+    /// <summary>
+    /// 流SHA256哈希(HMAC)
+    /// </summary>
+    /// <param name="stream">流</param>
+    /// <param name="secret">密钥</param>
+    /// <returns>SHA256哈希值</returns>
+    public static string SHA256Hash(this Stream stream, string secret)
+    {
+        using var sha = new HMACSHA256();
+        sha.Key = secret.ToUtf8Bytes();
+        return sha.ComputeHash(stream).ToHexString();
+    }
+    #endregion
 
-//    /// <summary>
-//    /// md5 compute a file
-//    /// </summary>
-//    /// <param name="stream">file stream</param>
-//    /// <param name="length">result length</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>md5 hash</returns>
-//    public static string FileMD5Hash(this Stream? stream, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null)
-//    {
-//        if (stream is null || stream.Length <= 0) return string.Empty;
-//        stream.Seek(0, SeekOrigin.Begin);
-//        using var md5 = MD5.Create();
-//        var bytes = md5.ComputeHash(stream);
-//        var hexString = bytes.ToHexString();
-//        if (length == MD5Length.Sixteen) hexString = hexString.Substring(8, 16);
-//        if (wordCase is null) return hexString;
-//        if (wordCase == WordCase.UpperCase) return hexString.ToUpper();
-//        return hexString.ToLower();
-//    }
+    #region SHA384
+    /// <summary>
+    /// 字节数组SHA384哈希
+    /// </summary>
+    /// <param name="bytes">字节数组</param>
+    /// <returns>SHA384哈希值</returns>
+    public static string SHA384Hash(this byte[] bytes)
+    {
+        using var sha = SHA384.Create();
+        return sha.ComputeHash(bytes).ToHexString();
+    }
 
-//    /// <summary>
-//    /// md5 compute a file
-//    /// </summary>
-//    /// <param name="filePath">file path</param>
-//    /// <param name="length">result length</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>md5 hash</returns>
-//    public static string FileMD5Hash(this string? filePath, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null)
-//    {
-//        if (!File.Exists(filePath)) throw new FileNotFoundException(filePath);
-//        using var stream = File.OpenRead(filePath);
-//        return stream.FileMD5Hash(length, wordCase);
-//    }
-//    #endregion
+    /// <summary>
+    /// 流SHA384哈希
+    /// </summary>
+    /// <param name="stream">流</param>
+    /// <returns>SHA384哈希值</returns>
+    public static string SHA384Hash(this Stream stream)
+    {
+        using var sha = SHA384.Create();
+        return sha.ComputeHash(stream).ToHexString();
+    }
 
-//    #region HMACMD5
-//    /// <summary>
-//    /// hmacmd5 compute a object(use serialize)
-//    /// </summary>
-//    /// <typeparam name="T">object type</typeparam>
-//    /// <param name="obj">object to compute</param>
-//    /// <param name="secret">hmac secret</param>
-//    /// <param name="length">result length</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmacmd5 hash</returns>
-//    public static string HMACMD5Hash<T>(this T? obj, string secret, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null) where T : class
-//    {
-//        if (obj is null) return string.Empty;
-//        return obj.Serialize().HMACMD5Hash(secret, length, wordCase);
-//    }
+    /// <summary>
+    /// 字节数组SHA384哈希(HMAC)
+    /// </summary>
+    /// <param name="bytes">字节数组</param>
+    /// <param name="secret">密钥</param>
+    /// <returns>SHA384哈希值</returns>
+    public static string SHA384Hash(this byte[] bytes, string secret)
+    {
+        using var sha = new HMACSHA384();
+        sha.Key = secret.ToUtf8Bytes();
+        return sha.ComputeHash(bytes).ToHexString();
+    }
 
-//    /// <summary>
-//    /// hmacmd5 compute a string
-//    /// </summary>
-//    /// <param name="str">string value</param>
-//    /// <param name="secret">hamc secret</param>
-//    /// <param name="length">result length</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmacmd5 hash</returns>
-//    public static string HMACMD5Hash(this string? str, string secret, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null)
-//    {
-//        if (str is null) return string.Empty;
-//        return Encoding.UTF8.GetBytes(str).HMACMD5Hash(secret, length, wordCase);
-//    }
+    /// <summary>
+    /// 流SHA384哈希(HMAC)
+    /// </summary>
+    /// <param name="stream">流</param>
+    /// <param name="secret">密钥</param>
+    /// <returns>SHA384哈希值</returns>
+    public static string SHA384Hash(this Stream stream, string secret)
+    {
+        using var sha = new HMACSHA384();
+        sha.Key = secret.ToUtf8Bytes();
+        return sha.ComputeHash(stream).ToHexString();
+    }
+    #endregion
 
-//    /// <summary>
-//    /// hmacmd5 compute a byte array
-//    /// </summary>
-//    /// <param name="bytes">byte array to compoute</param>
-//    /// <param name="secret">hamc secret</param>
-//    /// <param name="length">result length</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmacmd5 hash</returns>
-//    /// <exception cref="InvalidOperationException"></exception>
-//    public static string HMACMD5Hash(this byte[]? bytes, string secret, MD5Length length = MD5Length.ThirtyTwo, WordCase? wordCase = null)
-//    {
-//        if (bytes.IsEmpty()) return string.Empty;
-//        var key = secret is null ? Array.Empty<byte>() : Encoding.UTF8.GetBytes(secret);
-//        if (key.Length > 64) throw new InvalidOperationException("md5 secret length can't more than 64");
-//        using var md5 = new HMACMD5(key);
-//        var hashBytes = md5.ComputeHash(bytes);
-//        var hexString = hashBytes.ToHexString();
-//        if (length == MD5Length.Sixteen) hexString = hexString.Substring(8, 16);
-//        if (wordCase is null) return hexString;
-//        if (wordCase == WordCase.UpperCase) return hexString.ToUpper();
-//        return hexString.ToLower();
-//    }
-//    #endregion
+    #region SHA512
+    /// <summary>
+    /// 字节数组SHA512哈希
+    /// </summary>
+    /// <param name="bytes">字节数组</param>
+    /// <returns>SHA512哈希值</returns>
+    public static string SHA512Hash(this byte[] bytes)
+    {
+        using var sha = SHA512.Create();
+        return sha.ComputeHash(bytes).ToHexString();
+    }
 
-//    #region SHA128
-//    /// <summary>
-//    /// sha128 compute a object(use serialize)
-//    /// </summary>
-//    /// <typeparam name="T">object type</typeparam>
-//    /// <param name="obj">object to compute</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha128 hash</returns>
-//    public static string SHA128Hash<T>(this T? obj, WordCase? wordCase = null) where T : class => obj.SHAHash(SHA1.Create(), wordCase);
+    /// <summary>
+    /// 流SHA512哈希
+    /// </summary>
+    /// <param name="stream">流</param>
+    /// <returns>SHA512哈希值</returns>
+    public static string SHA512Hash(this Stream stream)
+    {
+        using var sha = SHA512.Create();
+        return sha.ComputeHash(stream).ToHexString();
+    }
 
-//    /// <summary>
-//    /// sha128 compute a string
-//    /// </summary>
-//    /// <param name="str">string value</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha128 hash</returns>
-//    public static string SHA128Hash(this string? str, WordCase? wordCase = null) => str.SHAHash(SHA1.Create(), wordCase);
+    /// <summary>
+    /// 字节数组SHA512哈希(HMAC)
+    /// </summary>
+    /// <param name="bytes">字节数组</param>
+    /// <param name="secret">密钥</param>
+    /// <returns>SHA512哈希值</returns>
+    public static string SHA512Hash(this byte[] bytes, string secret)
+    {
+        using var sha = new HMACSHA512();
+        sha.Key = secret.ToUtf8Bytes();
+        return sha.ComputeHash(bytes).ToHexString();
+    }
 
-//    /// <summary>
-//    /// sha128 compute a byte array
-//    /// </summary>
-//    /// <param name="bytes">byte array to compute</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha128 hash</returns>
-//    public static string SHA128Hash(this byte[]? bytes, WordCase? wordCase = null) => bytes.SHAHash(SHA1.Create(), wordCase);
-
-//    /// <summary>
-//    /// sha128 compute a file
-//    /// </summary>
-//    /// <param name="stream">file stream</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha128 hash</returns>
-//    public static string FileSHA128Hash(this Stream? stream, WordCase? wordCase = null) => stream.FileSHAHash(SHA1.Create(), wordCase);
-
-//    /// <summary>
-//    /// sha128 compute a file
-//    /// </summary>
-//    /// <param name="filePath">file path</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha128 hash</returns>
-//    /// <exception cref="FileNotFoundException"></exception>
-//    public static string FileSHA128Hash(this string? filePath, WordCase? wordCase = null) => filePath.FileSHAHash(SHA1.Create(), wordCase);
-//    #endregion
-
-//    #region HMACSHA128
-//    /// <summary>
-//    /// hmacsha128 compute a object(use serialize)
-//    /// </summary>
-//    /// <typeparam name="T">object type</typeparam>
-//    /// <param name="obj">object to compute</param>
-//    /// <param name="secret">hash secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha128 hash</returns>
-//    public static string HMACSHA128Hash<T>(this T? obj, string secret, WordCase? wordCase = null) where T : class => obj.HMACSHAHash(new HMACSHA1(), secret, wordCase);
-
-//    /// <summary>
-//    /// hmacsha128 compute a string
-//    /// </summary>
-//    /// <param name="str">string value</param>
-//    /// <param name="secret">hmac secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha128 hash</returns>
-//    public static string HMACSHA128Hash(this string? str, string secret, WordCase? wordCase = null) => str.HMACSHAHash(new HMACSHA1(), secret, wordCase);
-
-//    /// <summary>
-//    /// hmacsha128 compute a byte array
-//    /// </summary>
-//    /// <param name="bytes">byte array to compute</param>
-//    /// <param name="secret">hmac secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha128 hash</returns>
-//    public static string HMACSHA128Hash(this byte[]? bytes, string secret, WordCase? wordCase = null) => bytes.HMACSHAHash(new HMACSHA1(), secret, wordCase);
-//    #endregion
-
-//    #region SHA256
-//    /// <summary>
-//    /// sha256 compute a object(use serialize)
-//    /// </summary>
-//    /// <typeparam name="T">object type</typeparam>
-//    /// <param name="obj">object to compute</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha256 hash</returns>
-//    public static string SHA256Hash<T>(this T? obj, WordCase? wordCase = null) where T : class => obj.SHAHash(SHA256.Create(), wordCase);
-
-//    /// <summary>
-//    /// sha256 compute a string
-//    /// </summary>
-//    /// <param name="str">string value</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha256 hash</returns>
-//    public static string SHA256Hash(this string? str, WordCase? wordCase = null) => str.SHAHash(SHA256.Create(), wordCase);
-
-//    /// <summary>
-//    /// sha256 compute a byte array
-//    /// </summary>
-//    /// <param name="bytes">byte array to compute</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha256 hash</returns>
-//    public static string SHA256Hash(this byte[]? bytes, WordCase? wordCase = null) => bytes.SHAHash(SHA256.Create(), wordCase);
-
-//    /// <summary>
-//    /// sha256 compute a file
-//    /// </summary>
-//    /// <param name="stream">file stream</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha256 hash</returns>
-//    public static string FileSHA256Hash(this Stream? stream, WordCase? wordCase = null) => stream.FileSHAHash(SHA256.Create(), wordCase);
-
-//    /// <summary>
-//    /// sha256 compute a file
-//    /// </summary>
-//    /// <param name="filePath">file path</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha256 hash</returns>
-//    /// <exception cref="FileNotFoundException"></exception>
-//    public static string FileSHA256Hash(this string? filePath, WordCase? wordCase = null) => filePath.FileSHAHash(SHA256.Create(), wordCase);
-//    #endregion
-
-//    #region HMACSHA256
-//    /// <summary>
-//    /// hmacsha256 compute a object(use serialize)
-//    /// </summary>
-//    /// <typeparam name="T">object type</typeparam>
-//    /// <param name="obj">object to compute</param>
-//    /// <param name="secret">hash secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha256 hash</returns>
-//    public static string HMACSHA256Hash<T>(this T? obj, string secret, WordCase? wordCase = null) where T : class => obj.HMACSHAHash(new HMACSHA256(), secret, wordCase);
-
-//    /// <summary>
-//    /// hmacsha256 compute a string
-//    /// </summary>
-//    /// <param name="str">string value</param>
-//    /// <param name="secret">hmac secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha256 hash</returns>
-//    public static string HMACSHA256Hash(this string? str, string secret, WordCase? wordCase = null) => str.HMACSHAHash(new HMACSHA256(), secret, wordCase);
-
-//    /// <summary>
-//    /// hmacsha256 compute a byte array
-//    /// </summary>
-//    /// <param name="bytes">byte array to compute</param>
-//    /// <param name="secret">hmac secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha256 hash</returns>
-//    public static string HMACSHA256Hash(this byte[]? bytes, string secret, WordCase? wordCase = null) => bytes.HMACSHAHash(new HMACSHA256(), secret, wordCase);
-//    #endregion
-
-//    #region SHA384
-//    /// <summary>
-//    /// sha384 compute a object(use serialize)
-//    /// </summary>
-//    /// <typeparam name="T">object type</typeparam>
-//    /// <param name="obj">object to compute</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha384 hash</returns>
-//    public static string SHA384Hash<T>(this T? obj, WordCase? wordCase = null) where T : class => obj.SHAHash(SHA384.Create(), wordCase);
-
-//    /// <summary>
-//    /// sha384 compute a string
-//    /// </summary>
-//    /// <param name="str">string value</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha384 hash</returns>
-//    public static string SHA384Hash(this string? str, WordCase? wordCase = null) => str.SHAHash(SHA384.Create(), wordCase);
-
-//    /// <summary>
-//    /// sha384 compute a byte array
-//    /// </summary>
-//    /// <param name="bytes">byte array to compute</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha384 hash</returns>
-//    public static string SHA384Hash(this byte[]? bytes, WordCase? wordCase = null) => bytes.SHAHash(SHA384.Create(), wordCase);
-
-//    /// <summary>
-//    /// sha384 compute a file
-//    /// </summary>
-//    /// <param name="stream">file stream</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha384 hash</returns>
-//    public static string FileSHA384Hash(this Stream? stream, WordCase? wordCase = null) => stream.FileSHAHash(SHA384.Create(), wordCase);
-
-//    /// <summary>
-//    /// sha384 compute a file
-//    /// </summary>
-//    /// <param name="filePath">file path</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha384 hash</returns>
-//    /// <exception cref="FileNotFoundException"></exception>
-//    public static string FileSHA384Hash(this string? filePath, WordCase? wordCase = null) => filePath.FileSHAHash(SHA384.Create(), wordCase);
-//    #endregion
-
-//    #region HMACSHA384
-//    /// <summary>
-//    /// hmacsha384 compute a object(use serialize)
-//    /// </summary>
-//    /// <typeparam name="T">object type</typeparam>
-//    /// <param name="obj">object to compute</param>
-//    /// <param name="secret">hash secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha384 hash</returns>
-//    public static string HMACSHA384Hash<T>(this T? obj, string secret, WordCase? wordCase = null) where T : class => obj.HMACSHAHash(new HMACSHA384(), secret, wordCase);
-
-//    /// <summary>
-//    /// hmacsha384 compute a string
-//    /// </summary>
-//    /// <param name="str">string value</param>
-//    /// <param name="secret">hmac secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha384 hash</returns>
-//    public static string HMACSHA384Hash(this string? str, string secret, WordCase? wordCase = null) => str.HMACSHAHash(new HMACSHA384(), secret, wordCase);
-
-//    /// <summary>
-//    /// hmacsha384 compute a byte array
-//    /// </summary>
-//    /// <param name="bytes">byte array to compute</param>
-//    /// <param name="secret">hmac secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha384 hash</returns>
-//    public static string HMACSHA384Hash(this byte[]? bytes, string secret, WordCase? wordCase = null) => bytes.HMACSHAHash(new HMACSHA384(), secret, wordCase);
-//    #endregion
-
-//    #region SHA512
-//    /// <summary>
-//    /// sha512 compute a object(use serialize)
-//    /// </summary>
-//    /// <typeparam name="T">object type</typeparam>
-//    /// <param name="obj">object to compute</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha512 hash</returns>
-//    public static string SHA512Hash<T>(this T? obj, WordCase? wordCase = null) where T : class => obj.SHAHash(SHA512.Create(), wordCase);
-
-//    /// <summary>
-//    /// sha512 compute a string
-//    /// </summary>
-//    /// <param name="str">string value</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha512 hash</returns>
-//    public static string SHA512Hash(this string? str, WordCase? wordCase = null) => str.SHAHash(SHA512.Create(), wordCase);
-
-//    /// <summary>
-//    /// sha512 compute a byte array
-//    /// </summary>
-//    /// <param name="bytes">byte array to compute</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha512 hash</returns>
-//    public static string SHA512Hash(this byte[]? bytes, WordCase? wordCase = null) => bytes.SHAHash(SHA512.Create(), wordCase);
-
-//    /// <summary>
-//    /// sha512 compute a file
-//    /// </summary>
-//    /// <param name="stream">file stream</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha512 hash</returns>
-//    public static string FileSHA512Hash(this Stream? stream, WordCase? wordCase = null) => stream.FileSHAHash(SHA512.Create(), wordCase);
-
-//    /// <summary>
-//    /// sha512 compute a file
-//    /// </summary>
-//    /// <param name="filePath">file path</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>sha512 hash</returns>
-//    /// <exception cref="FileNotFoundException"></exception>
-//    public static string FileSHA512Hash(this string? filePath, WordCase? wordCase = null) => filePath.FileSHAHash(SHA512.Create(), wordCase);
-//    #endregion
-
-//    #region HMACSHA512
-//    /// <summary>
-//    /// hmacsha512 compute a object(use serialize)
-//    /// </summary>
-//    /// <typeparam name="T">object type</typeparam>
-//    /// <param name="obj">object to compute</param>
-//    /// <param name="secret">hash secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha512 hash</returns>
-//    public static string HMACSHA512Hash<T>(this T? obj, string secret, WordCase? wordCase = null) where T : class => obj.HMACSHAHash(new HMACSHA512(), secret, wordCase);
-
-//    /// <summary>
-//    /// hmacsha512 compute a string
-//    /// </summary>
-//    /// <param name="str">string value</param>
-//    /// <param name="secret">hmac secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha512 hash</returns>
-//    public static string HMACSHA512Hash(this string? str, string secret, WordCase? wordCase = null) => str.HMACSHAHash(new HMACSHA512(), secret, wordCase);
-
-//    /// <summary>
-//    /// hmacsha512 compute a byte array
-//    /// </summary>
-//    /// <param name="bytes">byte array to compute</param>
-//    /// <param name="secret">hmac secret</param>
-//    /// <param name="wordCase">word case</param>
-//    /// <returns>hmac sha512 hash</returns>
-//    public static string HMACSHA512Hash(this byte[]? bytes, string secret, WordCase? wordCase = null) => bytes.HMACSHAHash(new HMACSHA512(), secret, wordCase);
-//    #endregion
-//}
+    /// <summary>
+    /// 流SHA512哈希(HMAC)
+    /// </summary>
+    /// <param name="stream">流</param>
+    /// <param name="secret">密钥</param>
+    /// <returns>SHA512哈希值</returns>
+    public static string SHA512Hash(this Stream stream, string secret)
+    {
+        using var sha = new HMACSHA512();
+        sha.Key = secret.ToUtf8Bytes();
+        return sha.ComputeHash(stream).ToHexString();
+    }
+    #endregion
+}

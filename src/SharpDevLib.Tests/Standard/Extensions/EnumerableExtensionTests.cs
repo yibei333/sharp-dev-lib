@@ -22,7 +22,7 @@ public class EnumerableExtensionTests
             new ("bar",20),
             null
         };
-        var distinctedUsers = users.DistinctByObjectValue()?.ToList();
+        var distinctedUsers = users.DistinctByObjectValue().ToList();
         Console.WriteLine(distinctedUsers.Serialize());
         Assert.AreEqual(4, distinctedUsers?.Count);
     }

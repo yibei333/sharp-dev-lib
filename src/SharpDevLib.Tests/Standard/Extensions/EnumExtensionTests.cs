@@ -38,7 +38,6 @@ public class EnumExtensionTests
     }
 
     [TestMethod]
-    [DataRow(null)]
     [DataRow("")]
     [DataRow(" ")]
     [DataRow("male")]

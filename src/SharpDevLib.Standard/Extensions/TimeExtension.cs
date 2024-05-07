@@ -1,24 +1,22 @@
-using System;
-
 namespace SharpDevLib.Standard;
 
 /// <summary>
-/// time convert utils
+/// 时间扩展
 /// </summary>
 public static class TimeExtension
 {
 
     /// <summary>
-    /// utc start Time
+    /// UTC开始时间
     /// </summary>
     public static DateTime UtcStartTime = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     /// <summary>
-    /// convert a datetime to utc timestamp
+    /// 将时间转换为UTC时间戳
     /// </summary>
-    /// <param name="time">the time to covert</param>
-    /// <returns>utc timestamp</returns>
-    public static long ToUtcTimestamp(this DateTime time) => (long)((time.ToUniversalTime() - UtcStartTime).TotalMilliseconds);
+    /// <param name="time">时间</param>
+    /// <returns>UTC时间戳</returns>
+    public static long ToUtcTimestamp(this DateTime time) => (long)(time.ToUniversalTime() - UtcStartTime).TotalMilliseconds;
 
     /// <summary>
     /// convert a long timestamp to datetime
@@ -38,5 +36,5 @@ public static class TimeExtension
     /// <summary>
     /// convert a datetime to a format string
     /// </summary>
-    public static string ToTimeString(this DateTime time, string format = "yyyy-MM-dd HH:mm:ss") => time.ToString(format);
+    public static string ToTimeString(this DateTime time, string format = "yyyy-MM-dd HH:mm:ss") =>time.ToString(format);
 }

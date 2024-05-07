@@ -1,6 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Standard;
 using SharpDevLib.Tests.Data;
+using System;
+using System.Text.Json;
 
 namespace SharpDevLib.Tests.Standard.Extensions;
 
@@ -18,8 +20,6 @@ public class JsonExtensionTests
     [TestMethod]
     public void SerializeTest()
     {
-        Assert.AreEqual(string.Empty, ((User?)null).Serialize());
-
         var json = _user.Serialize();
         Assert.AreEqual(_json, json);
 
@@ -32,12 +32,18 @@ public class JsonExtensionTests
     [TestMethod]
     public void DeSerializeTest()
     {
-        Assert.AreEqual(null, ((string?)null).DeSerialize<User>());
-        Assert.AreEqual(null, "".DeSerialize<User>());
-        Assert.AreEqual(null, " ".DeSerialize<User>());
-
         Assert.AreEqual(_userString, _json.DeSerialize<User>()?.ToString());
         Assert.AreEqual(_userString, _formatedJson.DeSerialize<User>()?.ToString());
+    }
+
+    [TestMethod]
+    [DataRow(null)]
+    [DataRow("")]
+    [DataRow(" ")]
+    [ExpectedException(typeof(ArgumentNullException))]
+    public void DeSerializeExceptionTest(string json)
+    {
+        json.DeSerialize<User>();
     }
 
     [TestMethod]

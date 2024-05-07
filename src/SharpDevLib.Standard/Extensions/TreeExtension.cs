@@ -43,7 +43,7 @@ public static class TreeExtension
         return parents;
     }
 
-    private static void AddChildren<T>(this T current, List<T> source) where T : class, ITreeNode<T>
+    static void AddChildren<T>(this T current, List<T> source) where T : class, ITreeNode<T>
     {
         current.Children ??= new List<T>();
         current.Children.Clear();

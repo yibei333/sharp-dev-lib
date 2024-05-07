@@ -14,11 +14,7 @@ public static class JsonUtil
     /// </summary>
     /// <param name="obj">object to serialize</param>
     /// <returns>json</returns>
-    public static string Serialize(this object? obj)
-    {
-        if (obj.IsNull()) return string.Empty;
-        return JsonConvert.SerializeObject(obj, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
-    }
+    public static string Serialize(this object obj) => JsonConvert.SerializeObject(obj, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
 
     /// <summary>
     /// deserialize a json to object

@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Standard;
 using SharpDevLib.Tests.Data;
-using System;
 
 namespace SharpDevLib.Tests.Standard.Extensions;
 
@@ -14,17 +13,8 @@ public class CloneExtensionTests
     [TestMethod]
     public void CloneTest()
     {
-        Assert.IsNull(((User?)null).DeepClone(false));
-
         var obj = _user.DeepClone();
         Assert.AreNotEqual(obj, _user);
         Assert.AreEqual(_userString, obj?.ToString());
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
-    public void CloneExceptionTest()
-    {
-        ((User?)null).DeepClone(true);
     }
 }
