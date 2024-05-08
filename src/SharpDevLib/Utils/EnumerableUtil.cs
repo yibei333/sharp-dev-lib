@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace SharpDevLib;
+﻿namespace SharpDevLib;
 
 /// <summary>
 /// enumerable util
@@ -14,8 +11,9 @@ public static class EnumerableUtil
     /// <typeparam name="T">enumerable type</typeparam>
     /// <param name="source">enumerable value</param>
     /// <returns>distincted value</returns>
-    public static IEnumerable<T> DistinctObject<T>(this IEnumerable<T>? source) where T : class {
-        if(source.IsEmpty()) return Enumerable.Empty<T>();
+    public static IEnumerable<T> DistinctObject<T>(this IEnumerable<T>? source) where T : class
+    {
+        if (source.IsEmpty()) return Enumerable.Empty<T>();
         return source.Distinct(new ObjectValueComparer<T>());
     }
 }

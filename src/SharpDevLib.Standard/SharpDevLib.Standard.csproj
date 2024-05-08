@@ -4,7 +4,7 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<LangVersion>10.0</LangVersion>
+		<LangVersion>11.0</LangVersion>
 		<Authors>yibei333</Authors>
 		<Description>c sharp development commonly used libarary with netstandard</Description>
 		<Copyright>yibei333</Copyright>

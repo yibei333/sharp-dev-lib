@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace SharpDevLib;
 
@@ -16,7 +13,7 @@ public static class NullCheckUtil
     /// </summary>
     /// <param name="obj">object to check</param>
     /// <returns>indicate the object is null reference</returns>
-    public static bool IsNull([NotNullWhen(false)]this object? obj) => obj == null;
+    public static bool IsNull([NotNullWhen(false)] this object? obj) => obj == null;
 
     /// <summary>
     /// check a object is not null reference

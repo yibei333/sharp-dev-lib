@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib.Tests.Data;
-using System.Collections.Generic;
 using SharpDevLib.Standard;
-using System.Linq;
+using SharpDevLib.Tests.Data;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SharpDevLib.Tests.Standard.Extensions;
 

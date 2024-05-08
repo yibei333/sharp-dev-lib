@@ -1,8 +1,5 @@
 ﻿using SharpCompress.Common;
 using SharpCompress.Readers;
-using System;
-using System.Collections.Generic;
-using System.IO;
 
 namespace SharpDevLib;
 
@@ -19,7 +16,7 @@ public static class ZipUtil
     /// <param name="password">compress password</param>
     /// <param name="progress">compress progress</param>
     /// <exception cref="ArgumentNullException">if directory is nulll or empty</exception>
-    public static void Compress(this string directory,string targetFile,string? password=null,Action<int>? progress=null)
+    public static void Compress(this string directory, string targetFile, string? password = null, Action<int>? progress = null)
     {
         directory.EnsureDirectoryExist();
         new FileInfo(targetFile).Directory.FullName.EnsureDirectoryExist();

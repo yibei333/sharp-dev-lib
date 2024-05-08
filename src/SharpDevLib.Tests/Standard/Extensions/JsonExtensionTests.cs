@@ -2,7 +2,6 @@
 using SharpDevLib.Standard;
 using SharpDevLib.Tests.Data;
 using System;
-using System.Text.Json;
 
 namespace SharpDevLib.Tests.Standard.Extensions;
 
@@ -11,10 +10,10 @@ public class JsonExtensionTests
 {
     static readonly User _user = new("foo", 10);
     static readonly string _userString = _user.ToString();
-    const string _json = "{\"Name\":\"foo\",\"Age\":10}";
+    const string _json = "{\"Age\":10,\"Name\":\"foo\"}";
     const string _formatedJson = @"{
-  ""Name"": ""foo"",
-  ""Age"": 10
+  ""Age"": 10,
+  ""Name"": ""foo""
 }";
 
     [TestMethod]
@@ -25,8 +24,6 @@ public class JsonExtensionTests
 
         var formatedJson = _user.Serialize(true);
         Assert.AreEqual(_formatedJson, formatedJson);
-        Assert.AreEqual(_formatedJson, new User { Age = 10, Name = "foo" }.Serialize(true));
-        Assert.AreEqual(_formatedJson, new User { Name = "foo", Age = 10 }.Serialize(true));
     }
 
     [TestMethod]

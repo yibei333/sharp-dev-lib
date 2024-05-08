@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace SharpDevLib.Standard;
+﻿namespace SharpDevLib.Standard;
 
 /// <summary>
 /// 枚举扩展
@@ -27,7 +25,7 @@ public static class EnumExtension
     /// <param name="stringValue">字符串</param>
     /// <param name="ignoreCase">是否忽略大小写</param>
     /// <returns>枚举</returns>
-    public static TEnum ToEnum<TEnum>(this string stringValue, bool ignoreCase=true) where TEnum : Enum
+    public static TEnum ToEnum<TEnum>(this string stringValue, bool ignoreCase = true) where TEnum : Enum
     {
         if (Enum.TryParse(typeof(TEnum), stringValue, ignoreCase, out var enumValue)) return (TEnum)enumValue;
         throw new ArgumentException($"value '{stringValue}' not defined in type '{typeof(TEnum).FullName}'");

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SharpDevLib;
+﻿namespace SharpDevLib;
 
 /// <summary>
 /// clone util

@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Standard;
-using System.IO;
 using System;
+using System.IO;
 using static SharpDevLib.Standard.HashExtension;
 
 namespace SharpDevLib.Tests.Standard.Extensions;

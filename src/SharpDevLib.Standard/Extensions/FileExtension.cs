@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace SharpDevLib.Standard;
+﻿namespace SharpDevLib.Standard;
 
 /// <summary>
 /// 文件扩展
@@ -1121,4 +1119,41 @@ public static class FileExtension
     /// <param name="path">路径</param>
     /// <returns>格式化字符串</returns>
     public static string FormatPath(this string path) => path.Trim().Replace("\\", "/");
+
+    /// <summary>
+    /// 将文件转换base64格式字符串
+    /// </summary>
+    /// <param name="filePath">文件路径</param>
+    /// <returns>base64格式字符串</returns>
+    public static string FileBase64Encode(this string filePath)
+    {
+        filePath.EnsureFileExist();
+        var mime = filePath.GetMimeType();
+        var bytes = File.ReadAllBytes(filePath);
+        return $"data:{mime};base64,{Convert.ToBase64String(bytes)}";
+    }
+
+    /// <summary>
+    /// 将base64格式字符串转换为字节数组
+    /// </summary>
+    /// <param name="base64FileString">base64格式字符串</param>
+    /// <returns>字节数组</returns>
+    public static byte[] FileBase64Decode(this string base64FileString)
+    {
+        if (base64FileString.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(base64FileString));
+        var list = base64FileString.SplitToList(';');
+        if (list.Count <= 1 || !list[1].StartsWith("base64,")) throw new FormatException($"'{base64FileString}' is not a valid base64 file string");
+        var base64 = list[1].TrimStart("base64,");
+        return base64.Base64Decode();
+    }
+
+    /// <summary>
+    /// 如果文件存在则删除
+    /// </summary>
+    /// <param name="path">文件路径</param>
+    public static void RemoveFileIfExist(this string path)
+    {
+        if (path.IsNullOrWhiteSpace()) return;
+        if (File.Exists(path)) File.Delete(path);
+    }
 }
