@@ -16,7 +16,7 @@ public static class StringExtension
         if (source.IsNullOrWhiteSpace() || target.IsNullOrWhiteSpace()) return source.Trim();
         source = source.Trim();
         target = target.Trim();
-        if (source.StartsWith(target)) return source[target.Length..];
+        if (source.StartsWith(target)) return source.Substring(source.IndexOf(target) + target.Length);
         return source;
     }
 
@@ -31,7 +31,7 @@ public static class StringExtension
         if (source.IsNullOrWhiteSpace() || target.IsNullOrWhiteSpace()) return source.Trim();
         source = source.Trim();
         target = target.Trim();
-        if (source.EndsWith(target)) return source[..^target.Length];
+        if (source.EndsWith(target)) return source.Substring(0, source.IndexOf(target));
         return source;
     }
 

@@ -1039,7 +1039,7 @@ public static class FileExtension
             File.Delete(filePath);
         }
         using var stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-        stream.Write(bytes);
+        stream.Write(bytes, 0, bytes.Length);
         stream.Flush();
     }
 

@@ -226,7 +226,7 @@ public class TreeExtensionTests
         {
             IdPropertyName = idPropertyName,
             ParentIdPropertyName = parentIdPropertyName,
-            SortPropertyName = idPropertyName,
+            SortPropertyName = sortPropertyName,
             Descending = true
         };
         departments.BuildTree(option);
