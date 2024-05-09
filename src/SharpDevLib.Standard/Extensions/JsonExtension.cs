@@ -9,7 +9,7 @@ namespace SharpDevLib.Standard;
 /// </summary>
 public static class JsonExtension
 {
-    static AlphabeticalOrderContractResolver _propertyNameOrderResolver = new();
+    static readonly AlphabeticalOrderContractResolver _propertyNameOrderResolver = new();
 
     /// <summary>
     /// 序列化对象

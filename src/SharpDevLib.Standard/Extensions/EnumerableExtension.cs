@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Reflection;
 
 namespace SharpDevLib.Standard;
 
@@ -22,17 +23,8 @@ public static class EnumerableExtension
     /// <param name="query">query</param>
     /// <param name="sortPropertyName">排序属性名称</param>
     /// <param name="descending">是否降序</param>
-    /// <returns>IQueryable</returns>
-    public static IQueryable<T> OrderByDynamic<T>(this IQueryable<T> query, string sortPropertyName, bool descending = false) where T : class
-    {
-        var parameter = Expression.Parameter(typeof(T), "x");
-        string command = descending ? "OrderByDescending" : "OrderBy";
-        var property = typeof(T).GetProperty(sortPropertyName);
-        var propertyAccess = Expression.MakeMemberAccess(parameter, property);
-        var orderByExpression = Expression.Lambda(propertyAccess, parameter);
-        var resultExpression = Expression.Call(typeof(Queryable), command, new Type[] { typeof(T), property.PropertyType }, query.Expression, Expression.Quote(orderByExpression));
-        return query.Provider.CreateQuery<T>(resultExpression);
-    }
+    /// <returns>IEnumerable</returns>
+    public static IEnumerable<T> OrderByDynamic<T>(this IEnumerable<T> query, string sortPropertyName, bool descending = false) where T : class => query.AsQueryable().OrderByDynamic(typeof(T).GetProperty(sortPropertyName), descending).AsEnumerable();
 
     /// <summary>
     /// 根据属性名称排序
@@ -41,8 +33,20 @@ public static class EnumerableExtension
     /// <param name="query">query</param>
     /// <param name="sortPropertyName">排序属性名称</param>
     /// <param name="descending">是否降序</param>
-    /// <returns>IEnumerable</returns>
-    public static IEnumerable<T> OrderByDynamic<T>(this IEnumerable<T> query, string sortPropertyName, bool descending = false) where T : class=>query.AsQueryable().OrderByDynamic(sortPropertyName, descending).AsEnumerable();
+    /// <returns>IQueryable</returns>
+    public static IQueryable<T> OrderByDynamic<T>(this IQueryable<T> query, string sortPropertyName, bool descending = false) where T : class => query.OrderByDynamic(typeof(T).GetProperty(sortPropertyName), descending);
+
+    internal static IEnumerable<T> OrderByDynamic<T>(this IEnumerable<T> query, PropertyInfo sortProperty, bool descending = false) where T : class => query.AsQueryable().OrderByDynamic(sortProperty, descending).AsEnumerable();
+
+    internal static IQueryable<T> OrderByDynamic<T>(this IQueryable<T> query, PropertyInfo sortProperty, bool descending = false) where T : class
+    {
+        var parameter = Expression.Parameter(typeof(T), "x");
+        string command = descending ? "OrderByDescending" : "OrderBy";
+        var propertyAccess = Expression.MakeMemberAccess(parameter, sortProperty);
+        var orderByExpression = Expression.Lambda(propertyAccess, parameter);
+        var resultExpression = Expression.Call(typeof(Queryable), command, new Type[] { typeof(T), sortProperty.PropertyType }, query.Expression, orderByExpression);
+        return query.Provider.CreateQuery<T>(resultExpression);
+    }
 }
 
 internal class ObjectValueComparer<T> : IEqualityComparer<T?> where T : class

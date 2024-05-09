@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace SharpDevLib.Tests.Data;
+﻿namespace SharpDevLib.Tests.Data;
 
 public class User
 {
@@ -15,6 +13,6 @@ public class User
 
     public override string ToString()
     {
-        return $"name:{Name},age={Age}";
+        return $"name={Name},age={Age}";
     }
 }

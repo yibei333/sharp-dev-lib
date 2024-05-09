@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace SharpDevLib.Standard;
 
@@ -8,62 +9,51 @@ namespace SharpDevLib.Standard;
 /// <typeparam name="TMetaData">元数据类型</typeparam>
 public class TreeItem<TMetaData> where TMetaData : class
 {
-    TreeItem<TMetaData>? _parent;
-
-    internal TreeItem(TMetaData metaData, PropertyInfo idProperty, PropertyInfo parentIdProperty, PropertyInfo? orderProperty, bool descending)
+    [JsonConstructor]
+    internal TreeItem(TMetaData metaData, List<TreeItem<TMetaData>> children)
     {
         MetaData = metaData;
-        OrderProperty = orderProperty;
-        Descending = descending;
-        Id = idProperty.GetValue(metaData);
-        ParentId = idProperty.GetValue(parentIdProperty);
-        if (orderProperty is not null) OrderValue = idProperty.GetValue(orderProperty);
-        Descending = descending;
+        Children = children;
     }
 
-    internal object Id { get; }
-    internal object? ParentId { get; }
-    internal object? OrderValue { get; }
-    PropertyInfo? OrderProperty { get; }
-    bool Descending { get; }
+    internal TreeItem(TMetaData metaData, BuildTreeOption<TMetaData>? option)
+    {
+        MetaData = metaData;
+        if (option is not null) Option = option;
+
+        Id = ToStringValue(Option.IdProperty, metaData, true);
+        ParentId = ToStringValue(Option.ParentIdProperty, metaData);
+        if (Option.TreeItemSortProperty is not null) SortValue = Option.MetaDataSortProperty?.GetValue(metaData);
+    }
+
+    internal string? Id { get; }
+    internal string? ParentId { get; }
+    internal object? SortValue { get; }
+    internal BuildTreeOption<TMetaData> Option { get; } = new BuildTreeOption<TMetaData>();
 
     /// <summary>
     /// 元数据
     /// </summary>
+    [JsonPropertyOrder(0)]
     public TMetaData MetaData { get; }
 
     /// <summary>
     /// 父项
     /// </summary>
-    public TreeItem<TMetaData>? Parent
-    {
-        get => _parent;
-        set
-        {
-            _parent?.Children?.Remove(this);
-            _parent = value;
-            if (_parent is not null)
-            {
-                EnsureNotCycle(_parent);
-                _parent.Children ??= new List<TreeItem<TMetaData>>();
-                _parent.Children.Add(this);
-                if (OrderProperty is not null)
-                {
-                    _parent.Children.OrderByDynamic("OrderValue", Descending);
-                }
-            }
-        }
-    }
+    [JsonIgnore]
+    public TreeItem<TMetaData>? Parent { get; private set; }
 
     /// <summary>
     /// 层级
     /// </summary>
+    [JsonPropertyOrder(1)]
     public int Level => (Parent?.Level ?? 0) + 1;
 
     /// <summary>
     /// 子项
     /// </summary>
-    public List<TreeItem<TMetaData>>? Children { get; private set; }
+    [JsonPropertyOrder(2)]
+    public List<TreeItem<TMetaData>> Children { get; internal set; } = new();
 
     /// <summary>
     /// 转换为元数据集合
@@ -87,10 +77,45 @@ public class TreeItem<TMetaData> where TMetaData : class
         return list;
     }
 
+    /// <summary>
+    /// 设置父项
+    /// </summary>
+    /// <param name="parent">父项</param>
+    public void SetParent(TreeItem<TMetaData> parent) => SetParent(parent, true);
+
+    string? ToStringValue(PropertyInfo propertyInfo, TMetaData metaData, bool required = false)
+    {
+        var data = propertyInfo.GetValue(metaData);
+        string? result = null;
+        if (data is not null)
+        {
+            if (propertyInfo.PropertyType.IsClass)
+            {
+                if (propertyInfo.PropertyType == typeof(string)) result = data.ToString();
+                else result = data.Serialize();
+            }
+            else result = data.ToString();
+        }
+        if (result.IsNullOrWhiteSpace() && required) throw new NullReferenceException($"property '{propertyInfo.Name}' should not be null or empty");
+        return result;
+    }
+
+    internal void SetParent(TreeItem<TMetaData> parent, bool sort)
+    {
+        Parent?.Children?.Remove(this);
+        Parent = parent;
+        if (Parent is not null)
+        {
+            EnsureNotCycle(Parent);
+            Parent.Children.Add(this);
+            if (sort) Parent.Children = Parent.Children.SortTree();
+        }
+    }
+
     void EnsureNotCycle(TreeItem<TMetaData> parent)
     {
         var current = parent;
-        var ids = new List<object> { Id };
+        var ids = new List<object?> { Id };
         while (current is not null)
         {
             ids.Add(current.Id);
@@ -104,6 +129,75 @@ public class TreeItem<TMetaData> where TMetaData : class
 }
 
 /// <summary>
+/// 构建属性结构选项
+/// </summary>
+public class BuildTreeOption<TMetaData> where TMetaData : class
+{
+    string _sortPropertyName = string.Empty;
+    readonly Type _type = typeof(TMetaData);
+    readonly Dictionary<string, PropertyInfo> _cache = new();
+
+    /// <summary>
+    /// Id属性名称
+    /// </summary>
+    public string IdPropertyName { get; set; } = "Id";
+
+    /// <summary>
+    /// 父Id属性名称
+    /// </summary>
+    public string ParentIdPropertyName { get; set; } = "ParentId";
+
+    /// <summary>
+    /// 排序属性名称
+    /// </summary>
+    public string SortPropertyName
+    {
+        get => _sortPropertyName;
+        set
+        {
+            _sortPropertyName = value;
+            if (_sortPropertyName.NotNullOrWhiteSpace())
+            {
+                MetaDataSortProperty = (_type.GetProperty(_sortPropertyName) ?? throw new ArgumentException($"unable to find property '{_sortPropertyName}' of type '{_type.FullName}'"));
+                TreeItemSortProperty = typeof(TreeItem<TMetaData>).GetProperty(nameof(TreeItem<TMetaData>.SortValue), BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 是否降序
+    /// </summary>
+    public bool Descending { get; set; }
+
+    internal PropertyInfo IdProperty
+    {
+        get
+        {
+            if (_cache.ContainsKey(IdPropertyName)) return _cache[IdPropertyName];
+
+            if (IdPropertyName.IsNullOrWhiteSpace()) throw new NullReferenceException($"id property name required");
+            var property = (_type.GetProperty(IdPropertyName) ?? throw new ArgumentException($"unable to find property '{IdPropertyName}' of type '{_type.FullName}'"));
+            _cache[IdPropertyName] = property;
+            return property;
+        }
+    }
+    internal PropertyInfo ParentIdProperty
+    {
+        get
+        {
+            if (_cache.ContainsKey(ParentIdPropertyName)) return _cache[ParentIdPropertyName];
+
+            if (ParentIdPropertyName.IsNullOrWhiteSpace()) throw new NullReferenceException($"parent id property name required");
+            var property = (_type.GetProperty(ParentIdPropertyName) ?? throw new ArgumentException($"unable to find property '{ParentIdPropertyName}' of type '{_type.FullName}'"));
+            _cache[ParentIdPropertyName] = property;
+            return property;
+        }
+    }
+    internal PropertyInfo? MetaDataSortProperty { get; private set; }
+    internal PropertyInfo? TreeItemSortProperty { get; private set; }
+}
+
+/// <summary>
 /// 树形结构扩展
 /// </summary>
 public static class TreeExtension
@@ -113,29 +207,31 @@ public static class TreeExtension
     /// </summary>
     /// <typeparam name="TMetaData">元数据类型</typeparam>
     /// <param name="items">集合</param>
-    /// <param name="idPropertyName">Id属性名称</param>
-    /// <param name="parentIdPropertyName">父Id属性名称</param>
-    /// <param name="orderPropertyName">排序属性名称</param>
-    /// <param name="descending">是否降序</param>
+    /// <param name="option">选项</param>
     /// <returns>树形结构集合</returns>
-    public static List<TreeItem<TMetaData>> BuildTree<TMetaData>(this IEnumerable<TMetaData> items, string idPropertyName = "Id", string parentIdPropertyName = "ParentId", string orderPropertyName = "", bool descending = false) where TMetaData : class
+    public static List<TreeItem<TMetaData>> BuildTree<TMetaData>(this IEnumerable<TMetaData> items, BuildTreeOption<TMetaData>? option = null) where TMetaData : class
     {
-        var type = typeof(TMetaData);
-        PropertyInfo idProperty = type.GetProperty(idPropertyName) ?? throw new ArgumentException($"unable to find property '{idPropertyName}' of type '{type.FullName}'");
-        PropertyInfo parentIdProperty = type.GetProperty(parentIdPropertyName) ?? throw new ArgumentException($"unable to find property '{parentIdPropertyName}' of type '{type.FullName}'");
-        PropertyInfo? orderProperty = orderPropertyName.IsNullOrWhiteSpace() ? null : (type.GetProperty(parentIdPropertyName) ?? throw new ArgumentException($"unable to find property '{parentIdPropertyName}' of type '{type.FullName}'"));
-        var list = items.Select(x => new TreeItem<TMetaData>(x, idProperty, parentIdProperty, orderProperty, descending));
+        var list = items.Select(x => new TreeItem<TMetaData>(x, option)).ToList();
         var repeated = list.GroupBy(x => x.Id).Where(x => x.Count() > 1).Select(x => x.Key).ToList();
-        if (repeated.Any()) throw new InvalidDataException($"repeat id detected:'{(string.Join(",", list))}'");
+        if (repeated.Any()) throw new InvalidDataException($"repeat id detected:'{(string.Join(",", repeated))}'");
         foreach (var item in list)
         {
-            if (item.ParentId is not null)
-            {
-                var parentItem = list.FirstOrDefault(x => x.Id == item.ParentId);
-                item.Parent = parentItem;
-            }
+            if (item.ParentId is not null) item.SetParent(list.FirstOrDefault(x => x.Id == item.ParentId), false);
         }
-        return list.Where(x => x.Parent is null).ToList();
+        return list.Where(x => x.Parent is null).ToList().SortTree();
+    }
+
+    /// <summary>
+    /// 反序列化json为树形结构集合
+    /// </summary>
+    /// <typeparam name="TMetaData">元数据类型</typeparam>
+    /// <param name="treeJson">json</param>
+    /// <param name="option">选项</param>
+    /// <returns>树形结构集合</returns>
+    public static List<TreeItem<TMetaData>> DeSerializeTree<TMetaData>(this string treeJson, BuildTreeOption<TMetaData>? option = null) where TMetaData : class
+    {
+        var items = treeJson.DeSerialize<List<TreeItem<TMetaData>>>();
+        return items.ToMetaDataList().BuildTree(option);
     }
 
     /// <summary>
@@ -158,5 +254,14 @@ public static class TreeExtension
     public static List<TreeItem<TMetaData>> ToFlatList<TMetaData>(this List<TreeItem<TMetaData>> tree) where TMetaData : class
     {
         return tree.SelectMany(x => x.ToFlatList()).ToList();
+    }
+
+    internal static List<TreeItem<TMetaData>> SortTree<TMetaData>(this List<TreeItem<TMetaData>> items) where TMetaData : class
+    {
+        items.ForEach(child => child.Children = child.Children.SortTree());
+        if (items.Count <= 1) return items;
+        var firstItem = items.FirstOrDefault();
+        if (firstItem.Option.TreeItemSortProperty is null) return items;
+        return items.OrderByDynamic(firstItem.Option.TreeItemSortProperty, firstItem.Option.Descending).ToList();
     }
 }
