@@ -3,11 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDevLib", "SharpDevLib\SharpDevLib.csproj", "{A61B88D7-EF59-4211-AD93-B36474FF44E4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDevLib.Tests", "SharpDevLib.Tests\SharpDevLib.Tests.csproj", "{79936E1A-EAB7-4869-8185-7DB9488CD640}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpDevLib.Standard", "SharpDevLib.Standard\SharpDevLib.Standard.csproj", "{136328EC-1415-4FB5-A3F7-1EFC8AE21F94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDevLib.Standard", "SharpDevLib.Standard\SharpDevLib.Standard.csproj", "{136328EC-1415-4FB5-A3F7-1EFC8AE21F94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A61B88D7-EF59-4211-AD93-B36474FF44E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A61B88D7-EF59-4211-AD93-B36474FF44E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A61B88D7-EF59-4211-AD93-B36474FF44E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A61B88D7-EF59-4211-AD93-B36474FF44E4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{79936E1A-EAB7-4869-8185-7DB9488CD640}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{79936E1A-EAB7-4869-8185-7DB9488CD640}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79936E1A-EAB7-4869-8185-7DB9488CD640}.Release|Any CPU.ActiveCfg = Release|Any CPU
