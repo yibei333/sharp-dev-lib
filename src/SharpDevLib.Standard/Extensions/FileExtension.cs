@@ -1111,7 +1111,7 @@ public static class FileExtension
     /// <param name="leftPath">左边路径</param>
     /// <param name="rightPath">右边路径</param>
     /// <returns>路径</returns>
-    public static string CombinePath(this string leftPath, string rightPath) => Path.Combine(leftPath.Trim(), rightPath.Trim()).FormatPath();
+    public static string CombinePath(this string leftPath, string rightPath) => Path.Combine(leftPath.Trim(), rightPath.Trim().TrimStart('/').TrimStart('\\')).FormatPath();
 
     /// <summary>
     /// 格式化路径
