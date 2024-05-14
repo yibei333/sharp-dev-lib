@@ -1156,4 +1156,15 @@ public static class FileExtension
         if (path.IsNullOrWhiteSpace()) return;
         if (File.Exists(path)) File.Delete(path);
     }
+
+    /// <summary>
+    /// 打开或创建文件流
+    /// </summary>
+    /// <param name="fileInfo">文件信息</param>
+    /// <returns>文件流</returns>
+    public static FileStream OpenOrCreate(this FileInfo fileInfo)
+    {
+        fileInfo.Directory.FullName.EnsureDirectoryExist();
+        return new FileStream(fileInfo.FullName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+    }
 }
