@@ -8,6 +8,6 @@ internal class SevenZipCompressHandler : CompressHandler
 
     public override Task HandleAsync()
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException(".7z is not supported yet");
     }
 }
