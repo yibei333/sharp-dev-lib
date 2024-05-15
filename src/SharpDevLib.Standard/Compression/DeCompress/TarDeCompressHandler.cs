@@ -1,4 +1,6 @@
-﻿namespace SharpDevLib.Standard.Compression.DeCompress;
+﻿using SharpCompress.Archives.Tar;
+
+namespace SharpDevLib.Standard.Compression.DeCompress;
 
 internal class TarDeCompressHandler : DeCompressHandler
 {
@@ -6,8 +8,11 @@ internal class TarDeCompressHandler : DeCompressHandler
     {
     }
 
-    public override Task HandleAsync()
+    protected override double GetUnCompressedSize(FileInfo fileInfo)
     {
-        throw new NotImplementedException();
+        var archive = TarArchive.Open(fileInfo);
+        var size = archive.TotalUncompressSize;
+        archive.Dispose();
+        return size;
     }
 }

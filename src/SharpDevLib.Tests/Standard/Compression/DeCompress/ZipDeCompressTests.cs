@@ -12,7 +12,10 @@ public class ZipDeCompressTests
     public void DeCompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/zip-decompress");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/zip.zip"), targetPath);
+        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/zip.zip"), targetPath)
+        {
+            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+        };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
         Assert.AreEqual("foo text", File.ReadAllText(targetPath.CombinePath("foo.txt")));

@@ -14,6 +14,7 @@ internal class SevenZipDeCompressHandler : DeCompressHandler
     public override async Task HandleAsync()
     {
         await Task.Yield();
+        Option.TargetPath.EnsureDirectoryExist();
         using var archive = SevenZipArchive.Open(Option.SourceFile, new ReaderOptions { Password = Option.Password });
         var progress = Option.OnProgress is null ? null : new CompressionProgressArgs<double> { Total = archive.TotalUncompressSize };
 

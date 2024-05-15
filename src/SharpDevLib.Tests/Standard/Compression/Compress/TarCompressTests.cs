@@ -7,12 +7,12 @@ using System.IO;
 namespace SharpDevLib.Tests.Standard.Compression.Compress;
 
 [TestClass]
-public class ZipCompressTests
+public class TarCompressTests
 {
     [TestMethod]
     public void CompressTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/zip-create.zip");
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/tar-create.tar");
         var option = new CompressOption(new List<string> { AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root") }, targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
@@ -23,9 +23,10 @@ public class ZipCompressTests
     }
 
     [TestMethod]
+    [ExpectedException(typeof(InvalidDataException))]
     public void CompressWithPasswordTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/zip-password-create.zip");
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/tar-password-create.tar");
         var option = new CompressOption(new List<string> { AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root") }, targetPath)
         {
             Password = "abc",
@@ -34,7 +35,5 @@ public class ZipCompressTests
             OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
         };
         option.CompressAsync().GetAwaiter().GetResult();
-        Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
     }
 }

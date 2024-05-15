@@ -12,7 +12,10 @@ public class SevenZipDeCompressTests
     public void DeCompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/sevenzip-decompress");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/sevenzip.7z"), targetPath);
+        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/sevenzip.7z"), targetPath)
+        {
+            OnProgress = (p) => Console.WriteLine(p.Serialize(true))
+        };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
         Assert.AreEqual("foo text", File.ReadAllText(targetPath.CombinePath("foo.txt")));
