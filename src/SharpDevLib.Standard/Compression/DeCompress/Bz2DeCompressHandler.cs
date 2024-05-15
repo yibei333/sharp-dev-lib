@@ -2,7 +2,7 @@
 
 internal class Bz2DeCompressHandler : DeCompressHandler
 {
-    public Bz2DeCompressHandler(CompressOption option) : base(option)
+    public Bz2DeCompressHandler(DeCompressOption option) : base(option)
     {
     }
 

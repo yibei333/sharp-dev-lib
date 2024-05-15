@@ -49,7 +49,7 @@ public class CompressOption
     /// <summary>
     /// 进度变化回调
     /// </summary>
-    public Action<CompressionProgressArgs>? OnProgress { get; set; }
+    public Action<CompressionProgressArgs<int>>? OnProgress { get; set; }
 
     /// <summary>
     /// 压缩文件格式

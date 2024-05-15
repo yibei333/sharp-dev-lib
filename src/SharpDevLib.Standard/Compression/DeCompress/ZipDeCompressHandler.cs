@@ -1,13 +1,18 @@
-﻿namespace SharpDevLib.Standard.Compression.DeCompress;
+﻿using SharpCompress.Archives.Zip;
+
+namespace SharpDevLib.Standard.Compression.DeCompress;
 
 internal class ZipDeCompressHandler : DeCompressHandler
 {
-    public ZipDeCompressHandler(CompressOption option) : base(option)
+    public ZipDeCompressHandler(DeCompressOption option) : base(option)
     {
     }
 
-    public override Task HandleAsync()
+    protected override double GetUnCompressedSize(FileInfo fileInfo)
     {
-        throw new NotImplementedException();
+        var archive = ZipArchive.Open(fileInfo);
+        var size = archive.TotalUncompressSize;
+        archive.Dispose();
+        return size;
     }
 }

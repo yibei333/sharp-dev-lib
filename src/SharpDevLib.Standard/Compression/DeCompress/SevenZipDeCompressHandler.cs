@@ -2,7 +2,7 @@
 
 internal class SevenZipDeCompressHandler : DeCompressHandler
 {
-    public SevenZipDeCompressHandler(CompressOption option) : base(option)
+    public SevenZipDeCompressHandler(DeCompressOption option) : base(option)
     {
     }
 

@@ -2,7 +2,7 @@
 
 internal class GzDeCompressHandler : DeCompressHandler
 {
-    public GzDeCompressHandler(CompressOption option) : base(option)
+    public GzDeCompressHandler(DeCompressOption option) : base(option)
     {
     }
 

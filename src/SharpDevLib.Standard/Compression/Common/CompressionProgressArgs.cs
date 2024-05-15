@@ -3,41 +3,41 @@
 /// <summary>
 /// 压缩/解压进度参数
 /// </summary>
-public class CompressionProgressArgs
+public class CompressionProgressArgs<T> where T : struct
 {
-    /// <summary>
-    /// 实例化参数
-    /// </summary>
-    /// <param name="currentName">当前处理的文件名称</param>
-    /// <param name="totalCount">总数</param>
-    /// <param name="handledCount">已处理的数量</param>
-    public CompressionProgressArgs(string currentName, int totalCount, int handledCount)
+    internal CompressionProgressArgs()
     {
-        CurrentName = currentName;
-        TotalCount = totalCount;
-        HandledCount = handledCount;
-    }
 
+    }
 
     /// <summary>
     /// 当前处理的文件名称
     /// </summary>
-    public string CurrentName { get; }
+    public string? CurrentName { get; internal set; }
 
     /// <summary>
-    /// 总数
+    /// 总数(int为文件个数,double为字节个数)
     /// </summary>
-    public int TotalCount { get; }
+    public T Total { get; internal set; }
 
     /// <summary>
-    /// 已处理的数量
+    /// 已处理的数量(int为文件个数,double为字节个数)
     /// </summary>
-    public int HandledCount { get; }
+    public T Handled { get; internal set; }
 
     /// <summary>
     /// 进度(%)
     /// </summary>
-    public double Progress => TotalCount <= 0 ? 0 : Math.Round(HandledCount * 1.0 / TotalCount * 100, 2);
+    public double Progress
+    {
+        get
+        {
+            var total = (double)Convert.ChangeType(Total, typeof(double));
+            if (total <= 0) return 0;
+            var handled = (double)Convert.ChangeType(Handled, typeof(double));
+            return Math.Round(handled * 1.0 / total * 100, 2);
+        }
+    }
 
     /// <summary>
     /// 进度字符串(加了%)

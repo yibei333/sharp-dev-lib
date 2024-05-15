@@ -1165,6 +1165,8 @@ public static class FileExtension
     public static FileStream OpenOrCreate(this FileInfo fileInfo)
     {
         fileInfo.Directory.FullName.EnsureDirectoryExist();
-        return new FileStream(fileInfo.FullName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        var stream = new FileStream(fileInfo.FullName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        if (stream.CanSeek) stream.Seek(0, SeekOrigin.Begin);
+        return stream;
     }
 }

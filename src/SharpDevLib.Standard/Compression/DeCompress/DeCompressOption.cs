@@ -32,11 +32,6 @@ public class DeCompressOption
     public string? Password { get; set; }
 
     /// <summary>
-    /// 压缩级别
-    /// </summary>
-    public CompressionLevel Level { get; set; } = CompressionLevel.Normal;
-
-    /// <summary>
     /// CancellationToken
     /// </summary>
     public CancellationToken CancellationToken { get; set; } = Statics.CancellationToken;
@@ -44,10 +39,10 @@ public class DeCompressOption
     /// <summary>
     /// 进度变化回调
     /// </summary>
-    public Action<CompressionProgressArgs>? OnProgress { get; set; }
+    public Action<CompressionProgressArgs<double>>? OnProgress { get; set; }
 
     /// <summary>
     /// 压缩文件格式
     /// </summary>
-    public CompressionFormat Format => TargetPath.GetFormatByName();
+    public CompressionFormat Format => new FileInfo(SourceFile).GetFormatByFileInfo(Password);
 }

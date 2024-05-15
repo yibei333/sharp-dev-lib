@@ -2,7 +2,7 @@
 
 internal class TarDeCompressHandler : DeCompressHandler
 {
-    public TarDeCompressHandler(CompressOption option) : base(option)
+    public TarDeCompressHandler(DeCompressOption option) : base(option)
     {
     }
 

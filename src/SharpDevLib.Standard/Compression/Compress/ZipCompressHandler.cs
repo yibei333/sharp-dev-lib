@@ -21,6 +21,7 @@ internal class ZipCompressHandler : CompressHandler
         outputStream.SetLevel(Option.Level.ConvertToSharpZipLibLevel());
 
         var count = 0;
+        var progress = Option.OnProgress is null ? null : new CompressionProgressArgs<int> { Total = entries.Count };
         foreach (var entry in entries)
         {
             if (Option.CancellationToken.IsCancellationRequested) break;
@@ -28,7 +29,12 @@ internal class ZipCompressHandler : CompressHandler
             using var entryStream = entry.FileInfo.OpenRead();
             await entryStream.CopyToAsync(outputStream, Statics.BufferSize, Option.CancellationToken);
             count++;
-            Option.OnProgress?.Invoke(new CompressionProgressArgs(entry.FileInfo.FullName, entries.Count, count));
+            if (Option.OnProgress is not null)
+            {
+                progress!.CurrentName = entry.FileInfo.FullName;
+                progress.Handled = count;
+                Option.OnProgress?.Invoke(progress);
+            }
         }
 
         if (Option.CancellationToken.IsCancellationRequested) throw new OperationCanceledException(Option.CancellationToken);
