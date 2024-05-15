@@ -10,7 +10,7 @@ internal class ZipCompressHandler : CompressHandler<ZipOutputStream, ZipEntry>
 
     public override bool SupportPassword => true;
 
-    public override ZipEntry CreateEntry(string key, string path) => new(path);
+    public override ZipEntry CreateEntry(string key, string path) => new(key);
 
     public override ZipOutputStream CreateStream(Stream sourceStream)
     {

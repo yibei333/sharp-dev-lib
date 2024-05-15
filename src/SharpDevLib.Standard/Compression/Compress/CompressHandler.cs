@@ -29,24 +29,23 @@ internal abstract class CompressHandler<TOutputStream, TEntry> : CompressHandler
     {
         if (Option.SourcePaths.IsNullOrEmpty()) throw new InvalidOperationException("source path required");
         if (!SupportPassword && Option.Password.NotNullOrWhiteSpace()) throw new InvalidDataException("password not supported");
+        Option.TargetPath.RemoveFileIfExist();
 
         var entries = GetEntries();
         using var stream = new FileInfo(Option.TargetPath).OpenOrCreate();
         using var outputStream = CreateStream(stream);
 
-        var count = 0;
-        var progress = Option.OnProgress is null ? null : new CompressionProgressArgs<int> { Total = entries.Count };
+        var progress = Option.OnProgress is null ? null : new CompressionProgressArgs { Total = entries.Sum(x => x.FileInfo.Length) };
         foreach (var entry in entries)
         {
             if (Option.CancellationToken.IsCancellationRequested) break;
             PutNextEntry(outputStream, entry.Entry);
             using var entryStream = entry.FileInfo.OpenRead();
             await entryStream.CopyToAsync(outputStream, Statics.BufferSize, Option.CancellationToken);
-            count++;
             if (Option.OnProgress is not null)
             {
                 progress!.CurrentName = entry.FileInfo.FullName;
-                progress.Handled = count;
+                progress.Handled += entry.FileInfo.Length;
                 Option.OnProgress?.Invoke(progress);
             }
         }

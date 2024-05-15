@@ -39,7 +39,7 @@ public class DeCompressOption
     /// <summary>
     /// 进度变化回调
     /// </summary>
-    public Action<CompressionProgressArgs<double>>? OnProgress { get; set; }
+    public Action<CompressionProgressArgs>? OnProgress { get; set; }
 
     /// <summary>
     /// 压缩文件格式

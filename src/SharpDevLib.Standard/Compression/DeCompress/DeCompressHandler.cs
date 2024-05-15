@@ -22,7 +22,7 @@ internal abstract class DeCompressHandler
         var totalSize = GetUnCompressedSize(fileInfo);
         using var sourceStream = fileInfo.OpenOrCreate();
         using var reader = ReaderFactory.Open(sourceStream, new ReaderOptions { Password = Option.Password });
-        var progress = Option.OnProgress is null ? null : new CompressionProgressArgs<double> { Total = totalSize };
+        var progress = Option.OnProgress is null ? null : new CompressionProgressArgs { Total = totalSize };
 
         while (reader.MoveToNextEntry())
         {
