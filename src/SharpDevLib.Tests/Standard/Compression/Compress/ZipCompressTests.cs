@@ -10,7 +10,7 @@ namespace SharpDevLib.Tests.Standard.Compression.Compress;
 public class ZipCompressTests
 {
     [TestMethod]
-    public void ZipTest()
+    public void CompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/zip-create.zip");
         var option = new CompressOption(new List<string> { AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root") }, targetPath);
@@ -20,7 +20,7 @@ public class ZipCompressTests
     }
 
     [TestMethod]
-    public void ZipWithPasswordTest()
+    public void CompressWithPasswordTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/zip-password-create.zip");
         var option = new CompressOption(new List<string> { AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root") }, targetPath)

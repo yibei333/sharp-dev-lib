@@ -5,9 +5,4 @@ internal class RarDeCompressHandler : DeCompressHandler
     public RarDeCompressHandler(DeCompressOption option) : base(option)
     {
     }
-
-    public override Task HandleAsync()
-    {
-        throw new NotImplementedException();
-    }
 }

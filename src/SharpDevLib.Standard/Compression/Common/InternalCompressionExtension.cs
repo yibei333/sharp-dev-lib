@@ -1,11 +1,4 @@
-﻿using SharpCompress.Archives.GZip;
-using SharpCompress.Archives.Rar;
-using SharpCompress.Archives.SevenZip;
-using SharpCompress.Archives.Tar;
-using SharpCompress.Archives.Zip;
-using SharpCompress.Compressors.BZip2;
-using SharpCompress.Compressors.Xz;
-using SharpDevLib.Standard.Compression.Compress;
+﻿using SharpDevLib.Standard.Compression.Compress;
 using SharpDevLib.Standard.Compression.DeCompress;
 
 namespace SharpDevLib.Standard;
@@ -53,21 +46,6 @@ internal static class InternalCompressionExtension
         if (path.IsNullOrWhiteSpace()) return CompressionFormat.UnKnown;
         var extension = path.GetFileExtension();
         return SupportedFormats.TryGetValue(extension, out var format) ? format : throw new CompressionFormatNotSupportedException(extension);
-    }
-
-    internal static CompressionFormat GetFormatByFileInfo(this FileInfo fileInfo, string? password)
-    {
-        if (!fileInfo.Exists) throw new FileNotFoundException("file not found", fileInfo.FullName);
-        using var stream = fileInfo.OpenRead();
-
-        if (ZipArchive.IsZipFile(stream)) return CompressionFormat.Zip;
-        if (RarArchive.IsRarFile(stream)) return CompressionFormat.Rar;
-        if (SevenZipArchive.IsSevenZipFile(stream)) return CompressionFormat.SevenZip;
-        if (TarArchive.IsTarFile(stream)) return CompressionFormat.Tar;
-        if (GZipArchive.IsGZipFile(stream)) return CompressionFormat.Gz;
-        if (XZStream.IsXZStream(stream)) return CompressionFormat.Xz;
-        if (BZip2Stream.IsBZip2(stream)) return CompressionFormat.Bz2;
-        throw new CompressionFormatNotSupportedException(fileInfo.Extension);
     }
 
     internal static async Task InternalCompressAsync(this CompressOption option)

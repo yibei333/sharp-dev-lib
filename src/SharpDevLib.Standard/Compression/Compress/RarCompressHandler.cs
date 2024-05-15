@@ -8,6 +8,7 @@ internal class RarCompressHandler : CompressHandler
 
     public override Task HandleAsync()
     {
-        throw new NotImplementedException();
+
+        throw new NotSupportedException("rar format not supported yet");
     }
 }

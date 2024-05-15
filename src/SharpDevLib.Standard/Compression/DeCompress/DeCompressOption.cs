@@ -44,5 +44,5 @@ public class DeCompressOption
     /// <summary>
     /// 压缩文件格式
     /// </summary>
-    public CompressionFormat Format => new FileInfo(SourceFile).GetFormatByFileInfo(Password);
+    public CompressionFormat Format => SourceFile.GetFormatByName();
 }
