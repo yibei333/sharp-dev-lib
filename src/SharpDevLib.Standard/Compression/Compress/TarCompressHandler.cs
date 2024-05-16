@@ -11,19 +11,17 @@ internal class TarCompressHandler : CompressHandler<TarOutputStream, TarEntry>
 
     public override TarOutputStream CreateStream(Stream targetStream)
     {
-        return new TarOutputStream(targetStream, Encoding.ASCII);
+        return new TarOutputStream(targetStream, Encoding.ASCII) { IsStreamOwner = false };
     }
 
     public override async Task WriteNextEntryAsync(TarOutputStream outputStream, FilePathInfo pathInfo)
     {
-        var entry = TarEntry.CreateEntryFromFile(pathInfo.Path);
-        entry.Name = pathInfo.Name;
+        var entry = TarEntry.CreateTarEntry(pathInfo.SelfName);
+        entry.Name = pathInfo.Name.FormatPath();
+        entry.Size = pathInfo.Size;
+
         outputStream.PutNextEntry(entry);
-        using var sourceStream = new FileInfo(entry.File).OpenOrCreate();
-        await sourceStream.CopyToAsync(outputStream, Option.CancellationToken, (_, _, transfered) =>
-        {
-            Option.CurrentName = pathInfo.Path;
-            Option.Transfered += transfered;
-        });
+        await CopyStream(pathInfo, outputStream);
+        outputStream.CloseEntry();
     }
 }

@@ -8,7 +8,7 @@ public class CompressOption
     long _transfered;
     internal long Total { get; set; }
     internal CompressionProgressArgs? progress;
-    internal string CurrentName { get; set; }
+    internal string? CurrentName { get; set; }
     internal long Transfered
     {
         get => _transfered;

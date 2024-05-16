@@ -16,6 +16,7 @@ public class GzCompressTests
         var option = new CompressOption(new List<string> { AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root") }, targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+            IncludeSourceDiretory = true
         };
         option.CompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath));

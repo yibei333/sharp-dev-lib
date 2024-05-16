@@ -25,11 +25,7 @@ internal class ZipCompressHandler : CompressHandler<ZipOutputStream, ZipEntry>
     {
         var entry = new ZipEntry(pathInfo.Name);
         outputStream.PutNextEntry(entry);
-        using var sourceStream = new FileInfo(pathInfo.Path).OpenOrCreate();
-        await sourceStream.CopyToAsync(outputStream, Option.CancellationToken, (_, _, transfered) =>
-        {
-            Option.CurrentName = pathInfo.Path;
-            Option.Transfered += transfered;
-        });
+        await CopyStream(pathInfo, outputStream);
+        outputStream.CloseEntry();
     }
 }

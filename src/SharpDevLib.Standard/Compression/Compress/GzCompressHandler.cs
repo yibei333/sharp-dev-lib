@@ -15,42 +15,28 @@ internal class GzCompressHandler : CompressHandler
         Option.TargetPath.RemoveFileIfExist();
 
         var tempFileInfo = new FileInfo($"{Option.TargetPath}.temp.tar");
-        using var sourceStream = await CreateSourceStream(tempFileInfo);
-        using var outStream = new FileInfo(Option.TargetPath).OpenOrCreate();
-        using var zipStream = new GZipOutputStream(outStream);
-        zipStream.SetLevel(Option.Level.ConvertToSharpZipLibLevel());
+        var pathInfo = await CreateSourcePathInfo(tempFileInfo);
+        using var targetStream = new FileInfo(Option.TargetPath).OpenOrCreate();
+        using var zipOutStream = new GZipOutputStream(targetStream);
+        zipOutStream.SetLevel(Option.Level.ConvertToSharpZipLibLevel());
 
-        var buffer = new byte[Statics.BufferSize];
-        var length = 0;
-        sourceStream.Seek(0, SeekOrigin.Begin);
-        var progress = Option.OnProgress is null ? null : new CompressionProgressArgs { CurrentName = tempFileInfo.Exists ? tempFileInfo.FullName : Option.SourcePaths.First(), Total = sourceStream.Length };
-        while ((length = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
-        {
-            zipStream.Write(buffer, 0, length);
-            if (Option.OnProgress is not null)
-            {
-                progress!.Handled += length;
-                Option.OnProgress.Invoke(progress);
-            }
-        }
-        await outStream.FlushAsync(Option.CancellationToken);
+        await CopyStream(pathInfo, zipOutStream);
 
         if (tempFileInfo.Exists)
         {
-            sourceStream.Dispose();
             tempFileInfo.Delete();
         }
     }
 
-    async Task<Stream> CreateSourceStream(FileInfo tempFileInfo)
+    async Task<FilePathInfo> CreateSourcePathInfo(FileInfo tempFileInfo)
     {
         if (Option.SourcePaths.Count == 1)
         {
             var fileInfo = new FileInfo(Option.SourcePaths.First());
-            if (fileInfo.Exists) return fileInfo.OpenOrCreate();
+            if (fileInfo.Exists) return new FilePathInfo(fileInfo.FullName, fileInfo.Name, fileInfo.Name, fileInfo.Length);
         }
 
         await new CompressOption(Option.SourcePaths, tempFileInfo.FullName) { CancellationToken = Option.CancellationToken, IncludeSourceDiretory = Option.IncludeSourceDiretory }.CompressAsync();
-        return tempFileInfo.OpenOrCreate();
+        return new FilePathInfo(tempFileInfo.FullName, tempFileInfo.Name, tempFileInfo.Name, tempFileInfo.Length);
     }
 }

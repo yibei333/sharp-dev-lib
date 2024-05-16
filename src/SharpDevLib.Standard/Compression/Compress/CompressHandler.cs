@@ -12,6 +12,51 @@ internal abstract class CompressHandler
     public virtual bool SupportPassword { get; } = false;
 
     public abstract Task HandleAsync();
+
+    protected async Task CopyStream(FilePathInfo pathInfo, Stream outputStream)
+    {
+        using var sourceStream = new FileInfo(pathInfo.Path).OpenOrCreate();
+        await sourceStream.CopyToAsync(outputStream, Option.CancellationToken, (_, _, transfered) =>
+        {
+            Option.CurrentName = pathInfo.Path;
+            Option.Transfered += transfered;
+        });
+    }
+
+    protected List<FilePathInfo> GetPathList()
+    {
+        return Option.SourcePaths.SelectMany(path =>
+        {
+            string rootPath = string.Empty;
+            var directoryInfo = new DirectoryInfo(path);
+            if (directoryInfo.Exists)
+            {
+                rootPath = Option.IncludeSourceDiretory ? directoryInfo.Parent?.FullName ?? string.Empty : directoryInfo.FullName;
+            }
+            else
+            {
+                var fileInfo = new FileInfo(path);
+                rootPath = fileInfo.Directory.FullName;
+            }
+            return GetPathList(path, rootPath);
+        }).ToList();
+    }
+
+    List<FilePathInfo> GetPathList(string path, string rootPath)
+    {
+        var directoryInfo = new DirectoryInfo(path);
+        if (directoryInfo.Exists)
+        {
+            return directoryInfo.GetDirectories().Select(y => y.FullName).Concat(directoryInfo.GetFiles().Select(y => y.FullName)).SelectMany(x => GetPathList(x, rootPath)).ToList();
+        }
+        else
+        {
+            var fileInfo = new FileInfo(path);
+            if (!fileInfo.Exists) throw new FileNotFoundException("file not found", path);
+            var pathInfo = new FilePathInfo(path, path.TrimStart(rootPath).TrimStart("\\"), fileInfo.Name, fileInfo.Length);
+            return new List<FilePathInfo> { pathInfo };
+        }
+    }
 }
 
 internal abstract class CompressHandler<TOutputStream, TEntry> : CompressHandler where TOutputStream : Stream where TEntry : class
@@ -43,54 +88,21 @@ internal abstract class CompressHandler<TOutputStream, TEntry> : CompressHandler
         if (Option.CancellationToken.IsCancellationRequested) throw new OperationCanceledException(Option.CancellationToken);
         await outputStream.FlushAsync(Option.CancellationToken);
     }
-
-    List<FilePathInfo> GetPathList()
-    {
-        return Option.SourcePaths.SelectMany(path =>
-        {
-            string rootPath = string.Empty;
-            var directoryInfo = new DirectoryInfo(path);
-            if (directoryInfo.Exists)
-            {
-                rootPath = Option.IncludeSourceDiretory ? directoryInfo.Parent?.FullName ?? string.Empty : directoryInfo.FullName;
-            }
-            else
-            {
-                var fileInfo = new FileInfo(path);
-                rootPath = fileInfo.Directory.FullName;
-            }
-            return GetPathList(path, rootPath);
-        }).ToList();
-    }
-
-    List<FilePathInfo> GetPathList(string path, string rootPath)
-    {
-        var directoryInfo = new DirectoryInfo(path);
-        if (directoryInfo.Exists)
-        {
-            return directoryInfo.GetDirectories().Select(y => y.FullName).Concat(directoryInfo.GetFiles().Select(y => y.FullName)).SelectMany(x => GetPathList(x, rootPath)).ToList();
-        }
-        else
-        {
-            var fileInfo = new FileInfo(path);
-            if (!fileInfo.Exists) throw new FileNotFoundException("file not found", path);
-            var pathInfo = new FilePathInfo(path, path.TrimStart(rootPath), fileInfo.Length);
-            return new List<FilePathInfo> { pathInfo };
-        }
-    }
 }
 
 internal class FilePathInfo
 {
-    public FilePathInfo(string path, string name, long size)
+    public FilePathInfo(string path, string name, string selfName, long size)
     {
         Path = path;
         Name = name;
         Size = size;
+        SelfName = selfName;
     }
 
     public string Path { get; }
     public string Name { get; }
+    public string SelfName { get; }
     public long Size { get; }
 }
 
