@@ -28,7 +28,7 @@ public class ZipCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/zip-password-create.zip");
         var option = new CompressOption(new List<string> { AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root") }, targetPath)
         {
-            Password = "abc",
+            Password = "foobar",
             Level = CompressionLevel.MinimumSize,
             IncludeSourceDiretory = true,
             OnProgress = (p) => Console.WriteLine(p.Serialize(true)),

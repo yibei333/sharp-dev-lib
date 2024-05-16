@@ -10,8 +10,6 @@ internal class ZipCompressHandler : CompressHandler<ZipOutputStream, ZipEntry>
 
     public override bool SupportPassword => true;
 
-    public override ZipEntry CreateEntry(string key, string path) => new(key);
-
     public override ZipOutputStream CreateStream(Stream targetStream)
     {
         var outputStream = new ZipOutputStream(targetStream)
@@ -23,8 +21,15 @@ internal class ZipCompressHandler : CompressHandler<ZipOutputStream, ZipEntry>
         return outputStream;
     }
 
-    public override void PutNextEntry(ZipOutputStream outputStream, ZipEntry entry)
+    public override async Task WriteNextEntryAsync(ZipOutputStream outputStream, FilePathInfo pathInfo)
     {
+        var entry = new ZipEntry(pathInfo.Name);
         outputStream.PutNextEntry(entry);
+        using var sourceStream = new FileInfo(pathInfo.Path).OpenOrCreate();
+        await sourceStream.CopyToAsync(outputStream, Option.CancellationToken, (_, _, transfered) =>
+        {
+            Option.CurrentName = pathInfo.Path;
+            Option.Transfered += transfered;
+        });
     }
 }

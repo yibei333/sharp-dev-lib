@@ -5,6 +5,26 @@
 /// </summary>
 public class CompressOption
 {
+    long _transfered;
+    internal long Total { get; set; }
+    internal CompressionProgressArgs? progress;
+    internal string CurrentName { get; set; }
+    internal long Transfered
+    {
+        get => _transfered;
+        set
+        {
+            _transfered = value;
+            if (Total > 0 && OnProgress is not null)
+            {
+                progress ??= new CompressionProgressArgs { Total = Total };
+                progress.CurrentName = CurrentName;
+                progress.Handled = _transfered;
+                OnProgress.Invoke(progress);
+            }
+        }
+    }
+
     /// <summary>
     /// 实例化压缩选项
     /// </summary>

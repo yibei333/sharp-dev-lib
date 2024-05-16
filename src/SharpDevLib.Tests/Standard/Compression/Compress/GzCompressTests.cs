@@ -29,7 +29,7 @@ public class GzCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/gz-password-create.tar");
         var option = new CompressOption(new List<string> { AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root") }, targetPath)
         {
-            Password = "abc",
+            Password = "foobar",
             Level = CompressionLevel.MinimumSize,
             IncludeSourceDiretory = true,
             OnProgress = (p) => Console.WriteLine(p.Serialize(true)),

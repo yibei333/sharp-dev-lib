@@ -19,16 +19,9 @@ internal abstract class CompressHandler<TOutputStream, TEntry> : CompressHandler
     protected CompressHandler(CompressOption option) : base(option)
     { }
 
-    public abstract TEntry CreateEntry(string key, string path);
-
     public abstract TOutputStream CreateStream(Stream targetStream);
 
-    public abstract void PutNextEntry(TOutputStream outputStream, TEntry entry);
-
-    protected virtual async Task CopyEntryStreamToOutputStream(Stream entryStream, TOutputStream outputStream)
-    {
-        await entryStream.CopyToAsync(outputStream, Statics.BufferSize, Option.CancellationToken);
-    }
+    public abstract Task WriteNextEntryAsync(TOutputStream outputStream, FilePathInfo pathInfo);
 
     public override async Task HandleAsync()
     {
@@ -36,74 +29,69 @@ internal abstract class CompressHandler<TOutputStream, TEntry> : CompressHandler
         if (!SupportPassword && Option.Password.NotNullOrWhiteSpace()) throw new InvalidDataException("password not supported");
         Option.TargetPath.RemoveFileIfExist();
 
-        var entries = GetEntries();
+        var pathList = GetPathList();
         using var targetStream = new FileInfo(Option.TargetPath).OpenOrCreate();
         using var outputStream = CreateStream(targetStream);
+        Option.Total = pathList.Sum(x => x.Size);
 
-        var progress = Option.OnProgress is null ? null : new CompressionProgressArgs { Total = entries.Sum(x => x.FileInfo?.Length ?? 0) };
-        foreach (var entry in entries)
+        foreach (var path in pathList)
         {
             if (Option.CancellationToken.IsCancellationRequested) break;
-            PutNextEntry(outputStream, entry.Entry);
-            if (entry.FileInfo is not null)
-            {
-                using var entryStream = entry.FileInfo.OpenRead();
-                await CopyEntryStreamToOutputStream(entryStream, outputStream);
-                if (Option.OnProgress is not null)
-                {
-                    progress!.CurrentName = entry.FileInfo.FullName;
-                    progress.Handled += entry.FileInfo.Length;
-                    Option.OnProgress?.Invoke(progress);
-                }
-            }
+            await WriteNextEntryAsync(outputStream, path);
         }
 
         if (Option.CancellationToken.IsCancellationRequested) throw new OperationCanceledException(Option.CancellationToken);
         await outputStream.FlushAsync(Option.CancellationToken);
     }
 
-    List<EntryInfo<TEntry>> GetEntries()
+    List<FilePathInfo> GetPathList()
     {
-        var result = new List<EntryInfo<TEntry>>();
-        Option.SourcePaths.ForEach(x =>
+        return Option.SourcePaths.SelectMany(path =>
         {
-            var directoryInfo = new DirectoryInfo(x);
-            if (directoryInfo.Exists) result.AddRange(GetEntries(directoryInfo));
+            string rootPath = string.Empty;
+            var directoryInfo = new DirectoryInfo(path);
+            if (directoryInfo.Exists)
+            {
+                rootPath = Option.IncludeSourceDiretory ? directoryInfo.Parent?.FullName ?? string.Empty : directoryInfo.FullName;
+            }
             else
             {
-                var fileInfo = new FileInfo(x);
-                if (fileInfo.Exists) result.Add(GetEntry(fileInfo));
-                else throw new FileNotFoundException("file not found", x);
+                var fileInfo = new FileInfo(path);
+                rootPath = fileInfo.Directory.FullName;
             }
-        });
-        return result;
+            return GetPathList(path, rootPath);
+        }).ToList();
     }
 
-    List<EntryInfo<TEntry>> GetEntries(DirectoryInfo directoryInfo, string relative = "")
+    List<FilePathInfo> GetPathList(string path, string rootPath)
     {
-        var result = new List<EntryInfo<TEntry>>();
-        if (relative.IsNullOrWhiteSpace() && Option.IncludeSourceDiretory) relative = directoryInfo.Name;
-        foreach (var childDir in directoryInfo.GetDirectories()) result.AddRange(GetEntries(childDir, relative.CombinePath(childDir.Name)));
-        foreach (var childFile in directoryInfo.GetFiles()) result.Add(GetEntry(childFile, relative));
-        return result;
-    }
-
-    EntryInfo<TEntry> GetEntry(FileInfo file, string relative = "")
-    {
-        return new EntryInfo<TEntry>(file, CreateEntry(relative.CombinePath(file.Name), file.FullName));
+        var directoryInfo = new DirectoryInfo(path);
+        if (directoryInfo.Exists)
+        {
+            return directoryInfo.GetDirectories().Select(y => y.FullName).Concat(directoryInfo.GetFiles().Select(y => y.FullName)).SelectMany(x => GetPathList(x, rootPath)).ToList();
+        }
+        else
+        {
+            var fileInfo = new FileInfo(path);
+            if (!fileInfo.Exists) throw new FileNotFoundException("file not found", path);
+            var pathInfo = new FilePathInfo(path, path.TrimStart(rootPath), fileInfo.Length);
+            return new List<FilePathInfo> { pathInfo };
+        }
     }
 }
 
-internal class EntryInfo<TEntry> where TEntry : class
+internal class FilePathInfo
 {
-    public EntryInfo(FileInfo fileInfo, TEntry entry)
+    public FilePathInfo(string path, string name, long size)
     {
-        FileInfo = fileInfo;
-        Entry = entry;
+        Path = path;
+        Name = name;
+        Size = size;
     }
 
-    public FileInfo FileInfo { get; set; }
-    public TEntry Entry { get; set; }
+    public string Path { get; }
+    public string Name { get; }
+    public long Size { get; }
 }
 
 
