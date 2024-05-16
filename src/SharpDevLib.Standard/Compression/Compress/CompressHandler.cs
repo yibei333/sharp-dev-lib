@@ -21,9 +21,14 @@ internal abstract class CompressHandler<TOutputStream, TEntry> : CompressHandler
 
     public abstract TEntry CreateEntry(string key, string path);
 
-    public abstract TOutputStream CreateStream(Stream sourceStream);
+    public abstract TOutputStream CreateStream(Stream targetStream);
 
-    public abstract void PutNextEntry(TOutputStream stream, TEntry entry);
+    public abstract void PutNextEntry(TOutputStream outputStream, TEntry entry);
+
+    protected virtual async Task CopyEntryStreamToOutputStream(Stream entryStream, TOutputStream outputStream)
+    {
+        await entryStream.CopyToAsync(outputStream, Statics.BufferSize, Option.CancellationToken);
+    }
 
     public override async Task HandleAsync()
     {
@@ -32,21 +37,24 @@ internal abstract class CompressHandler<TOutputStream, TEntry> : CompressHandler
         Option.TargetPath.RemoveFileIfExist();
 
         var entries = GetEntries();
-        using var stream = new FileInfo(Option.TargetPath).OpenOrCreate();
-        using var outputStream = CreateStream(stream);
+        using var targetStream = new FileInfo(Option.TargetPath).OpenOrCreate();
+        using var outputStream = CreateStream(targetStream);
 
-        var progress = Option.OnProgress is null ? null : new CompressionProgressArgs { Total = entries.Sum(x => x.FileInfo.Length) };
+        var progress = Option.OnProgress is null ? null : new CompressionProgressArgs { Total = entries.Sum(x => x.FileInfo?.Length ?? 0) };
         foreach (var entry in entries)
         {
             if (Option.CancellationToken.IsCancellationRequested) break;
             PutNextEntry(outputStream, entry.Entry);
-            using var entryStream = entry.FileInfo.OpenRead();
-            await entryStream.CopyToAsync(outputStream, Statics.BufferSize, Option.CancellationToken);
-            if (Option.OnProgress is not null)
+            if (entry.FileInfo is not null)
             {
-                progress!.CurrentName = entry.FileInfo.FullName;
-                progress.Handled += entry.FileInfo.Length;
-                Option.OnProgress?.Invoke(progress);
+                using var entryStream = entry.FileInfo.OpenRead();
+                await CopyEntryStreamToOutputStream(entryStream, outputStream);
+                if (Option.OnProgress is not null)
+                {
+                    progress!.CurrentName = entry.FileInfo.FullName;
+                    progress.Handled += entry.FileInfo.Length;
+                    Option.OnProgress?.Invoke(progress);
+                }
             }
         }
 
@@ -73,9 +81,8 @@ internal abstract class CompressHandler<TOutputStream, TEntry> : CompressHandler
 
     List<EntryInfo<TEntry>> GetEntries(DirectoryInfo directoryInfo, string relative = "")
     {
-        if (relative.IsNullOrWhiteSpace() && Option.IncludeSourceDiretory) relative = directoryInfo.Name;
-
         var result = new List<EntryInfo<TEntry>>();
+        if (relative.IsNullOrWhiteSpace() && Option.IncludeSourceDiretory) relative = directoryInfo.Name;
         foreach (var childDir in directoryInfo.GetDirectories()) result.AddRange(GetEntries(childDir, relative.CombinePath(childDir.Name)));
         foreach (var childFile in directoryInfo.GetFiles()) result.Add(GetEntry(childFile, relative));
         return result;

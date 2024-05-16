@@ -12,9 +12,9 @@ internal class ZipCompressHandler : CompressHandler<ZipOutputStream, ZipEntry>
 
     public override ZipEntry CreateEntry(string key, string path) => new(key);
 
-    public override ZipOutputStream CreateStream(Stream sourceStream)
+    public override ZipOutputStream CreateStream(Stream targetStream)
     {
-        var outputStream = new ZipOutputStream(sourceStream)
+        var outputStream = new ZipOutputStream(targetStream)
         {
             Password = Option.Password,
             UseZip64 = UseZip64.Dynamic,
@@ -23,8 +23,8 @@ internal class ZipCompressHandler : CompressHandler<ZipOutputStream, ZipEntry>
         return outputStream;
     }
 
-    public override void PutNextEntry(ZipOutputStream stream, ZipEntry entry)
+    public override void PutNextEntry(ZipOutputStream outputStream, ZipEntry entry)
     {
-        stream.PutNextEntry(entry);
+        outputStream.PutNextEntry(entry);
     }
 }
