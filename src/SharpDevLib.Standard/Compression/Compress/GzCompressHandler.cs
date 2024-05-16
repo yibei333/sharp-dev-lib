@@ -14,10 +14,12 @@ internal class GzCompressHandler : CompressHandler
         if (Option.Password.NotNullOrWhiteSpace()) throw new InvalidDataException("password not supported");
         Option.TargetPath.RemoveFileIfExist();
 
-        var tempFileInfo = new FileInfo($"{Option.TargetPath}.temp.tar");
+        var targetFileInfo=new FileInfo(Option.TargetPath);
+        var tempFileInfo = new FileInfo($"{targetFileInfo.Name.TrimEnd(".tgz").TrimEnd(".tar.gz")}.tar");
         var pathInfo = await CreateSourcePathInfo(tempFileInfo);
+        Option.Total = pathInfo.Size;
         using var targetStream = new FileInfo(Option.TargetPath).OpenOrCreate();
-        using var zipOutStream = new GZipOutputStream(targetStream);
+        using var zipOutStream = new GZipOutputStream(targetStream) { FileName = pathInfo.Name };
         zipOutStream.SetLevel(Option.Level.ConvertToSharpZipLibLevel());
 
         await CopyStream(pathInfo, zipOutStream);
