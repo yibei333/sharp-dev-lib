@@ -2,6 +2,7 @@
 using SharpDevLib.Standard;
 using SharpDevLib.Tests.Data;
 using System;
+using System.Collections.Generic;
 
 namespace SharpDevLib.Tests.Standard.Extensions;
 
@@ -53,5 +54,18 @@ public class JsonExtensionTests
     public void CompressJsonTest()
     {
         Assert.AreEqual(_json, _formatedJson.CompressJson());
+    }
+
+    [TestMethod]
+    public void DictionarySerializeTest()
+    {
+        var dictionary = new Dictionary<string, string>
+        {
+            { "foo","foo value" },
+            { "bar","bar value" }
+        };
+        var actual = dictionary.Serialize();
+        var expected = "{\"foo\":\"foo value\",\"bar\":\"bar value\"}";
+        Assert.AreEqual(expected, actual);
     }
 }

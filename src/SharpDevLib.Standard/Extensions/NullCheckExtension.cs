@@ -34,7 +34,7 @@ public static class NullCheckExtension
     /// </summary>
     /// <param name="str">需要断言的字符串</param>
     /// <returns>字符串是否不为null且不为空白字符串</returns>
-    public static bool NotNullOrWhiteSpace([NotNullWhen(false)] this string? str) => !string.IsNullOrWhiteSpace(str);
+    public static bool NotNullOrWhiteSpace([NotNullWhen(true)] this string? str) => !string.IsNullOrWhiteSpace(str);
     #endregion
 
     #region guid
