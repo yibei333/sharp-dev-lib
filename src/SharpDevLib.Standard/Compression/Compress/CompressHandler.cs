@@ -16,7 +16,7 @@ internal abstract class CompressHandler
     protected async Task CopyStream(FilePathInfo pathInfo, Stream outputStream)
     {
         using var sourceStream = new FileInfo(pathInfo.Path).OpenOrCreate();
-        await sourceStream.CopyToAsync(outputStream, Option.CancellationToken, (_, _, transfered) =>
+        await sourceStream.CopyToAsync(outputStream, Option.CancellationToken, transfered =>
         {
             Option.CurrentName = pathInfo.Path;
             Option.Transfered += transfered;

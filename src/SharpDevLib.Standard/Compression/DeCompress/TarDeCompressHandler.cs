@@ -1,6 +1,4 @@
-﻿using SharpCompress.Archives.Tar;
-
-namespace SharpDevLib.Standard.Compression.DeCompress;
+﻿namespace SharpDevLib.Standard.Compression.DeCompress;
 
 internal class TarDeCompressHandler : DeCompressHandler
 {

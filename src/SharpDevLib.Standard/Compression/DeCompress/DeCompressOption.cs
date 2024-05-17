@@ -23,5 +23,5 @@ public class DeCompressOption : CompressionOption
     /// <summary>
     /// 解压文件格式
     /// </summary>
-    public CompressionFormat Format => SourceFile.GetFormatByName();
+    public CompressionFormat Format => SourceFile.GetDecompressFormat();
 }

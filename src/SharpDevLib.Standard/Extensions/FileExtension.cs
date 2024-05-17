@@ -1176,24 +1176,21 @@ public static class FileExtension
     /// <param name="source">原始流</param>
     /// <param name="target">目标流</param>
     /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="transfered">传输回调,第一个表示总数,第二个表示累加数,单个本次传输个数</param>
+    /// <param name="transfered">传输回调(本次传输字节数)</param>
     /// <returns>task</returns>
-    public static async Task CopyToAsync(this Stream source, Stream target, CancellationToken cancellationToken, Action<long, long, long>? transfered = null)
+    public static async Task CopyToAsync(this Stream source, Stream target, CancellationToken cancellationToken, Action<long>? transfered = null)
     {
         await Task.Yield();
         var buffer = new byte[Statics.BufferSize];
         int length;
-        long total = source.Length;
-        long handled = 0;
-        source.Seek(0, SeekOrigin.Begin);
+        if (source.CanSeek) source.Seek(0, SeekOrigin.Begin);
 
         while ((length = source.Read(buffer, 0, buffer.Length)) > 0)
         {
             if (cancellationToken.IsCancellationRequested) break;
             target.Write(buffer, 0, length);
 
-            handled += length;
-            transfered?.Invoke(total, handled, length);
+            transfered?.Invoke(length);
         }
     }
 }

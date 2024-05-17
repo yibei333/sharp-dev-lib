@@ -1,6 +1,4 @@
-﻿using SharpCompress.Archives.Zip;
-
-namespace SharpDevLib.Standard.Compression.DeCompress;
+﻿namespace SharpDevLib.Standard.Compression.DeCompress;
 
 internal class ZipDeCompressHandler : DeCompressHandler
 {

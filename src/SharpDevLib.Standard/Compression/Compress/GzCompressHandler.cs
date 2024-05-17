@@ -14,7 +14,7 @@ internal class GzCompressHandler : CompressHandler
         if (Option.Password.NotNullOrWhiteSpace()) throw new InvalidDataException("password not supported");
         Option.TargetPath.RemoveFileIfExist();
 
-        var targetFileInfo=new FileInfo(Option.TargetPath);
+        var targetFileInfo = new FileInfo(Option.TargetPath);
         var tempFileInfo = new FileInfo($"{targetFileInfo.Name.TrimEnd(".tgz").TrimEnd(".tar.gz")}.tar");
         var pathInfo = await CreateSourcePathInfo(tempFileInfo);
         Option.Total = pathInfo.Size;

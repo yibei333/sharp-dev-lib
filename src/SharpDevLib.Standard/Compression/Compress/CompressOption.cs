@@ -3,14 +3,14 @@
 /// <summary>
 /// 压缩选项
 /// </summary>
-public class CompressOption: CompressionOption
+public class CompressOption : CompressionOption
 {
     /// <summary>
     /// 实例化压缩选项
     /// </summary>
     /// <param name="sourcePaths">路径集合,可以是目录也可以是文件路径</param>
     /// <param name="targetPath">保存目标路径</param>
-    public CompressOption(List<string> sourcePaths, string targetPath):base(targetPath)
+    public CompressOption(List<string> sourcePaths, string targetPath) : base(targetPath)
     {
         SourcePaths = sourcePaths;
     }
@@ -33,5 +33,5 @@ public class CompressOption: CompressionOption
     /// <summary>
     /// 压缩文件格式
     /// </summary>
-    public CompressionFormat Format => TargetPath.GetFormatByName();
+    public CompressionFormat Format => TargetPath.GetComopressFormat();
 }

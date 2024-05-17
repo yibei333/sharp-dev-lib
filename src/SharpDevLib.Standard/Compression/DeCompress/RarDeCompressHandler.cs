@@ -1,7 +1,4 @@
-﻿
-using SharpCompress.Archives.Rar;
-
-namespace SharpDevLib.Standard.Compression.DeCompress;
+﻿namespace SharpDevLib.Standard.Compression.DeCompress;
 
 internal class RarDeCompressHandler : DeCompressHandler
 {
