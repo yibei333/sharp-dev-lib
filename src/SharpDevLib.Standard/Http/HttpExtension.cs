@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace SharpDevLib.Standard;
+﻿namespace SharpDevLib.Standard;
 
 /// <summary>
 /// http扩展
@@ -23,6 +21,11 @@ public static class HttpExtension
     //    return services;
     //}
 
+    /// <summary>
+    /// http get请求
+    /// </summary>
+    /// <param name="request">请求</param>
+    /// <returns>http响应</returns>
     public static async Task<HttpResponse> GetAsync(this HttpKeyValueRequest request)
     {
         return await new HttpService().GetAsync(request);

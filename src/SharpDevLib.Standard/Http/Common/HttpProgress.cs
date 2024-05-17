@@ -30,7 +30,7 @@ public class HttpProgress
             var time = now - (_lastTransferTime ?? now);
             _lastTransferTime = now;
             if (time.TotalMilliseconds <= 0) return;
-            var count = singleTransfered * 1000 / (long)time.TotalMilliseconds;
+            var count = (long)Math.Round(singleTransfered * 1000 / time.TotalMilliseconds, 2);
             Speed = $"{count.ToFileSizeString()}/S";
         }
     }
@@ -38,7 +38,7 @@ public class HttpProgress
     /// <summary>
     /// 进度(0-100)
     /// </summary>
-    public double Progress => Total <= 0 ? 0 : Math.Round(Transfered * 1.0 / Total, 2) * 100;
+    public double Progress => Total <= 0 ? 0 : Math.Round(Transfered * 100.0 / Total, 2);
 
     /// <summary>
     /// 进度字符串(带%)

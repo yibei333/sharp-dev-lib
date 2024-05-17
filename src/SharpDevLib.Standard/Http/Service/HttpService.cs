@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Handlers;
-using System.Net;
+﻿using System.Net;
 
 namespace SharpDevLib.Standard;
 
@@ -62,7 +61,7 @@ internal class HttpService : IHttpService
         using var client = CreateClient(request);
         var url = BuildGetUrl(request);
         var response = await client.GetAsync(url);
-        return new HttpResponse(url, response.IsSuccessStatusCode, response.StatusCode, null, null, null, 0, TimeSpan.FromSeconds(1));
+        return new HttpResponse(url, response.IsSuccessStatusCode, response.StatusCode, string.Empty, new(), new(), 0, TimeSpan.FromSeconds(1));
     }
 
     public Task<Stream> GetStreamAsync(HttpKeyValueRequest request)
