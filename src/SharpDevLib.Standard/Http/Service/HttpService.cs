@@ -1,4 +1,8 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SharpDevLib.Standard;
 
@@ -44,7 +48,7 @@ internal class HttpService : IHttpService
         {
             foreach (var header in request.Headers)
             {
-                if (!string.IsNullOrWhiteSpace(header.Value)) client.DefaultRequestHeaders.Add(header.Key, header.Value);
+                if (header.Value.NotNullOrEmpty()) client.DefaultRequestHeaders.Add(header.Key, header.Value);
             }
         }
         client.Timeout = request.TimeOut ?? HttpGlobalSettings.TimeOut ?? TimeSpan.FromDays(1);
@@ -60,8 +64,9 @@ internal class HttpService : IHttpService
     {
         using var client = CreateClient(request);
         var url = BuildGetUrl(request);
-        var response = await client.GetAsync(url);
-        return new HttpResponse(url, response.IsSuccessStatusCode, response.StatusCode, string.Empty, new(), new(), 0, TimeSpan.FromSeconds(1));
+        var responseMonitor = await Retry(client, () => new HttpRequestMessage(HttpMethod.Get, url), request, cancellationToken);
+        var response = await BuildResponse(url, responseMonitor);
+        return response;
     }
 
     public Task<Stream> GetStreamAsync(HttpKeyValueRequest request)
@@ -136,8 +141,122 @@ internal class HttpService : IHttpService
         var prefix = url.Contains("?") ? "&" : "?";
         return $"{url}{prefix}{string.Join("&", request.Parameters.Select(x => $"{x.Key}={x.Value}")).ToUtf8Bytes().UrlEncode()}";
     }
+
+    async Task<ResponseMonitor> Retry(HttpClient client, Func<HttpRequestMessage> requestMessageBuilder, HttpRequest request, CancellationToken? cancellationToken = null)
+    {
+        var retryCount = request.RetryCount ?? HttpGlobalSettings.RetryCount ?? 0;
+        var retryIndex = -1;
+        var totalStartTime = DateTime.Now;
+        HttpResponseMessage? response = null;
+        string? exceptionMessage = null;
+        TimeSpan last;
+        TimeSpan total = TimeSpan.Zero;
+
+        while (retryIndex < retryCount)
+        {
+            if (cancellationToken?.IsCancellationRequested ?? false) break;
+            var requestMessage = requestMessageBuilder();
+
+            var startTime = DateTime.Now;
+            retryIndex++;
+            try
+            {
+                response = await client.SendAsync(requestMessage, HttpCompletionOption.ResponseContentRead, cancellationToken ?? CancellationToken.None);
+                var endTime = DateTime.Now;
+                last = endTime - startTime;
+                total += last;
+
+                if (response is null || !response.IsSuccessStatusCode)
+                {
+                    continue;
+                }
+                return new ResponseMonitor(null, retryIndex, last, endTime - totalStartTime, response);
+            }
+            catch (Exception ex)
+            {
+                last = DateTime.Now - startTime;
+                total += last;
+                exceptionMessage = ex.Message;
+            }
+        };
+        return new ResponseMonitor(exceptionMessage, retryIndex, last, total, response);
+    }
+
+    private static async Task<HttpResponse> BuildResponse(string url, ResponseMonitor responseMonitor)
+    {
+        var response = await BuildResponse<string>(url, responseMonitor);
+        response.Data = null;
+        return response;
+    }
+
+    private static async Task<HttpResponse<T>> BuildResponse<T>(string url, ResponseMonitor responseMonitor)
+    {
+        if (responseMonitor.ResponseMessage is null) return new HttpResponse<T>(url, false, HttpStatusCode.ServiceUnavailable, responseMonitor.ExceptionMessage ?? "no response", default, responseMonitor.RetryCount, responseMonitor.LastTimeConsuming, responseMonitor.TotalTimeConsuming);
+
+        //set headers
+        Dictionary<string, IEnumerable<string>>? headers = null;
+        foreach (var header in responseMonitor.ResponseMessage.Headers)
+        {
+            headers ??= new();
+            headers.Add(header.Key, header.Value);
+        }
+
+        // set cookies
+        List<Cookie>? cookies = null;
+        if (headers.NotNullOrEmpty() && headers.TryGetValue("Set-Cookie", out var cookieValues))
+        {
+            var host = new Uri(url).Host;
+            foreach (var item in cookieValues)
+            {
+                cookies ??= new();
+                var cookie = item.ParseCookie(host);
+                if (cookie is not null) cookies.Add(cookie);
+            }
+        }
+
+        var content = responseMonitor.ResponseMessage.Content;
+        var responseText = content is null ? "empty response" : await content.ReadAsStringAsync();
+        T? data = default;
+
+        if (responseMonitor.ResponseMessage.IsSuccessStatusCode)
+        {
+            var type = typeof(T);
+            if (type.IsClass)
+            {
+                if (type == typeof(string)) data = (T)Convert.ChangeType(responseText, type);
+                else data = JsonSerializer.Deserialize<T>(responseText);
+            }
+            else
+            {
+                data = (T)Convert.ChangeType(responseText, type);
+            }
+        }
+
+        return new HttpResponse<T>(url, responseMonitor.ResponseMessage.IsSuccessStatusCode, responseMonitor.ResponseMessage.StatusCode, responseMonitor.ExceptionMessage ?? responseText, data, headers, cookies, responseMonitor.RetryCount, responseMonitor.LastTimeConsuming, responseMonitor.TotalTimeConsuming);
+    }
 }
 
+class ResponseMonitor
+{
+    public ResponseMonitor(string? exceptionMessage, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming, HttpResponseMessage? responseMessage)
+    {
+        ExceptionMessage = exceptionMessage;
+        RetryCount = retryCount;
+        LastTimeConsuming = lastTimeConsuming;
+        TotalTimeConsuming = totalTimeConsuming;
+        ResponseMessage = responseMessage;
+    }
+
+    public string? ExceptionMessage { get; }
+
+    public int RetryCount { get; }
+
+    public TimeSpan LastTimeConsuming { get; }
+
+    public TimeSpan TotalTimeConsuming { get; }
+
+    public HttpResponseMessage? ResponseMessage { get; }
+}
 
 #region old
 //using Microsoft.Extensions.DependencyInjection;
@@ -297,110 +416,5 @@ internal class HttpService : IHttpService
 //        return client;
 //    }
 
-//    private string BuildUrl(HttpRequest option)
-//    {
-//        if (option.Url.IsNull()) return string.Empty;
-//        if (Uri.IsWellFormedUriString(option.Url, UriKind.Absolute)) return option.Url!;
-//        if (_globalOptions.NotNull() && _globalOptions!.BaseUrl.NotNull()) return _globalOptions.BaseUrl.CombinePath(option.Url);
-//        return option.Url!;
-//    }
-
-//    private static string BuildGetUrl(string url, Dictionary<string, string>? parameters)
-//    {
-//        if (parameters!.IsEmpty()) return url;
-//        return $"{url}?{(string.Join("&", parameters.Select(x => $"{x.Key}={x.Value}")))}";
-//    }
-
-//    private async Task<HttpResult<T>> Retry<T>(HttpRequest option, Func<Task<HttpResponseMessage>> action)
-//    {
-//        var retryCount = option.RetryCount ?? _globalOptions?.RetryCount ?? 0;
-//        var index = 0;
-//        var startTime = DateTime.Now;
-//        HttpResponseMessage response = default!;
-//        string? exceptionMessage = null;
-//        do
-//        {
-//            try
-//            {
-//                response = await action.Invoke();
-//                if (!response.IsSuccessStatusCode)
-//                {
-//                    index++;
-//                    continue;
-//                }
-//                return await BuildResult<T>(option, response, index, DateTime.Now - startTime, null);
-//            }
-//            catch (Exception ex)
-//            {
-//                index++;
-//                exceptionMessage = ex.Message;
-//            }
-//        } while (index < retryCount);
-//        return await BuildResult<T>(option, response, index, DateTime.Now - startTime, exceptionMessage);
-//    }
-
-//    private static async Task<HttpResult<T>> BuildResult<T>(HttpRequest option, HttpResponseMessage response, int retryCount, TimeSpan timeConsuming, string? exceptionMessage)
-//    {
-//        if (option.Url.IsNull()) throw new ArgumentNullException(nameof(option.Url));
-//        var host = new Uri(option.Url).Host;
-//        if (response.IsNull()) return new HttpResult<T>(false, HttpStatusCode.ServiceUnavailable, exceptionMessage ?? "no response", default!, new Dictionary<string, string>(), null!, retryCount, timeConsuming);
-//        var cookies = (response.Headers.Contains("Set-Cookie") ? response.Headers.GetValues("Set-Cookie")?.SelectMany(x =>
-//        {
-//            if (CookieHeaderValue.TryParse(x, out var y))
-//            {
-//                return y.Cookies.Select(z => new Cookie(z.Name, z.Value, y.Path, host)).ToList();
-//            }
-//            return new List<Cookie>();
-//        }).Where(x => x.NotNull()).ToList() : null) ?? new List<Cookie>();
-
-//        var headers = new Dictionary<string, string>();
-//        foreach (var header in response.Headers)
-//        {
-//            headers.Add(header.Key, string.Join(";", header.Value));
-//        }
-
-//        var content = response.Content;
-//        if (content is null) return new HttpResult<T>(response.IsSuccessStatusCode, response.StatusCode, "empty response", default!, headers, cookies, retryCount, timeConsuming);
-//        var message = string.Empty;
-//        var stringContent = string.Empty;
-//        var data = default(T);
-//        if (!response.IsSuccessStatusCode)
-//        {
-//            var responseText = await content.ReadAsStringAsync();
-//            try
-//            {
-//                var result = JsonConvert.DeserializeObject<Result>(responseText);
-//                message = result?.Description ?? responseText;
-//                stringContent = responseText;
-//            }
-//            catch (Exception ex)
-//            {
-//                Debug.WriteLine($"response '{responseText}' is not json,can not convert,exception:{ex.Message}");
-//                message = responseText;
-//            }
-//        }
-//        else
-//        {
-//            var type = typeof(T);
-//            if (type.IsValueType)
-//            {
-//                var str = await content.ReadAsStringAsync();
-//                if (type.IsEnum) data = Enum.TryParse(type, str ?? string.Empty, out var x) ? (T)x! : throw new InvalidCastException($"unable to cast value '{str}' to enum type '{type.FullName}'");
-//                else data = (T)Convert.ChangeType(str, type);
-//            }
-//            else if (type == typeof(string)) data = (T)Convert.ChangeType(await content.ReadAsStringAsync(), type);
-//            else if (type == typeof(byte[]))
-//            {
-//                data = (T)Convert.ChangeType(await content.ReadAsByteArrayAsync(), type);
-//            }
-//            else
-//            {
-//                data = JsonConvert.DeserializeObject<T>(await content.ReadAsStringAsync());
-//            }
-//        }
-//        if (string.IsNullOrWhiteSpace(message)) message = response.StatusCode.ToString();
-//        return new HttpResult<T>(response.IsSuccessStatusCode, response.StatusCode, message, data!, headers, cookies, retryCount, timeConsuming) { StringContent = stringContent };
-//    }
-//}
 
 #endregion
