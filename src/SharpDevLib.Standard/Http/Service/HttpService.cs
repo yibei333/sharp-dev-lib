@@ -1,63 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace SharpDevLib.Standard;
 
 internal class HttpService : IHttpService
 {
-    HttpClient CreateClient(HttpRequest request)
+    public async Task<HttpResponse<T>> GetAsync<T>(HttpKeyValueRequest request, CancellationToken? cancellationToken = null)
     {
-        var handler = new HttpClientHandler { CookieContainer = new CookieContainer() };
-        if (request.Cookies.NotNullOrEmpty())
-        {
-            handler.CookieContainer = new CookieContainer();
-            foreach (var cookie in request.Cookies) handler.CookieContainer.Add(cookie);
-        }
-
-        var progressHanlder = new ProgressMessageHandler(handler);
-        var client = new HttpClient(progressHanlder);
-
-        if (request.OnSendProgress is not null)
-        {
-            var progress = new HttpProgress();
-            progressHanlder.HttpStartSend += (_, _) => progress.Reset();
-            progressHanlder.HttpSendProgress += (_, e) =>
-            {
-                progress.Total = e.TotalBytes ?? 0;
-                progress.Transfered = e.BytesTransferred;
-                request.OnSendProgress(progress);
-            };
-        }
-
-        if (request.OnReceiveProgress is not null)
-        {
-            var progress = new HttpProgress();
-            progressHanlder.HttpStartSend += (_, _) => progress.Reset();
-            progressHanlder.HttpReceiveProgress += (_, e) =>
-            {
-                progress.Total = e.TotalBytes ?? 0;
-                progress.Transfered = e.BytesTransferred;
-                request.OnReceiveProgress(progress);
-            };
-        }
-
-        if (request.Headers.NotNullOrEmpty())
-        {
-            foreach (var header in request.Headers)
-            {
-                if (header.Value.NotNullOrEmpty()) client.DefaultRequestHeaders.Add(header.Key, header.Value);
-            }
-        }
-        client.Timeout = request.TimeOut ?? HttpGlobalSettings.TimeOut ?? TimeSpan.FromDays(1);
-        return client;
-    }
-
-    public Task<HttpResponse<T>> GetAsync<T>(HttpKeyValueRequest request, CancellationToken? cancellationToken = null)
-    {
-        throw new NotImplementedException();
+        using var client = CreateClient(request);
+        var url = BuildGetUrl(request);
+        var responseMonitor = await Retry(client, () => new HttpRequestMessage(HttpMethod.Get, url), request, cancellationToken);
+        var response = await BuildResponse<T>(url, responseMonitor);
+        return response;
     }
 
     public async Task<HttpResponse> GetAsync(HttpKeyValueRequest request, CancellationToken? cancellationToken = null)
@@ -124,6 +78,53 @@ internal class HttpService : IHttpService
         throw new NotImplementedException();
     }
 
+    HttpClient CreateClient(HttpRequest request)
+    {
+        var handler = new HttpClientHandler { CookieContainer = new CookieContainer() };
+        if (request.Cookies.NotNullOrEmpty())
+        {
+            handler.CookieContainer = new CookieContainer();
+            foreach (var cookie in request.Cookies) handler.CookieContainer.Add(cookie);
+        }
+
+        var progressHanlder = new ProgressMessageHandler(handler);
+        var client = new HttpClient(progressHanlder);
+
+        if (request.OnSendProgress is not null)
+        {
+            var progress = new HttpProgress();
+            progressHanlder.HttpStartSend += (_, _) => progress.Reset();
+            progressHanlder.HttpSendProgress += (_, e) =>
+            {
+                progress.Total = e.TotalBytes ?? 0;
+                progress.Transfered = e.BytesTransferred;
+                request.OnSendProgress(progress);
+            };
+        }
+
+        if (request.OnReceiveProgress is not null)
+        {
+            var progress = new HttpProgress();
+            progressHanlder.HttpStartSend += (_, _) => progress.Reset();
+            progressHanlder.HttpReceiveProgress += (_, e) =>
+            {
+                progress.Total = e.TotalBytes ?? 0;
+                progress.Transfered = e.BytesTransferred;
+                request.OnReceiveProgress(progress);
+            };
+        }
+
+        if (request.Headers.NotNullOrEmpty())
+        {
+            foreach (var header in request.Headers)
+            {
+                if (header.Value.NotNullOrEmpty()) client.DefaultRequestHeaders.Add(header.Key, header.Value);
+            }
+        }
+        client.Timeout = request.TimeOut ?? HttpGlobalSettings.TimeOut ?? TimeSpan.FromDays(1);
+        return client;
+    }
+
     string BuildUrl(HttpRequest request)
     {
         if (request.Url.IsNullOrWhiteSpace()) return HttpGlobalSettings.BaseUrl ?? request.Url;
@@ -139,7 +140,7 @@ internal class HttpService : IHttpService
         var url = BuildUrl(request);
         if (request.Parameters.IsNullOrEmpty()) return url;
         var prefix = url.Contains("?") ? "&" : "?";
-        return $"{url}{prefix}{string.Join("&", request.Parameters.Select(x => $"{x.Key}={x.Value}")).ToUtf8Bytes().UrlEncode()}";
+        return $"{url}{prefix}{string.Join("&", request.Parameters.Select(x => $"{x.Key}={x.Value.ToUtf8Bytes().UrlEncode()}"))}";
     }
 
     async Task<ResponseMonitor> Retry(HttpClient client, Func<HttpRequestMessage> requestMessageBuilder, HttpRequest request, CancellationToken? cancellationToken = null)

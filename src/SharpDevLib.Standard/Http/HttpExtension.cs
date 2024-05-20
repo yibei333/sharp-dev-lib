@@ -33,6 +33,17 @@ public static class HttpExtension
         return await new HttpService().GetAsync(request);
     }
 
+    /// <summary>
+    /// http get请求
+    /// </summary>
+    /// <typeparam name="T">返回类型</typeparam>
+    /// <param name="request">请求</param>
+    /// <returns>http响应</returns>
+    public static async Task<HttpResponse<T>> GetAsync<T>(this HttpKeyValueRequest request)
+    {
+        return await new HttpService().GetAsync<T>(request);
+    }
+
     internal static Cookie? ParseCookie(this string cookieString, string host)
     {
         if (cookieString.IsNullOrEmpty()) return null;
