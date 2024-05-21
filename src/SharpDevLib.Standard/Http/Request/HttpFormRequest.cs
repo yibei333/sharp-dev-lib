@@ -79,7 +79,7 @@ public class HttpMultiPartFormDataRequest : HttpRequest<Dictionary<string, strin
         }
         else
         {
-            builder.AppendLine($"Files:{Files.Select(x => new { x.ParameterName, x.FileName, x.Size, BytesIsNull = x.Bytes is null, StreamIsNull = x.Stream is null })}");
+            builder.AppendLine($"Files:{Files.Select(x => new { x.ParameterName, x.FileName, x.Size, BytesIsNull = x.Bytes is null, StreamIsNull = x.Stream is null }).Serialize()}");
         }
         return builder.ToString();
     }

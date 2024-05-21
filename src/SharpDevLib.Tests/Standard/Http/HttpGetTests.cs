@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using EmbedIO.WebApi;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Standard;
 using SharpDevLib.Tests.Data;
 using SharpDevLib.Tests.Standard.Http.Base;
@@ -107,5 +108,51 @@ public class HttpGetTests : HttpBaseTests
         Assert.IsTrue(response.IsSuccess);
         Assert.AreEqual(1, response.Cookies?.Count(x => x.Name == "BIDUPSID"));
         Assert.AreEqual("601145944A9976FC12AF00B3136B48F0", response.Cookies?.FirstOrDefault(x => x.Name == "BIDUPSID")?.Value);
+    }
+
+    [TestMethod]
+    public void RetryTest()
+    {
+        var count = 5;
+        HttpGlobalSettings.RetryCount = count;
+        var url = "/api/get/retry";
+        var request = new HttpKeyValueRequest(url, new Dictionary<string, string> { { "count", count.ToString() }, { "id", Guid.NewGuid().ToString() } });
+        var response = request.GetAsync().GetAwaiter().GetResult();
+        Assert.IsTrue(response.IsSuccess);
+
+        request = new HttpKeyValueRequest(url, new Dictionary<string, string> { { "count", "6" }, { "id", Guid.NewGuid().ToString() } });
+        response = request.GetAsync().GetAwaiter().GetResult();
+        Assert.IsFalse(response.IsSuccess);
+
+        request = new HttpKeyValueRequest(url, new Dictionary<string, string> { { "count", "6" }, { "id", Guid.NewGuid().ToString() } }) { RetryCount = 3 };
+        response = request.GetAsync().GetAwaiter().GetResult();
+        Assert.IsFalse(response.IsSuccess);
+
+        request = new HttpKeyValueRequest(url, new Dictionary<string, string> { { "count", "3" }, { "id", Guid.NewGuid().ToString() } }) { RetryCount = 3 };
+        response = request.GetAsync().GetAwaiter().GetResult();
+        Assert.IsTrue(response.IsSuccess);
+    }
+
+    [TestMethod]
+    public void TimeoutTest()
+    {
+        HttpGlobalSettings.TimeOut = TimeSpan.FromSeconds(2);
+        var url = "/api/get/timeout";
+        var request = new HttpKeyValueRequest(url);
+        var response = request.GetAsync().GetAwaiter().GetResult();
+        Assert.IsTrue(response.IsSuccess);
+
+        HttpGlobalSettings.TimeOut = TimeSpan.FromSeconds(1);
+        request = new HttpKeyValueRequest(url);
+        response = request.GetAsync().GetAwaiter().GetResult();
+        Assert.IsFalse(response.IsSuccess);
+
+        request = new HttpKeyValueRequest(url) { TimeOut = TimeSpan.FromSeconds(2) };
+        response = request.GetAsync().GetAwaiter().GetResult();
+        Assert.IsTrue(response.IsSuccess);
+
+        request = new HttpKeyValueRequest(url) { TimeOut = TimeSpan.FromSeconds(1) };
+        response = request.GetAsync().GetAwaiter().GetResult();
+        Assert.IsFalse(response.IsSuccess);
     }
 }

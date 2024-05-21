@@ -18,7 +18,7 @@ public class HttpBaseTests
         _server = new WebServer(o => o.WithUrlPrefix(BaseUrl)
                         .WithMode(HttpListenerMode.EmbedIO))
                         .WithLocalSessionManager()
-                        .WithWebApi("/api", m => m.WithController<ApiController>())
+                        .WithWebApi("/api", m => m.WithController<HttpGetController>().WithController<HttpPostController>())
                         .WithStaticFolder("/statics", AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data"), true, m => m.WithContentCaching(true));
         _server.Start();
         HttpGlobalSettings.BaseUrl = BaseUrl;

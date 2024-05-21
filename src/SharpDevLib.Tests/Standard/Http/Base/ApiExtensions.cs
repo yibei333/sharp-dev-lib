@@ -15,7 +15,11 @@ public static class ApiExtensions
         if (obj is not null)
         {
             var type = obj.GetType();
-            if (type.IsClass && type != typeof(string)) text = obj.Serialize();
+            if (type.IsClass && type != typeof(string))
+            {
+                text = obj.Serialize();
+                context.Response.ContentType = MimeType.Json;
+            }
             else text = obj.ToString();
         }
         writer.Write(text);

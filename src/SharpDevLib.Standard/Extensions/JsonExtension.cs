@@ -1,6 +1,8 @@
-﻿using System.Text.Json;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using System.Text.Unicode;
 
 namespace SharpDevLib.Standard;
 
@@ -119,7 +121,8 @@ public static class JsonExtension
         var option = new JsonSerializerOptions
         {
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            WriteIndented = writeIndented
+            WriteIndented = writeIndented,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         };
         if (orderPropertyByName) option.TypeInfoResolver = _propertyNameOrderResolver;
         return option;

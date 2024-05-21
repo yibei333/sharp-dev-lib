@@ -8,8 +8,8 @@ public class User
         Age = age;
     }
 
-    public string? Name { get; }
-    public int Age { get; }
+    public string? Name { get; set; }
+    public int Age { get; set; }
 
     public override string ToString()
     {

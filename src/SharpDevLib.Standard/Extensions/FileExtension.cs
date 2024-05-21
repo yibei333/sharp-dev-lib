@@ -1038,6 +1038,7 @@ public static class FileExtension
             if (throwIfFileExist) throw new InvalidOperationException($"file '{filePath}' already existed");
             File.Delete(filePath);
         }
+        new FileInfo(filePath).DirectoryName.EnsureDirectoryExist();
         using var stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
         stream.Write(bytes, 0, bytes.Length);
         stream.Flush();

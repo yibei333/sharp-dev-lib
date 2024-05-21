@@ -16,23 +16,17 @@ internal class HttpService : IHttpService
         _logger = provider?.GetService<ILogger<HttpService>>();
     }
 
-    public async Task<HttpResponse<T>> GetAsync<T>(HttpKeyValueRequest request, CancellationToken? cancellationToken = null)
+    async Task<HttpResponse<T>> GetAsync<T>(HttpKeyValueRequest request, bool isGenericMethod, CancellationToken? cancellationToken = null)
     {
         using var client = CreateClient(request);
         var url = BuildGetUrl(request);
         var responseMonitor = await Retry(client, () => new HttpRequestMessage(HttpMethod.Get, url), request, cancellationToken);
-        var response = await BuildResponse<T>(url, responseMonitor, nameof(GetAsync));
-        return response;
+        return await BuildResponse<T>(responseMonitor, nameof(GetAsync), isGenericMethod);
     }
 
-    public async Task<HttpResponse> GetAsync(HttpKeyValueRequest request, CancellationToken? cancellationToken = null)
-    {
-        using var client = CreateClient(request);
-        var url = BuildGetUrl(request);
-        var responseMonitor = await Retry(client, () => new HttpRequestMessage(HttpMethod.Get, url), request, cancellationToken);
-        var response = await BuildResponse(url, responseMonitor, nameof(GetAsync));
-        return response;
-    }
+    public async Task<HttpResponse<T>> GetAsync<T>(HttpKeyValueRequest request, CancellationToken? cancellationToken = null) => await GetAsync<T>(request, true, cancellationToken);
+
+    public async Task<HttpResponse> GetAsync(HttpKeyValueRequest request, CancellationToken? cancellationToken = null) => await GetAsync<string>(request, false, cancellationToken);
 
     public async Task<Stream> GetStreamAsync(HttpKeyValueRequest request)
     {
@@ -51,56 +45,116 @@ internal class HttpService : IHttpService
         }
     }
 
-    public Task<HttpResponse<T>> PostAsync<T>(HttpJsonRequest request, CancellationToken? cancellationToken = null)
+    async Task<HttpResponse<T>> PostAsync<T>(HttpJsonRequest request, bool isGenericMethod, CancellationToken? cancellationToken = null)
     {
-        throw new NotImplementedException();
+        using var client = CreateClient(request);
+        var url = BuildUrl(request);
+        var responseMonitor = await Retry(client, () =>
+        {
+            var content = new StringContent(request.Parameters);
+            var message = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
+            return message;
+        }, request, cancellationToken);
+
+        var response = await BuildResponse<T>(responseMonitor, nameof(PostAsync), isGenericMethod);
+        return response;
     }
 
-    public Task<HttpResponse> PostAsync(HttpJsonRequest request, CancellationToken? cancellationToken = null)
+    public async Task<HttpResponse<T>> PostAsync<T>(HttpJsonRequest request, CancellationToken? cancellationToken = null) => await PostAsync<T>(request, true, cancellationToken);
+
+    public async Task<HttpResponse> PostAsync(HttpJsonRequest request, CancellationToken? cancellationToken = null) => await PostAsync<string>(request, false, cancellationToken);
+
+    async Task<HttpResponse<T>> PostAsync<T>(HttpMultiPartFormDataRequest request, bool isGenericMethod, CancellationToken? cancellationToken = null)
     {
-        throw new NotImplementedException();
+        using var client = CreateClient(request);
+        var url = BuildUrl(request);
+        var responseMonitor = await Retry(client, () =>
+        {
+            var content = new MultipartFormDataContent();
+            if (request.Parameters.NotNullOrEmpty())
+            {
+                foreach (var item in request.Parameters)
+                {
+                    content.Add(new StringContent(item.Value), item.Key);
+                }
+            }
+            if (request.Files.NotNullOrEmpty())
+            {
+                foreach (var file in request.Files)
+                {
+                    var stream = file.Stream;
+                    if (stream is null)
+                    {
+                        if (file.Bytes.IsNullOrEmpty()) throw new Exception($"file data required");
+                        else stream = new MemoryStream(file.Bytes);
+                    }
+                    content.Add(new StreamContent(stream), file.ParameterName, file.FileName);
+                }
+            }
+
+            var message = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
+            return message;
+        }, request, cancellationToken);
+
+        var response = await BuildResponse<T>(responseMonitor, nameof(PostAsync), isGenericMethod);
+        return response;
     }
 
-    public Task<HttpResponse<T>> PostAsync<T>(HttpMultiPartFormDataRequest request, CancellationToken? cancellationToken = null)
+    public async Task<HttpResponse<T>> PostAsync<T>(HttpMultiPartFormDataRequest request, CancellationToken? cancellationToken = null) => await PostAsync<T>(request, true, cancellationToken);
+
+    public async Task<HttpResponse> PostAsync(HttpMultiPartFormDataRequest request, CancellationToken? cancellationToken = null) => await PostAsync<string>(request, false, cancellationToken);
+
+    async Task<HttpResponse<T>> PostAsync<T>(HttpUrlEncodedFormRequest request, bool isGenericMethod, CancellationToken? cancellationToken = null)
     {
-        throw new NotImplementedException();
+        using var client = CreateClient(request);
+        var url = BuildUrl(request);
+        var responseMonitor = await Retry(client, () =>
+        {
+            var content = new FormUrlEncodedContent(request.Parameters ?? new());
+            var message = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
+            return message;
+        }, request, cancellationToken);
+
+        var response = await BuildResponse<T>(responseMonitor, nameof(PostAsync), isGenericMethod);
+        return response;
     }
 
-    public Task<HttpResponse> PostAsync(HttpMultiPartFormDataRequest request, CancellationToken? cancellationToken = null)
+    public async Task<HttpResponse<T>> PostAsync<T>(HttpUrlEncodedFormRequest request, CancellationToken? cancellationToken = null) => await PostAsync<T>(request, true, cancellationToken);
+
+    public async Task<HttpResponse> PostAsync(HttpUrlEncodedFormRequest request, CancellationToken? cancellationToken = null) => await PostAsync<string>(request, false, cancellationToken);
+
+    async Task<HttpResponse<T>> PutAsync<T>(HttpJsonRequest request, bool isGenericMethod, CancellationToken? cancellationToken = null)
     {
-        throw new NotImplementedException();
+        using var client = CreateClient(request);
+        var url = BuildUrl(request);
+        var responseMonitor = await Retry(client, () =>
+        {
+            var content = new StringContent(request.Parameters);
+            var message = new HttpRequestMessage(HttpMethod.Put, url) { Content = content };
+            return message;
+        }, request, cancellationToken);
+
+        var response = await BuildResponse<T>(responseMonitor, nameof(PutAsync), isGenericMethod);
+        return response;
     }
 
-    public Task<HttpResponse<T>> PostAsync<T>(HttpUrlEncodedFormRequest request, CancellationToken? cancellationToken = null)
+    public async Task<HttpResponse<T>> PutAsync<T>(HttpJsonRequest request, CancellationToken? cancellationToken = null) => await PutAsync<T>(request, true, cancellationToken);
+
+    public async Task<HttpResponse> PutAsync(HttpJsonRequest request, CancellationToken? cancellationToken = null) => await PutAsync<string>(request, false, cancellationToken);
+
+    async Task<HttpResponse<T>> DeleteAsync<T>(HttpKeyValueRequest request, bool isGenericMethod, CancellationToken? cancellationToken = null)
     {
-        throw new NotImplementedException();
+        using var client = CreateClient(request);
+        var url = BuildGetUrl(request);
+        var responseMonitor = await Retry(client, () => new HttpRequestMessage(HttpMethod.Delete, url), request, cancellationToken);
+        return await BuildResponse<T>(responseMonitor, nameof(DeleteAsync), isGenericMethod);
     }
 
-    public Task<HttpResponse> PostAsync(HttpUrlEncodedFormRequest request, CancellationToken? cancellationToken = null)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<HttpResponse<T>> DeleteAsync<T>(HttpKeyValueRequest request, CancellationToken? cancellationToken = null) => await DeleteAsync<T>(request, true, cancellationToken);
 
-    public Task<HttpResponse<T>> PutAsync<T>(HttpJsonRequest request, CancellationToken? cancellationToken = null)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<HttpResponse> DeleteAsync(HttpKeyValueRequest request, CancellationToken? cancellationToken = null) => await DeleteAsync<string>(request, false, cancellationToken);
 
-    public Task<HttpResponse> PutAsync(HttpJsonRequest request, CancellationToken? cancellationToken = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<HttpResponse<T>> DeleteAsync<T>(HttpKeyValueRequest request, CancellationToken? cancellationToken = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<HttpResponse> DeleteAsync(HttpKeyValueRequest request, CancellationToken? cancellationToken = null)
-    {
-        throw new NotImplementedException();
-    }
-
+    #region Private
     HttpClient CreateClient(HttpRequest request)
     {
         var handler = new HttpClientHandler { CookieContainer = new CookieContainer() };
@@ -175,11 +229,13 @@ internal class HttpService : IHttpService
         Exception? exception = null;
         TimeSpan last;
         TimeSpan total = TimeSpan.Zero;
+        string url = string.Empty;
 
         while (retryIndex < retryCount)
         {
             if (cancellationToken?.IsCancellationRequested ?? false) break;
             var requestMessage = requestMessageBuilder();
+            url = requestMessage.RequestUri.AbsoluteUri;
 
             var startTime = DateTime.Now;
             retryIndex++;
@@ -194,7 +250,7 @@ internal class HttpService : IHttpService
                 {
                     continue;
                 }
-                return new ResponseMonitor(request, null, retryIndex, last, endTime - totalStartTime, response);
+                return new ResponseMonitor(url, request, null, retryIndex, last, endTime - totalStartTime, response);
             }
             catch (Exception ex)
             {
@@ -203,19 +259,18 @@ internal class HttpService : IHttpService
                 exception = ex;
             }
         };
-        return new ResponseMonitor(request, exception, retryIndex, last, total, response);
+        return new ResponseMonitor(url, request, exception, retryIndex, last, total, response);
     }
 
-    async Task<HttpResponse> BuildResponse(string url, ResponseMonitor responseMonitor, string methodName)
+    async Task<HttpResponse<T>> BuildResponse<T>(ResponseMonitor responseMonitor, string methodName, bool isGenericMethod = true)
     {
-        var response = await BuildResponse<string>(url, responseMonitor, methodName, false);
-        response.Data = null;
-        return response;
-    }
-
-    async Task<HttpResponse<T>> BuildResponse<T>(string url, ResponseMonitor responseMonitor, string methodName, bool isGenericMethod = true)
-    {
-        if (responseMonitor.ResponseMessage is null) return new HttpResponse<T>(url, false, HttpStatusCode.ServiceUnavailable, responseMonitor.Exception?.Message ?? "no response", default, responseMonitor.RetryCount, responseMonitor.LastTimeConsuming, responseMonitor.TotalTimeConsuming);
+        var genericType = isGenericMethod ? typeof(T) : null;
+        if (responseMonitor.ResponseMessage is null)
+        {
+            var errorResponse = new HttpResponse<T>(responseMonitor.Url, false, HttpStatusCode.ServiceUnavailable, responseMonitor.Exception?.Message ?? "no response", default, responseMonitor.RetryCount, responseMonitor.LastTimeConsuming, responseMonitor.TotalTimeConsuming);
+            Log(responseMonitor.Exception, responseMonitor.Request, errorResponse, methodName, genericType);
+            return errorResponse;
+        }
 
         //set headers
         Dictionary<string, IEnumerable<string>>? headers = null;
@@ -229,7 +284,7 @@ internal class HttpService : IHttpService
         List<Cookie>? cookies = null;
         if (headers.NotNullOrEmpty() && headers.TryGetValue("Set-Cookie", out var cookieValues))
         {
-            var host = new Uri(url).Host;
+            var host = new Uri(responseMonitor.Url).Host;
             foreach (var item in cookieValues)
             {
                 cookies ??= new();
@@ -242,7 +297,7 @@ internal class HttpService : IHttpService
         var responseText = content is null ? "empty response" : await content.ReadAsStringAsync();
         T? data = default;
 
-        if (responseMonitor.ResponseMessage.IsSuccessStatusCode)
+        if (isGenericMethod && responseMonitor.ResponseMessage.IsSuccessStatusCode)
         {
             var type = typeof(T);
             if (type.IsClass)
@@ -256,8 +311,8 @@ internal class HttpService : IHttpService
             }
         }
 
-        var response = new HttpResponse<T>(url, responseMonitor.ResponseMessage.IsSuccessStatusCode, responseMonitor.ResponseMessage.StatusCode, responseMonitor.Exception?.Message ?? responseText, data, headers, cookies, responseMonitor.RetryCount, responseMonitor.LastTimeConsuming, responseMonitor.TotalTimeConsuming);
-        Log(responseMonitor.Exception, responseMonitor.Request, response, methodName, isGenericMethod ? typeof(T) : null);
+        var response = new HttpResponse<T>(responseMonitor.Url, responseMonitor.ResponseMessage.IsSuccessStatusCode, responseMonitor.ResponseMessage.StatusCode, responseMonitor.Exception?.Message ?? responseText, data, headers, cookies, responseMonitor.RetryCount, responseMonitor.LastTimeConsuming, responseMonitor.TotalTimeConsuming);
+        Log(responseMonitor.Exception, responseMonitor.Request, response, methodName, genericType);
         return response;
     }
 
@@ -277,31 +332,35 @@ internal class HttpService : IHttpService
         }
         else Debug.WriteLine(message);
     }
-}
 
-class ResponseMonitor
-{
-    public ResponseMonitor(HttpRequest request, Exception? exception, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming, HttpResponseMessage? responseMessage)
+    class ResponseMonitor
     {
-        Request = request;
-        Exception = exception;
-        RetryCount = retryCount;
-        LastTimeConsuming = lastTimeConsuming;
-        TotalTimeConsuming = totalTimeConsuming;
-        ResponseMessage = responseMessage;
+        public ResponseMonitor(string url, HttpRequest request, Exception? exception, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming, HttpResponseMessage? responseMessage)
+        {
+            Url = url;
+            Request = request;
+            Exception = exception;
+            RetryCount = retryCount;
+            LastTimeConsuming = lastTimeConsuming;
+            TotalTimeConsuming = totalTimeConsuming;
+            ResponseMessage = responseMessage;
+        }
+
+        public string Url { get; }
+
+        public Exception? Exception { get; }
+
+        public int RetryCount { get; }
+
+        public TimeSpan LastTimeConsuming { get; }
+
+        public TimeSpan TotalTimeConsuming { get; }
+
+        public HttpResponseMessage? ResponseMessage { get; }
+
+        public HttpRequest Request { get; }
     }
-
-    public Exception? Exception { get; }
-
-    public int RetryCount { get; }
-
-    public TimeSpan LastTimeConsuming { get; }
-
-    public TimeSpan TotalTimeConsuming { get; }
-
-    public HttpResponseMessage? ResponseMessage { get; }
-
-    public HttpRequest Request { get; }
+    #endregion
 }
 
 #region old

@@ -59,6 +59,131 @@ public static class HttpExtension
         return await new HttpService(serviceProvider).GetStreamAsync(request);
     }
 
+    /// <summary>
+    /// http post请求
+    /// </summary>
+    /// <param name="request">请求</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <returns>http响应</returns>
+    public static async Task<HttpResponse> PostAsync(this HttpJsonRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
+    {
+        return await new HttpService(serviceProvider).PostAsync(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// http post请求
+    /// </summary>
+    /// <typeparam name="T">返回类型</typeparam>
+    /// <param name="request">请求</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <returns>http响应</returns>
+    public static async Task<HttpResponse<T>> PostAsync<T>(this HttpJsonRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
+    {
+        return await new HttpService(serviceProvider).PostAsync<T>(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// http post请求
+    /// </summary>
+    /// <param name="request">请求</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <returns>http响应</returns>
+    public static async Task<HttpResponse> PostAsync(this HttpUrlEncodedFormRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
+    {
+        return await new HttpService(serviceProvider).PostAsync(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// http post请求
+    /// </summary>
+    /// <typeparam name="T">返回类型</typeparam>
+    /// <param name="request">请求</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <returns>http响应</returns>
+    public static async Task<HttpResponse<T>> PostAsync<T>(this HttpUrlEncodedFormRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
+    {
+        return await new HttpService(serviceProvider).PostAsync<T>(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// http post请求
+    /// </summary>
+    /// <param name="request">请求</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <returns>http响应</returns>
+    public static async Task<HttpResponse> PostAsync(this HttpMultiPartFormDataRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
+    {
+        return await new HttpService(serviceProvider).PostAsync(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// http post请求
+    /// </summary>
+    /// <typeparam name="T">返回类型</typeparam>
+    /// <param name="request">请求</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <returns>http响应</returns>
+    public static async Task<HttpResponse<T>> PostAsync<T>(this HttpMultiPartFormDataRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
+    {
+        return await new HttpService(serviceProvider).PostAsync<T>(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// http put请求
+    /// </summary>
+    /// <param name="request">请求</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <returns>http响应</returns>
+    public static async Task<HttpResponse> PutAsync(this HttpJsonRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
+    {
+        return await new HttpService(serviceProvider).PutAsync(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// http put请求
+    /// </summary>
+    /// <typeparam name="T">返回类型</typeparam>
+    /// <param name="request">请求</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <returns>http响应</returns>
+    public static async Task<HttpResponse<T>> PutAsync<T>(this HttpJsonRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
+    {
+        return await new HttpService(serviceProvider).PutAsync<T>(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// http delete请求
+    /// </summary>
+    /// <param name="request">请求</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <returns>http响应</returns>
+    public static async Task<HttpResponse> DeleteAsync(this HttpKeyValueRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
+    {
+        return await new HttpService(serviceProvider).DeleteAsync(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// http delete请求
+    /// </summary>
+    /// <typeparam name="T">返回类型</typeparam>
+    /// <param name="request">请求</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <returns>http响应</returns>
+    public static async Task<HttpResponse<T>> DeleteAsync<T>(this HttpKeyValueRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
+    {
+        return await new HttpService(serviceProvider).DeleteAsync<T>(request, cancellationToken);
+    }
+
     internal static Cookie? ParseCookie(this string cookieString, string host)
     {
         if (cookieString.IsNullOrEmpty()) return null;
