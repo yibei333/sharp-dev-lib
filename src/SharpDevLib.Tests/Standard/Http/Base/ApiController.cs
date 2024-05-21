@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using SharpDevLib.Tests.Data;
 using System;
-using System.Text;
 
 namespace SharpDevLib.Tests.Standard.Http.Base;
 
@@ -18,36 +17,32 @@ internal class ApiController : WebApiController
     }
 
     [Route(HttpVerbs.Get, "/get/int")]
-    public int GetInt([QueryField] int seed)
+    public void GetInt([QueryField] int seed)
     {
-        Response.ContentLength64 = 1;
-        return seed + 1;
+        HttpContext.WriteObject(seed + 1);
     }
 
     [Route(HttpVerbs.Get, "/get/string")]
     public void GetString([QueryField] string foo, [QueryField] string bar)
     {
-        Response.ContentType = MimeType.PlainText;
-        using (var writer = HttpContext.OpenResponseText(Encoding.UTF8, true))
-        {
-            writer.Write($"{foo}_{bar}");
-        }
+        HttpContext.WriteObject($"{foo}_{bar}");
     }
 
     [Route(HttpVerbs.Get, "/get/user")]
-    public User GetUser()
+    public void GetUser()
     {
-        return new User("foo", 10);
+        HttpContext.WriteObject(new User("foo", 10));
     }
 
     [Route(HttpVerbs.Get, "/get/users")]
-    public List<User> GetUsers()
+    public void GetUsers()
     {
-        return new List<User>
+        var data = new List<User>
         {
             new("foo",10),
             new("bar",20),
         };
+        HttpContext.WriteObject(data);
     }
 
     [Route(HttpVerbs.Get, "/get/cookie")]

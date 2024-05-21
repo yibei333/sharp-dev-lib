@@ -60,6 +60,7 @@ public abstract class HttpRequest
     {
         var builder = new StringBuilder();
         builder.AppendLine($"********request********");
+        builder.AppendLine($"Type:{this.GetType().Name}");
         builder.AppendLine($"Url:{Url}");
         builder.AppendLine($"TimeOut:{TimeOut}");
         builder.AppendLine($"RetryCount:{RetryCount}");

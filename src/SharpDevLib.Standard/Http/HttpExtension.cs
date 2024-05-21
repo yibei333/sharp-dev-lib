@@ -27,10 +27,12 @@ public static class HttpExtension
     /// http get请求
     /// </summary>
     /// <param name="request">请求</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
     /// <returns>http响应</returns>
-    public static async Task<HttpResponse> GetAsync(this HttpKeyValueRequest request)
+    public static async Task<HttpResponse> GetAsync(this HttpKeyValueRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
     {
-        return await new HttpService().GetAsync(request);
+        return await new HttpService(serviceProvider).GetAsync(request, cancellationToken);
     }
 
     /// <summary>
@@ -38,10 +40,23 @@ public static class HttpExtension
     /// </summary>
     /// <typeparam name="T">返回类型</typeparam>
     /// <param name="request">请求</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
     /// <returns>http响应</returns>
-    public static async Task<HttpResponse<T>> GetAsync<T>(this HttpKeyValueRequest request)
+    public static async Task<HttpResponse<T>> GetAsync<T>(this HttpKeyValueRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
     {
-        return await new HttpService().GetAsync<T>(request);
+        return await new HttpService(serviceProvider).GetAsync<T>(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// http get请求
+    /// </summary>
+    /// <param name="request">请求</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <returns>http响应</returns>
+    public static async Task<Stream> GetStreamAsync(this HttpKeyValueRequest request, IServiceProvider? serviceProvider = null)
+    {
+        return await new HttpService(serviceProvider).GetStreamAsync(request);
     }
 
     internal static Cookie? ParseCookie(this string cookieString, string host)

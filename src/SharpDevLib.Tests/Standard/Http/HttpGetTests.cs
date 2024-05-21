@@ -4,6 +4,7 @@ using SharpDevLib.Tests.Data;
 using SharpDevLib.Tests.Standard.Http.Base;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace SharpDevLib.Tests.Standard.Http;
@@ -32,7 +33,6 @@ public class HttpGetTests : HttpBaseTests
             }
         };
         var response = request.GetAsync<int>().GetAwaiter().GetResult();
-        Console.WriteLine(response);
         Assert.IsTrue(count > 0);
         Assert.IsTrue(response.IsSuccess);
         Assert.AreEqual(2, response.Data);
@@ -43,7 +43,6 @@ public class HttpGetTests : HttpBaseTests
     {
         var request = new HttpKeyValueRequest("/api/get/string", new Dictionary<string, string> { { "foo", "foo" }, { "bar", "bar" } });
         var response = request.GetAsync<string>().GetAwaiter().GetResult();
-        Console.WriteLine(response);
         Assert.IsTrue(response.IsSuccess);
         Assert.AreEqual("foo_bar", response.Data);
     }
@@ -74,6 +73,26 @@ public class HttpGetTests : HttpBaseTests
     }
 
     [TestMethod]
+    public void GetStreamTest()
+    {
+        var count = 0;
+        var request = new HttpKeyValueRequest("/statics/TestFile.txt")
+        {
+            OnReceiveProgress = p =>
+            {
+                count++;
+                Console.WriteLine($"receive->{p}");
+            }
+        };
+        var response = request.GetStreamAsync().GetAwaiter().GetResult();
+        using var memoryStream = new MemoryStream();
+        response.CopyTo(memoryStream);
+        var actual = memoryStream.ToArray().ToUtf8String();
+        Assert.AreEqual("Hello,World!", actual);
+        Assert.IsTrue(count > 0);
+    }
+
+    [TestMethod]
     public void CookieTest()
     {
         var url = "/api/get/cookie";
@@ -85,7 +104,6 @@ public class HttpGetTests : HttpBaseTests
             }
         };
         var response = request.GetAsync().GetAwaiter().GetResult();
-        Console.WriteLine(response);
         Assert.IsTrue(response.IsSuccess);
         Assert.AreEqual(1, response.Cookies?.Count(x => x.Name == "BIDUPSID"));
         Assert.AreEqual("601145944A9976FC12AF00B3136B48F0", response.Cookies?.FirstOrDefault(x => x.Name == "BIDUPSID")?.Value);

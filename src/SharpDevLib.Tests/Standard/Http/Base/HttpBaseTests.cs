@@ -19,7 +19,7 @@ public class HttpBaseTests
                         .WithMode(HttpListenerMode.EmbedIO))
                         .WithLocalSessionManager()
                         .WithWebApi("/api", m => m.WithController<ApiController>())
-                        .WithStaticFolder("/", AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data"), true, m => m.WithContentCaching(true));
+                        .WithStaticFolder("/statics", AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data"), true, m => m.WithContentCaching(true));
         _server.Start();
         HttpGlobalSettings.BaseUrl = BaseUrl;
     }

@@ -31,7 +31,7 @@ public class HttpProgress
             _lastTransferTime = now;
             if (time.TotalMilliseconds <= 0) return;
             var count = (long)Math.Round(singleTransfered * 1000 / time.TotalMilliseconds, 2);
-            Speed = $"{count.ToFileSizeString()}/S";
+            Speed = $"{count.ToFileSizeString()}/s";
         }
     }
 

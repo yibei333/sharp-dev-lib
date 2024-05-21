@@ -35,12 +35,12 @@ internal class ProgressMessageHandler : DelegatingHandler
 
     protected internal virtual void OnHttpRequestProgress(HttpRequestMessage request, HttpProgressEventArgs e)
     {
-        if (HttpSendProgress is not null) HttpSendProgress(request, e);
+        if (HttpSendProgress is not null && e.TotalBytes > 0) HttpSendProgress(request, e);
     }
 
     protected internal virtual void OnHttpResponseProgress(HttpRequestMessage request, HttpProgressEventArgs e)
     {
-        if (HttpReceiveProgress is not null) HttpReceiveProgress(request, e);
+        if (HttpReceiveProgress is not null && e.TotalBytes > 0) HttpReceiveProgress(request, e);
     }
 
     private void AddRequestProgress(HttpRequestMessage request)

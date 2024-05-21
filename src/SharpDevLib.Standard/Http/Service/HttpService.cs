@@ -1,16 +1,27 @@
-﻿using System.Net;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics;
+using System.Net;
+using System.Text;
 using System.Text.Json;
 
 namespace SharpDevLib.Standard;
 
 internal class HttpService : IHttpService
 {
+    readonly ILogger<HttpService>? _logger;
+
+    public HttpService(IServiceProvider? provider)
+    {
+        _logger = provider?.GetService<ILogger<HttpService>>();
+    }
+
     public async Task<HttpResponse<T>> GetAsync<T>(HttpKeyValueRequest request, CancellationToken? cancellationToken = null)
     {
         using var client = CreateClient(request);
         var url = BuildGetUrl(request);
         var responseMonitor = await Retry(client, () => new HttpRequestMessage(HttpMethod.Get, url), request, cancellationToken);
-        var response = await BuildResponse<T>(url, responseMonitor);
+        var response = await BuildResponse<T>(url, responseMonitor, nameof(GetAsync));
         return response;
     }
 
@@ -19,13 +30,25 @@ internal class HttpService : IHttpService
         using var client = CreateClient(request);
         var url = BuildGetUrl(request);
         var responseMonitor = await Retry(client, () => new HttpRequestMessage(HttpMethod.Get, url), request, cancellationToken);
-        var response = await BuildResponse(url, responseMonitor);
+        var response = await BuildResponse(url, responseMonitor, nameof(GetAsync));
         return response;
     }
 
-    public Task<Stream> GetStreamAsync(HttpKeyValueRequest request)
+    public async Task<Stream> GetStreamAsync(HttpKeyValueRequest request)
     {
-        throw new NotImplementedException();
+        try
+        {
+            using var client = CreateClient(request);
+            var url = BuildGetUrl(request);
+            var stream = await client.GetStreamAsync(url);
+            Log(null, request, null, nameof(GetStreamAsync));
+            return stream;
+        }
+        catch (Exception ex)
+        {
+            Log(ex, request, null, nameof(GetAsync));
+            throw ex;
+        }
     }
 
     public Task<HttpResponse<T>> PostAsync<T>(HttpJsonRequest request, CancellationToken? cancellationToken = null)
@@ -149,7 +172,7 @@ internal class HttpService : IHttpService
         var retryIndex = -1;
         var totalStartTime = DateTime.Now;
         HttpResponseMessage? response = null;
-        string? exceptionMessage = null;
+        Exception? exception = null;
         TimeSpan last;
         TimeSpan total = TimeSpan.Zero;
 
@@ -171,28 +194,28 @@ internal class HttpService : IHttpService
                 {
                     continue;
                 }
-                return new ResponseMonitor(null, retryIndex, last, endTime - totalStartTime, response);
+                return new ResponseMonitor(request, null, retryIndex, last, endTime - totalStartTime, response);
             }
             catch (Exception ex)
             {
                 last = DateTime.Now - startTime;
                 total += last;
-                exceptionMessage = ex.Message;
+                exception = ex;
             }
         };
-        return new ResponseMonitor(exceptionMessage, retryIndex, last, total, response);
+        return new ResponseMonitor(request, exception, retryIndex, last, total, response);
     }
 
-    private static async Task<HttpResponse> BuildResponse(string url, ResponseMonitor responseMonitor)
+    async Task<HttpResponse> BuildResponse(string url, ResponseMonitor responseMonitor, string methodName)
     {
-        var response = await BuildResponse<string>(url, responseMonitor);
+        var response = await BuildResponse<string>(url, responseMonitor, methodName, false);
         response.Data = null;
         return response;
     }
 
-    private static async Task<HttpResponse<T>> BuildResponse<T>(string url, ResponseMonitor responseMonitor)
+    async Task<HttpResponse<T>> BuildResponse<T>(string url, ResponseMonitor responseMonitor, string methodName, bool isGenericMethod = true)
     {
-        if (responseMonitor.ResponseMessage is null) return new HttpResponse<T>(url, false, HttpStatusCode.ServiceUnavailable, responseMonitor.ExceptionMessage ?? "no response", default, responseMonitor.RetryCount, responseMonitor.LastTimeConsuming, responseMonitor.TotalTimeConsuming);
+        if (responseMonitor.ResponseMessage is null) return new HttpResponse<T>(url, false, HttpStatusCode.ServiceUnavailable, responseMonitor.Exception?.Message ?? "no response", default, responseMonitor.RetryCount, responseMonitor.LastTimeConsuming, responseMonitor.TotalTimeConsuming);
 
         //set headers
         Dictionary<string, IEnumerable<string>>? headers = null;
@@ -233,22 +256,42 @@ internal class HttpService : IHttpService
             }
         }
 
-        return new HttpResponse<T>(url, responseMonitor.ResponseMessage.IsSuccessStatusCode, responseMonitor.ResponseMessage.StatusCode, responseMonitor.ExceptionMessage ?? responseText, data, headers, cookies, responseMonitor.RetryCount, responseMonitor.LastTimeConsuming, responseMonitor.TotalTimeConsuming);
+        var response = new HttpResponse<T>(url, responseMonitor.ResponseMessage.IsSuccessStatusCode, responseMonitor.ResponseMessage.StatusCode, responseMonitor.Exception?.Message ?? responseText, data, headers, cookies, responseMonitor.RetryCount, responseMonitor.LastTimeConsuming, responseMonitor.TotalTimeConsuming);
+        Log(responseMonitor.Exception, responseMonitor.Request, response, methodName, isGenericMethod ? typeof(T) : null);
+        return response;
+    }
+
+    void Log(Exception? ex, HttpRequest request, HttpResponse? response, string methodName, Type? genericType = null)
+    {
+        var builder = new StringBuilder();
+        builder.AppendLine("HttpService." + methodName + (genericType is not null ? $"<{genericType.GetTypeName()}>" : ""));
+        if (ex is not null) builder.AppendLine(ex.Message);
+        if (request is not null) builder.AppendLine(request.ToString());
+        if (response is not null) builder.AppendLine(response.ToString());
+        var message = builder.ToString();
+
+        if (_logger is not null)
+        {
+            if (ex is not null) _logger.LogError(ex, message);
+            else _logger.LogDebug(ex, message);
+        }
+        else Debug.WriteLine(message);
     }
 }
 
 class ResponseMonitor
 {
-    public ResponseMonitor(string? exceptionMessage, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming, HttpResponseMessage? responseMessage)
+    public ResponseMonitor(HttpRequest request, Exception? exception, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming, HttpResponseMessage? responseMessage)
     {
-        ExceptionMessage = exceptionMessage;
+        Request = request;
+        Exception = exception;
         RetryCount = retryCount;
         LastTimeConsuming = lastTimeConsuming;
         TotalTimeConsuming = totalTimeConsuming;
         ResponseMessage = responseMessage;
     }
 
-    public string? ExceptionMessage { get; }
+    public Exception? Exception { get; }
 
     public int RetryCount { get; }
 
@@ -257,6 +300,8 @@ class ResponseMonitor
     public TimeSpan TotalTimeConsuming { get; }
 
     public HttpResponseMessage? ResponseMessage { get; }
+
+    public HttpRequest Request { get; }
 }
 
 #region old
