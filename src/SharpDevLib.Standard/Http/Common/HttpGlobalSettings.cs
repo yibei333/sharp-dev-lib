@@ -20,3 +20,21 @@ public static class HttpGlobalSettings
     /// </summary>
     public static int? RetryCount { get; set; }
 }
+
+internal class HttpGlobalSettingsOptions
+{
+    /// <summary>
+    /// 基址
+    /// </summary>
+    public string? BaseUrl { get; set; }
+
+    /// <summary>
+    /// 超时时间
+    /// </summary>
+    public int? TimeOut { get; set; }
+
+    /// <summary>
+    /// 重试次数
+    /// </summary>
+    public int? RetryCount { get; set; }
+}

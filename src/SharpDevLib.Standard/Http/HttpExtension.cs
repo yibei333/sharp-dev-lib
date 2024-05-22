@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.Net;
 
 namespace SharpDevLib.Standard;
 
@@ -7,33 +9,27 @@ namespace SharpDevLib.Standard;
 /// </summary>
 public static class HttpExtension
 {
-    ///// <summary>
-    ///// add http service
-    ///// </summary>
-    ///// <param name="services">service collection</param>
-    ///// <param name="configuration">configuration</param>
-    ///// <returns>service collection</returns>
-    //public static IServiceCollection AddHttp(this IServiceCollection services, IConfiguration? configuration = null)
-    //{
-    //    if (configuration.NotNull())
-    //    {
-    //        services.Configure<HttpGlobalSettings>(configuration!.GetSection("HttpService"));
-    //    }
-    //    services.AddTransient<IHttpService, HttpService>();
-    //    return services;
-    //}
+    /// <summary>
+    /// 添加http服务
+    /// </summary>
+    /// <param name="services">service collection</param>
+    /// <returns>service collection</returns>
+    public static IServiceCollection AddHttp(this IServiceCollection services)
+    {
+        var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+        services.Configure<HttpGlobalSettingsOptions>(configuration.GetSection(nameof(HttpGlobalSettingsOptions)));
+        services.AddTransient<IHttpService, HttpService>();
+        return services;
+    }
 
     /// <summary>
     /// http get请求
     /// </summary>
     /// <param name="request">请求</param>
     /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger和全局配置用)</param>
     /// <returns>http响应</returns>
-    public static async Task<HttpResponse> GetAsync(this HttpKeyValueRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
-    {
-        return await new HttpService(serviceProvider).GetAsync(request, cancellationToken);
-    }
+    public static async Task<HttpResponse> GetAsync(this HttpKeyValueRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null) => await new HttpService(serviceProvider).GetAsync(request, cancellationToken);
 
     /// <summary>
     /// http get请求
@@ -41,35 +37,26 @@ public static class HttpExtension
     /// <typeparam name="T">返回类型</typeparam>
     /// <param name="request">请求</param>
     /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger和全局配置用)</param>
     /// <returns>http响应</returns>
-    public static async Task<HttpResponse<T>> GetAsync<T>(this HttpKeyValueRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
-    {
-        return await new HttpService(serviceProvider).GetAsync<T>(request, cancellationToken);
-    }
+    public static async Task<HttpResponse<T>> GetAsync<T>(this HttpKeyValueRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null) => await new HttpService(serviceProvider).GetAsync<T>(request, cancellationToken);
 
     /// <summary>
     /// http get请求
     /// </summary>
     /// <param name="request">请求</param>
-    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger和全局配置用)</param>
     /// <returns>http响应</returns>
-    public static async Task<Stream> GetStreamAsync(this HttpKeyValueRequest request, IServiceProvider? serviceProvider = null)
-    {
-        return await new HttpService(serviceProvider).GetStreamAsync(request);
-    }
+    public static async Task<Stream> GetStreamAsync(this HttpKeyValueRequest request, IServiceProvider? serviceProvider = null) => await new HttpService(serviceProvider).GetStreamAsync(request);
 
     /// <summary>
     /// http post请求
     /// </summary>
     /// <param name="request">请求</param>
     /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger和全局配置用)</param>
     /// <returns>http响应</returns>
-    public static async Task<HttpResponse> PostAsync(this HttpJsonRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
-    {
-        return await new HttpService(serviceProvider).PostAsync(request, cancellationToken);
-    }
+    public static async Task<HttpResponse> PostAsync(this HttpJsonRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null) => await new HttpService(serviceProvider).PostAsync(request, cancellationToken);
 
     /// <summary>
     /// http post请求
@@ -77,24 +64,18 @@ public static class HttpExtension
     /// <typeparam name="T">返回类型</typeparam>
     /// <param name="request">请求</param>
     /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger和全局配置用)</param>
     /// <returns>http响应</returns>
-    public static async Task<HttpResponse<T>> PostAsync<T>(this HttpJsonRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
-    {
-        return await new HttpService(serviceProvider).PostAsync<T>(request, cancellationToken);
-    }
+    public static async Task<HttpResponse<T>> PostAsync<T>(this HttpJsonRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null) => await new HttpService(serviceProvider).PostAsync<T>(request, cancellationToken);
 
     /// <summary>
     /// http post请求
     /// </summary>
     /// <param name="request">请求</param>
     /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger和全局配置用)</param>
     /// <returns>http响应</returns>
-    public static async Task<HttpResponse> PostAsync(this HttpUrlEncodedFormRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
-    {
-        return await new HttpService(serviceProvider).PostAsync(request, cancellationToken);
-    }
+    public static async Task<HttpResponse> PostAsync(this HttpUrlEncodedFormRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null) => await new HttpService(serviceProvider).PostAsync(request, cancellationToken);
 
     /// <summary>
     /// http post请求
@@ -102,24 +83,18 @@ public static class HttpExtension
     /// <typeparam name="T">返回类型</typeparam>
     /// <param name="request">请求</param>
     /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger和全局配置用)</param>
     /// <returns>http响应</returns>
-    public static async Task<HttpResponse<T>> PostAsync<T>(this HttpUrlEncodedFormRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
-    {
-        return await new HttpService(serviceProvider).PostAsync<T>(request, cancellationToken);
-    }
+    public static async Task<HttpResponse<T>> PostAsync<T>(this HttpUrlEncodedFormRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null) => await new HttpService(serviceProvider).PostAsync<T>(request, cancellationToken);
 
     /// <summary>
     /// http post请求
     /// </summary>
     /// <param name="request">请求</param>
     /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger和全局配置用)</param>
     /// <returns>http响应</returns>
-    public static async Task<HttpResponse> PostAsync(this HttpMultiPartFormDataRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
-    {
-        return await new HttpService(serviceProvider).PostAsync(request, cancellationToken);
-    }
+    public static async Task<HttpResponse> PostAsync(this HttpMultiPartFormDataRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null) => await new HttpService(serviceProvider).PostAsync(request, cancellationToken);
 
     /// <summary>
     /// http post请求
@@ -127,24 +102,18 @@ public static class HttpExtension
     /// <typeparam name="T">返回类型</typeparam>
     /// <param name="request">请求</param>
     /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger和全局配置用)</param>
     /// <returns>http响应</returns>
-    public static async Task<HttpResponse<T>> PostAsync<T>(this HttpMultiPartFormDataRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
-    {
-        return await new HttpService(serviceProvider).PostAsync<T>(request, cancellationToken);
-    }
+    public static async Task<HttpResponse<T>> PostAsync<T>(this HttpMultiPartFormDataRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null) => await new HttpService(serviceProvider).PostAsync<T>(request, cancellationToken);
 
     /// <summary>
     /// http put请求
     /// </summary>
     /// <param name="request">请求</param>
     /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger和全局配置用)</param>
     /// <returns>http响应</returns>
-    public static async Task<HttpResponse> PutAsync(this HttpJsonRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
-    {
-        return await new HttpService(serviceProvider).PutAsync(request, cancellationToken);
-    }
+    public static async Task<HttpResponse> PutAsync(this HttpJsonRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null) => await new HttpService(serviceProvider).PutAsync(request, cancellationToken);
 
     /// <summary>
     /// http put请求
@@ -152,24 +121,18 @@ public static class HttpExtension
     /// <typeparam name="T">返回类型</typeparam>
     /// <param name="request">请求</param>
     /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger和全局配置用)</param>
     /// <returns>http响应</returns>
-    public static async Task<HttpResponse<T>> PutAsync<T>(this HttpJsonRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
-    {
-        return await new HttpService(serviceProvider).PutAsync<T>(request, cancellationToken);
-    }
+    public static async Task<HttpResponse<T>> PutAsync<T>(this HttpJsonRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null) => await new HttpService(serviceProvider).PutAsync<T>(request, cancellationToken);
 
     /// <summary>
     /// http delete请求
     /// </summary>
     /// <param name="request">请求</param>
     /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger和全局配置用)</param>
     /// <returns>http响应</returns>
-    public static async Task<HttpResponse> DeleteAsync(this HttpKeyValueRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
-    {
-        return await new HttpService(serviceProvider).DeleteAsync(request, cancellationToken);
-    }
+    public static async Task<HttpResponse> DeleteAsync(this HttpKeyValueRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null) => await new HttpService(serviceProvider).DeleteAsync(request, cancellationToken);
 
     /// <summary>
     /// http delete请求
@@ -177,12 +140,9 @@ public static class HttpExtension
     /// <typeparam name="T">返回类型</typeparam>
     /// <param name="request">请求</param>
     /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="serviceProvider">serviceProvider(获取ILogger用)</param>
+    /// <param name="serviceProvider">serviceProvider(获取ILogger和全局配置用)</param>
     /// <returns>http响应</returns>
-    public static async Task<HttpResponse<T>> DeleteAsync<T>(this HttpKeyValueRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null)
-    {
-        return await new HttpService(serviceProvider).DeleteAsync<T>(request, cancellationToken);
-    }
+    public static async Task<HttpResponse<T>> DeleteAsync<T>(this HttpKeyValueRequest request, CancellationToken? cancellationToken = null, IServiceProvider? serviceProvider = null) => await new HttpService(serviceProvider).DeleteAsync<T>(request, cancellationToken);
 
     internal static Cookie? ParseCookie(this string cookieString, string host)
     {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
@@ -15,6 +16,13 @@ internal class HttpService : IHttpService
     public HttpService(IServiceProvider? provider)
     {
         _logger = provider?.GetService<ILogger<HttpService>>();
+        var options = provider?.GetService<IOptionsMonitor<HttpGlobalSettingsOptions>>()?.CurrentValue;
+        if (options is not null)
+        {
+            HttpGlobalSettings.BaseUrl = options.BaseUrl;
+            HttpGlobalSettings.RetryCount = options.RetryCount;
+            if (options.TimeOut.HasValue) HttpGlobalSettings.TimeOut = TimeSpan.FromSeconds(options.TimeOut.Value);
+        }
     }
 
     async Task<HttpResponse<T>> GetAsync<T>(HttpKeyValueRequest request, bool isGenericMethod, CancellationToken? cancellationToken = null)
@@ -333,7 +341,7 @@ internal class HttpService : IHttpService
         if (_logger is not null)
         {
             if (ex is not null) _logger.LogError(ex, message);
-            else _logger.LogDebug(ex, message);
+            else _logger.LogTrace(ex, message);
         }
         else Debug.WriteLine(message);
     }
