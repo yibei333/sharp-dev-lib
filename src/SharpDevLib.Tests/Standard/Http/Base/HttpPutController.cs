@@ -12,6 +12,7 @@ internal class HttpPutController : WebApiController
     [Route(HttpVerbs.Put, "/put")]
     public void Put([JsonData] User user)
     {
+        Console.WriteLine(HttpContext.Request.UserAgent);
         Console.WriteLine(user.Serialize());
     }
 

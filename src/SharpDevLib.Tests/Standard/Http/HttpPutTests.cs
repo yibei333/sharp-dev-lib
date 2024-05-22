@@ -13,7 +13,10 @@ public class HttpPutTests : HttpBaseTests
     [TestMethod]
     public void PutTest()
     {
-        var request = new HttpJsonRequest("/api/put", _userJson);
+        var request = new HttpJsonRequest("/api/put", _userJson)
+        {
+            UseEdgeUserAgent = false
+        };
         var response = request.PutAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
     }

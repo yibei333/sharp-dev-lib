@@ -53,6 +53,11 @@ public abstract class HttpRequest
     public Action<HttpProgress>? OnSendProgress { get; set; }
 
     /// <summary>
+    /// 使用edge的ua(默认为true)
+    /// </summary>
+    public bool UseEdgeUserAgent { get; set; } = true;
+
+    /// <summary>
     /// 将请求转换为字符串,用于记录日志
     /// </summary>
     /// <returns>字符串</returns>

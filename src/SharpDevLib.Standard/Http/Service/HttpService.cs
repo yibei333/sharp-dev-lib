@@ -9,6 +9,7 @@ namespace SharpDevLib.Standard;
 
 internal class HttpService : IHttpService
 {
+    const string _edgeUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0";
     readonly ILogger<HttpService>? _logger;
 
     public HttpService(IServiceProvider? provider)
@@ -197,6 +198,10 @@ internal class HttpService : IHttpService
             {
                 if (header.Value.NotNullOrEmpty()) client.DefaultRequestHeaders.Add(header.Key, header.Value);
             }
+        }
+        if (request.UseEdgeUserAgent && !(request.Headers?.ContainsKey("User-Agent") ?? false))
+        {
+            client.DefaultRequestHeaders.Add("User-Agent", _edgeUA);
         }
         client.Timeout = request.TimeOut ?? HttpGlobalSettings.TimeOut ?? TimeSpan.FromDays(1);
         return client;
