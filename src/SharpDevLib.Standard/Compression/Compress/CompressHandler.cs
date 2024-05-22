@@ -2,13 +2,14 @@
 
 internal abstract class CompressHandler
 {
-    protected CompressHandler(CompressOption option)
+    protected CompressHandler(CompressOption option, CancellationToken? cancellationToken)
     {
         Option = option;
+        CancellationToken = cancellationToken;
     }
 
     public CompressOption Option { get; }
-
+    public CancellationToken? CancellationToken { get; }
     public virtual bool SupportPassword { get; } = false;
 
     public abstract Task HandleAsync();
@@ -16,7 +17,7 @@ internal abstract class CompressHandler
     protected async Task CopyStream(FilePathInfo pathInfo, Stream outputStream)
     {
         using var sourceStream = new FileInfo(pathInfo.Path).OpenOrCreate();
-        await sourceStream.CopyToAsync(outputStream, Option.CancellationToken, transfered =>
+        await sourceStream.CopyToAsync(outputStream, CancellationToken ?? System.Threading.CancellationToken.None, transfered =>
         {
             Option.CurrentName = pathInfo.Path;
             Option.Transfered += transfered;
@@ -61,7 +62,7 @@ internal abstract class CompressHandler
 
 internal abstract class CompressHandler<TOutputStream, TEntry> : CompressHandler where TOutputStream : Stream where TEntry : class
 {
-    protected CompressHandler(CompressOption option) : base(option)
+    protected CompressHandler(CompressOption option, CancellationToken? cancellationToken) : base(option, cancellationToken)
     { }
 
     public abstract TOutputStream CreateStream(Stream targetStream);
@@ -81,12 +82,12 @@ internal abstract class CompressHandler<TOutputStream, TEntry> : CompressHandler
 
         foreach (var path in pathList)
         {
-            if (Option.CancellationToken.IsCancellationRequested) break;
+            if (CancellationToken?.IsCancellationRequested ?? false) break;
             await WriteNextEntryAsync(outputStream, path);
         }
 
-        if (Option.CancellationToken.IsCancellationRequested) throw new OperationCanceledException(Option.CancellationToken);
-        await outputStream.FlushAsync(Option.CancellationToken);
+        if (CancellationToken?.IsCancellationRequested ?? false) throw new OperationCanceledException(CancellationToken.Value);
+        await outputStream.FlushAsync(CancellationToken ?? System.Threading.CancellationToken.None);
     }
 }
 

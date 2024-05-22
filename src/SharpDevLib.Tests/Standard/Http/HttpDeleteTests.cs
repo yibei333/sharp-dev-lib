@@ -4,7 +4,6 @@ using SharpDevLib.Tests.Data;
 using SharpDevLib.Tests.Standard.Http.Base;
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace SharpDevLib.Tests.Standard.Http;
 

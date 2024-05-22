@@ -4,7 +4,7 @@ namespace SharpDevLib.Standard.Compression.Compress;
 
 internal class ZipCompressHandler : CompressHandler<ZipOutputStream, ZipEntry>
 {
-    public ZipCompressHandler(CompressOption option) : base(option)
+    public ZipCompressHandler(CompressOption option, CancellationToken? cancellationToken) : base(option, cancellationToken)
     {
     }
 

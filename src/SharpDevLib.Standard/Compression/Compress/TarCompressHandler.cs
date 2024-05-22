@@ -5,7 +5,7 @@ namespace SharpDevLib.Standard.Compression.Compress;
 
 internal class TarCompressHandler : CompressHandler<TarOutputStream, TarEntry>
 {
-    public TarCompressHandler(CompressOption option) : base(option)
+    public TarCompressHandler(CompressOption option, CancellationToken? cancellationToken) : base(option, cancellationToken)
     {
     }
 

@@ -2,7 +2,7 @@
 
 internal class RarDeCompressHandler : DeCompressHandler
 {
-    public RarDeCompressHandler(DeCompressOption option) : base(option)
+    public RarDeCompressHandler(DeCompressOption option, CancellationToken? cancellationToken) : base(option, cancellationToken)
     {
     }
 }

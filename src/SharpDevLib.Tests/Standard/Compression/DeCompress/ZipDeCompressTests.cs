@@ -34,4 +34,31 @@ public class ZipDeCompressTests
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
         Assert.AreEqual("foo text", File.ReadAllText(targetPath.CombinePath("foo.txt")));
     }
+
+    [TestMethod]
+    public void SyncDeCompressTest()
+    {
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/zip-decompress-sync");
+        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/zip.zip"), targetPath)
+        {
+            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+        };
+        option.DeCompress();
+        Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
+        Assert.AreEqual("foo text", File.ReadAllText(targetPath.CombinePath("foo.txt")));
+    }
+
+    [TestMethod]
+    public void SyncDeCompressWithPasswordTest()
+    {
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/zip-decompress-password-sync");
+        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/zip-password.zip"), targetPath)
+        {
+            Password = "foobar",
+            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+        };
+        option.DeCompress();
+        Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
+        Assert.AreEqual("foo text", File.ReadAllText(targetPath.CombinePath("foo.txt")));
+    }
 }

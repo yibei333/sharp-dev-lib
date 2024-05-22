@@ -7,7 +7,7 @@ namespace SharpDevLib.Standard.Compression.DeCompress;
 
 internal class SevenZipDeCompressHandler : DeCompressHandler
 {
-    public SevenZipDeCompressHandler(DeCompressOption option) : base(option)
+    public SevenZipDeCompressHandler(DeCompressOption option, CancellationToken? cancellationToken) : base(option, cancellationToken)
     {
     }
 
@@ -20,7 +20,7 @@ internal class SevenZipDeCompressHandler : DeCompressHandler
 
         foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
         {
-            if (Option.CancellationToken.IsCancellationRequested) break;
+            if (CancellationToken?.IsCancellationRequested ?? false) break;
             entry.WriteToDirectory(Option.TargetPath, new ExtractionOptions
             {
                 ExtractFullPath = true,
@@ -34,6 +34,6 @@ internal class SevenZipDeCompressHandler : DeCompressHandler
                 Option.OnProgress!.Invoke(progress);
             }
         }
-        if (Option.CancellationToken.IsCancellationRequested) throw new OperationCanceledException(Option.CancellationToken);
+        if (CancellationToken?.IsCancellationRequested ?? false) throw new OperationCanceledException(CancellationToken.Value);
     }
 }

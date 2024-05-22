@@ -5,11 +5,13 @@ namespace SharpDevLib.Standard.Compression.DeCompress;
 
 internal abstract class DeCompressHandler
 {
-    protected DeCompressHandler(DeCompressOption option)
+    protected DeCompressHandler(DeCompressOption option, CancellationToken? cancellationToken)
     {
         Option = option;
+        CancellationToken = cancellationToken;
     }
     public DeCompressOption Option { get; }
+    public CancellationToken? CancellationToken { get; }
 
     public virtual async Task HandleAsync()
     {
@@ -27,7 +29,7 @@ internal abstract class DeCompressHandler
         };
         while (reader.MoveToNextEntry())
         {
-            if (Option.CancellationToken.IsCancellationRequested) break;
+            if (CancellationToken?.IsCancellationRequested ?? false) break;
             if (reader.Entry.IsDirectory) continue;
 
             reader.WriteEntryToDirectory(Option.TargetPath, new ExtractionOptions
@@ -37,7 +39,7 @@ internal abstract class DeCompressHandler
             });
         }
 
-        if (Option.CancellationToken.IsCancellationRequested) throw new OperationCanceledException(Option.CancellationToken);
+        if (CancellationToken?.IsCancellationRequested ?? false) throw new OperationCanceledException(CancellationToken.Value);
     }
 
     private void SetTotalSize(Stream sourceStream)

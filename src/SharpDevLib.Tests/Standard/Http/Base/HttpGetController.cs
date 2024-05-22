@@ -14,6 +14,7 @@ internal class HttpGetController : WebApiController
     [Route(HttpVerbs.Get, "/get")]
     public void Get()
     {
+        Console.WriteLine(HttpContext.Id);
         Console.WriteLine("ok");
     }
 
@@ -56,16 +57,17 @@ internal class HttpGetController : WebApiController
         });
     }
 
-    static readonly Dictionary<string, int> _retryCount = new();
+    static readonly Dictionary<string, int> _retryCount = [];
 
     [Route(HttpVerbs.Get, "/get/retry")]
     public void GetRetry([QueryField] int count, [QueryField] string id)
     {
-        if (_retryCount.ContainsKey(id))
+        Console.WriteLine(HttpContext.Id);
+        if (_retryCount.TryGetValue(id, out int value))
         {
-            if (_retryCount[id] != count)
+            if (value != count)
             {
-                _retryCount[id] = _retryCount[id] + 1;
+                _retryCount[id] = value + 1;
                 throw new Exception("retry please");
             }
         }
@@ -79,6 +81,7 @@ internal class HttpGetController : WebApiController
     [Route(HttpVerbs.Get, "/get/timeout")]
     public void Timeout()
     {
+        Console.WriteLine(HttpContext.Id);
         Thread.Sleep(1500);
     }
 }

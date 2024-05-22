@@ -11,7 +11,7 @@ namespace SharpDevLib.Tests.Standard.Http;
 [TestClass]
 public class HttpPostTests : HttpBaseTests
 {
-    static string _userJson = new User("foo", 10).Serialize();
+    static readonly string _userJson = new User("foo", 10).Serialize();
 
     [TestMethod]
     public void PostJsonTest()

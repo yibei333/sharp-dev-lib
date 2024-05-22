@@ -4,7 +4,7 @@ namespace SharpDevLib.Standard.Compression.DeCompress;
 
 internal class XzDeCompressHandler : DeCompressHandler
 {
-    public XzDeCompressHandler(DeCompressOption option) : base(option)
+    public XzDeCompressHandler(DeCompressOption option, CancellationToken? cancellationToken) : base(option, cancellationToken)
     {
     }
 
@@ -23,7 +23,7 @@ internal class XzDeCompressHandler : DeCompressHandler
             using var sourceStream = new FileInfo(Option.SourceFile).OpenOrCreate();
             using var inputStream = new XZStream(sourceStream);
             using var outputStream = new FileInfo(Option.TargetPath.CombinePath(fileName)).OpenOrCreate();
-            await inputStream.CopyToAsync(outputStream, Option.CancellationToken, transfered => Option.Transfered += transfered);
+            await inputStream.CopyToAsync(outputStream, CancellationToken ?? System.Threading.CancellationToken.None, transfered => Option.Transfered += transfered);
         }
     }
 

@@ -45,11 +45,6 @@ public abstract class CompressionOption
     public string? Password { get; set; }
 
     /// <summary>
-    /// CancellationToken
-    /// </summary>
-    public CancellationToken CancellationToken { get; set; } = Statics.CancellationToken;
-
-    /// <summary>
     /// 进度变化回调
     /// </summary>
     public Action<CompressionProgressArgs>? OnProgress { get; set; }

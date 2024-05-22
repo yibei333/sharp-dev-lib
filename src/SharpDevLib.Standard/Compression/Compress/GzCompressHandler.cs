@@ -4,7 +4,7 @@ namespace SharpDevLib.Standard.Compression.Compress;
 
 internal class GzCompressHandler : CompressHandler
 {
-    public GzCompressHandler(CompressOption option) : base(option)
+    public GzCompressHandler(CompressOption option, CancellationToken? cancellationToken) : base(option, cancellationToken)
     {
     }
 
@@ -38,7 +38,7 @@ internal class GzCompressHandler : CompressHandler
             if (fileInfo.Exists) return new FilePathInfo(fileInfo.FullName, fileInfo.Name, fileInfo.Name, fileInfo.Length);
         }
 
-        await new CompressOption(Option.SourcePaths, tempFileInfo.FullName) { CancellationToken = Option.CancellationToken, IncludeSourceDiretory = Option.IncludeSourceDiretory }.CompressAsync();
+        await new CompressOption(Option.SourcePaths, tempFileInfo.FullName) { IncludeSourceDiretory = Option.IncludeSourceDiretory }.CompressAsync(CancellationToken);
         return new FilePathInfo(tempFileInfo.FullName, tempFileInfo.Name, tempFileInfo.Name, tempFileInfo.Length);
     }
 }

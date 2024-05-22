@@ -1045,6 +1045,27 @@ public static class FileExtension
     }
 
     /// <summary>
+    /// 将字节数组保存到文件中
+    /// </summary>
+    /// <param name="bytes">字节数组</param>
+    /// <param name="filePath">文件路径</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
+    public static async Task SaveToFileAsync(this byte[] bytes, string filePath, CancellationToken? cancellationToken, bool throwIfFileExist = false)
+    {
+        if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
+        if (File.Exists(filePath))
+        {
+            if (throwIfFileExist) throw new InvalidOperationException($"file '{filePath}' already existed");
+            File.Delete(filePath);
+        }
+        new FileInfo(filePath).DirectoryName.EnsureDirectoryExist();
+        using var stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        await stream.WriteAsync(bytes, 0, bytes.Length, cancellationToken ?? CancellationToken.None);
+        await stream.FlushAsync(cancellationToken ?? CancellationToken.None);
+    }
+
+    /// <summary>
     /// 将流保存到文件中
     /// </summary>
     /// <param name="stream">流</param>
@@ -1062,6 +1083,27 @@ public static class FileExtension
         using var fileStream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
         stream.CopyTo(fileStream);
         fileStream.Flush();
+    }
+
+    /// <summary>
+    /// 将流保存到文件中
+    /// </summary>
+    /// <param name="stream">流</param>
+    /// <param name="filePath">文件路径</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
+    public static async Task SaveToFileAsync(this Stream stream, string filePath, CancellationToken? cancellationToken, bool throwIfFileExist = false)
+    {
+        if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
+        if (File.Exists(filePath))
+        {
+            if (throwIfFileExist) throw new InvalidOperationException($"file '{filePath}' already existed");
+            File.Delete(filePath);
+        }
+
+        using var fileStream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        await stream.CopyToAsync(fileStream, cancellationToken ?? CancellationToken.None);
+        await fileStream.FlushAsync(cancellationToken ?? CancellationToken.None);
     }
 
     /// <summary>
