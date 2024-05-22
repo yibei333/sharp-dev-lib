@@ -1,5 +1,4 @@
-﻿using EmbedIO.WebApi;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Standard;
 using SharpDevLib.Tests.Data;
 using SharpDevLib.Tests.Standard.Http.Base;

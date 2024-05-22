@@ -4,7 +4,6 @@ using SharpDevLib.Tests.Data;
 using SharpDevLib.Tests.Standard.Http.Base;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 
 namespace SharpDevLib.Tests.Standard.Http;
@@ -97,6 +96,8 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public void PostMultiPartFormObjectTest()
     {
+        var sendCount = 0;
+        var receiveCount = 0;
         var request = new HttpMultiPartFormDataRequest("/api/post/form/multi/object", new Dictionary<string, string>
         {
             { "Name","foo" },
@@ -105,9 +106,23 @@ public class HttpPostTests : HttpBaseTests
         [
             new FormFile("file","TestFile.txt",File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/TestFile.txt"))),
             new FormFile("file","Foo.txt",File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Foo.txt"))),
-        ]);
+        ])
+        {
+            OnReceiveProgress = p =>
+            {
+                receiveCount++;
+                Console.WriteLine($"receive->{p}");
+            },
+            OnSendProgress = p =>
+            {
+                sendCount++;
+                Console.WriteLine($"send->{p}");
+            }
+        };
         var response = request.PostAsync<User>().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
+        Assert.IsTrue(sendCount > 0);
+        Assert.IsTrue(receiveCount > 0);
         Assert.IsNotNull(response.Data);
         Assert.AreEqual(10, response.Data.Age);
         Assert.AreEqual("foo", response.Data.Name);

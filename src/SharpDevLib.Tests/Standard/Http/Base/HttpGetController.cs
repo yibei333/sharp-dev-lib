@@ -76,7 +76,7 @@ internal class HttpGetController : WebApiController
         }
     }
 
-    [Route(HttpVerbs.Get,"/get/timeout")]
+    [Route(HttpVerbs.Get, "/get/timeout")]
     public void Timeout()
     {
         Thread.Sleep(1500);
