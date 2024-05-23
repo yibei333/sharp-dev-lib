@@ -66,6 +66,7 @@ internal static class InternalCompressionExtension
 
     internal static async Task InternalCompressAsync(this CompressOption option, CancellationToken? cancellationToken = null)
     {
+        await Task.Yield();
         var format = option.Format;
         var type = CompressHandlers.TryGetValue(format, out var handlerType) ? handlerType : throw new Exception($"unable to find handler of format '{format}'");
         var instance = Activator.CreateInstance(type, option, cancellationToken) as CompressHandler ?? throw new NullReferenceException();
@@ -74,6 +75,7 @@ internal static class InternalCompressionExtension
 
     internal static async Task InternalDeCompressAsync(this DeCompressOption option, CancellationToken? cancellationToken = null)
     {
+        await Task.Yield();
         var format = option.Format;
         var type = DeCompressHandlers.TryGetValue(format, out var handlerType) ? handlerType : throw new Exception($"unable to find handler of format '{format}'");
         var instance = Activator.CreateInstance(type, option, cancellationToken) as DeCompressHandler ?? throw new NullReferenceException();

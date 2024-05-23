@@ -27,7 +27,7 @@ internal class HttpService : IHttpService
 
     async Task<HttpResponse<T>> GetAsync<T>(HttpKeyValueRequest request, bool isGenericMethod, CancellationToken? cancellationToken = null)
     {
-        using var client = CreateClient(request);
+        using var client = await CreateClientAsync(request);
         var url = BuildGetUrl(request);
         var responseMonitor = await Retry(client, () => new HttpRequestMessage(HttpMethod.Get, url), request, cancellationToken);
         return await BuildResponse<T>(responseMonitor, nameof(GetAsync), isGenericMethod);
@@ -41,7 +41,7 @@ internal class HttpService : IHttpService
     {
         try
         {
-            using var client = CreateClient(request);
+            using var client = await CreateClientAsync(request);
             var url = BuildGetUrl(request);
             var stream = await client.GetStreamAsync(url);
             Log(null, request, null, nameof(GetStreamAsync));
@@ -56,7 +56,7 @@ internal class HttpService : IHttpService
 
     async Task<HttpResponse<T>> PostAsync<T>(HttpJsonRequest request, bool isGenericMethod, CancellationToken? cancellationToken = null)
     {
-        using var client = CreateClient(request);
+        using var client = await CreateClientAsync(request);
         var url = BuildUrl(request);
         var responseMonitor = await Retry(client, () =>
         {
@@ -75,7 +75,7 @@ internal class HttpService : IHttpService
 
     async Task<HttpResponse<T>> PostAsync<T>(HttpMultiPartFormDataRequest request, bool isGenericMethod, CancellationToken? cancellationToken = null)
     {
-        using var client = CreateClient(request);
+        using var client = await CreateClientAsync(request);
         var url = BuildUrl(request);
         var responseMonitor = await Retry(client, () =>
         {
@@ -115,7 +115,7 @@ internal class HttpService : IHttpService
 
     async Task<HttpResponse<T>> PostAsync<T>(HttpUrlEncodedFormRequest request, bool isGenericMethod, CancellationToken? cancellationToken = null)
     {
-        using var client = CreateClient(request);
+        using var client = await CreateClientAsync(request);
         var url = BuildUrl(request);
         var responseMonitor = await Retry(client, () =>
         {
@@ -134,7 +134,7 @@ internal class HttpService : IHttpService
 
     async Task<HttpResponse<T>> PutAsync<T>(HttpJsonRequest request, bool isGenericMethod, CancellationToken? cancellationToken = null)
     {
-        using var client = CreateClient(request);
+        using var client = await CreateClientAsync(request);
         var url = BuildUrl(request);
         var responseMonitor = await Retry(client, () =>
         {
@@ -153,7 +153,7 @@ internal class HttpService : IHttpService
 
     async Task<HttpResponse<T>> DeleteAsync<T>(HttpKeyValueRequest request, bool isGenericMethod, CancellationToken? cancellationToken = null)
     {
-        using var client = CreateClient(request);
+        using var client = await CreateClientAsync(request);
         var url = BuildGetUrl(request);
         var responseMonitor = await Retry(client, () => new HttpRequestMessage(HttpMethod.Delete, url), request, cancellationToken);
         return await BuildResponse<T>(responseMonitor, nameof(DeleteAsync), isGenericMethod);
@@ -164,8 +164,10 @@ internal class HttpService : IHttpService
     public async Task<HttpResponse> DeleteAsync(HttpKeyValueRequest request, CancellationToken? cancellationToken = null) => await DeleteAsync<string>(request, false, cancellationToken);
 
     #region Private
-    HttpClient CreateClient(HttpRequest request)
+    async Task<HttpClient> CreateClientAsync(HttpRequest request)
     {
+        await Task.Yield();
+
         var handler = new HttpClientHandler { CookieContainer = new CookieContainer() };
         if (request.Cookies.NotNullOrEmpty())
         {
