@@ -202,6 +202,12 @@ internal class HttpService : IHttpService
             };
         }
 
+        if (request.UseEdgeUserAgent && !(request.Headers?.ContainsKey("User-Agent") ?? false))
+        {
+            request.Headers ??= new Dictionary<string, IEnumerable<string>>();
+            request.Headers.Add("User-Agent", new string[] { _edgeUA });
+        }
+
         if (request.Headers.NotNullOrEmpty())
         {
             foreach (var header in request.Headers)
@@ -209,10 +215,7 @@ internal class HttpService : IHttpService
                 if (header.Value.NotNullOrEmpty()) client.DefaultRequestHeaders.Add(header.Key, header.Value);
             }
         }
-        if (request.UseEdgeUserAgent && !(request.Headers?.ContainsKey("User-Agent") ?? false))
-        {
-            client.DefaultRequestHeaders.Add("User-Agent", _edgeUA);
-        }
+
         client.Timeout = request.TimeOut ?? HttpGlobalSettings.TimeOut ?? TimeSpan.FromDays(1);
         return client;
     }

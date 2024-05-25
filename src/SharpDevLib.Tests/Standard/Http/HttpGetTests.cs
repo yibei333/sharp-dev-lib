@@ -36,6 +36,7 @@ public class HttpGetTests : HttpBaseTests
         Assert.IsTrue(count > 0);
         Assert.IsTrue(response.IsSuccess);
         Assert.AreEqual(2, response.Data);
+        Console.WriteLine(request);
     }
 
     [TestMethod]
