@@ -1,36 +1,41 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace SharpDevLib.Extensions.Email;
 
 /// <summary>
-/// email dependency register extension
+/// 邮件扩展
 /// </summary>
 public static class EmailExtension
 {
     /// <summary>
-    /// add email service from configuration files
+    /// 添加邮件服务
     /// </summary>
     /// <param name="services">service collection</param>
-    /// <param name="configuration">configuration</param>
     /// <returns>service collection</returns>
-    public static IServiceCollection AddEmail(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddEmail(this IServiceCollection services)
     {
-        services.Configure<EmailOptions>(configuration.GetSection("Email"));
         services.AddScoped<IEmailService, EmailService>();
         return services;
     }
 
     /// <summary>
-    /// add email service from code
+    /// 发送邮件
     /// </summary>
-    /// <param name="services">service collection</param>
-    /// <param name="options">options</param>
-    /// <returns>service collection</returns>
-    public static IServiceCollection AddEmail(this IServiceCollection services, Action<EmailOptions> options)
+    /// <param name="options">配置</param>
+    /// <param name="content">内容</param>
+    public static void Send(this EmailOptions options, EmailContent content)
     {
-        services.Configure(options);
-        services.AddScoped<IEmailService, EmailService>();
-        return services;
+        new EmailService(options).Send(content);
+    }
+
+    /// <summary>
+    /// 发送邮件
+    /// </summary>
+    /// <param name="options">配置</param>
+    /// <param name="content">内容</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    public static async Task SendAsync(this EmailOptions options, EmailContent content, CancellationToken? cancellationToken = null)
+    {
+        await new EmailService(options).SendAsync(content, cancellationToken);
     }
 }

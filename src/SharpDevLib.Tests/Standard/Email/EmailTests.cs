@@ -71,14 +71,67 @@ public class EmailTests
             CC = ["baz@localhost"],
             BCC = ["qux@localhost"]
         };
-        var service = new EmailService(options);
-        service.Send(content);
+        options.Send(content);
 
         Assert.IsNotNull(_emailUserService);
         Assert.IsNotNull(_emailService);
         Assert.IsNotNull(_emailDetailService);
 
         var email = (from a in _emailService.All join b in _emailDetailService.All on a.Id equals b.EmailId join c in _emailUserService.All on b.UserId equals c.Id where b.Type == 1 && c.Name == options.SenderDisplayName && a.Subject == content.Subject select a).FirstOrDefault();
+        Assert.IsNotNull(email);
+        Assert.IsTrue(File.Exists(email.FilePath));
+
+        using var stream = File.OpenRead(email.FilePath);
+        using var message = MimeMessage.Load(new ParserOptions { CharsetEncoding = Encoding.UTF8 }, stream);
+        Assert.IsNotNull(message);
+
+        Console.WriteLine(message.ToString());
+
+        Assert.IsTrue(message.Body.ToString().Contains(content.Body!));
+        Assert.AreEqual(content.Receivers?.First(), message.To.First().ToString());
+        Assert.AreEqual(content.CC?.First(), message.Cc.First().ToString());
+        Assert.AreEqual(true, message.Bcc.IsNullOrEmpty());
+        var bccEmail = (from a in _emailService.All join b in _emailDetailService.All on a.Id equals b.EmailId join c in _emailUserService.All on b.UserId equals c.Id where b.Type == 2 && c.Name == "qux" && a.Subject == content.Subject select a).FirstOrDefault();
+        Assert.IsNotNull(bccEmail);
+
+        Assert.AreEqual(1, message.Attachments.Count());
+        using var attachment = message.Attachments.First() as MimePart;
+        Assert.IsNotNull(attachment);
+        using var attachStream = new MemoryStream();
+        attachment.Content.WriteTo(attachStream);
+        var attachmentText = attachStream.ToArray().ToUtf8String();
+        Assert.AreEqual("Hello,World!", attachmentText.Base64Decode().ToUtf8String());
+    }
+
+    [TestMethod]
+    public void SendFromServiceTest()
+    {
+        EmailGlobalOptions.Host = "localhost";
+        EmailGlobalOptions.Port = 25;
+        EmailGlobalOptions.Sender = "baz@localhost";
+        EmailGlobalOptions.SenderDisplayName = "baz";
+        EmailGlobalOptions.SenderPassword = "baz_password";
+
+        IServiceCollection services = new ServiceCollection();
+        services.AddEmail();
+        var serviceProvider = services.BuildServiceProvider().CreateScope().ServiceProvider;
+        var service = serviceProvider.GetRequiredService<IEmailService>();
+
+        var content = new EmailContent(["qux@localhost"], "send test", "testbody")
+        {
+            Attachments = [
+                new EmailAttachment(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/TestFile.txt"))
+            ],
+            CC = ["foo@localhost"],
+            BCC = ["bar@localhost"]
+        };
+        service.Send(content);
+
+        Assert.IsNotNull(_emailUserService);
+        Assert.IsNotNull(_emailService);
+        Assert.IsNotNull(_emailDetailService);
+
+        var email = (from a in _emailService.All join b in _emailDetailService.All on a.Id equals b.EmailId join c in _emailUserService.All on b.UserId equals c.Id where b.Type == 1 && c.Name == EmailGlobalOptions.SenderDisplayName && a.Subject == content.Subject select a).FirstOrDefault();
         Assert.IsNotNull(email);
         Assert.IsTrue(File.Exists(email.FilePath));
 

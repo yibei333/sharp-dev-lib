@@ -1,39 +1,45 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SharpDevLib.Standard;
 using System.Net;
 using System.Net.Mail;
 
 namespace SharpDevLib.Extensions.Email;
 
-/// <summary>
-/// email service
-/// </summary>
-public class EmailService : IEmailService
+internal class EmailService : IEmailService
 {
     private readonly EmailOptions _options;
 
-    /// <summary>
-    /// instantient email service use di
-    /// </summary>
-    /// <param name="options">email options</param>
-    public EmailService(IOptions<EmailOptions> options)
+    public EmailService(IServiceProvider? provider)
     {
-        _options = options.Value;
+        _options = provider?.GetService<IOptionsMonitor<EmailOptions>>()?.CurrentValue!;
+        if (_options is null)
+        {
+            _options = new EmailOptions
+            {
+                Sender = EmailGlobalOptions.Sender,
+                SenderPassword = EmailGlobalOptions.SenderPassword,
+                SenderDisplayName = EmailGlobalOptions.SenderDisplayName,
+                Host = EmailGlobalOptions.Host,
+                Port = EmailGlobalOptions.Port,
+                UseSSL = EmailGlobalOptions.UseSSL
+            };
+        }
+        else
+        {
+            if (_options.Sender.IsNullOrWhiteSpace()) _options.Sender = EmailGlobalOptions.Sender;
+            if (_options.SenderPassword.IsNullOrWhiteSpace()) _options.SenderPassword = EmailGlobalOptions.SenderPassword;
+            if (_options.SenderDisplayName.IsNullOrWhiteSpace()) _options.SenderDisplayName = EmailGlobalOptions.SenderDisplayName;
+            if (_options.Host.IsNullOrWhiteSpace()) _options.Host = EmailGlobalOptions.Host;
+            if (_options.Port <= 0) _options.Port = EmailGlobalOptions.Port;
+        }
     }
 
-    /// <summary>
-    /// instantient email service use di
-    /// </summary>
-    /// <param name="options">email options</param>
-    public EmailService(EmailOptions options)
+    internal EmailService(EmailOptions options)
     {
         _options = options;
     }
 
-    /// <summary>
-    /// send email
-    /// </summary>
-    /// <param name="content">email content</param>
     public void Send(EmailContent content)
     {
         VerifyOptions(content);
@@ -42,13 +48,9 @@ public class EmailService : IEmailService
         client.Send(message);
     }
 
-    /// <summary>
-    /// send email async
-    /// </summary>
-    /// <param name="content">email content</param>
-    /// <param name="cancellationToken">cancellationToken</param>
     public async Task SendAsync(EmailContent content, CancellationToken? cancellationToken)
     {
+        await Task.Yield();
         VerifyOptions(content);
         var message = BuildMailMessage(content);
         using var client = CreateClient();
@@ -56,7 +58,6 @@ public class EmailService : IEmailService
         {
             await client.SendMailAsync(message);
         }, cancellationToken ?? CancellationToken.None);
-        //await client.SendMailAsync(message, cancellationToken ?? CancellationToken.None);
     }
 
     #region Private

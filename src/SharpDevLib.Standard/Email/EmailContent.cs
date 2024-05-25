@@ -5,21 +5,18 @@ using System.Text;
 namespace SharpDevLib.Extensions.Email;
 
 /// <summary>
-/// email content
+/// 邮箱内容
 /// </summary>
 public class EmailContent
 {
-    /// <summary>
-    /// prevent use instantient default
-    /// </summary>
     private EmailContent() { }
 
     /// <summary>
-    /// instantient email content
+    /// 实例化邮箱内容
     /// </summary>
-    /// <param name="receivers">receivers</param>
-    /// <param name="subject">subject</param>
-    /// <param name="body">body</param>
+    /// <param name="receivers">收件人</param>
+    /// <param name="subject">标题</param>
+    /// <param name="body">主体</param>
     public EmailContent(IEnumerable<string>? receivers, string? subject, string? body)
     {
         Receivers = receivers;
@@ -27,67 +24,73 @@ public class EmailContent
         Body = body;
     }
 
-
     /// <summary>
-    /// receivers address
+    /// 收件人
     /// </summary>
     public IEnumerable<string>? Receivers { get; set; }
+
     /// <summary>
-    /// the carbon copies (CC) recipients address
+    /// 抄送人
     /// </summary>
     public IEnumerable<string>? CC { get; set; }
+
     /// <summary>
-    /// the blind carbon copy (BCC) recipients address
+    /// 密送人
     /// </summary>
     public IEnumerable<string>? BCC { get; set; }
+
     /// <summary>
-    /// repliers address
+    /// 回复人
     /// </summary>
     public IEnumerable<string>? Repliers { get; set; }
+
     /// <summary>
-    /// message subject
+    /// 标题
     /// </summary>
     public string? Subject { get; set; }
+
     /// <summary>
-    /// message body
+    /// 主体
     /// </summary>
     public string? Body { get; set; }
+
     /// <summary>
-    /// attachment list
+    /// 附件
     /// </summary>
     public IEnumerable<EmailAttachment>? Attachments { get; set; }
+
     /// <summary>
-    /// email priority
+    /// 优先级
     /// </summary>
     public MailPriority? Priority { get; set; }
+
     /// <summary>
-    /// body encoding
+    /// 主体编码
     /// </summary>
     public Encoding? BodyEncoding { get; set; }
+
     /// <summary>
-    /// header encoding
+    /// 头部编码
     /// </summary>
     public Encoding? HeaderEncoding { get; set; }
+
     /// <summary>
-    /// indicate body is html
+    /// 是否是Html内容
     /// </summary>
     public bool IsHtml { get; set; }
 }
 
 /// <summary>
-/// email attachment
+/// 邮件附件
 /// </summary>
 public class EmailAttachment
 {
-    /// <summary>
-    /// prevent use instantient default
-    /// </summary>
     private EmailAttachment() { }
 
     /// <summary>
-    /// instantiate email attachment
+    /// 实例化邮件附件
     /// </summary>
-    /// <param name="path">file path</param>
+    /// <param name="path">文件路径</param>
     public EmailAttachment(string path)
     {
         path.EnsureFileExist();
@@ -97,10 +100,10 @@ public class EmailAttachment
     }
 
     /// <summary>
-    /// instantiate email attachment
+    /// 实例化邮件附件
     /// </summary>
-    /// <param name="name">file name</param>
-    /// <param name="bytes">file binary data</param>
+    /// <param name="name">文件名</param>
+    /// <param name="bytes">字节数组</param>
     public EmailAttachment(string name, byte[] bytes)
     {
         Name = name;
@@ -108,15 +111,17 @@ public class EmailAttachment
     }
 
     /// <summary>
-    /// file name
+    /// 文件名
     /// </summary>
     public string? Name { get; set; }
+
     /// <summary>
-    /// file data,priority is high than [Path] protperty
+    /// 字节数组
     /// </summary>
     public byte[]? Bytes { get; set; }
+
     /// <summary>
-    /// file path,priority is lower than [Path] protperty
+    /// 文件路径
     /// </summary>
     public string? Path { get; set; }
 }

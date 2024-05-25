@@ -1,19 +1,21 @@
 ﻿namespace SharpDevLib.Extensions.Email;
 
 /// <summary>
-/// email service abstraction
+/// 邮件服务
 /// </summary>
 public interface IEmailService
 {
     /// <summary>
-    /// send email
+    /// 发送邮件
     /// </summary>
-    /// <param name="content">email content</param>
+    /// <param name="content">内容</param>
     void Send(EmailContent content);
+
     /// <summary>
-    /// send email
+    /// 发送邮件
     /// </summary>
-    /// <param name="content">email content</param>
-    /// <param name="cancellationToken">async cancellationToken</param>
+    /// <param name="content">内容</param>
+    /// <param name="cancellationToken">cancellationToken</param>
+    /// <returns>Task</returns>
     Task SendAsync(EmailContent content, CancellationToken? cancellationToken);
 }
