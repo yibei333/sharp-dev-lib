@@ -138,20 +138,20 @@ public class HttpGetTests : HttpBaseTests
     {
         HttpGlobalSettings.TimeOut = TimeSpan.FromSeconds(2);
         var url = "/api/get/timeout";
-        var request = new HttpKeyValueRequest(url);
+        var request = new HttpKeyValueRequest(url) { RetryCount = 0 };
         var response = request.GetAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
 
         HttpGlobalSettings.TimeOut = TimeSpan.FromSeconds(1);
-        request = new HttpKeyValueRequest(url);
+        request = new HttpKeyValueRequest(url) { RetryCount = 0 };
         response = request.GetAsync().GetAwaiter().GetResult();
         Assert.IsFalse(response.IsSuccess);
 
-        request = new HttpKeyValueRequest(url) { TimeOut = TimeSpan.FromSeconds(2) };
+        request = new HttpKeyValueRequest(url) { TimeOut = TimeSpan.FromSeconds(2), RetryCount = 0 };
         response = request.GetAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
 
-        request = new HttpKeyValueRequest(url) { TimeOut = TimeSpan.FromSeconds(1) };
+        request = new HttpKeyValueRequest(url) { TimeOut = TimeSpan.FromSeconds(1), RetryCount = 0 };
         response = request.GetAsync().GetAwaiter().GetResult();
         Assert.IsFalse(response.IsSuccess);
     }
