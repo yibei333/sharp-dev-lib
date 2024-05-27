@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using SharpDevLib.Standard;
 using System.Net;
 using System.Net.Mail;
 
-namespace SharpDevLib.Extensions.Email;
+namespace SharpDevLib.Standard;
 
 internal class EmailService : IEmailService
 {

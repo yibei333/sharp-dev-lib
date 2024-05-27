@@ -27,7 +27,7 @@ public class HttpBaseTests
                         )
                         .WithStaticFolder("/statics", AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data"), true, m => m.WithContentCaching(true));
         _server.Start();
-        HttpGlobalSettings.BaseUrl = BaseUrl;
+        HttpGlobalOptions.BaseUrl = BaseUrl;
     }
 
     [ClassCleanup(InheritanceBehavior.BeforeEachDerivedClass)]

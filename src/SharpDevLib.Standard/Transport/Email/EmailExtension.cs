@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace SharpDevLib.Extensions.Email;
+namespace SharpDevLib.Standard;
 
 /// <summary>
 /// 邮件扩展

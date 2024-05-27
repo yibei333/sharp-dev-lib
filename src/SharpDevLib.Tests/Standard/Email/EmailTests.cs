@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MimeKit;
-using SharpDevLib.Extensions.Email;
 using SharpDevLib.Standard;
 using SharpDevLib.Tests.Standard.Email.EmailHost;
 using SharpDevLib.Tests.Standard.Email.EmailHost.Service;

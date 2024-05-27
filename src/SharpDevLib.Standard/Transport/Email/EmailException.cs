@@ -1,4 +1,4 @@
-﻿namespace SharpDevLib.Extensions.Email;
+﻿namespace SharpDevLib.Standard;
 
 /// <summary>
 /// 邮件验证异常

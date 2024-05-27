@@ -3,7 +3,7 @@
 /// <summary>
 /// http全局设置
 /// </summary>
-public static class HttpGlobalSettings
+public static class HttpGlobalOptions
 {
     /// <summary>
     /// 基址

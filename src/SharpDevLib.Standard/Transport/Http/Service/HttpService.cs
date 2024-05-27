@@ -19,9 +19,9 @@ internal class HttpService : IHttpService
         var options = provider?.GetService<IOptionsMonitor<HttpGlobalSettingsOptions>>()?.CurrentValue;
         if (options is not null)
         {
-            HttpGlobalSettings.BaseUrl = options.BaseUrl;
-            HttpGlobalSettings.RetryCount = options.RetryCount;
-            if (options.TimeOut.HasValue) HttpGlobalSettings.TimeOut = TimeSpan.FromSeconds(options.TimeOut.Value);
+            HttpGlobalOptions.BaseUrl = options.BaseUrl;
+            HttpGlobalOptions.RetryCount = options.RetryCount;
+            if (options.TimeOut.HasValue) HttpGlobalOptions.TimeOut = TimeSpan.FromSeconds(options.TimeOut.Value);
         }
     }
 
@@ -216,16 +216,16 @@ internal class HttpService : IHttpService
             }
         }
 
-        client.Timeout = request.TimeOut ?? HttpGlobalSettings.TimeOut ?? TimeSpan.FromDays(1);
+        client.Timeout = request.TimeOut ?? HttpGlobalOptions.TimeOut ?? TimeSpan.FromDays(1);
         return client;
     }
 
     string BuildUrl(HttpRequest request)
     {
-        if (request.Url.IsNullOrWhiteSpace()) return HttpGlobalSettings.BaseUrl ?? request.Url;
+        if (request.Url.IsNullOrWhiteSpace()) return HttpGlobalOptions.BaseUrl ?? request.Url;
         else
         {
-            if (!Uri.IsWellFormedUriString(request.Url, UriKind.Absolute) && HttpGlobalSettings.BaseUrl.NotNullOrWhiteSpace()) return HttpGlobalSettings.BaseUrl.CombinePath(request.Url);
+            if (!Uri.IsWellFormedUriString(request.Url, UriKind.Absolute) && HttpGlobalOptions.BaseUrl.NotNullOrWhiteSpace()) return HttpGlobalOptions.BaseUrl.CombinePath(request.Url);
         }
         return request.Url;
     }
@@ -240,7 +240,7 @@ internal class HttpService : IHttpService
 
     async Task<ResponseMonitor> Retry(HttpClient client, Func<HttpRequestMessage> requestMessageBuilder, HttpRequest request, CancellationToken? cancellationToken = null)
     {
-        var retryCount = request.RetryCount ?? HttpGlobalSettings.RetryCount ?? 0;
+        var retryCount = request.RetryCount ?? HttpGlobalOptions.RetryCount ?? 0;
         var retryIndex = -1;
         var totalStartTime = DateTime.Now;
         HttpResponseMessage? response = null;

@@ -75,6 +75,6 @@ sharp-dev-lib包含如下表格的工具
 | 2022-07-09 |v1.0.5 |VerifyCodeUtil依赖库由"System.Drawing.Common"变更为"SixLabors.ImageSharp"  |
 | 2022-05-19 |v1.0.4 |HashUtil中GetHexString方法重命名为ToHexString，增加FromHexString方法  |
 | 2022-05-13 |v1.0.3 |增加1个工具（FileUtil）  |
-| 2022-05-09 |v1.0.2 |ConvertUtil工具移除list和DataTable的转换，转换将在SharpDevLib.Extensions包中体现  |
+| 2022-05-09 |v1.0.2 |ConvertUtil工具移除list和DataTable的转换，转换将在SharpDevLib.Standard包中体现  |
 | 2022-04-10 |v1.0.1 |增加1个工具（ZipUtil）,添加nuget打包的注释  |
 | 2022-04-08 |v1.0.0 |初始化13个工具（CloneUtil,ConvertUtil,EncodeUtil,EnumerableUtil,EnumUtil,HashUtil,JsonUtil,NullCheckUtil,ReflectionUtil,TimeUtil,TreeUtil,UrlUtil,VerifyCodeUtil）  |

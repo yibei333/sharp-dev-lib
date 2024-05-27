@@ -6,13 +6,13 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>11.0</LangVersion>
 		<Authors>yibei333</Authors>
-		<Description>csharp development commonly used libarary base on netstandard2.0</Description>
+		<Description>基于netstandard2.0的常用开发扩展和服务</Description>
 		<Copyright>yibei333</Copyright>
 		<PackageId>SharpDevLib.Standard</PackageId>
 		<PackageProjectUrl>https://github.com/yibei333/sharp-dev-lib</PackageProjectUrl>
 		<PackageIcon>c-sharp.png</PackageIcon>
 		<RepositoryUrl>https://github.com/yibei333/sharp-dev-lib</RepositoryUrl>
-		<PackageTags>csharp development commonly used libarary</PackageTags>
+		<PackageTags>libarary service</PackageTags>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>

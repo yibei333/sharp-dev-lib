@@ -1,8 +1,7 @@
-﻿using SharpDevLib.Standard;
-using System.Net.Mail;
+﻿using System.Net.Mail;
 using System.Text;
 
-namespace SharpDevLib.Extensions.Email;
+namespace SharpDevLib.Standard;
 
 /// <summary>
 /// 邮箱内容

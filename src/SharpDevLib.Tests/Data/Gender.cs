@@ -6,14 +6,3 @@ public enum Gender
     Female = 2,
     Other = 3
 }
-
-public enum Week
-{
-    Monday,
-    Tuesday,
-    Wednesday,
-    Thursday,
-    Friday,
-    Saturday,
-    Sunday
-}

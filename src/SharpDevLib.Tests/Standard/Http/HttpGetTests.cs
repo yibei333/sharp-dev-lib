@@ -116,7 +116,7 @@ public class HttpGetTests : HttpBaseTests
     public void RetryTest()
     {
         var count = 5;
-        HttpGlobalSettings.RetryCount = count;
+        HttpGlobalOptions.RetryCount = count;
         var url = "/api/get/retry";
         var request = new HttpKeyValueRequest(url, new Dictionary<string, string> { { "count", count.ToString() }, { "id", Guid.NewGuid().ToString() } });
         var response = request.GetAsync().GetAwaiter().GetResult();
@@ -138,13 +138,13 @@ public class HttpGetTests : HttpBaseTests
     [TestMethod]
     public void TimeoutTest()
     {
-        HttpGlobalSettings.TimeOut = TimeSpan.FromSeconds(2);
+        HttpGlobalOptions.TimeOut = TimeSpan.FromSeconds(2);
         var url = "/api/get/timeout";
         var request = new HttpKeyValueRequest(url) { RetryCount = 0 };
         var response = request.GetAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
 
-        HttpGlobalSettings.TimeOut = TimeSpan.FromSeconds(1);
+        HttpGlobalOptions.TimeOut = TimeSpan.FromSeconds(1);
         request = new HttpKeyValueRequest(url) { RetryCount = 0 };
         response = request.GetAsync().GetAwaiter().GetResult();
         Assert.IsFalse(response.IsSuccess);
