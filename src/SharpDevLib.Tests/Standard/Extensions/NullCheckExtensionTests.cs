@@ -104,9 +104,9 @@ public class NullCheckExtensionTests
     {
         List<int>? source = null;
         Assert.AreEqual(true, source.IsNullOrEmpty());
-        source = new();
+        source = [];
         Assert.AreEqual(true, source.IsNullOrEmpty());
-        source = new() { 1 };
+        source = [1];
         Assert.AreEqual(false, source.IsNullOrEmpty());
     }
 
@@ -115,9 +115,9 @@ public class NullCheckExtensionTests
     {
         List<int>? source = null;
         Assert.AreEqual(false, source.NotNullOrEmpty());
-        source = new();
+        source = [];
         Assert.AreEqual(false, source.NotNullOrEmpty());
-        source = new() { 1 };
+        source = [1];
         Assert.AreEqual(true, source.NotNullOrEmpty());
     }
     #endregion

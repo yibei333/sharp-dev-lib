@@ -9,6 +9,18 @@ namespace SharpDevLib.Standard;
 public static class EnumerableExtension
 {
     /// <summary>
+    /// 循环
+    /// </summary>
+    /// <typeparam name="T">泛型类型</typeparam>
+    /// <param name="source">集合</param>
+    /// <param name="action">action</param>
+    public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
+    {
+        if (source.IsNullOrEmpty()) return;
+        foreach (var item in source) action(item);
+    }
+
+    /// <summary>
     /// 根据对象的值（不是引用）去重
     /// </summary>
     /// <typeparam name="T">泛型类型</typeparam>

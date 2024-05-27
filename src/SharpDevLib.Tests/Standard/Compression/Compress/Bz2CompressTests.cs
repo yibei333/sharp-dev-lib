@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Standard;
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace SharpDevLib.Tests.Standard.Compression.Compress;
@@ -13,7 +12,7 @@ public class Bz2CompressTests
     public void TarCompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/bz2-create.tar.bz2");
-        var option = new CompressOption(new List<string> { AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root") }, targetPath)
+        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root")], targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
             IncludeSourceDiretory = true
@@ -27,7 +26,7 @@ public class Bz2CompressTests
     public void CompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/bz2-create.bz2");
-        var option = new CompressOption(new List<string> { AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root/foo.txt") }, targetPath)
+        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root/foo.txt")], targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
             IncludeSourceDiretory = true
@@ -42,7 +41,7 @@ public class Bz2CompressTests
     public void CompressWithPasswordTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/bz2-password-create.bz2");
-        var option = new CompressOption(new List<string> { AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root") }, targetPath)
+        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root")], targetPath)
         {
             Password = "foobar",
             Level = CompressionLevel.MinimumSize,

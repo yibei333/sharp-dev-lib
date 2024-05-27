@@ -2,7 +2,6 @@
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
 using HttpMultipartParser;
-using SharpCompress;
 using SharpDevLib.Standard;
 using SharpDevLib.Tests.Data;
 using System;
