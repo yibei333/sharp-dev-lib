@@ -16,8 +16,11 @@ public static class HttpExtension
     /// <returns>service collection</returns>
     public static IServiceCollection AddHttp(this IServiceCollection services)
     {
-        var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
-        services.Configure<HttpGlobalSettingsOptions>(configuration.GetSection(nameof(HttpGlobalSettingsOptions)));
+        var configuration = services.BuildServiceProvider().GetService<IConfiguration>();
+        if (configuration is not null)
+        {
+            services.Configure<HttpGlobalSettingsOptions>(configuration.GetSection(nameof(HttpGlobalSettingsOptions)));
+        }
         services.AddTransient<IHttpService, HttpService>();
         return services;
     }
