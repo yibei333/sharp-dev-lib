@@ -83,6 +83,19 @@ public static class JsonExtension
     /// </summary>
     /// <typeparam name="T">要反序列化的类型</typeparam>
     /// <param name="json">json</param>
+    /// <param name="type">type</param>
+    /// <returns>反序列化对象结果</returns>
+    public static object DeSerialize(this string json, Type type)
+    {
+        if (json.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(json));
+        return JsonSerializer.Deserialize(json, type, JsonOption.Default.Create()) ?? throw new JsonException($"unable to deserialize json to object of type '{type.FullName}'");
+    }
+
+    /// <summary>
+    /// Json反序列化
+    /// </summary>
+    /// <typeparam name="T">要反序列化的类型</typeparam>
+    /// <param name="json">json</param>
     /// <param name="option">选项</param>
     /// <returns>反序列化对象结果</returns>
     public static T DeSerialize<T>(this string json, JsonOption option) where T : class

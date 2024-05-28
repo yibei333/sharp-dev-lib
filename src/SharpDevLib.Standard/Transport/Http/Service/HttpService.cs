@@ -321,7 +321,7 @@ internal class HttpService : IHttpService
             if (type.IsClass)
             {
                 if (type == typeof(string)) data = (T)Convert.ChangeType(responseText, type);
-                else data = JsonSerializer.Deserialize<T>(responseText);
+                else data = (T)responseText.DeSerialize(type);
             }
             else
             {
