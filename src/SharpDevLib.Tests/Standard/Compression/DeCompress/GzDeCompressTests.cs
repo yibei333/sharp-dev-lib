@@ -14,7 +14,7 @@ public class GzDeCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/gz-tar-gz-decompress");
         var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/gz.tar.gz"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true))
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat))
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
@@ -27,7 +27,7 @@ public class GzDeCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/gz-tgz-decompress");
         var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/gz.tgz"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true))
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat))
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
@@ -40,7 +40,7 @@ public class GzDeCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/gz-decompress");
         var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/gz.gz"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true))
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat))
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));

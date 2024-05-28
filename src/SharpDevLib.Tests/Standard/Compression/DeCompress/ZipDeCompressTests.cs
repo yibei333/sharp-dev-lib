@@ -14,7 +14,7 @@ public class ZipDeCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/zip-decompress");
         var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/zip.zip"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
@@ -28,7 +28,7 @@ public class ZipDeCompressTests
         var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/zip-password.zip"), targetPath)
         {
             Password = "foobar",
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
@@ -41,7 +41,7 @@ public class ZipDeCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/zip-decompress-sync");
         var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/zip.zip"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
         };
         option.DeCompress();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
@@ -55,7 +55,7 @@ public class ZipDeCompressTests
         var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/zip-password.zip"), targetPath)
         {
             Password = "foobar",
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
         };
         option.DeCompress();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));

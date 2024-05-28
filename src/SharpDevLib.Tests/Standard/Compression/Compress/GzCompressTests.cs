@@ -14,7 +14,7 @@ public class GzCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/gz-create.tgz");
         var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root")], targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
             IncludeSourceDiretory = true
         };
         option.CompressAsync().GetAwaiter().GetResult();
@@ -28,7 +28,7 @@ public class GzCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/gz-create.gz");
         var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root/foo.txt")], targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
             IncludeSourceDiretory = true
         };
         option.CompressAsync().GetAwaiter().GetResult();
@@ -46,7 +46,7 @@ public class GzCompressTests
             Password = "foobar",
             Level = CompressionLevel.MinimumSize,
             IncludeSourceDiretory = true,
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
         };
         option.CompressAsync().GetAwaiter().GetResult();
     }

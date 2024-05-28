@@ -14,7 +14,7 @@ public class SevenZipDeCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/sevenzip-decompress");
         var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/sevenzip.7z"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true))
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat))
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
@@ -28,7 +28,7 @@ public class SevenZipDeCompressTests
         var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/sevenzip-password.7z"), targetPath)
         {
             Password = "foobar",
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));

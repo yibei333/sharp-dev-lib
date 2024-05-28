@@ -14,7 +14,7 @@ public class XzDeCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/xz-tar-decompress");
         var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/xz.tar.xz"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
@@ -27,7 +27,7 @@ public class XzDeCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/xz-decompress");
         var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/xz.xz"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("xz")));

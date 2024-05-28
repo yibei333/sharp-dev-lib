@@ -14,7 +14,7 @@ public class TarDeCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/tar-decompress");
         var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/tar.tar"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true))
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat))
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));

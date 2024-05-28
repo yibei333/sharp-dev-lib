@@ -14,7 +14,7 @@ public class RarDeCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/rar-decompress");
         var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/rar.rar"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
@@ -28,7 +28,7 @@ public class RarDeCompressTests
         var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/rar-password.rar"), targetPath)
         {
             Password = "foobar",
-            OnProgress = (p) => Console.WriteLine(p.Serialize(true)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));

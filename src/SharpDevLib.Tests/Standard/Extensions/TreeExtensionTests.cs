@@ -33,20 +33,21 @@ public class TreeExtensionTests
             Descending = true
         };
 
+        var jsonOption = new JsonOption { FormatJson = true, OrderByNameProperty = false };
         var tree = departments.BuildTree(option);
-        var json = tree.Serialize(true, false);
+        var json = tree.Serialize(jsonOption);
 
         var deserialized = json.DeSerializeTree(option);
-        var deserializedJson = deserialized.Serialize(true, false);
+        var deserializedJson = deserialized.Serialize(jsonOption);
         Console.WriteLine(deserializedJson);
         Assert.AreEqual(json, deserializedJson);
 
         var metaList = deserialized.ToMetaDataList();
-        Console.WriteLine(metaList.Serialize(true));
+        Console.WriteLine(metaList.Serialize(JsonOption.DefaultWithFormat));
         Assert.AreEqual(9, metaList.Count);
 
         var flatList = deserialized.ToFlatList();
-        Console.WriteLine(flatList.Serialize(true));
+        Console.WriteLine(flatList.Serialize(JsonOption.DefaultWithFormat));
         Assert.AreEqual(9, flatList.Count);
     }
 
@@ -76,20 +77,21 @@ public class TreeExtensionTests
             Descending = true
         };
 
+        var jsonOption = new JsonOption { FormatJson = true, OrderByNameProperty = false };
         var tree = departments.BuildTree(option);
-        var json = tree.Serialize(true, false);
+        var json = tree.Serialize(jsonOption);
 
         var deserialized = json.DeSerializeTree(option);
-        var deserializedJson = deserialized.Serialize(true, false);
+        var deserializedJson = deserialized.Serialize(jsonOption);
         Console.WriteLine(deserializedJson);
         Assert.AreEqual(json, deserializedJson);
 
         var metaList = deserialized.ToMetaDataList();
-        Console.WriteLine(metaList.Serialize(true));
+        Console.WriteLine(metaList.Serialize(JsonOption.DefaultWithFormat));
         Assert.AreEqual(9, metaList.Count);
 
         var flatList = deserialized.ToFlatList();
-        Console.WriteLine(flatList.Serialize(true));
+        Console.WriteLine(flatList.Serialize(JsonOption.DefaultWithFormat));
         Assert.AreEqual(9, flatList.Count);
     }
 
@@ -118,19 +120,20 @@ public class TreeExtensionTests
         };
 
         var tree = departments.BuildTree(option);
-        var json = tree.Serialize(true, false);
+        var jsonOption = new JsonOption { FormatJson = true, OrderByNameProperty = false };
+        var json = tree.Serialize(jsonOption);
 
         var deserialized = json.DeSerializeTree(option);
-        var deserializedJson = deserialized.Serialize(true, false);
+        var deserializedJson = deserialized.Serialize(jsonOption);
         Console.WriteLine(deserializedJson);
         Assert.AreEqual(json, deserializedJson);
 
         var metaList = deserialized.ToMetaDataList();
-        Console.WriteLine(metaList.Serialize(true));
+        Console.WriteLine(metaList.Serialize(JsonOption.DefaultWithFormat));
         Assert.AreEqual(9, metaList.Count);
 
         var flatList = deserialized.ToFlatList();
-        Console.WriteLine(flatList.Serialize(true));
+        Console.WriteLine(flatList.Serialize(JsonOption.DefaultWithFormat));
         Assert.AreEqual(9, flatList.Count);
     }
 

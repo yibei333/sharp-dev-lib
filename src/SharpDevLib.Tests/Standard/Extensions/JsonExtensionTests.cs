@@ -23,7 +23,7 @@ public class JsonExtensionTests
         var json = _user.Serialize();
         Assert.AreEqual(_json, json);
 
-        var formatedJson = _user.Serialize(true);
+        var formatedJson = _user.Serialize(JsonOption.DefaultWithFormat);
         Assert.AreEqual(_formatedJson, formatedJson);
     }
 
