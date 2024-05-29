@@ -68,20 +68,4 @@ public class JsonExtensionTests
         var expected = "{\"foo\":\"foo value\",\"bar\":\"bar value\"}";
         Assert.AreEqual(expected, actual);
     }
-
-    [TestMethod]
-    public void XX()
-    {
-        var a = "{\"data\":null,\"success\":false,\"description\":\"user not found\",\"extraData\":null}";
-    }
-}
-
-public class MessageModel
-{
-    public Guid UserId { get; set; }
-    public Guid MessageId { get; set; }
-    public string? UserName { get; set; }
-    public int MessageType { get; set; }
-    public string? Message { get; set; }
-    public byte[]? Bytes { get; set; }
 }

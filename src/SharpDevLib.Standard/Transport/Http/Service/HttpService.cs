@@ -60,7 +60,7 @@ internal class HttpService : IHttpService
         var url = BuildUrl(request);
         var responseMonitor = await Retry(client, () =>
         {
-            var content = new StringContent(request.Parameters);
+            var content = new StringContent(request.Parameters, Encoding.UTF8, "application/json");
             var message = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
             return message;
         }, request, cancellationToken);
