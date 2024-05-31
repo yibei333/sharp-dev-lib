@@ -81,7 +81,6 @@ public static class JsonExtension
     /// <summary>
     /// Json反序列化
     /// </summary>
-    /// <typeparam name="T">要反序列化的类型</typeparam>
     /// <param name="json">json</param>
     /// <param name="type">type</param>
     /// <returns>反序列化对象结果</returns>
