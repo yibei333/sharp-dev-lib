@@ -14,7 +14,23 @@ public class TcpTests
     public async Task Test()
     {
         var listenerFactory = new TcpListenerFactory();
-        using var listener = listenerFactory.Create<int>(IPAddress.Any, 4098);
+        var listener = listenerFactory.Create<int>(IPAddress.Any, 4098);
+        StartListener(listener);
+
+        var clientFactory = new TcpClientFactory();
+        var client = clientFactory.Create(IPAddress.Loopback, 4098);
+        ClientStartConnectAndReceive(client);
+        await Task.Delay(500);
+
+        client.Send("hello,world".ToUtf8Bytes());
+        await Task.Delay(500);
+
+        listener.Dispose();
+        client.Dispose();
+    }
+
+    async void StartListener(TcpListener<int> listener)
+    {
         listener.StateChanged += (s, e) =>
         {
             Console.WriteLine($"server state changed:{e.Before}->{e.Current}");
@@ -24,7 +40,7 @@ public class TcpTests
             Console.WriteLine("session added");
             e.Session.Received += (ss, ee) =>
             {
-                Console.WriteLine($"server received:{(string.Join(",", ee.Bytes))}");
+                Console.WriteLine($"server received:{ee.Bytes.ToUtf8String()}");
                 ee.Session.Send("server reply".ToUtf8Bytes());
             };
             e.Session.Error += (ss, ee) =>
@@ -32,40 +48,27 @@ public class TcpTests
                 Console.WriteLine($"server error:{ee.Exception.Message}");
             };
         };
-        StartListener(listener);
-        await Task.Delay(1000);
+        listener.SessionRemoved += (s, e) =>
+        {
+            Console.WriteLine($"server session removed");
+        };
+        await listener.ListenAsync();
+    }
 
-        var clientFactory = new TcpClientFactory();
-        using var client = clientFactory.Create(IPAddress.Loopback, 4098);
+    async void ClientStartConnectAndReceive(SharpDevLib.Standard.TcpClient client)
+    {
         client.StateChanged += (s, e) =>
         {
             Console.WriteLine($"client state changed:{e.Before}->{e.Current}");
         };
         client.Received += (s, e) =>
         {
-            Console.WriteLine($"client received:{(string.Join(",", e.Bytes))}");
+            Console.WriteLine($"client received:{e.Bytes.ToUtf8String()}");
         };
         client.Error += (s, e) =>
         {
             Console.WriteLine($"client error:{e.Exception.Message}");
         };
-        ClientStartConnectAndReceive(client);
-        await Task.Delay(1000);
-
-        client.Send([1, 2, 3, 4, 5, 6, 7, 8]);
-        await Task.Delay(1000);
-
-        listener.Dispose();
-        client.Dispose();
-    }
-
-    async void StartListener(TcpListener<int> listener)
-    {
-        await listener.ListenAsync();
-    }
-
-    async void ClientStartConnectAndReceive(SharpDevLib.Standard.TcpClient client)
-    {
         await client.ConnectAndReceiveAsync();
     }
 }

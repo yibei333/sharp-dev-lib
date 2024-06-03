@@ -15,6 +15,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
 {
     TcpListnerStates _state = 0;
     readonly List<TcpSession<TSessionMetadata>> _sessions;
+    static readonly object _lock = new();
 
     internal TcpListener(IPAddress iPAddress, int port, IServiceProvider? serviceProvider, TcpAdapterType adapterType = TcpAdapterType.Default)
     {
@@ -167,8 +168,12 @@ public class TcpListener<TSessionMetadata> : IDisposable
     internal void RemoveSession(TcpSession<TSessionMetadata> session)
     {
         if (!_sessions.Contains(session)) return;
-        _sessions.Remove(session);
-        SessionRemoved?.Invoke(this, new TcpSessionEventArgs<TSessionMetadata>(session));
+        lock (_lock)
+        {
+            if (!_sessions.Contains(session)) return;
+            _sessions.Remove(session);
+            SessionRemoved?.Invoke(this, new TcpSessionEventArgs<TSessionMetadata>(session));
+        }
     }
 
     /// <summary>
@@ -177,7 +182,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
     public void Close()
     {
         if (State == TcpListnerStates.Closed) return;
-        Sessions.ForEach(x => x.Close());
+        while (Sessions.Any()) Sessions.First().Close();
         Socket.Dispose();
         State = TcpListnerStates.Closed;
     }

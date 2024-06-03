@@ -17,7 +17,7 @@ public class TcpClient : IDisposable
         RemotePort = remotePort;
         AdapterType = adapterType;
 
-        Socket = new Socket(SocketType.Dgram, ProtocolType.Udp);
+        Socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
         State = TcpClientStates.Created;
     }
 
@@ -148,7 +148,7 @@ public class TcpClient : IDisposable
                 break;
             }
 
-            if (State != TcpClientStates.Created || !Socket.Connected) break;
+            if (State != TcpClientStates.Connected || !Socket.Connected) break;
 
             try
             {
