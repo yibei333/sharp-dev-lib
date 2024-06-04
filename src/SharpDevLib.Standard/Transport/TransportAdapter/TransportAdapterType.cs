@@ -1,9 +1,9 @@
 ﻿namespace SharpDevLib.Standard;
 
 /// <summary>
-/// Tcp收发数据适配器类型
+/// 传输收发数据适配器类型
 /// </summary>
-public enum TcpAdapterType
+public enum TransportAdapterType
 {
     /// <summary>
     /// 默认

@@ -26,5 +26,5 @@ public class TcpListenerFactory : ITcpListenerFactory
     /// <param name="port">端口</param>
     /// <param name="adapterType">接收数据适配器类型</param>
     /// <returns>Tcp监听器</returns>
-    public TcpListener<TSessionMetadata> Create<TSessionMetadata>(IPAddress address, int port, TcpAdapterType adapterType = TcpAdapterType.Default) => new(address, port, ServiceProvider, adapterType);
+    public TcpListener<TSessionMetadata> Create<TSessionMetadata>(IPAddress address, int port, TransportAdapterType adapterType = TransportAdapterType.Default) => new(address, port, ServiceProvider, adapterType);
 }

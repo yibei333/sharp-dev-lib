@@ -3,19 +3,18 @@
 namespace SharpDevLib.Standard;
 
 /// <summary>
-/// Tcp扩展
+/// Udp扩展
 /// </summary>
-public static class TcpExtensions
+public static class UdpExtensions
 {
     /// <summary>
-    /// 添加Tcp服务
+    /// 添加Udp服务
     /// </summary>
     /// <param name="services">service collection</param>
     /// <returns>service collection</returns>
-    public static IServiceCollection AddTcp(this IServiceCollection services)
+    public static IServiceCollection AddUdp(this IServiceCollection services)
     {
-        services.AddSingleton<ITcpListenerFactory, TcpListenerFactory>();
-        services.AddSingleton<ITcpClientFactory, TcpClientFactory>();
+        services.AddSingleton<IUdpClientFactory, UdpClientFactory>();
         return services;
     }
 }

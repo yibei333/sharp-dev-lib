@@ -17,7 +17,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
     readonly List<TcpSession<TSessionMetadata>> _sessions;
     static readonly object _lock = new();
 
-    internal TcpListener(IPAddress iPAddress, int port, IServiceProvider? serviceProvider, TcpAdapterType adapterType = TcpAdapterType.Default)
+    internal TcpListener(IPAddress iPAddress, int port, IServiceProvider? serviceProvider, TransportAdapterType adapterType = TransportAdapterType.Default)
     {
         IPAddress = iPAddress;
         Port = port;
@@ -43,17 +43,17 @@ public class TcpListener<TSessionMetadata> : IDisposable
     /// <summary>
     /// 接收数据适配器类型
     /// </summary>
-    public TcpAdapterType AdapterType { get; }
+    public TransportAdapterType AdapterType { get; }
 
     /// <summary>
     /// 接收数据适配器(仅当AdapterType=TcpAdapterType.Custom时有用)
     /// </summary>
-    public ITcpReceiveAdapter? ReceiveAdapter { get; set; }
+    public ITransportReceiveAdapter? ReceiveAdapter { get; set; }
 
     /// <summary>
     /// 发送数据适配器(仅当AdapterType=TcpAdapterType.Custom时有用)
     /// </summary>
-    public ITcpSendAdapter? SendAdapter { get; set; }
+    public ITransportSendAdapter? SendAdapter { get; set; }
 
     /// <summary>
     /// 状态

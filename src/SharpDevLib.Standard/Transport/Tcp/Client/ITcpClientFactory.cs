@@ -14,7 +14,7 @@ public interface ITcpClientFactory
     /// <param name="remotePort">远程端口</param>
     /// <param name="adapterType">收发适配器类型</param>
     /// <returns>Tcp客户端</returns>
-    TcpClient Create(IPAddress remoteAdress, int remotePort, TcpAdapterType adapterType = TcpAdapterType.Default);
+    TcpClient Create(IPAddress remoteAdress, int remotePort, TransportAdapterType adapterType = TransportAdapterType.Default);
 
     /// <summary>
     /// 创建Tcp客户端
@@ -25,5 +25,5 @@ public interface ITcpClientFactory
     /// <param name="remotePort">远程端口</param>
     /// <param name="adapterType">收发适配器类型</param>
     /// <returns>Tcp客户端</returns>
-    TcpClient Create(IPAddress localAdress, int localPort, IPAddress remoteAdress, int remotePort, TcpAdapterType adapterType = TcpAdapterType.Default);
+    TcpClient Create(IPAddress localAdress, int localPort, IPAddress remoteAdress, int remotePort, TransportAdapterType adapterType = TransportAdapterType.Default);
 }

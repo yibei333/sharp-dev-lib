@@ -10,7 +10,7 @@ public class TcpClient : IDisposable
 {
     TcpClientStates _state = 0;
 
-    internal TcpClient(IServiceProvider? serviceProvider, IPAddress remoteAdress, int remotePort, TcpAdapterType adapterType = TcpAdapterType.Default)
+    internal TcpClient(IServiceProvider? serviceProvider, IPAddress remoteAdress, int remotePort, TransportAdapterType adapterType = TransportAdapterType.Default)
     {
         ServiceProvider = serviceProvider;
         RemoteAdress = remoteAdress;
@@ -21,7 +21,7 @@ public class TcpClient : IDisposable
         State = TcpClientStates.Created;
     }
 
-    internal TcpClient(IServiceProvider? serviceProvider, IPAddress localAdress, int localPort, IPAddress remoteAdress, int remotePort, TcpAdapterType adapterType = TcpAdapterType.Default)
+    internal TcpClient(IServiceProvider? serviceProvider, IPAddress localAdress, int localPort, IPAddress remoteAdress, int remotePort, TransportAdapterType adapterType = TransportAdapterType.Default)
     {
         ServiceProvider = serviceProvider;
         LocalAdress = localAdress;
@@ -87,17 +87,17 @@ public class TcpClient : IDisposable
     /// <summary>
     /// 收发适配器类型
     /// </summary>
-    public TcpAdapterType AdapterType { get; }
+    public TransportAdapterType AdapterType { get; }
 
     /// <summary>
     /// 接收数据适配器(仅当AdapterType=TcpAdapterType.Custom时有用)
     /// </summary>
-    public ITcpReceiveAdapter? ReceiveAdapter { get; set; }
+    public ITransportReceiveAdapter? ReceiveAdapter { get; set; }
 
     /// <summary>
     /// 发送数据适配器(仅当AdapterType=TcpAdapterType.Custom时有用)
     /// </summary>
-    public ITcpSendAdapter? SendAdapter { get; set; }
+    public ITransportSendAdapter? SendAdapter { get; set; }
 
     /// <summary>
     /// 接收事件

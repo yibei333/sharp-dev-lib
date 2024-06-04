@@ -19,8 +19,8 @@ public class TcpSession<TMetaData> : IDisposable
         SendAdapter = Listener.AdapterType.GetSendAdapter(listener.SendAdapter);
     }
 
-    ITcpReceiveAdapter ReceiveAdapter { get; }
-    ITcpSendAdapter SendAdapter { get; }
+    ITransportReceiveAdapter ReceiveAdapter { get; }
+    ITransportSendAdapter SendAdapter { get; }
 
     /// <summary>
     /// 套接字

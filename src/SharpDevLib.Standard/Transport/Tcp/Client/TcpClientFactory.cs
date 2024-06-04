@@ -25,7 +25,7 @@ public class TcpClientFactory : ITcpClientFactory
     /// <param name="remotePort">远程端口</param>
     /// <param name="adapterType">收发适配器类型</param>
     /// <returns>Tcp客户端</returns>
-    public TcpClient Create(IPAddress remoteAdress, int remotePort, TcpAdapterType adapterType = TcpAdapterType.Default) => new(ServiceProvider, remoteAdress, remotePort, adapterType);
+    public TcpClient Create(IPAddress remoteAdress, int remotePort, TransportAdapterType adapterType = TransportAdapterType.Default) => new(ServiceProvider, remoteAdress, remotePort, adapterType);
 
     /// <summary>
     /// 创建Tcp客户端
@@ -36,5 +36,5 @@ public class TcpClientFactory : ITcpClientFactory
     /// <param name="remotePort">远程端口</param>
     /// <param name="adapterType">收发适配器类型</param>
     /// <returns>Tcp客户端</returns>
-    public TcpClient Create(IPAddress localAdress, int localPort, IPAddress remoteAdress, int remotePort, TcpAdapterType adapterType = TcpAdapterType.Default) => new(ServiceProvider, localAdress, localPort, remoteAdress, remotePort, adapterType);
+    public TcpClient Create(IPAddress localAdress, int localPort, IPAddress remoteAdress, int remotePort, TransportAdapterType adapterType = TransportAdapterType.Default) => new(ServiceProvider, localAdress, localPort, remoteAdress, remotePort, adapterType);
 }
