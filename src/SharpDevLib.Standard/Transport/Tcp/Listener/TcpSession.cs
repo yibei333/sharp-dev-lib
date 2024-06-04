@@ -76,7 +76,8 @@ public class TcpSession<TMetaData> : IDisposable
     /// 发送
     /// </summary>
     /// <param name="bytes">字节数组</param>
-    public void Send(byte[] bytes)
+    /// <param name="throwIfException">发送失败是否抛出异常,默认false,可以订阅Error事件</param>
+    public void Send(byte[] bytes, bool throwIfException = false)
     {
         try
         {
@@ -88,11 +89,12 @@ public class TcpSession<TMetaData> : IDisposable
         {
             Close();
             Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetaData>(this, ex));
+            if (throwIfException) throw ex;
         }
         catch (Exception ex)
         {
             Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetaData>(this, ex));
-            throw ex;
+            if (throwIfException) throw ex;
         }
     }
 

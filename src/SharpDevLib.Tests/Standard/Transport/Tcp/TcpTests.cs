@@ -1,8 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Standard;
 using System;
 using System.Net;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace SharpDevLib.Tests.Standard.Transport.Tcp;
@@ -70,6 +70,29 @@ public class TcpTests
             Console.WriteLine($"client error:{e.Exception.Message}");
         };
         await client.ConnectAndReceiveAsync();
+    }
+
+    [TestMethod]
+    public async Task ServiceTest()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddTcp();
+        var serviceProvider = services.BuildServiceProvider();
+        var listenerFactory = serviceProvider.GetRequiredService<ITcpListenerFactory>();
+        var clientFactory = serviceProvider.GetRequiredService<ITcpClientFactory>();
+
+        var listener = listenerFactory.Create<int>(IPAddress.Any, 4099);
+        StartListener(listener);
+
+        var client = clientFactory.Create(IPAddress.Loopback, 4099);
+        ClientStartConnectAndReceive(client);
+        await Task.Delay(500);
+
+        client.Send("hello,world".ToUtf8Bytes());
+        await Task.Delay(500);
+
+        listener.Dispose();
+        client.Dispose();
     }
 }
 
