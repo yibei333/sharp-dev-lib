@@ -9,6 +9,7 @@ namespace SharpDevLib.Standard;
 public class TcpSession<TMetaData> : IDisposable
 {
     TcpSessionStates _state = 0;
+    bool _isDisposed;
 
     internal TcpSession(TcpListener<TMetaData> listener, Socket socket)
     {
@@ -103,6 +104,7 @@ public class TcpSession<TMetaData> : IDisposable
         while (true)
         {
             if (State != TcpSessionStates.Connected || !Socket.Connected) break;
+            if (_isDisposed) break;
 
             try
             {
@@ -122,6 +124,7 @@ public class TcpSession<TMetaData> : IDisposable
             }
             catch (Exception ex)
             {
+                if (_isDisposed) break;
                 Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetaData>(this, ex));
             }
         }
@@ -132,6 +135,8 @@ public class TcpSession<TMetaData> : IDisposable
     /// </summary>
     public void Close()
     {
+        if (_isDisposed) return;
+        _isDisposed = true;
         Socket.Close();
         State = TcpSessionStates.Closed;
         Listener.RemoveSession(this);

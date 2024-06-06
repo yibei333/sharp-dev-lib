@@ -8,6 +8,8 @@ namespace SharpDevLib.Standard;
 /// </summary>
 public class UdpClient : IDisposable
 {
+    bool _isDisposed;
+
     internal UdpClient(IServiceProvider? serviceProvider, TransportAdapterType adapterType = TransportAdapterType.Default)
     {
         ServiceProvider = serviceProvider;
@@ -41,11 +43,6 @@ public class UdpClient : IDisposable
     /// 本地地址
     /// </summary>
     public IPAddress? LocalAdress { get; }
-
-    /// <summary>
-    /// 是否已释放
-    /// </summary>
-    public bool IsDisposed;
 
     /// <summary>
     /// 本地端口
@@ -94,7 +91,7 @@ public class UdpClient : IDisposable
             while (true)
             {
                 if (cancellationToken?.IsCancellationRequested ?? false) break;
-                if (IsDisposed) break;
+                if (_isDisposed) break;
 
                 try
                 {
@@ -105,6 +102,7 @@ public class UdpClient : IDisposable
                 }
                 catch (Exception ex)
                 {
+                    if (_isDisposed) break;
                     Error?.Invoke(this, new UdpClientExceptionEventArgs(this, ex));
                 }
             }
@@ -122,7 +120,7 @@ public class UdpClient : IDisposable
     {
         try
         {
-            if (IsDisposed) throw new ObjectDisposedException("can not access a disposed udp client");
+            if (_isDisposed) throw new ObjectDisposedException("can not access a disposed udp client");
             AdapterType.GetSendAdapter(SendAdapter).SendTo(Socket, remoteAdress, remotePort, bytes);
             Sended?.Invoke(this, new UdpClientDataEventArgs(this, bytes));
         }
@@ -138,7 +136,7 @@ public class UdpClient : IDisposable
     /// </summary>
     public void Dispose()
     {
+        _isDisposed = true;
         Socket.Dispose();
-        IsDisposed = true;
     }
 }

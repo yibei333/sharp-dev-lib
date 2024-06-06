@@ -16,7 +16,7 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>0.1.9-alpha</Version>
+		<Version>0.1.10-alpha</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
