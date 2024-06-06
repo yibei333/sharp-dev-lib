@@ -17,10 +17,11 @@ public class TcpListener<TSessionMetadata> : IDisposable
     readonly List<TcpSession<TSessionMetadata>> _sessions;
     static readonly object _lock = new();
 
-    internal TcpListener(IPAddress iPAddress, int port, IServiceProvider? serviceProvider, TransportAdapterType adapterType = TransportAdapterType.Default)
+    internal TcpListener(IPAddress iPAddress, int port, Func<TSessionMetadata> initSessionMetadata, IServiceProvider? serviceProvider, TransportAdapterType adapterType = TransportAdapterType.Default)
     {
         IPAddress = iPAddress;
         Port = port;
+        InitSessionMetadata = initSessionMetadata;
         ServiceProvider = serviceProvider;
         AdapterType = adapterType;
         Logger = ServiceProvider?.GetService<ILogger<TcpListener>>();
@@ -79,6 +80,11 @@ public class TcpListener<TSessionMetadata> : IDisposable
     /// 端口
     /// </summary>
     public int Port { get; }
+
+    /// <summary>
+    /// 初始化会话元数据
+    /// </summary>
+    public Func<TSessionMetadata> InitSessionMetadata { get; }
 
     /// <summary>
     /// ServiceProvider
@@ -145,7 +151,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
             try
             {
                 var socket = Socket.Accept();
-                var session = new TcpSession<TSessionMetadata>(this, socket);
+                var session = new TcpSession<TSessionMetadata>(this, socket, InitSessionMetadata());
                 _sessions.Add(session);
                 SessionAdded?.Invoke(this, new TcpSessionEventArgs<TSessionMetadata>(session));
                 try
@@ -200,5 +206,15 @@ public class TcpListener<TSessionMetadata> : IDisposable
         Logger?.LogError(exception, exception.Message);
         Debug.WriteLine(exception.Message);
         Debug.WriteLine(exception?.StackTrace);
+    }
+}
+
+/// <summary>
+/// Tcp监听器
+/// </summary>
+public class TcpListener : TcpListener<int>
+{
+    internal TcpListener(IPAddress iPAddress, int port, IServiceProvider? serviceProvider, TransportAdapterType adapterType = TransportAdapterType.Default) : base(iPAddress, port, () => 0, serviceProvider, adapterType)
+    {
     }
 }

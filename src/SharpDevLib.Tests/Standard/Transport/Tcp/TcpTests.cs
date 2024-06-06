@@ -14,7 +14,7 @@ public class TcpTests
     public async Task Test()
     {
         var listenerFactory = new TcpListenerFactory();
-        var listener = listenerFactory.Create<int>(IPAddress.Any, 4098);
+        var listener = listenerFactory.Create(IPAddress.Any, 4098);
         StartListener(listener);
 
         var clientFactory = new TcpClientFactory();
@@ -38,7 +38,7 @@ public class TcpTests
         var listenerFactory = serviceProvider.GetRequiredService<ITcpListenerFactory>();
         var clientFactory = serviceProvider.GetRequiredService<ITcpClientFactory>();
 
-        var listener = listenerFactory.Create<int>(IPAddress.Any, 4099);
+        var listener = listenerFactory.Create(IPAddress.Any, 4099);
         StartListener(listener);
 
         var client = clientFactory.Create(IPAddress.Loopback, 4099);
@@ -52,7 +52,7 @@ public class TcpTests
         client.Dispose();
     }
 
-    static async void StartListener(TcpListener<int> listener)
+    static async void StartListener(TcpListener listener)
     {
         listener.StateChanged += (s, e) =>
         {
@@ -78,7 +78,7 @@ public class TcpTests
         await listener.ListenAsync();
     }
 
-    static async void ClientStartConnectAndReceive(SharpDevLib.Standard.TcpClient client)
+    static async void ClientStartConnectAndReceive(TcpClient client)
     {
         client.StateChanged += (s, e) =>
         {

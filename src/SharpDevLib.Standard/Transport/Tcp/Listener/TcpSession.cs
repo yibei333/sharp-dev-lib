@@ -5,16 +5,17 @@ namespace SharpDevLib.Standard;
 /// <summary>
 /// Tcp会话
 /// </summary>
-/// <typeparam name="TMetaData">元数据</typeparam>
-public class TcpSession<TMetaData> : IDisposable
+/// <typeparam name="TMetadata">元数据</typeparam>
+public class TcpSession<TMetadata> : IDisposable
 {
     TcpSessionStates _state = 0;
     bool _isDisposed;
 
-    internal TcpSession(TcpListener<TMetaData> listener, Socket socket)
+    internal TcpSession(TcpListener<TMetadata> listener, Socket socket, TMetadata metaData)
     {
         Listener = listener;
         Socket = socket;
+        Metadata = metaData;
         State = TcpSessionStates.Connected;
         ReceiveAdapter = Listener.AdapterType.GetReceiveAdapter(listener.ReceiveAdapter);
         SendAdapter = Listener.AdapterType.GetSendAdapter(listener.SendAdapter);
@@ -31,12 +32,12 @@ public class TcpSession<TMetaData> : IDisposable
     /// <summary>
     /// 所属监听器
     /// </summary>
-    public TcpListener<TMetaData> Listener { get; }
+    public TcpListener<TMetadata> Listener { get; }
 
     /// <summary>
     /// 元数据
     /// </summary>
-    public TMetaData? MetaData { get; }
+    public TMetadata Metadata { get; }
 
     /// <summary>
     /// 状态
@@ -49,29 +50,29 @@ public class TcpSession<TMetaData> : IDisposable
             if (_state == value) return;
             var before = _state;
             _state = value;
-            StateChanged?.Invoke(this, new TcpSessionStateChangedEventArgs<TMetaData>(this, before, _state));
+            StateChanged?.Invoke(this, new TcpSessionStateChangedEventArgs<TMetadata>(this, before, _state));
         }
     }
 
     /// <summary>
     /// 状态变更回调事件
     /// </summary>
-    public event EventHandler<TcpSessionStateChangedEventArgs<TMetaData>>? StateChanged;
+    public event EventHandler<TcpSessionStateChangedEventArgs<TMetadata>>? StateChanged;
 
     /// <summary>
     /// 接收事件
     /// </summary>
-    public event EventHandler<TcpSessionDataEventArgs<TMetaData>>? Received;
+    public event EventHandler<TcpSessionDataEventArgs<TMetadata>>? Received;
 
     /// <summary>
     /// 发送事件
     /// </summary>
-    public event EventHandler<TcpSessionDataEventArgs<TMetaData>>? Sended;
+    public event EventHandler<TcpSessionDataEventArgs<TMetadata>>? Sended;
 
     /// <summary>
     /// 异常事件
     /// </summary>
-    public event EventHandler<TcpSessionExceptionEventArgs<TMetaData>>? Error;
+    public event EventHandler<TcpSessionExceptionEventArgs<TMetadata>>? Error;
 
     /// <summary>
     /// 发送
@@ -84,17 +85,17 @@ public class TcpSession<TMetaData> : IDisposable
         {
             if (State != TcpSessionStates.Connected || !Socket.Connected) throw new Exception("can not access a closed tcp session");
             SendAdapter.Send(Socket, bytes);
-            Sended?.Invoke(this, new TcpSessionDataEventArgs<TMetaData>(this, bytes));
+            Sended?.Invoke(this, new TcpSessionDataEventArgs<TMetadata>(this, bytes));
         }
         catch (SocketException ex)
         {
             Close();
-            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetaData>(this, ex));
+            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
             if (throwIfException) throw ex;
         }
         catch (Exception ex)
         {
-            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetaData>(this, ex));
+            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
             if (throwIfException) throw ex;
         }
     }
@@ -114,18 +115,18 @@ public class TcpSession<TMetaData> : IDisposable
                     Close();
                     break;
                 }
-                Received?.Invoke(this, new TcpSessionDataEventArgs<TMetaData>(this, bytes));
+                Received?.Invoke(this, new TcpSessionDataEventArgs<TMetadata>(this, bytes));
             }
             catch (SocketException ex)
             {
                 Close();
-                Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetaData>(this, ex));
+                Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
                 break;
             }
             catch (Exception ex)
             {
                 if (_isDisposed) break;
-                Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetaData>(this, ex));
+                Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
             }
         }
     }
