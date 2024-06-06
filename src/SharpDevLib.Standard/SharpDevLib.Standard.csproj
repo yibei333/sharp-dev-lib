@@ -14,9 +14,10 @@
 		<RepositoryUrl>https://github.com/yibei333/sharp-dev-lib</RepositoryUrl>
 		<PackageTags>libarary service</PackageTags>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>0.1.11-alpha</Version>
+		<Version>0.1.12-alpha</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
