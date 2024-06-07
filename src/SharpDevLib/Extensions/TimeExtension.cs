@@ -20,9 +20,9 @@ public static class TimeExtension
     /// <summary>
     /// 将UTC时间戳转换为时间
     /// </summary>
-    /// <param name="utcTimeStamp">UTC时间戳</param>
+    /// <param name="utcTimestamp">UTC时间戳</param>
     /// <returns>时间</returns>
-    public static DateTime ToUtcTime(this long utcTimeStamp) => UtcStartTime.AddMilliseconds(utcTimeStamp);
+    public static DateTime ToUtcTime(this long utcTimestamp) => UtcStartTime.AddMilliseconds(utcTimestamp);
 
     /// <summary>
     /// 将时间转换为格式化的字符串
