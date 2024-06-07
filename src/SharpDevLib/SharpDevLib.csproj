@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>11.0</LangVersion>
+		<Authors>developer333</Authors>
+		<Description>基于netstandard2.0的常用开发扩展和服务</Description>
+		<Copyright>developer333</Copyright>
+		<PackageId>SharpDevLib</PackageId>
+		<PackageProjectUrl>https://github.com/yibei333/sharp-dev-lib</PackageProjectUrl>
+		<PackageIcon>c-sharp.png</PackageIcon>
+		<RepositoryUrl>https://github.com/yibei333/sharp-dev-lib</RepositoryUrl>
+		<PackageTags>libarary service</PackageTags>
+		<!--<PackageLicenseFile>LICENSE</PackageLicenseFile>-->
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<Version>2.0.0.1-alpha</Version>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="../../assets/c-sharp.png" Link="Assets\c-sharp.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="../../LICENSE" Link="Assets\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="../../README.md" Link="Assets\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="../../assets/sharpdevlib.version.txt" Link="Assets\sharpdevlib.version.txt">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Text.Json" Version="8.0.3" />
+	</ItemGroup>
+</Project>

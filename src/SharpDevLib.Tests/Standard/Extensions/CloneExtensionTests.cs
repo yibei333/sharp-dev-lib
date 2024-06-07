@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib.Standard;
 using SharpDevLib.Tests.TestData;
 
 namespace SharpDevLib.Tests.Standard.Extensions;

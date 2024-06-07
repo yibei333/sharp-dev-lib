@@ -1,15 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib.Standard;
 using System;
 using System.IO;
-using static SharpDevLib.Standard.HashExtension;
 
 namespace SharpDevLib.Tests.Standard.Extensions;
 
 [TestClass]
 public class HashExtensionTests
 {
-    static readonly byte[] _emptyBytes = Array.Empty<byte>();
+    static readonly byte[] _emptyBytes = [];
     static readonly byte[] _bytes = "foobar".ToUtf8Bytes();
     const string _secret = "123456";
 

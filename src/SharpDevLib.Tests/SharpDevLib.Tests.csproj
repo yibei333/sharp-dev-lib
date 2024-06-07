@@ -18,7 +18,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SharpDevLib.Standard\SharpDevLib.Standard.csproj" />
+	  <ProjectReference Include="..\SharpDevLib.Compression\SharpDevLib.Compression.csproj" />
+	  <ProjectReference Include="..\SharpDevLib.Transport\SharpDevLib.Transport.csproj" />
+	  <ProjectReference Include="..\SharpDevLib\SharpDevLib.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

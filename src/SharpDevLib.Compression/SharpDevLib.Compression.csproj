@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>11.0</LangVersion>
+		<Authors>developer333</Authors>
+		<Description>文件压缩/解压库</Description>
+		<Copyright>developer333</Copyright>
+		<PackageId>SharpDevLib.Compression</PackageId>
+		<PackageProjectUrl>https://github.com/yibei333/sharp-dev-lib</PackageProjectUrl>
+		<PackageIcon>c-sharp.png</PackageIcon>
+		<RepositoryUrl>https://github.com/yibei333/sharp-dev-lib</RepositoryUrl>
+		<PackageTags>compress decompress compression</PackageTags>
+		<!--<PackageLicenseFile>LICENSE</PackageLicenseFile>-->
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<Version>2.0.0.1-alpha</Version>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="../../assets/c-sharp.png" Link="Assets\c-sharp.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="../../LICENSE" Link="Assets\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="../../README.md" Link="Assets\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="../../assets/sharpdevlib.compression.version.txt" Link="Assets\sharpdevlib.compression.version.txt">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SharpCompress" Version="0.37.2" />
+		<PackageReference Include="SharpZipLib" Version="1.4.2" />
+	</ItemGroup>
+</Project>
