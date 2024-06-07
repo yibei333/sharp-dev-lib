@@ -1,4 +1,4 @@
-name: standard20-release
+name: sharpdevlib-transport-release
 
 on:
   push:
