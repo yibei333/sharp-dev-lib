@@ -12,7 +12,7 @@ public class TimeExtensionTests
     public void ToUtcTimestampTest(int year, int month, int day, long expected)
     {
         var time = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc);
-        Assert.AreEqual(expected, time.ToUtcTimeStamp());
+        Assert.AreEqual(expected, time.ToUtcTimestamp());
     }
 
     [TestMethod]

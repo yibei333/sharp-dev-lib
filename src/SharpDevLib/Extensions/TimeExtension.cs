@@ -15,7 +15,7 @@ public static class TimeExtension
     /// </summary>
     /// <param name="time">时间</param>
     /// <returns>UTC时间戳</returns>
-    public static long ToUtcTimeStamp(this DateTime time) => (long)(time.ToUniversalTime() - UtcStartTime).TotalMilliseconds;
+    public static long ToUtcTimestamp(this DateTime time) => (long)(time.ToUniversalTime() - UtcStartTime).TotalMilliseconds;
 
     /// <summary>
     /// 将UTC时间戳转换为时间
