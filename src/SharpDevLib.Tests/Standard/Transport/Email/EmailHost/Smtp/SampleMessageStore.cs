@@ -28,7 +28,7 @@ public class SampleMessageStore(IServiceProvider serviceProvider) : SmtpBase(ser
         toUsers = toUsers.Where(x => !notExistToUsers.Contains(x.Name)).ToList();
 
         //save file
-        var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"Data/Email/{Guid.NewGuid()}.txt");
+        var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Email/{Guid.NewGuid()}.txt");
         buffer.ToArray().SaveToFile(path);
 
         var email = new Models.Email(message.Subject, message.MessageId, path) { ReferenceMessageIds = message.MessageId };

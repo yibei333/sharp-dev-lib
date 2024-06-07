@@ -3,7 +3,7 @@ using EmbedIO.Routing;
 using EmbedIO.WebApi;
 using HttpMultipartParser;
 using SharpDevLib.Standard;
-using SharpDevLib.Tests.Data;
+using SharpDevLib.Tests.TestData;
 using System;
 using System.Threading.Tasks;
 
@@ -15,6 +15,7 @@ internal class HttpPostController : WebApiController
     public void Post([JsonData] User user)
     {
         Console.WriteLine(user.Serialize());
+        HttpContext.WriteObject(true);
     }
 
     [Route(HttpVerbs.Post, "/post/int")]
@@ -40,6 +41,7 @@ internal class HttpPostController : WebApiController
     {
         Console.WriteLine(name);
         Console.WriteLine(age);
+        HttpContext.WriteObject(true);
     }
 
     [Route(HttpVerbs.Post, "/post/form/object")]
@@ -68,7 +70,7 @@ internal class HttpPostController : WebApiController
         var parser = await MultipartFormDataParser.ParseAsync(Request.InputStream);
         parser.Files.ForEach(x =>
         {
-            var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"Data/Tests/Post{x.FileName}");
+            var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/Post{x.FileName}");
             x.Data.SaveToFile(path);
         });
 

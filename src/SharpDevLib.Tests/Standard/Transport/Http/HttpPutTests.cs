@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Standard;
-using SharpDevLib.Tests.Data;
 using SharpDevLib.Tests.Standard.Http.Base;
+using SharpDevLib.Tests.TestData;
 
 namespace SharpDevLib.Tests.Standard.Http;
 

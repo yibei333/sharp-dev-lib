@@ -11,8 +11,8 @@ public class Bz2DeCompressTests
     [TestMethod]
     public void TarDeCompressTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/bz2-tar-decompress");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/bz2.tar.bz2"), targetPath)
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/bz2-tar-decompress");
+        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/bz2.tar.bz2"), targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat))
         };
@@ -24,8 +24,8 @@ public class Bz2DeCompressTests
     [TestMethod]
     public void DeCompressTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/bz2-decompress");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/bz2.bz2"), targetPath)
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/bz2-decompress");
+        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/bz2.bz2"), targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat))
         };

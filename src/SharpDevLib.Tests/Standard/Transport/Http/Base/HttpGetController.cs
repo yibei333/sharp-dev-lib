@@ -1,7 +1,7 @@
 ﻿using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
-using SharpDevLib.Tests.Data;
+using SharpDevLib.Tests.TestData;
 using System;
 using System.Collections.Generic;
 using System.Linq;

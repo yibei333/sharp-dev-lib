@@ -11,8 +11,8 @@ public class GzDeCompressTests
     [TestMethod]
     public void TarGzDeCompressTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/gz-tar-gz-decompress");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/gz.tar.gz"), targetPath)
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/gz-tar-gz-decompress");
+        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/gz.tar.gz"), targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat))
         };
@@ -24,8 +24,8 @@ public class GzDeCompressTests
     [TestMethod]
     public void TgzDeCompressTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/gz-tgz-decompress");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/gz.tgz"), targetPath)
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/gz-tgz-decompress");
+        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/gz.tgz"), targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat))
         };
@@ -37,8 +37,8 @@ public class GzDeCompressTests
     [TestMethod]
     public void DeCompressTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/gz-decompress");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/gz.gz"), targetPath)
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/gz-decompress");
+        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/gz.gz"), targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat))
         };

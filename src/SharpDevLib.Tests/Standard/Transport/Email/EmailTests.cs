@@ -19,7 +19,7 @@ public class EmailTests
     static EmailUserService? _emailUserService;
     static EmailSerivce? _emailService;
     static EmailDetailSerivce? _emailDetailService;
-    static readonly string _baseDirectory = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Email");
+    static readonly string _baseDirectory = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Email");
 
     [ClassInitialize(InheritanceBehavior.BeforeEachDerivedClass)]
     public static void Initialize(TestContext context)
@@ -65,7 +65,7 @@ public class EmailTests
         var content = new EmailContent(["bar@localhost"], "send test", "testbody")
         {
             Attachments = [
-                new EmailAttachment(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/TestFile.txt"))
+                new EmailAttachment(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))
             ],
             CC = ["baz@localhost"],
             BCC = ["qux@localhost"]
@@ -119,7 +119,7 @@ public class EmailTests
         var content = new EmailContent(["qux@localhost"], "send test", "testbody")
         {
             Attachments = [
-                new EmailAttachment(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/TestFile.txt"))
+                new EmailAttachment(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))
             ],
             CC = ["foo@localhost"],
             BCC = ["bar@localhost"]

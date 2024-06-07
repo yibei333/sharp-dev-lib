@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Standard;
-using SharpDevLib.Tests.Data;
 using SharpDevLib.Tests.Standard.Http.Base;
+using SharpDevLib.Tests.TestData;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -86,8 +86,8 @@ public class HttpPostTests : HttpBaseTests
             { "Age","10" },
         },
         [
-            new FormFile("file","TestFile.txt",File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/TestFile.txt"))),
-            new FormFile("file","Foo.txt",File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Foo.txt"))),
+            new FormFile("file","TestFile.txt",File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))),
+            new FormFile("file","Foo.txt",File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Foo.txt"))),
         ]);
         var response = request.PostAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
@@ -104,8 +104,8 @@ public class HttpPostTests : HttpBaseTests
             { "Age","10" },
         },
         [
-            new FormFile("file","TestFile.txt",File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/TestFile.txt"))),
-            new FormFile("file","Foo.txt",File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Foo.txt"))),
+            new FormFile("file","TestFile.txt",File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))),
+            new FormFile("file","Foo.txt",File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Foo.txt"))),
         ])
         {
             OnReceiveProgress = p =>
@@ -126,9 +126,9 @@ public class HttpPostTests : HttpBaseTests
         Assert.IsNotNull(response.Data);
         Assert.AreEqual(10, response.Data.Age);
         Assert.AreEqual("foo", response.Data.Name);
-        Assert.IsTrue(File.Exists(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/PostTestFile.txt")));
-        Assert.AreEqual("Hello,World!", File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/PostTestFile.txt")));
-        Assert.IsTrue(File.Exists(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/PostFoo.txt")));
-        Assert.AreEqual("foo", File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/PostFoo.txt")));
+        Assert.IsTrue(File.Exists(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/PostTestFile.txt")));
+        Assert.AreEqual("Hello,World!", File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/PostTestFile.txt")));
+        Assert.IsTrue(File.Exists(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/PostFoo.txt")));
+        Assert.AreEqual("foo", File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/PostFoo.txt")));
     }
 }

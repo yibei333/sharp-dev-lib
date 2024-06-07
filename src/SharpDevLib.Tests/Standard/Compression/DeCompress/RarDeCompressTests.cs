@@ -11,8 +11,8 @@ public class RarDeCompressTests
     [TestMethod]
     public void DeCompressTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/rar-decompress");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/rar.rar"), targetPath)
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/rar-decompress");
+        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/rar.rar"), targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
         };
@@ -24,8 +24,8 @@ public class RarDeCompressTests
     [TestMethod]
     public void DeCompressWithPasswordTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/rar-decompress-password");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/rar-password.rar"), targetPath)
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/rar-decompress-password");
+        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/rar-password.rar"), targetPath)
         {
             Password = "foobar",
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),

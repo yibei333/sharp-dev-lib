@@ -2,7 +2,7 @@
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
 using SharpDevLib.Standard;
-using SharpDevLib.Tests.Data;
+using SharpDevLib.Tests.TestData;
 using System;
 
 namespace SharpDevLib.Tests.Standard.Http.Base;

@@ -1,4 +1,4 @@
-﻿namespace SharpDevLib.Tests.Data;
+﻿namespace SharpDevLib.Tests.TestData;
 
 public enum Gender
 {

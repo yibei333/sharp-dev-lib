@@ -11,8 +11,8 @@ public class TarCompressTests
     [TestMethod]
     public void CompressTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/tar-create.tar");
-        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root")], targetPath)
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/tar-create.tar");
+        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
         };
@@ -25,8 +25,8 @@ public class TarCompressTests
     [ExpectedException(typeof(InvalidDataException))]
     public void CompressWithPasswordTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/tar-password-create.tar");
-        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root")], targetPath)
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/tar-password-create.tar");
+        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
         {
             Password = "foobar",
             Level = CompressionLevel.MinimumSize,

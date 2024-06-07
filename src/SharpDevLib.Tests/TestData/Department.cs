@@ -1,4 +1,4 @@
-﻿namespace SharpDevLib.Tests.Data;
+﻿namespace SharpDevLib.Tests.TestData;
 
 public class Department<TId>(TId identity, string name, TId? pId = default)
 {

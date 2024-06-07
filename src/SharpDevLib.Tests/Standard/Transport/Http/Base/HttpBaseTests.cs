@@ -25,7 +25,7 @@ public class HttpBaseTests
                             .WithController<HttpPutController>()
                             .WithController<HttpDeleteController>()
                         )
-                        .WithStaticFolder("/statics", AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data"), true, m => m.WithContentCaching(true));
+                        .WithStaticFolder("/statics", AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData"), true, m => m.WithContentCaching(true));
         _server.Start();
         HttpGlobalOptions.BaseUrl = BaseUrl;
     }

@@ -22,64 +22,64 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="Data\c-sharp.png">
+		<None Update="TestData\c-sharp.png">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\bz2.bz2">
+		<None Update="TestData\Compression\bz2.bz2">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\bz2.tar.bz2">
+		<None Update="TestData\Compression\bz2.tar.bz2">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\gz.gz">
+		<None Update="TestData\Compression\gz.gz">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\gz.tar.gz">
+		<None Update="TestData\Compression\gz.tar.gz">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\gz.tgz">
+		<None Update="TestData\Compression\gz.tgz">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\rar-password.rar">
+		<None Update="TestData\Compression\rar-password.rar">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\rar.rar">
+		<None Update="TestData\Compression\rar.rar">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\Root\bar.txt">
+		<None Update="TestData\Compression\Root\bar.txt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\Root\dir\baz.txt">
+		<None Update="TestData\Compression\Root\dir\baz.txt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\Root\foo.txt">
+		<None Update="TestData\Compression\Root\foo.txt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\sevenzip-password.7z">
+		<None Update="TestData\Compression\sevenzip-password.7z">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\sevenzip.7z">
+		<None Update="TestData\Compression\sevenzip.7z">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\tar.tar">
+		<None Update="TestData\Compression\tar.tar">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\xz.tar.xz">
+		<None Update="TestData\Compression\xz.tar.xz">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\xz.xz">
+		<None Update="TestData\Compression\xz.xz">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\zip-password.zip">
+		<None Update="TestData\Compression\zip-password.zip">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Compression\zip.zip">
+		<None Update="TestData\Compression\zip.zip">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\Foo.txt">
+		<None Update="TestData\Foo.txt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Data\TestFile.txt">
+		<None Update="TestData\TestFile.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

@@ -1,4 +1,4 @@
-﻿namespace SharpDevLib.Tests.Data;
+﻿namespace SharpDevLib.Tests.TestData;
 
 public class User(string name, int age)
 {

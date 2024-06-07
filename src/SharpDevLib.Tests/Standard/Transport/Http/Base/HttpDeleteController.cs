@@ -2,7 +2,7 @@
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
 using SharpDevLib.Standard;
-using SharpDevLib.Tests.Data;
+using SharpDevLib.Tests.TestData;
 using System;
 
 namespace SharpDevLib.Tests.Standard.Http.Base;
@@ -14,6 +14,7 @@ internal class HttpDeleteController : WebApiController
     {
         var user = new User(name, age);
         Console.WriteLine(user.Serialize());
+        HttpContext.WriteObject(true);
     }
 
     [Route(HttpVerbs.Delete, "/delete/int")]

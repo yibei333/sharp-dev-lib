@@ -11,8 +11,8 @@ public class GzCompressTests
     [TestMethod]
     public void TarCompressTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/gz-create.tgz");
-        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root")], targetPath)
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/gz-create.tgz");
+        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
             IncludeSourceDiretory = true
@@ -25,8 +25,8 @@ public class GzCompressTests
     [TestMethod]
     public void CompressTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/gz-create.gz");
-        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root/foo.txt")], targetPath)
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/gz-create.gz");
+        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root/foo.txt")], targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
             IncludeSourceDiretory = true
@@ -40,8 +40,8 @@ public class GzCompressTests
     [ExpectedException(typeof(InvalidDataException))]
     public void CompressWithPasswordTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/gz-password-create.tar");
-        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/Root")], targetPath)
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/gz-password-create.tar");
+        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
         {
             Password = "foobar",
             Level = CompressionLevel.MinimumSize,

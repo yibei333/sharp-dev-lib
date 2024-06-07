@@ -11,8 +11,8 @@ public class SevenZipDeCompressTests
     [TestMethod]
     public void DeCompressTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/sevenzip-decompress");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/sevenzip.7z"), targetPath)
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/sevenzip-decompress");
+        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/sevenzip.7z"), targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat))
         };
@@ -24,8 +24,8 @@ public class SevenZipDeCompressTests
     [TestMethod]
     public void DeCompressWithPasswordTest()
     {
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Tests/sevenzip-decompress-password");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data/Compression/sevenzip-password.7z"), targetPath)
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/sevenzip-decompress-password");
+        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/sevenzip-password.7z"), targetPath)
         {
             Password = "foobar",
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),

@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Standard;
-using SharpDevLib.Tests.Data;
+using SharpDevLib.Tests.TestData;
 using System;
 
 namespace SharpDevLib.Tests.Standard.Extensions;
