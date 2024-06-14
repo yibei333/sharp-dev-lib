@@ -1,4 +1,4 @@
-﻿using MimeKit;
+﻿using OpenPop.Mime;
 using SharpDevLib.Tests.Transport.Email.EmailHost.Models;
 using SmtpServer;
 using SmtpServer.Protocol;
@@ -7,7 +7,6 @@ using System;
 using System.Buffers;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,7 +17,7 @@ public class SampleMessageStore(IServiceProvider serviceProvider) : SmtpBase(ser
     public Task<SmtpResponse> SaveAsync(ISessionContext context, IMessageTransaction transaction, ReadOnlySequence<byte> buffer, CancellationToken cancellationToken)
     {
         using var memoryStream = new MemoryStream(buffer.ToArray());
-        var message = MimeMessage.Load(new ParserOptions { CharsetEncoding = Encoding.UTF8 }, memoryStream, cancellationToken);
+        var message = Message.Load(memoryStream);
 
         var fromUser = UserService.Get(x => x.Name == transaction.From.User).FirstOrDefault() ?? throw new NullReferenceException();
         var toUsers = UserService.Get(x => transaction.To.Select(x => x.User).Contains(x.Name)).ToList();
@@ -30,7 +29,7 @@ public class SampleMessageStore(IServiceProvider serviceProvider) : SmtpBase(ser
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Email/{Guid.NewGuid()}.txt");
         buffer.ToArray().SaveToFile(path);
 
-        var email = new Models.Email(message.Subject, message.MessageId, path) { ReferenceMessageIds = message.MessageId };
+        var email = new Models.Email(message.Headers.Subject, message.Headers.MessageId, path) { ReferenceMessageIds = message.Headers.MessageId };
         EmailSerivce.Save(email);
 
         var fromDetail = new EmailDetail(email.Id, fromUser.Id, 1);

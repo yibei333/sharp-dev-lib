@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MimeKit;
+using OpenPop.Mime;
 using SharpDevLib.Tests.Transport.Email.EmailHost;
 using SharpDevLib.Tests.Transport.Email.EmailHost.Service;
 using SharpDevLib.Transport;
 using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace SharpDevLib.Tests.Transport.Email;
 
@@ -81,25 +80,26 @@ public class EmailTests
         Assert.IsTrue(File.Exists(email.FilePath));
 
         using var stream = File.OpenRead(email.FilePath);
-        using var message = MimeMessage.Load(new ParserOptions { CharsetEncoding = Encoding.UTF8 }, stream);
+        var message = Message.Load(stream);
         Assert.IsNotNull(message);
 
         Console.WriteLine(message.ToString());
 
-        Assert.IsTrue(message.Body.ToString().Contains(content.Body!));
-        Assert.AreEqual(content.Receivers?.First(), message.To.First().ToString());
-        Assert.AreEqual(content.CC?.First(), message.Cc.First().ToString());
-        Assert.AreEqual(true, message.Bcc.IsNullOrEmpty());
+        Assert.IsTrue(message.FindAllTextVersions().Any(x => x.Body.ToUtf8String().Contains(content.Body!)));
+        Assert.AreEqual(content.Receivers?.First(), message.Headers.To.First().ToString());
+        Assert.AreEqual(content.CC?.First(), message.Headers.Cc.First().ToString());
+        Assert.AreEqual(true, message.Headers.Bcc.IsNullOrEmpty());
         var bccEmail = (from a in _emailService.All join b in _emailDetailService.All on a.Id equals b.EmailId join c in _emailUserService.All on b.UserId equals c.Id where b.Type == 2 && c.Name == "qux" && a.Subject == content.Subject select a).FirstOrDefault();
         Assert.IsNotNull(bccEmail);
 
-        Assert.AreEqual(1, message.Attachments.Count());
-        using var attachment = message.Attachments.First() as MimePart;
+        var attachments = message.FindAllAttachments();
+        Assert.AreEqual(1, attachments.Count());
+        var attachment = attachments.First();
         Assert.IsNotNull(attachment);
         using var attachStream = new MemoryStream();
-        attachment.Content.WriteTo(attachStream);
+        attachment.Save(attachStream);
         var attachmentText = attachStream.ToArray().ToUtf8String();
-        Assert.AreEqual("Hello,World!", attachmentText.Base64Decode().ToUtf8String());
+        Assert.AreEqual("Hello,World!", attachmentText);
     }
 
     [TestMethod]
@@ -135,24 +135,25 @@ public class EmailTests
         Assert.IsTrue(File.Exists(email.FilePath));
 
         using var stream = File.OpenRead(email.FilePath);
-        using var message = MimeMessage.Load(new ParserOptions { CharsetEncoding = Encoding.UTF8 }, stream);
+        var message = Message.Load(stream);
         Assert.IsNotNull(message);
 
         Console.WriteLine(message.ToString());
 
-        Assert.IsTrue(message.Body.ToString().Contains(content.Body!));
-        Assert.AreEqual(content.Receivers?.First(), message.To.First().ToString());
-        Assert.AreEqual(content.CC?.First(), message.Cc.First().ToString());
-        Assert.AreEqual(true, message.Bcc.IsNullOrEmpty());
+        Assert.IsTrue(message.FindAllTextVersions().Any(x => x.Body.ToUtf8String().Contains(content.Body!)));
+        Assert.AreEqual(content.Receivers?.First(), message.Headers.To.First().ToString());
+        Assert.AreEqual(content.CC?.First(), message.Headers.Cc.First().ToString());
+        Assert.AreEqual(true, message.Headers.Bcc.IsNullOrEmpty());
         var bccEmail = (from a in _emailService.All join b in _emailDetailService.All on a.Id equals b.EmailId join c in _emailUserService.All on b.UserId equals c.Id where b.Type == 2 && c.Name == "qux" && a.Subject == content.Subject select a).FirstOrDefault();
         Assert.IsNotNull(bccEmail);
 
-        Assert.AreEqual(1, message.Attachments.Count());
-        using var attachment = message.Attachments.First() as MimePart;
+        var attachments = message.FindAllAttachments();
+        Assert.AreEqual(1, attachments.Count());
+        var attachment = attachments.First();
         Assert.IsNotNull(attachment);
         using var attachStream = new MemoryStream();
-        attachment.Content.WriteTo(attachStream);
+        attachment.Save(attachStream);
         var attachmentText = attachStream.ToArray().ToUtf8String();
-        Assert.AreEqual("Hello,World!", attachmentText.Base64Decode().ToUtf8String());
+        Assert.AreEqual("Hello,World!", attachmentText);
     }
 }

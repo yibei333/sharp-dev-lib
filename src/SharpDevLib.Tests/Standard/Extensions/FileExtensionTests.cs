@@ -122,7 +122,7 @@ public class FileExtensionTests
         path.EnsureDirectoryExist();
         Assert.IsTrue(Directory.Exists(path));
 
-        path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Foo Bar");
+        path = path.CombinePath("Foo Bar");
         if (Directory.Exists(path)) Directory.Delete(path, true);
         path.EnsureDirectoryExist();
         Assert.IsTrue(Directory.Exists(path));
