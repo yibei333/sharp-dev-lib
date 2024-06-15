@@ -33,7 +33,7 @@ public static class RsaKeyExtension
             var md5Key = password.Concat(salt).ToArray();
             using var md5 = MD5.Create();
             var hash1 = md5.ComputeHash(md5Key);
-            var hash2 = md5.ComputeHash(hash1.Concat(md5Key).ToArray());
+            var hash2 = md5.ComputeHash(hash1.Concat(md5Key).ToArray());//length not enough,hash again
             var key = hash1.Concat(hash2).ToArray();
 
             using var aes = Aes.Create();
@@ -48,7 +48,7 @@ public static class RsaKeyExtension
             var md5Key = password.Concat(salt).ToArray();
             using var md5 = MD5.Create();
             var hash1 = md5.ComputeHash(md5Key);
-            var hash2 = md5.ComputeHash(hash1.Concat(md5Key).ToArray());
+            var hash2 = md5.ComputeHash(hash1.Concat(md5Key).ToArray());//length not enough,hash again
             var key = hash1.Concat(hash2).Take(24).ToArray();
 
             using var tripleDES = TripleDES.Create();
