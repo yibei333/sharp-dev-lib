@@ -25,6 +25,7 @@ public static class RsaKeyExtension
 
         var ciphertext = Convert.FromBase64String(pemObject.Body);
         var algorithm = dekInfo.First().Split(':').Last().Trim();
+        //rfc2898
         if (algorithm == "AES-256-CBC")
         {
             var iv = dekInfo.Last().Trim().FromHexString();
@@ -61,15 +62,9 @@ public static class RsaKeyExtension
         }
     }
 
-    static byte[] ReadIntegerValue(this AsnReader reader)
-    {
-        var array = reader.ReadInteger().ToByteArray().Reverse();
-        if (array.First() == 0x00) array = array.Skip(1);
-        return array.ToArray();
-    }
-
     static void ImportPkcs1PrivateKeyPem(this RSA rsa, byte[] bytes)
     {
+        //rfc8017
         var reader = new AsnReader(bytes, AsnEncodingRules.DER);
         var sequence = reader.ReadSequence(Asn1Tag.Sequence);
         _ = sequence.ReadInteger();//version
@@ -95,5 +90,13 @@ public static class RsaKeyExtension
         };
         rsa.ImportParameters(parameter);
     }
+
+    static byte[] ReadIntegerValue(this AsnReader reader)
+    {
+        var array = reader.ReadInteger().ToByteArray().Reverse();
+        if (array.First() == 0x00) array = array.Skip(1);
+        return array.ToArray();
+    }
+
     #endregion
 }
