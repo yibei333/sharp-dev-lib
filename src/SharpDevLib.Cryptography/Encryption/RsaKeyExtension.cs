@@ -25,7 +25,9 @@ public static class RsaKeyExtension
 
         var ciphertext = Convert.FromBase64String(pemObject.Body);
         var algorithm = dekInfo.First().Split(':').Last().Trim();
+
         //rfc2898
+        //https://stackoverflow.com/questions/77239925/decrypt-the-encrypted-private-key-in-pkcs-1-format
         if (algorithm == "AES-256-CBC")
         {
             var iv = dekInfo.Last().Trim().FromHexString();
