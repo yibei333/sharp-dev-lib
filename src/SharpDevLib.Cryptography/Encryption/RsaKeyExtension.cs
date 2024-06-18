@@ -69,7 +69,7 @@ public static class RsaKeyExtension
         //rfc8017
         var reader = new AsnReader(bytes, AsnEncodingRules.DER);
         var sequence = reader.ReadSequence(Asn1Tag.Sequence);
-        _ = sequence.ReadInteger();//version
+        _ = sequence.ReadInteger();//version:0
         var module = sequence.ReadIntegerValue();
         var publicExponent = sequence.ReadIntegerValue();
         var privateExponent = sequence.ReadIntegerValue();
@@ -99,6 +99,100 @@ public static class RsaKeyExtension
         if (array.First() == 0x00) array = array.Skip(1);
         return array.ToArray();
     }
+    #endregion
 
+    #region Pkcs8
+    public static void ImportPkcs8PrivateKeyPem(this RSA rsa, string pkcs8PrivateKeyPem)
+    {
+        var pemObject = PemObject.Read(pkcs8PrivateKeyPem);
+        if (pemObject.PemType != PemType.RsaPkcs8PrivateKey) throw new InvalidDataException($"key type({pemObject.PemType}) is not pkcs8 private key");
+        var bytes = Convert.FromBase64String(pemObject.Body);
+
+        ImportPkcs8PrivateKeyPem(rsa, bytes);
+    }
+
+    public static void ImportEncryptedPkcs8PrivateKeyPem(this RSA rsa, string encryptedPkcs8PrivateKeyPem, byte[] password)
+    {
+        var pemObject = PemObject.Read(encryptedPkcs8PrivateKeyPem);
+        if (pemObject.PemType != PemType.RsaEncryptedPkcs8PrivateKey) throw new InvalidDataException($"key type({pemObject.PemType}) is not encrypted pkcs8 private key");
+        var bytes = Convert.FromBase64String(pemObject.Body);
+
+        var reader = new AsnReader(bytes, AsnEncodingRules.DER);
+        var sequence = reader.ReadSequence(Asn1Tag.Sequence);
+        var parameterSequence = sequence.ReadSequence(Asn1Tag.Sequence);
+        var encryptedData = sequence.ReadOctetString();
+
+        var pkcs5pbes2Identifier = parameterSequence.ReadObjectIdentifier();//pkcs5 pbes2
+        if (pkcs5pbes2Identifier != "1.2.840.113549.1.5.13") throw new NotSupportedException();
+        var pbes2Sequence = parameterSequence.ReadSequence();
+
+        var hashSequence = pbes2Sequence.ReadSequence(Asn1Tag.Sequence);
+        var hashIdentifier = hashSequence.ReadObjectIdentifier();//pkcs5 PBKDF2
+        if (hashIdentifier != "1.2.840.113549.1.5.12") throw new NotSupportedException();
+
+        var pbkdf2ParameterSequence = hashSequence.ReadSequence();
+        var salt = pbkdf2ParameterSequence.ReadOctetString();
+        var iterationCount = pbkdf2ParameterSequence.ReadInteger();
+        //var keyLength = pbkdf2ParameterSequence.TryReadInt32(out var length) ? length : 32;
+        var prfSequence = pbkdf2ParameterSequence.ReadSequence();
+        var prfIdentifier = prfSequence.ReadObjectIdentifier();
+        if (prfIdentifier == "1.2.840.113549.2.9")//rfc4231,hmacWithSHA256
+        {
+
+        }
+        else throw new NotSupportedException();
+
+
+        var symmetricSequence = pbes2Sequence.ReadSequence();
+        var symmetricIdentifier = symmetricSequence.ReadObjectIdentifier();
+        if (symmetricIdentifier == "2.16.840.1.101.3.4.1.42")//rfc3565,id-aes256-CBC
+        {
+
+        }
+        else throw new NotSupportedException();
+        var iv = symmetricSequence.ReadOctetString();
+
+        //get key
+        var key = GetKey(password, salt, iterationCount);
+
+        //aes decrypt
+        using var aes = Aes.Create();
+        aes.Mode = CipherMode.CBC;
+        var transform = aes.CreateDecryptor(key, iv);
+        var decrypted = transform.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
+        ImportPkcs8PrivateKeyPem(rsa, decrypted);
+    }
+
+    static byte[] GetKey(byte[] password, byte[] salt, System.Numerics.BigInteger iterationCount)
+    {
+        using var sha = new HMACSHA256(password);
+        var key = sha.ComputeHash(salt.Concat(new byte[] { 0, 0, 0, 1 }).ToArray());
+        var initKey = new byte[key.Length];
+        key.CopyTo(initKey, 0);
+        for (int i = 1; i < iterationCount; i++)
+        {
+            key = sha.ComputeHash(key);
+            for (int j = 0; j < initKey.Length; j++)
+            {
+                initKey[j] ^= key[j];
+            }
+        }
+
+        return initKey;
+    }
+
+    static void ImportPkcs8PrivateKeyPem(this RSA rsa, byte[] bytes)
+    {
+        //rfc5208
+        var reader = new AsnReader(bytes, AsnEncodingRules.DER);
+        var sequence = reader.ReadSequence(Asn1Tag.Sequence);
+        var version = sequence.ReadInteger();//version
+        if (version != 0) throw new NotImplementedException($"only support rfc5208 structure");
+        var identifierSequence = sequence.ReadSequence(Asn1Tag.Sequence);
+        var identifier = identifierSequence.ReadObjectIdentifier();//rsa identifier,rfc8017
+        if (identifier != "1.2.840.113549.1.1.1") throw new NotImplementedException($"identifier '{identifier}' not supported yet");
+        var pkcs1Key = sequence.ReadOctetString();
+        rsa.ImportPkcs1PrivateKeyPem(pkcs1Key);
+    }
     #endregion
 }

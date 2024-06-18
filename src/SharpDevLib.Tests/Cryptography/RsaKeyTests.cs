@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using SharpDevLib.Cryptography;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace SharpDevLib.Tests.Cryptography;
 
@@ -39,7 +40,7 @@ public class RsaKeyTests
     static string GetKey(PemType type)
     {
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/CryptoGraphy/{type}.txt");
-        var text = File.ReadAllText(path);
+        var text = File.ReadAllText(path).Replace("\r\n", "\n");
         return text;
     }
     #endregion
@@ -72,14 +73,20 @@ public class RsaKeyTests
     }
 
     [TestMethod]
-    public void Tet()
+    public void ImportPkcs8PrivateKeyPemTest()
     {
-        var a=CSharp_easy_RSA_PEM.Crypto.DecodeRsaPrivateKey(keys[PemType.TrippleDESEncryptedPkcs1PrivateKey], password);
-        var exportedPem = a.ExportRSAPrivateKeyPem().Trim();
-
         using var rsa = RSA.Create();
-        rsa.ImportEncryptedPkcs1PrivateKeyPem(keys[PemType.TrippleDESEncryptedPkcs1PrivateKey], passwordBytes);
+        rsa.ImportPkcs8PrivateKeyPem(keys[PemType.Pkcs8PrivateKey]);
+        var exportedPem = rsa.ExportRSAPrivateKeyPem().Trim();
+        Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], exportedPem);
+    }
 
-        Console.WriteLine(exportedPem);
+    [TestMethod]
+    public void ImportEncryptedPkcs8PrivateKeyPemTest()
+    {
+        using var rsa = RSA.Create();
+        rsa.ImportEncryptedPkcs8PrivateKeyPem(keys[PemType.EncryptedPkcs8PrivateKey], passwordBytes);
+        var exportedPem = rsa.ExportRSAPrivateKeyPem().Trim();
+        Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], exportedPem);
     }
 }

@@ -47,5 +47,6 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
 		<PackageReference Include="System.Formats.Asn1" Version="8.0.0" />
+		<PackageReference Include="System.Security.Cryptography.Cng" Version="5.0.0" />
 	</ItemGroup>
 </Project>
