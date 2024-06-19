@@ -1,4 +1,5 @@
 ﻿using SharpDevLib.Cryptography.References;
+using System.Text;
 
 namespace SharpDevLib.Cryptography;
 
@@ -27,5 +28,17 @@ internal static class InternalExtension
             list.Add(Convert.ToByte(string.Join("", hexString.Skip(i * 2).Take(2)), 16));
         }
         return list.ToArray();
+    }
+
+    const string LFTerminator = "\n";
+    internal static void AppendLineWithLFTerminator(this StringBuilder builder, string? content)
+    {
+        if (content.NotNullOrWhiteSpace()) builder.Append(content);
+        builder.Append(LFTerminator);
+    }
+
+    internal static void AppendLineWithLFTerminator(this StringBuilder builder)
+    {
+        builder.Append(LFTerminator);
     }
 }

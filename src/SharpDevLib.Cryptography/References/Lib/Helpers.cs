@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-
-namespace CSharp_easy_RSA_PEM
+﻿namespace CSharp_easy_RSA_PEM
 {
     public class Helpers
-    {  
+    {
         static Dictionary<PEMtypes, string> PEMs = new Dictionary<PEMtypes, string>()
         {
             {PEMtypes.PEM_X509_OLD , "X509 CERTIFICATE"},
@@ -37,7 +31,7 @@ namespace CSharp_easy_RSA_PEM
             {PEMtypes.PEM_SSH2_PUBLIC , "SSH2 PUBLIC KEY"},
             {PEMtypes.unknown , "UNKNOWN"}
         };
-          
+
         /// <summary>
         /// This helper function parses an integer size from the reader using the ASN.1 format
         /// </summary>
@@ -77,7 +71,7 @@ namespace CSharp_easy_RSA_PEM
 
             return count;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -89,7 +83,7 @@ namespace CSharp_easy_RSA_PEM
             PEMtypes keyType = getPEMType(pemString);
             Dictionary<string, string> extras;
             if (keyType == PEMtypes.unknown) return null;
-            return GetBytesFromPEM(pemString, keyType,out extras);
+            return GetBytesFromPEM(pemString, keyType, out extras);
         }
         public static byte[] GetBytesFromPEM(string pemString, PEMtypes type)
         {
@@ -101,15 +95,15 @@ namespace CSharp_easy_RSA_PEM
             PEMtypes type = getPEMType(pemString);
             return GetBytesFromPEM(pemString, type, out extras);
         }
-        public static byte[] GetBytesFromPEM(string pemString, PEMtypes type,out Dictionary<string,string> extras)
+        public static byte[] GetBytesFromPEM(string pemString, PEMtypes type, out Dictionary<string, string> extras)
         {
             extras = new Dictionary<string, string>();
             string header; string footer;
-            string data="";
+            string data = "";
             header = PEMheader(type);
             footer = PEMfooter(type);
-            
-            foreach(string s in pemString.Replace("\r","").Split('\n'))
+
+            foreach (string s in pemString.Replace("\r", "").Split('\n'))
             {
                 if (s.Contains(":"))
                 {
@@ -117,11 +111,11 @@ namespace CSharp_easy_RSA_PEM
                 }
                 else
                 {
-                    if (s !="") data += s + "\n";
+                    if (s != "") data += s + "\n";
                 }
             }
 
-            int start = data.IndexOf(header) + header.Length; 
+            int start = data.IndexOf(header) + header.Length;
             int end = data.IndexOf(footer, start) - start;
 
             return Convert.FromBase64String(data.Substring(start, end));
@@ -139,7 +133,7 @@ namespace CSharp_easy_RSA_PEM
         public static string PEMheader(PEMtypes p)
         {
             if (p == PEMtypes.PEM_SSH2_PUBLIC)
-            { 
+            {
                 return "---- BEGIN " + PEMs[p] + " ----";
             }
             else

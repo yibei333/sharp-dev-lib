@@ -1,5 +1,5 @@
-﻿using System.Security.Cryptography;
-using System.Formats.Asn1;
+﻿using System.Formats.Asn1;
+using System.Security.Cryptography;
 
 namespace SharpDevLib.Cryptography;
 
@@ -66,38 +66,15 @@ public static class RsaKeyExtension
 
     static void ImportPkcs1PrivateKeyPem(this RSA rsa, byte[] bytes)
     {
-        //rfc8017
-        var reader = new AsnReader(bytes, AsnEncodingRules.DER);
-        var sequence = reader.ReadSequence(Asn1Tag.Sequence);
-        _ = sequence.ReadInteger();//version:0
-        var module = sequence.ReadIntegerValue();
-        var publicExponent = sequence.ReadIntegerValue();
-        var privateExponent = sequence.ReadIntegerValue();
-        var p = sequence.ReadIntegerValue();
-        var q = sequence.ReadIntegerValue();
-        var dp = sequence.ReadIntegerValue();
-        var dq = sequence.ReadIntegerValue();
-        var inverseQ = sequence.ReadIntegerValue();
-
-        var parameter = new RSAParameters
-        {
-            Modulus = module,
-            Exponent = publicExponent,
-            D = privateExponent,
-            P = p,
-            Q = q,
-            DP = dp,
-            DQ = dq,
-            InverseQ = inverseQ,
-        };
+        var parameter = Pkcs1.Decode(bytes);
         rsa.ImportParameters(parameter);
     }
 
-    static byte[] ReadIntegerValue(this AsnReader reader)
+    public static string ExportPkcs1PrivateKeyPem(this RSA rsa)
     {
-        var array = reader.ReadInteger().ToByteArray().Reverse();
-        if (array.First() == 0x00) array = array.Skip(1);
-        return array.ToArray();
+        var bytes = Pkcs1.Encode(rsa.ExportParameters(true));
+        var pemObject = new PemObject(new PemHeader(PemStatics.RsaPkcs1PrivateStart, null, null), Convert.ToBase64String(bytes), PemStatics.RsaPkcs1PrivateEnd, PemType.RsaPkcs1PrivateKey);
+        return pemObject.Write();
     }
     #endregion
 

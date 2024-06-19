@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace SharpDevLib.Cryptography;
 
@@ -24,7 +22,28 @@ internal class PemObject
 
     public string Write()
     {
-        throw new NotImplementedException();
+        var builder = new StringBuilder();
+        builder.AppendLineWithLFTerminator(Header.Title);
+        if (Header.ProcType.NotNullOrWhiteSpace()) builder.AppendLineWithLFTerminator(Header.ProcType);
+        if (Header.DEKInfo.NotNullOrWhiteSpace())
+        {
+            builder.AppendLineWithLFTerminator(Header.ProcType);
+            builder.AppendLineWithLFTerminator();
+        }
+
+        var count = Math.Ceiling(Body.Length / 64.0);
+        for (int i = 0; i < count; i++)
+        {
+            var length = 64;
+            if (i == count - 1)
+            {
+                length = Body.Length % 64;
+            }
+            builder.AppendLineWithLFTerminator(Body.Substring(i * 64, length));
+        }
+
+        builder.Append(Footer);
+        return builder.ToString();
     }
 
     public static PemObject Read(string key)
@@ -76,7 +95,7 @@ internal class PemObject
         //unkonw
         else
         {
-            throw new InvalidDataException($"unknow format with '{title}'");
+            throw new InvalidDataException($"unknow format '{title}'");
         }
     }
 

@@ -1,10 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Security.Cryptography;
 using SharpDevLib.Cryptography;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Security.Cryptography;
 
 namespace SharpDevLib.Tests.Cryptography;
 
@@ -52,6 +51,16 @@ public class RsaKeyTests
         rsa.ImportPkcs1PrivateKeyPem(keys[PemType.Pkcs1PrivateKey]);
         var exportedPem = rsa.ExportRSAPrivateKeyPem().Trim();
         Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], exportedPem);
+    }
+
+    [TestMethod]
+    public void ExportPkcs1PrivateKey()
+    {
+        using var rsa = RSA.Create();
+        rsa.ImportFromPem(keys[PemType.Pkcs1PrivateKey]);
+        var pem = rsa.ExportPkcs1PrivateKeyPem();
+        Console.WriteLine(pem);
+        Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], pem);
     }
 
     [TestMethod]

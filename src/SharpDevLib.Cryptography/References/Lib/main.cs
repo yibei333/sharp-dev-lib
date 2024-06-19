@@ -1,15 +1,10 @@
 ﻿using CSInteropKeys;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CSharp_easy_RSA_PEM
 {
@@ -21,7 +16,7 @@ namespace CSharp_easy_RSA_PEM
         /// <param name="privateKeyBytes">Byte array containing PEM string of private key.</param>
         /// <returns>An instance of <see cref="RSACryptoServiceProvider"/> rapresenting the requested private key.
         /// Null if method fails on retriving the key.</returns>
-        public static RSACryptoServiceProvider DecodeRsaPrivateKey(string privateKey,string password="")
+        public static RSACryptoServiceProvider DecodeRsaPrivateKey(string privateKey, string password = "")
         {
             Dictionary<string, string> extras = new Dictionary<string, string>();
             byte[] bytes = Helpers.GetBytesFromPEM(privateKey, out extras);
@@ -422,13 +417,13 @@ namespace CSharp_easy_RSA_PEM
             return packagePEM(key.GetBytes(), PEMtypes.PEM_PUBLIC);
 
         }
-        public static string packagePEM(byte[] bytes,PEMtypes type)
+        public static string packagePEM(byte[] bytes, PEMtypes type)
         {
             TextWriter outputStream = new StringWriter();
             outputStream.NewLine = "\n";
 
             var base64 = Convert.ToBase64String(bytes, 0, (int)bytes.Length).ToCharArray();
-            outputStream.WriteLine(Helpers.PEMheader(type)); 
+            outputStream.WriteLine(Helpers.PEMheader(type));
 
             // Output as Base64 with lines chopped at 64 characters
             for (var i = 0; i < base64.Length; i += 64)
@@ -452,7 +447,7 @@ namespace CSharp_easy_RSA_PEM
             //Console.Write("\nEnter password to derive 3DES key: ");
             //String pswd = Console.ReadLine();
             byte[] deskey = GetOpenSSL3deskey(salt, despswd, 1, 2);    // count=1 (for OpenSSL implementation); 2 iterations to get at least 24 bytes
-            Console.WriteLine($"correct key:{string.Join(" ",deskey)}");
+            Console.WriteLine($"correct key:{string.Join(" ", deskey)}");
             if (deskey == null)
                 return null;
             //showBytes("3DES key", deskey) ;
@@ -557,7 +552,7 @@ namespace CSharp_easy_RSA_PEM
             //rsaCryptoServiceProvider.FromXmlString(xmlString);
             //int keySize = dwKeySize / 8;
             int keySize = key.KeySize / 8;
-             
+
             // The hash function in use by the .NET RSACryptoServiceProvider here is SHA1
             // int maxLength = ( keySize ) - 2 - ( 2 * SHA1.Create().ComputeHash( rawBytes ).Length );
             int maxLength = keySize - 42;
@@ -581,7 +576,7 @@ namespace CSharp_easy_RSA_PEM
         }
         public static string DecryptString(string inputString, RSACryptoServiceProvider key)
         {
-            return Encoding.UTF32.GetString(DecryptBytes(inputString,key));
+            return Encoding.UTF32.GetString(DecryptBytes(inputString, key));
         }
         public static byte[] DecryptBytes(string inputString, RSACryptoServiceProvider key)
         {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace CSharp_easy_RSA_PEM
+﻿namespace CSharp_easy_RSA_PEM
 {
     internal class RSAParameterTraits
     {
@@ -76,13 +71,13 @@ namespace CSharp_easy_RSA_PEM
             }
         }
 
-        public int size_Mod  = -1;
-        public int size_Exp  = -1;
-        public int size_D    = -1;
-        public int size_P    = -1;
-        public int size_Q    = -1;
-        public int size_DP   = -1;
-        public int size_DQ   = -1;
+        public int size_Mod = -1;
+        public int size_Exp = -1;
+        public int size_D = -1;
+        public int size_P = -1;
+        public int size_Q = -1;
+        public int size_DP = -1;
+        public int size_DQ = -1;
         public int size_InvQ = -1;
     }
 }
