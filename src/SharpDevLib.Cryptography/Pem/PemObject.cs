@@ -2,9 +2,10 @@
 
 namespace SharpDevLib.Cryptography;
 
+//rfc1421
 internal class PemObject
 {
-    public PemObject(PemHeader header, string body, string footer, PemType pemType)
+    public PemObject(string header, string body, string footer, PemType pemType)
     {
         Header = header;
         Body = body;
@@ -12,7 +13,17 @@ internal class PemObject
         PemType = pemType;
     }
 
-    public PemHeader Header { get; }
+    public PemObject(string header, PemHeaderFields headerFileds, string body, string footer, PemType pemType)
+    {
+        Header = header;
+        HeaderFields = headerFileds;
+        Body = body;
+        Footer = footer;
+        PemType = pemType;
+    }
+
+    public string Header { get; }
+    public PemHeaderFields? HeaderFields { get; }
 
     public string Body { get; }
 
@@ -23,12 +34,15 @@ internal class PemObject
     public string Write()
     {
         var builder = new StringBuilder();
-        builder.AppendLineWithLFTerminator(Header.Title);
-        if (Header.ProcType.NotNullOrWhiteSpace()) builder.AppendLineWithLFTerminator(Header.ProcType);
-        if (Header.DEKInfo.NotNullOrWhiteSpace())
+        builder.AppendLineWithLFTerminator(Header);
+        if (HeaderFields is not null)
         {
-            builder.AppendLineWithLFTerminator(Header.ProcType);
-            builder.AppendLineWithLFTerminator();
+            if (HeaderFields.ProcType.NotNullOrWhiteSpace()) builder.AppendLineWithLFTerminator(HeaderFields.ProcType);
+            if (HeaderFields.DEKInfo.NotNullOrWhiteSpace())
+            {
+                builder.AppendLineWithLFTerminator(HeaderFields.ProcType);
+                builder.AppendLineWithLFTerminator();
+            }
         }
 
         var count = Math.Ceiling(Body.Length / 64.0);
@@ -50,52 +64,52 @@ internal class PemObject
     {
         key = key.Trim();
         var reader = new StringReader(key);
-        var title = reader.ReadLine();
+        var header = reader.ReadLine();
 
         //pkcs1 private key
-        if (title.Equals(PemStatics.RsaPkcs1PrivateStart))
+        if (header.Equals(PemStatics.RsaPkcs1PrivateStart))
         {
             if (!key.EndsWith(PemStatics.RsaPkcs1PrivateEnd)) throw new InvalidDataException($"key should ends with '{PemStatics.RsaPkcs1PrivateEnd}'");
             var procType = reader.ReadLine();
             // encrypted pkcs1 private key
-            if (procType.StartsWith("Proc-Type"))
+            if (procType.StartsWith("Proc-Type: 4,ENCRYPTED"))
             {
                 var dekInfo = reader.ReadLine();
-                var body = key.Replace(title, "").Replace(PemStatics.RsaPkcs1PrivateEnd, "").Replace(procType, "").Replace(dekInfo, "");
-                return new PemObject(new PemHeader(title, procType, dekInfo), RemoveWrapLineAndTrim(body), PemStatics.RsaPkcs1PrivateEnd, PemType.RsaEncryptedPkcs1PrivateKey);
+                var body = key.Replace(header, "").Replace(PemStatics.RsaPkcs1PrivateEnd, "").Replace(procType, "").Replace(dekInfo, "");
+                return new PemObject(header, new PemHeaderFields(procType, dekInfo), RemoveWrapLineAndTrim(body), PemStatics.RsaPkcs1PrivateEnd, PemType.RsaEncryptedPkcs1PrivateKey);
             }
             //pkcs1 private key
             else
             {
-                var body = key.Replace(title, "").Replace(PemStatics.RsaPkcs1PrivateEnd, "");
-                return new PemObject(new PemHeader(title, null, null), RemoveWrapLineAndTrim(body), PemStatics.RsaPkcs1PrivateEnd, PemType.RsaPkcs1PrivateKey);
+                var body = key.Replace(header, "").Replace(PemStatics.RsaPkcs1PrivateEnd, "");
+                return new PemObject(header, RemoveWrapLineAndTrim(body), PemStatics.RsaPkcs1PrivateEnd, PemType.RsaPkcs1PrivateKey);
             }
         }
         //pkcs8 private key
-        else if (title.Equals(PemStatics.RsaPkcs8PrivateStart))
+        else if (header.Equals(PemStatics.RsaPkcs8PrivateStart))
         {
             if (!key.EndsWith(PemStatics.RsaPkcs8PrivateEnd)) throw new InvalidDataException($"key should ends with '{PemStatics.RsaPkcs8PrivateEnd}'");
-            var body = key.Replace(title, "").Replace(PemStatics.RsaPkcs8PrivateEnd, "");
-            return new PemObject(new PemHeader(title, null, null), RemoveWrapLineAndTrim(body), PemStatics.RsaPkcs8PrivateEnd, PemType.RsaPkcs8PrivateKey);
+            var body = key.Replace(header, "").Replace(PemStatics.RsaPkcs8PrivateEnd, "");
+            return new PemObject(header, RemoveWrapLineAndTrim(body), PemStatics.RsaPkcs8PrivateEnd, PemType.RsaPkcs8PrivateKey);
         }
         //encrypted pkcs8 private key
-        else if (title.Equals(PemStatics.RsaEncryptedPkcs8PrivateStart))
+        else if (header.Equals(PemStatics.RsaEncryptedPkcs8PrivateStart))
         {
             if (!key.EndsWith(PemStatics.RsaEncryptedPkcs8PrivateEnd)) throw new InvalidDataException($"key should ends with '{PemStatics.RsaEncryptedPkcs8PrivateEnd}'");
-            var body = key.Replace(title, "").Replace(PemStatics.RsaEncryptedPkcs8PrivateEnd, "");
-            return new PemObject(new PemHeader(title, null, null), RemoveWrapLineAndTrim(body), PemStatics.RsaEncryptedPkcs8PrivateEnd, PemType.RsaEncryptedPkcs8PrivateKey);
+            var body = key.Replace(header, "").Replace(PemStatics.RsaEncryptedPkcs8PrivateEnd, "");
+            return new PemObject(header, RemoveWrapLineAndTrim(body), PemStatics.RsaEncryptedPkcs8PrivateEnd, PemType.RsaEncryptedPkcs8PrivateKey);
         }
         //public key
-        else if (title.Equals(PemStatics.RsaPublicStart))
+        else if (header.Equals(PemStatics.RsaPublicStart))
         {
             if (!key.EndsWith(PemStatics.RsaPublicEnd)) throw new InvalidDataException($"key should ends with '{PemStatics.RsaPublicEnd}'");
-            var body = key.Replace(title, "").Replace(PemStatics.RsaPublicEnd, "");
-            return new PemObject(new PemHeader(title, null, null), RemoveWrapLineAndTrim(body), PemStatics.RsaPublicEnd, PemType.RsaPublicKey);
+            var body = key.Replace(header, "").Replace(PemStatics.RsaPublicEnd, "");
+            return new PemObject(header, RemoveWrapLineAndTrim(body), PemStatics.RsaPublicEnd, PemType.RsaPublicKey);
         }
         //unkonw
         else
         {
-            throw new InvalidDataException($"unknow format '{title}'");
+            throw new InvalidDataException($"unknow format '{header}'");
         }
     }
 

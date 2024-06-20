@@ -98,4 +98,17 @@ public class RsaKeyTests
         var exportedPem = rsa.ExportRSAPrivateKeyPem().Trim();
         Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], exportedPem);
     }
+
+    [TestMethod]
+    public void Test()
+    {
+        Console.WriteLine(new HMACMD5().InputBlockSize / 8);
+        Console.WriteLine(new HMACMD5().OutputBlockSize / 8);
+
+        Console.WriteLine(SHA1.Create().InputBlockSize / 8);
+        Console.WriteLine(SHA1.Create().OutputBlockSize / 8);
+
+        Console.WriteLine(SHA256.Create().InputBlockSize / 8);
+        Console.WriteLine(SHA256.Create().OutputBlockSize / 8);
+    }
 }

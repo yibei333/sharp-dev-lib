@@ -20,7 +20,7 @@ public static class NullCheckExtension
     /// </summary>
     /// <param name="str">需要断言的字符串</param>
     /// <returns>字符串是否不为null且不为空字符串</returns>
-    public static bool NotNullOrEmpty([NotNullWhen(false)] this string? str) => !string.IsNullOrEmpty(str);
+    public static bool NotNullOrEmpty([NotNullWhen(true)] this string? str) => !string.IsNullOrEmpty(str);
 
     /// <summary>
     /// 断言一个字符串是否为null或者空白字符串

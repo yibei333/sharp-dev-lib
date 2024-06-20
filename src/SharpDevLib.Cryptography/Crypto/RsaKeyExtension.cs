@@ -1,4 +1,5 @@
-﻿using System.Formats.Asn1;
+﻿using SharpDevLib.Cryptography.OpenSSL;
+using System.Formats.Asn1;
 using System.Security.Cryptography;
 
 namespace SharpDevLib.Cryptography;
@@ -6,6 +7,13 @@ namespace SharpDevLib.Cryptography;
 public static class RsaKeyExtension
 {
     #region Pkcs1
+    public static string ExportPkcs1PrivateKeyPem(this RSA rsa)
+    {
+        var bytes = Pkcs1.Encode(rsa.ExportParameters(true));
+        var pemObject = new PemObject(PemStatics.RsaPkcs1PrivateStart, Convert.ToBase64String(bytes), PemStatics.RsaPkcs1PrivateEnd, PemType.RsaPkcs1PrivateKey);
+        return pemObject.Write();
+    }
+
     public static void ImportPkcs1PrivateKeyPem(this RSA rsa, string pkcs1PrivateKeyPem)
     {
         var pemObject = PemObject.Read(pkcs1PrivateKeyPem);
@@ -19,49 +27,11 @@ public static class RsaKeyExtension
         if (password.IsNullOrEmpty()) throw new Exception("password required");
         var pemObject = PemObject.Read(pkcs1PrivateKeyPem);
         if (pemObject.PemType != PemType.RsaEncryptedPkcs1PrivateKey) throw new InvalidDataException($"key type({pemObject.PemType}) is not encrypted pkcs1 private key");
-        if (pemObject.Header.ProcType != "Proc-Type: 4,ENCRYPTED") throw new NotSupportedException($"Proc-Type with '{pemObject.Header.ProcType}' not supported yet");
-        var dekInfo = pemObject.Header.DEKInfo?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
-        if (dekInfo.Count != 2) throw new InvalidDataException("error DEKInfo");
+        if (pemObject.HeaderFields is null || pemObject.HeaderFields.DEKInfoAlgorithmFileds.IsNullOrEmpty()) throw new InvalidDataException("error DEK-INFO");
 
-        var ciphertext = Convert.FromBase64String(pemObject.Body);
-        var algorithm = dekInfo.First().Split(':').Last().Trim();
-
-        //rfc2898
-        //https://stackoverflow.com/questions/77239925/decrypt-the-encrypted-private-key-in-pkcs-1-format
-        if (algorithm == "AES-256-CBC")
-        {
-            var iv = dekInfo.Last().Trim().FromHexString();
-            var salt = iv.Take(8).ToArray();
-            var md5Key = password.Concat(salt).ToArray();
-            using var md5 = MD5.Create();
-            var hash1 = md5.ComputeHash(md5Key);
-            var hash2 = md5.ComputeHash(hash1.Concat(md5Key).ToArray());//length not enough,hash again
-            var key = hash1.Concat(hash2).ToArray();
-
-            using var aes = Aes.Create();
-            using var transform = aes.CreateDecryptor(key, iv);
-            var decrypted = transform.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
-            rsa.ImportPkcs1PrivateKeyPem(decrypted);
-        }
-        else if (algorithm == "DES-EDE3-CBC")
-        {
-            var iv = dekInfo.Last().Trim().FromHexString();
-            var salt = iv.Take(8).ToArray();
-            var md5Key = password.Concat(salt).ToArray();
-            using var md5 = MD5.Create();
-            var hash1 = md5.ComputeHash(md5Key);
-            var hash2 = md5.ComputeHash(hash1.Concat(md5Key).ToArray());//length not enough,hash again
-            var key = hash1.Concat(hash2).Take(24).ToArray();
-
-            using var tripleDES = TripleDES.Create();
-            using var transform = tripleDES.CreateDecryptor(key, iv);
-            var decrypted = transform.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
-            rsa.ImportPkcs1PrivateKeyPem(decrypted);
-        }
-        else
-        {
-            throw new NotSupportedException($"DEKInfo '{algorithm}' not supported yet");
-        }
+        var derivedKey = OpenSSLRsa.DeriveKey(pemObject.HeaderFields, password);
+        var decryptedKey = DecryptPkcs1Key(pemObject, derivedKey);
+        rsa.ImportPkcs1PrivateKeyPem(decryptedKey);
     }
 
     static void ImportPkcs1PrivateKeyPem(this RSA rsa, byte[] bytes)
@@ -70,11 +40,29 @@ public static class RsaKeyExtension
         rsa.ImportParameters(parameter);
     }
 
-    public static string ExportPkcs1PrivateKeyPem(this RSA rsa)
+    static byte[] DecryptPkcs1Key(PemObject pemObject, byte[] key)
     {
-        var bytes = Pkcs1.Encode(rsa.ExportParameters(true));
-        var pemObject = new PemObject(new PemHeader(PemStatics.RsaPkcs1PrivateStart, null, null), Convert.ToBase64String(bytes), PemStatics.RsaPkcs1PrivateEnd, PemType.RsaPkcs1PrivateKey);
-        return pemObject.Write();
+        var cipher = Convert.FromBase64String(pemObject.Body);
+        SymmetricAlgorithm algorithm;
+        if (pemObject.HeaderFields!.DEKInfoAlgorithmFileds![0].Equals(nameof(Aes), StringComparison.OrdinalIgnoreCase))
+        {
+            var aes = Aes.Create();
+            aes.KeySize = int.Parse(pemObject.HeaderFields.DEKInfoAlgorithmFileds[1]);
+            aes.Mode = (CipherMode)Enum.Parse(typeof(CipherMode), pemObject.HeaderFields.DEKInfoAlgorithmFileds[2]);
+            algorithm = aes;
+        }
+        else if (pemObject.HeaderFields.DEKInfoAlgorithmFileds[0].Equals(nameof(DES), StringComparison.OrdinalIgnoreCase) && pemObject.HeaderFields.DEKInfoAlgorithmFileds[1].Equals("EDE3", StringComparison.OrdinalIgnoreCase))
+        {
+            var tripleDES = TripleDES.Create();
+            tripleDES.Mode = (CipherMode)Enum.Parse(typeof(CipherMode), pemObject.HeaderFields.DEKInfoAlgorithmFileds[2]);
+            algorithm = tripleDES;
+        }
+        else throw new NotSupportedException($"algorithm '{pemObject.HeaderFields.DEKInfoAlgorithm}' not supported yet");
+
+        using var transform = algorithm.CreateDecryptor(key, pemObject.HeaderFields.DEKInfoIVBytes);
+        var decrypted = transform.TransformFinalBlock(cipher, 0, cipher.Length);
+        transform.Dispose();
+        return decrypted;
     }
     #endregion
 

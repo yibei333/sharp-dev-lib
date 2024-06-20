@@ -1,4 +1,4 @@
-﻿using SharpDevLib.Cryptography.References;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace SharpDevLib.Cryptography;
@@ -7,7 +7,7 @@ internal static class InternalExtension
 {
     internal static bool IsNullOrEmpty([NotNullWhen(false)] this string? str) => string.IsNullOrEmpty(str);
 
-    internal static bool NotNullOrEmpty([NotNullWhen(false)] this string? str) => !string.IsNullOrEmpty(str);
+    internal static bool NotNullOrEmpty([NotNullWhen(true)] this string? str) => !string.IsNullOrEmpty(str);
 
     internal static bool IsNullOrWhiteSpace([NotNullWhen(false)] this string? str) => string.IsNullOrWhiteSpace(str);
 
