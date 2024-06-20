@@ -14,6 +14,17 @@ public static class RsaKeyExtension
         return pemObject.Write();
     }
 
+    public static string ExportEncryptedPkcs1PrivateKeyPem(this RSA rsa, byte[] password, string algorithm = "AES-256-CBC")
+    {
+        var iv = GenterateRandomIVByAlgorithm(algorithm);
+        var fields = new PemHeaderFields("Proc-Type: 4,ENCRYPTED", $"DEK-Info: {algorithm},{iv.ToHexString()}");
+        var derivedKey = OpenSSLRsa.DeriveKey(fields, password);
+        var data = Pkcs1.Encode(rsa.ExportParameters(true));
+        var bytes = EncryptPkcs1Key(fields, data, derivedKey);
+        var pemObject = new PemObject(PemStatics.RsaPkcs1PrivateStart, fields, Convert.ToBase64String(bytes), PemStatics.RsaPkcs1PrivateEnd, PemType.RsaEncryptedPkcs1PrivateKey);
+        return pemObject.Write();
+    }
+
     public static void ImportPkcs1PrivateKeyPem(this RSA rsa, string pkcs1PrivateKeyPem)
     {
         var pemObject = PemObject.Read(pkcs1PrivateKeyPem);
@@ -30,8 +41,20 @@ public static class RsaKeyExtension
         if (pemObject.HeaderFields is null || pemObject.HeaderFields.DEKInfoAlgorithmFileds.IsNullOrEmpty()) throw new InvalidDataException("error DEK-INFO");
 
         var derivedKey = OpenSSLRsa.DeriveKey(pemObject.HeaderFields, password);
-        var decryptedKey = DecryptPkcs1Key(pemObject, derivedKey);
+        var decryptedKey = DecryptPkcs1Key(pemObject.HeaderFields, Convert.FromBase64String(pemObject.Body), derivedKey);
         rsa.ImportPkcs1PrivateKeyPem(decryptedKey);
+    }
+
+    static byte[] GenterateRandomIVByAlgorithm(string algorithm)
+    {
+        int ivLength;
+        if (algorithm == "AES-256-CBC") ivLength = 16;
+        else if (algorithm == "DES-EDE3-CBC") ivLength = 8;
+        else throw new NotSupportedException($"algorithm '{algorithm}' not supported yet");
+
+        var iv = new byte[ivLength];
+        new Random().NextBytes(iv);
+        return iv;
     }
 
     static void ImportPkcs1PrivateKeyPem(this RSA rsa, byte[] bytes)
@@ -40,29 +63,38 @@ public static class RsaKeyExtension
         rsa.ImportParameters(parameter);
     }
 
-    static byte[] DecryptPkcs1Key(PemObject pemObject, byte[] key)
+    static byte[] DecryptPkcs1Key(PemHeaderFields fields, byte[] data, byte[] key)
     {
-        var cipher = Convert.FromBase64String(pemObject.Body);
+        using var algorithm = GetSymmetricAlgorithmByFields(fields);
+        using var transform = algorithm.CreateDecryptor(key, fields.DEKInfoIVBytes);
+        return transform.TransformFinalBlock(data, 0, data.Length);
+    }
+
+    static byte[] EncryptPkcs1Key(PemHeaderFields fields, byte[] data, byte[] key)
+    {
+        using var algorithm = GetSymmetricAlgorithmByFields(fields);
+        using var transform = algorithm.CreateEncryptor(key, fields.DEKInfoIVBytes);
+        return transform.TransformFinalBlock(data, 0, data.Length);
+    }
+
+    static SymmetricAlgorithm GetSymmetricAlgorithmByFields(PemHeaderFields fields)
+    {
         SymmetricAlgorithm algorithm;
-        if (pemObject.HeaderFields!.DEKInfoAlgorithmFileds![0].Equals(nameof(Aes), StringComparison.OrdinalIgnoreCase))
+        if (fields.DEKInfoAlgorithmFileds![0].Equals(nameof(Aes), StringComparison.OrdinalIgnoreCase))
         {
             var aes = Aes.Create();
-            aes.KeySize = int.Parse(pemObject.HeaderFields.DEKInfoAlgorithmFileds[1]);
-            aes.Mode = (CipherMode)Enum.Parse(typeof(CipherMode), pemObject.HeaderFields.DEKInfoAlgorithmFileds[2]);
+            aes.KeySize = int.Parse(fields.DEKInfoAlgorithmFileds[1]);
+            aes.Mode = (CipherMode)Enum.Parse(typeof(CipherMode), fields.DEKInfoAlgorithmFileds[2]);
             algorithm = aes;
         }
-        else if (pemObject.HeaderFields.DEKInfoAlgorithmFileds[0].Equals(nameof(DES), StringComparison.OrdinalIgnoreCase) && pemObject.HeaderFields.DEKInfoAlgorithmFileds[1].Equals("EDE3", StringComparison.OrdinalIgnoreCase))
+        else if (fields.DEKInfoAlgorithmFileds[0].Equals(nameof(DES), StringComparison.OrdinalIgnoreCase) && fields.DEKInfoAlgorithmFileds[1].Equals("EDE3", StringComparison.OrdinalIgnoreCase))
         {
             var tripleDES = TripleDES.Create();
-            tripleDES.Mode = (CipherMode)Enum.Parse(typeof(CipherMode), pemObject.HeaderFields.DEKInfoAlgorithmFileds[2]);
+            tripleDES.Mode = (CipherMode)Enum.Parse(typeof(CipherMode), fields.DEKInfoAlgorithmFileds[2]);
             algorithm = tripleDES;
         }
-        else throw new NotSupportedException($"algorithm '{pemObject.HeaderFields.DEKInfoAlgorithm}' not supported yet");
-
-        using var transform = algorithm.CreateDecryptor(key, pemObject.HeaderFields.DEKInfoIVBytes);
-        var decrypted = transform.TransformFinalBlock(cipher, 0, cipher.Length);
-        transform.Dispose();
-        return decrypted;
+        else throw new NotSupportedException($"algorithm '{fields.DEKInfoAlgorithm}' not supported yet");
+        return algorithm;
     }
     #endregion
 

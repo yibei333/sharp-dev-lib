@@ -40,7 +40,7 @@ internal class PemObject
             if (HeaderFields.ProcType.NotNullOrWhiteSpace()) builder.AppendLineWithLFTerminator(HeaderFields.ProcType);
             if (HeaderFields.DEKInfo.NotNullOrWhiteSpace())
             {
-                builder.AppendLineWithLFTerminator(HeaderFields.ProcType);
+                builder.AppendLineWithLFTerminator(HeaderFields.DEKInfo);
                 builder.AppendLineWithLFTerminator();
             }
         }
@@ -48,12 +48,13 @@ internal class PemObject
         var count = Math.Ceiling(Body.Length / 64.0);
         for (int i = 0; i < count; i++)
         {
-            var length = 64;
             if (i == count - 1)
             {
-                length = Body.Length % 64;
+                var length = Body.Length % 64;
+                if (length == 0) length = 64;
+                builder.AppendLineWithLFTerminator(Body.Substring(i * 64, length));
             }
-            builder.AppendLineWithLFTerminator(Body.Substring(i * 64, length));
+            else builder.AppendLineWithLFTerminator(Body.Substring(i * 64, 64));
         }
 
         builder.Append(Footer);

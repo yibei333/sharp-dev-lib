@@ -41,4 +41,14 @@ internal static class InternalExtension
     {
         builder.Append(LFTerminator);
     }
+
+    internal static string ToHexString(this byte[] bytes)
+    {
+        var builder = new StringBuilder();
+        for (int i = 0; i < bytes.Length; i++)
+        {
+            builder.Append(bytes[i].ToString("x2"));
+        }
+        return builder.ToString();
+    }
 }
