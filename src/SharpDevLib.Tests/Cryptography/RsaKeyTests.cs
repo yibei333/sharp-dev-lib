@@ -45,7 +45,7 @@ public class RsaKeyTests
     #endregion
 
     [TestMethod]
-    public void ExportPkcs1PrivateKey()
+    public void ExportPkcs1PrivateKeyTest()
     {
         using var rsa = RSA.Create();
         rsa.ImportFromPem(keys[PemType.Pkcs1PrivateKey]);
@@ -55,7 +55,7 @@ public class RsaKeyTests
     }
 
     [TestMethod]
-    public void ExportAESEncryptedPkcs1PrivateKey()
+    public void ExportAESEncryptedPkcs1PrivateKeyTest()
     {
         using var rsa = RSA.Create();
         rsa.ImportPkcs1PrivateKeyPem(keys[PemType.Pkcs1PrivateKey]);
@@ -70,7 +70,7 @@ public class RsaKeyTests
     }
 
     [TestMethod]
-    public void ExportTrippleDESEncryptedPkcs1PrivateKey()
+    public void ExportTrippleDESEncryptedPkcs1PrivateKeyTest()
     {
         using var rsa = RSA.Create();
         rsa.ImportPkcs1PrivateKeyPem(keys[PemType.Pkcs1PrivateKey]);
@@ -112,6 +112,32 @@ public class RsaKeyTests
     }
 
     [TestMethod]
+    public void ExportPkcs8PrivateKeyTest()
+    {
+        using var rsa = RSA.Create();
+        rsa.ImportFromPem(keys[PemType.Pkcs8PrivateKey]);
+        var pem = rsa.InternalExportPkcs8PrivateKeyPem();
+        Console.WriteLine(pem);
+        Assert.AreEqual(keys[PemType.Pkcs8PrivateKey], pem);
+    }
+
+    [TestMethod]
+    public void ExportEncryptedPkcs8PrivateKeyTest()
+    {
+        using var rsa = RSA.Create();
+        rsa.ImportPkcs1PrivateKeyPem(keys[PemType.Pkcs1PrivateKey]);
+        var encryptedPkcs8Pem = rsa.InternalExportEncryptedPkcs8PrivateKeyPem(passwordBytes);
+        Console.WriteLine(encryptedPkcs8Pem);
+        Assert.AreNotEqual(keys[PemType.Pkcs1PrivateKey], encryptedPkcs8Pem);
+        Assert.AreNotEqual(keys[PemType.Pkcs8PrivateKey], encryptedPkcs8Pem);
+
+        using var newRsa = RSA.Create();
+        newRsa.ImportEncryptedPkcs8PrivateKeyPem(encryptedPkcs8Pem, passwordBytes);
+        var exportedPem = newRsa.ExportRSAPrivateKeyPem().Trim();
+        Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], exportedPem);
+    }
+
+    [TestMethod]
     public void ImportPkcs8PrivateKeyPemTest()
     {
         using var rsa = RSA.Create();
@@ -132,6 +158,8 @@ public class RsaKeyTests
     [TestMethod]
     public void Test()
     {
+
+        Console.WriteLine(string.Join(" ", BitConverter.GetBytes((short)0)));
         Console.WriteLine(string.Join(" ", BitConverter.GetBytes(1)));
         Console.WriteLine(new HMACMD5().InputBlockSize / 8);
         Console.WriteLine(new HMACMD5().OutputBlockSize / 8);

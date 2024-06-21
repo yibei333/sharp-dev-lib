@@ -170,4 +170,29 @@ internal class Pkcs8
         using var transform = algorithm.CreateDecryptor(derivedKey, iv);
         return transform.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
     }
+
+    public static byte[] EncodePrivateKey(RSAParameters parameters)
+    {
+        var writer = new AsnWriter(AsnEncodingRules.DER);
+        writer.PushSequence();
+
+        //1.version
+        writer.WriteInteger(0x00);
+
+        //2.PrivateKeyAlgorithmIdentifier
+        writer.PushSequence();
+        writer.WriteObjectIdentifier("1.2.840.113549.1.1.1");
+        writer.WriteNull();
+        writer.PopSequence();
+
+        //3.PrivateKey
+        var privateKey = Pkcs1.EncodePrivateKey(parameters);
+        writer.WriteOctetString(privateKey);
+
+        writer.PopSequence();
+        var length = writer.GetEncodedLength();
+        var bytes = new byte[length];
+        writer.Encode(bytes);
+        return bytes;
+    }
 }

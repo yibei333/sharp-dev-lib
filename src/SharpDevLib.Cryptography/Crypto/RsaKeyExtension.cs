@@ -99,6 +99,25 @@ public static class RsaKeyExtension
     #endregion
 
     #region Pkcs8
+    public static string InternalExportPkcs8PrivateKeyPem(this RSA rsa)
+    {
+        var bytes = Pkcs8.EncodePrivateKey(rsa.ExportParameters(true));
+        var pemObject = new PemObject(PemStatics.RsaPkcs8PrivateStart, Convert.ToBase64String(bytes), PemStatics.RsaPkcs8PrivateEnd, PemType.RsaPkcs8PrivateKey);
+        return pemObject.Write();
+    }
+
+    public static string InternalExportEncryptedPkcs8PrivateKeyPem(this RSA rsa, byte[] password, string algorithm = "AES-256-CBC")
+    {
+        //var iv = GenterateRandomIVByAlgorithm(algorithm);
+        //var fields = new PemHeaderFields("Proc-Type: 4,ENCRYPTED", $"DEK-Info: {algorithm},{iv.ToHexString()}");
+        //var derivedKey = OpenSSLRsa.DeriveKey(fields, password);
+        //var data = Pkcs1.EncodePrivateKey(rsa.ExportParameters(true));
+        //var bytes = EncryptPkcs1Key(fields, data, derivedKey);
+        //var pemObject = new PemObject(PemStatics.RsaPkcs1PrivateStart, fields, Convert.ToBase64String(bytes), PemStatics.RsaPkcs1PrivateEnd, PemType.RsaEncryptedPkcs1PrivateKey);
+        //return pemObject.Write();
+        throw new NotImplementedException();
+    }
+
     public static void ImportPkcs8PrivateKeyPem(this RSA rsa, string pkcs8PrivateKeyPem)
     {
         var pemObject = PemObject.Read(pkcs8PrivateKeyPem);
@@ -117,24 +136,6 @@ public static class RsaKeyExtension
         var key = Pkcs8.DecodeEncryptedPrivateKeyInfo(bytes, password);
         ImportPkcs8PrivateKeyPem(rsa, key);
     }
-
-    //static byte[] GetKey(byte[] password, byte[] salt, System.Numerics.BigInteger iterationCount)
-    //{
-    //    using var sha = new HMACSHA256(password);
-    //    var key = sha.ComputeHash(salt.Concat(new byte[] { 0, 0, 0, 1 }).ToArray());
-    //    var initKey = new byte[key.Length];
-    //    key.CopyTo(initKey, 0);
-    //    for (int i = 1; i < iterationCount; i++)
-    //    {
-    //        key = sha.ComputeHash(key);
-    //        for (int j = 0; j < initKey.Length; j++)
-    //        {
-    //            initKey[j] ^= key[j];
-    //        }
-    //    }
-
-    //    return initKey;
-    //}
 
     static void ImportPkcs8PrivateKeyPem(this RSA rsa, byte[] bytes)
     {
