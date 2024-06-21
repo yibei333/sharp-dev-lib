@@ -163,7 +163,6 @@ internal class Pkcs8
         }
         else throw new NotSupportedException($"current only support 'aes256-CBC' Encs");
 
-
         //2.EncryptedData
         var encryptedData = sequence.ReadOctetString();
 
