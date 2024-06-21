@@ -132,6 +132,7 @@ public class RsaKeyTests
     [TestMethod]
     public void Test()
     {
+        Console.WriteLine(string.Join(" ", BitConverter.GetBytes(1)));
         Console.WriteLine(new HMACMD5().InputBlockSize / 8);
         Console.WriteLine(new HMACMD5().OutputBlockSize / 8);
 

@@ -19,7 +19,7 @@ internal static class Pkcs1
     //     otherPrimeInfos OtherPrimeInfos OPTIONAL
     // }
 
-    internal static RSAParameters Decode(byte[] key)
+    internal static RSAParameters DecodePrivateKey(byte[] key)
     {
         var reader = new AsnReader(key, AsnEncodingRules.DER);
         var sequence = reader.ReadSequence();
@@ -55,7 +55,7 @@ internal static class Pkcs1
         return array.ToArray();
     }
 
-    internal static byte[] Encode(RSAParameters parameters)
+    internal static byte[] EncodePrivateKey(RSAParameters parameters)
     {
         var writer = new AsnWriter(AsnEncodingRules.DER);
 
