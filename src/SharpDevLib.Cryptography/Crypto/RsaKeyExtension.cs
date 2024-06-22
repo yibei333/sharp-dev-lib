@@ -1,4 +1,5 @@
 ﻿using SharpDevLib.Cryptography.OpenSSL;
+using System.Diagnostics;
 using System.Security.Cryptography;
 
 namespace SharpDevLib.Cryptography;
@@ -97,6 +98,32 @@ public static class RsaKeyExtension
             return rsa.ExportX509SubjectPublicKeyPem();
         }
         else throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// 密钥对是否匹配
+    /// </summary>
+    /// <param name="privatePem">PEM格式的私钥</param>
+    /// <param name="publicPem">PEM格式的公钥</param>
+    /// <returns>是否匹配</returns>
+    public static bool IsKeyPairMatch(string privatePem, string publicPem)
+    {
+        try
+        {
+            var pemObject = PemObject.Read(publicPem);
+            if (pemObject.PemType != RsaPemType.PublicKey && pemObject.PemType != RsaPemType.X509SubjectPublicKey) return false;
+
+            using var rsa = RSA.Create();
+            rsa.ImportPem(privatePem);
+            var exportPublicKey = rsa.ExportPem(pemObject.PemType);
+            return publicPem == exportPublicKey;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+            Debug.WriteLine(ex.StackTrace);
+            return false;
+        }
     }
     #endregion
 

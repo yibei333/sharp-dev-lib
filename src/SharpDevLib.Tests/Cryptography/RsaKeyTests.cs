@@ -15,6 +15,7 @@ public class RsaKeyTests
     static readonly string Pkcs1PrivateKey = GetKey(nameof(Pkcs1PrivateKey));
     static readonly string Pkcs8PrivateKey = GetKey(nameof(Pkcs8PrivateKey));
     static readonly string PublicKey = GetKey(nameof(PublicKey));
+    static readonly string X509PublicKey = GetKey(nameof(X509PublicKey));
 
     static string GetKey(string type)
     {
@@ -156,7 +157,7 @@ public class RsaKeyTests
         rsa.ImportFromPem(Pkcs1PrivateKey);
         var pem = rsa.ExportPem(RsaPemType.X509SubjectPublicKey);
         Console.WriteLine(pem);
-        Assert.AreEqual(GetKey("X509PublicKey"), pem);
+        Assert.AreEqual(X509PublicKey, pem);
     }
 
     [TestMethod]
@@ -172,9 +173,21 @@ public class RsaKeyTests
     public void ImportX509SubjectPublicKeyPemTest()
     {
         using var rsa = RSA.Create();
-        rsa.ImportPem(GetKey("X509PublicKey"));
+        rsa.ImportPem(X509PublicKey);
         var exportedPem = rsa.ExportRSAPublicKeyPem().Trim();
         Assert.AreEqual(PublicKey, exportedPem);
+    }
+    #endregion
+
+    #region Convert
+    [TestMethod]
+    public void IsKeyPairMatchTest()
+    {
+        Assert.IsTrue(RsaKeyExtension.IsKeyPairMatch(Pkcs1PrivateKey, PublicKey));
+        Assert.IsTrue(RsaKeyExtension.IsKeyPairMatch(Pkcs8PrivateKey, PublicKey));
+        Assert.IsTrue(RsaKeyExtension.IsKeyPairMatch(Pkcs1PrivateKey, X509PublicKey));
+        Assert.IsTrue(RsaKeyExtension.IsKeyPairMatch(Pkcs8PrivateKey, X509PublicKey));
+        Assert.IsFalse(RsaKeyExtension.IsKeyPairMatch(Pkcs1PrivateKey, Pkcs8PrivateKey));
     }
     #endregion
 }
