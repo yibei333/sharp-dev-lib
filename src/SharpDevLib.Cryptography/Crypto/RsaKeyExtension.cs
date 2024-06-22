@@ -106,16 +106,11 @@ public static class RsaKeyExtension
         return pemObject.Write();
     }
 
-    public static string InternalExportEncryptedPkcs8PrivateKeyPem(this RSA rsa, byte[] password, string algorithm = "AES-256-CBC")
+    public static string InternalExportEncryptedPkcs8PrivateKeyPem(this RSA rsa, byte[] password)
     {
-        //var iv = GenterateRandomIVByAlgorithm(algorithm);
-        //var fields = new PemHeaderFields("Proc-Type: 4,ENCRYPTED", $"DEK-Info: {algorithm},{iv.ToHexString()}");
-        //var derivedKey = OpenSSLRsa.DeriveKey(fields, password);
-        //var data = Pkcs1.EncodePrivateKey(rsa.ExportParameters(true));
-        //var bytes = EncryptPkcs1Key(fields, data, derivedKey);
-        //var pemObject = new PemObject(PemStatics.RsaPkcs1PrivateStart, fields, Convert.ToBase64String(bytes), PemStatics.RsaPkcs1PrivateEnd, PemType.RsaEncryptedPkcs1PrivateKey);
-        //return pemObject.Write();
-        throw new NotImplementedException();
+        var bytes = Pkcs8.EncodeEncryptedPrivateKey(rsa.ExportParameters(true),password);
+        var pemObject = new PemObject(PemStatics.RsaEncryptedPkcs8PrivateStart, Convert.ToBase64String(bytes), PemStatics.RsaEncryptedPkcs8PrivateEnd, PemType.RsaEncryptedPkcs8PrivateKey);
+        return pemObject.Write();
     }
 
     public static void ImportPkcs8PrivateKeyPem(this RSA rsa, string pkcs8PrivateKeyPem)

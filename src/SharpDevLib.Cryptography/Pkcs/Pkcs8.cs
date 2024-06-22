@@ -195,4 +195,55 @@ internal class Pkcs8
         writer.Encode(bytes);
         return bytes;
     }
+
+    public static byte[] EncodeEncryptedPrivateKey(RSAParameters parameters, byte[] password)
+    {
+        var writer = new AsnWriter(AsnEncodingRules.DER);
+        writer.PushSequence();
+
+        //1.EncryptionAlgorithmIdentifier
+        writer.PushSequence();
+        writer.WriteObjectIdentifier("1.2.840.113549.1.5.13");//pbes2
+        writer.PushSequence();
+        //pbkdf2
+        writer.PushSequence();
+        writer.WriteObjectIdentifier("1.2.840.113549.1.5.12");//pbkdf2
+        writer.PushSequence();
+        var salt = new byte[16];//salt
+        new Random().NextBytes(salt);
+        writer.WriteOctetString(salt);
+        var iterationCount = 2048;//iterationCount
+        writer.WriteInteger(iterationCount);
+        writer.PushSequence();
+        writer.WriteObjectIdentifier("1.2.840.113549.2.9");//hmacsha259
+        writer.WriteNull();
+        writer.PopSequence();
+
+        writer.PopSequence();
+        writer.PopSequence();
+        //encs
+        writer.PushSequence();
+        writer.WriteObjectIdentifier("2.16.840.1.101.3.4.1.42");//aes-256-cbc
+        var iv = new byte[16];//iv
+        new Random().NextBytes(iv);
+        writer.WriteOctetString(iv);
+        writer.PopSequence();
+        writer.PopSequence();
+        writer.PopSequence();
+
+        //2.EncryptedData
+        using var hMAC = new HMACSHA256(password);
+        var derivedKey = Pkcs5.PBKDF2(hMAC, salt, iterationCount, 32);
+        using var aes = Aes.Create();
+        using var transform = aes.CreateEncryptor(derivedKey, iv);
+        var key = EncodePrivateKey(parameters);
+        var encryptedKey = transform.TransformFinalBlock(key, 0, key.Length);
+        writer.WriteOctetString(encryptedKey);
+
+        writer.PopSequence();
+        var length = writer.GetEncodedLength();
+        var bytes = new byte[length];
+        writer.Encode(bytes);
+        return bytes;
+    }
 }
