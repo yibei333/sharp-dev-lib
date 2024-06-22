@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 namespace SharpDevLib.Cryptography;
 
 //rfc5958
-internal class Pkcs8
+internal static class Pkcs8
 {
     public static byte[] DecodePrivateKeyInfo(byte[] bytes)
     {

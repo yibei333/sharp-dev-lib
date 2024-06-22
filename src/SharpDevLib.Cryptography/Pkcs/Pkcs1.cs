@@ -6,21 +6,21 @@ namespace SharpDevLib.Cryptography;
 internal static class Pkcs1
 {
     //rfc8017
-    //RSAPrivateKey::= SEQUENCE {
-    //    version Version,
-    //    modulus           INTEGER,  --n
-    //     publicExponent INTEGER,  --e
-    //     privateExponent INTEGER,  --d
-    //     prime1 INTEGER,  --p
-    //     prime2 INTEGER,  --q
-    //     exponent1 INTEGER,  --d mod(p - 1)
-    //     exponent2 INTEGER,  --d mod(q - 1)
-    //     coefficient INTEGER,  --(inverse of q) mod p
-    //     otherPrimeInfos OtherPrimeInfos OPTIONAL
-    // }
-
     internal static RSAParameters DecodePrivateKey(byte[] key)
     {
+        //RSAPrivateKey::= SEQUENCE {
+        //    version Version,
+        //    modulus           INTEGER,  --n
+        //     publicExponent INTEGER,  --e
+        //     privateExponent INTEGER,  --d
+        //     prime1 INTEGER,  --p
+        //     prime2 INTEGER,  --q
+        //     exponent1 INTEGER,  --d mod(p - 1)
+        //     exponent2 INTEGER,  --d mod(q - 1)
+        //     coefficient INTEGER,  --(inverse of q) mod p
+        //     otherPrimeInfos OtherPrimeInfos OPTIONAL
+        // }
+
         var reader = new AsnReader(key, AsnEncodingRules.DER);
         var sequence = reader.ReadSequence();
         _ = sequence.ReadInteger();//version
@@ -81,5 +81,42 @@ internal static class Pkcs1
     {
         if (bytes.First() < 128) writer.WriteInteger(bytes);
         else writer.WriteIntegerUnsigned(bytes);
+    }
+
+    internal static RSAParameters DecodePublicKey(byte[] key)
+    {
+        //RSAPublicKey::= SEQUENCE {
+        //  modulus INTEGER,  --n
+        //  publicExponent INTEGER   --e
+        // }
+        //The fields of type RSAPublicKey have the following meanings:
+        //modulus is the RSA modulus n.
+        //publicExponent is the RSA public exponent e.
+
+        var reader = new AsnReader(key, AsnEncodingRules.DER);
+        var sequence = reader.ReadSequence();
+        var module = sequence.ReadIntegerValue();
+        var publicExponent = sequence.ReadIntegerValue();
+
+        return new RSAParameters
+        {
+            Modulus = module,
+            Exponent = publicExponent,
+        };
+    }
+
+    internal static byte[] EncodePublicKey(RSAParameters parameters)
+    {
+        var writer = new AsnWriter(AsnEncodingRules.DER);
+
+        writer.PushSequence();
+        writer.WriteIntegerValue(parameters.Modulus);//module
+        writer.WriteIntegerValue(parameters.Exponent);//publicExponent
+        writer.PopSequence();
+
+        var length = writer.GetEncodedLength();
+        var bytes = new byte[length];
+        writer.Encode(bytes);
+        return bytes;
     }
 }

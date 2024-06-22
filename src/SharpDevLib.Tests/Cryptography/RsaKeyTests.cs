@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Cryptography;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 
@@ -13,30 +12,11 @@ public class RsaKeyTests
     #region Data
     const string password = "foo";
     static readonly byte[] passwordBytes = password.ToUtf8Bytes();
+    static readonly string Pkcs1PrivateKey = GetKey(nameof(Pkcs1PrivateKey));
+    static readonly string Pkcs8PrivateKey = GetKey(nameof(Pkcs8PrivateKey));
+    static readonly string PublicKey = GetKey(nameof(PublicKey));
 
-    internal enum PemType
-    {
-        Pkcs1PrivateKey,
-        AESEncryptedPkcs1PrivateKey,
-        TrippleDESEncryptedPkcs1PrivateKey,
-        Pkcs8PrivateKey,
-        EncryptedPkcs8PrivateKey,
-        PublicKey,
-        X509PublicKey,
-    }
-
-    static readonly Dictionary<PemType, string> keys = new()
-    {
-        { PemType.Pkcs1PrivateKey,GetKey(PemType.Pkcs1PrivateKey) },
-        { PemType.AESEncryptedPkcs1PrivateKey,GetKey(PemType.AESEncryptedPkcs1PrivateKey) },
-        { PemType.TrippleDESEncryptedPkcs1PrivateKey,GetKey(PemType.TrippleDESEncryptedPkcs1PrivateKey) },
-        { PemType.Pkcs8PrivateKey,GetKey(PemType.Pkcs8PrivateKey) },
-        { PemType.EncryptedPkcs8PrivateKey,GetKey(PemType.EncryptedPkcs8PrivateKey) },
-        { PemType.PublicKey,GetKey(PemType.PublicKey) },
-        { PemType.X509PublicKey,GetKey(PemType.X509PublicKey) },
-    };
-
-    static string GetKey(PemType type)
+    static string GetKey(string type)
     {
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/CryptoGraphy/{type}.txt");
         var text = File.ReadAllText(path).Replace("\r\n", "\n");
@@ -44,130 +24,157 @@ public class RsaKeyTests
     }
     #endregion
 
+    #region Pkcs1
     [TestMethod]
     public void ExportPkcs1PrivateKeyTest()
     {
         using var rsa = RSA.Create();
-        rsa.ImportFromPem(keys[PemType.Pkcs1PrivateKey]);
-        var pem = rsa.ExportPkcs1PrivateKeyPem();
+        rsa.ImportFromPem(Pkcs1PrivateKey);
+        var pem = rsa.ExportPem(RsaPemType.Pkcs1PrivateKey);
         Console.WriteLine(pem);
-        Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], pem);
+        Assert.AreEqual(Pkcs1PrivateKey, pem);
     }
 
     [TestMethod]
     public void ExportAESEncryptedPkcs1PrivateKeyTest()
     {
         using var rsa = RSA.Create();
-        rsa.ImportPkcs1PrivateKeyPem(keys[PemType.Pkcs1PrivateKey]);
-        var encryptedPkcs1Pem = rsa.ExportEncryptedPkcs1PrivateKeyPem(passwordBytes);
+        rsa.ImportFromPem(Pkcs1PrivateKey);
+        var encryptedPkcs1Pem = rsa.ExportPem(RsaPemType.EncryptedPkcs1PrivateKey, passwordBytes);
         Console.WriteLine(encryptedPkcs1Pem);
-        Assert.AreNotEqual(keys[PemType.Pkcs1PrivateKey], encryptedPkcs1Pem);
+        Assert.AreNotEqual(Pkcs1PrivateKey, encryptedPkcs1Pem);
 
         using var newRsa = RSA.Create();
-        newRsa.ImportEncryptedPkcs1PrivateKeyPem(encryptedPkcs1Pem, passwordBytes);
+        newRsa.ImportPem(encryptedPkcs1Pem, passwordBytes);
         var exportedPem = newRsa.ExportRSAPrivateKeyPem().Trim();
-        Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], exportedPem);
+        Assert.AreEqual(Pkcs1PrivateKey, exportedPem);
     }
 
     [TestMethod]
     public void ExportTrippleDESEncryptedPkcs1PrivateKeyTest()
     {
         using var rsa = RSA.Create();
-        rsa.ImportPkcs1PrivateKeyPem(keys[PemType.Pkcs1PrivateKey]);
-        var encryptedPkcs1Pem = rsa.ExportEncryptedPkcs1PrivateKeyPem(passwordBytes, "DES-EDE3-CBC");
+        rsa.ImportFromPem(Pkcs1PrivateKey);
+        var encryptedPkcs1Pem = rsa.ExportPem(RsaPemType.EncryptedPkcs1PrivateKey, passwordBytes, "DES-EDE3-CBC");
         Console.WriteLine(encryptedPkcs1Pem);
-        Assert.AreNotEqual(keys[PemType.Pkcs1PrivateKey], encryptedPkcs1Pem);
+        Assert.AreNotEqual(Pkcs1PrivateKey, encryptedPkcs1Pem);
 
         using var newRsa = RSA.Create();
-        newRsa.ImportEncryptedPkcs1PrivateKeyPem(encryptedPkcs1Pem, passwordBytes);
+        newRsa.ImportPem(encryptedPkcs1Pem, passwordBytes);
         var exportedPem = newRsa.ExportRSAPrivateKeyPem().Trim();
-        Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], exportedPem);
+        Assert.AreEqual(Pkcs1PrivateKey, exportedPem);
     }
 
     [TestMethod]
     public void ImportPkcs1PrivateKeyPemTest()
     {
         using var rsa = RSA.Create();
-        rsa.ImportPkcs1PrivateKeyPem(keys[PemType.Pkcs1PrivateKey]);
+        rsa.ImportPem(Pkcs1PrivateKey);
         var exportedPem = rsa.ExportRSAPrivateKeyPem().Trim();
-        Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], exportedPem);
+        Assert.AreEqual(Pkcs1PrivateKey, exportedPem);
     }
 
     [TestMethod]
     public void ImportAESEncryptedPkcs1PrivateKeyPemTest()
     {
         using var rsa = RSA.Create();
-        rsa.ImportEncryptedPkcs1PrivateKeyPem(keys[PemType.AESEncryptedPkcs1PrivateKey], passwordBytes);
+        rsa.ImportPem(GetKey("AESEncryptedPkcs1PrivateKey"), passwordBytes);
         var exportedPem = rsa.ExportRSAPrivateKeyPem().Trim();
-        Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], exportedPem);
+        Assert.AreEqual(Pkcs1PrivateKey, exportedPem);
     }
 
     [TestMethod]
     public void ImportTrippleDESEncryptedPkcs1PrivateKeyPemTest()
     {
         using var rsa = RSA.Create();
-        rsa.ImportEncryptedPkcs1PrivateKeyPem(keys[PemType.TrippleDESEncryptedPkcs1PrivateKey], passwordBytes);
+        rsa.ImportPem(GetKey("TrippleDESEncryptedPkcs1PrivateKey"), passwordBytes);
         var exportedPem = rsa.ExportRSAPrivateKeyPem().Trim();
-        Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], exportedPem);
+        Assert.AreEqual(Pkcs1PrivateKey, exportedPem);
     }
+    #endregion
 
+    #region Pkcs8
     [TestMethod]
     public void ExportPkcs8PrivateKeyTest()
     {
         using var rsa = RSA.Create();
-        rsa.ImportFromPem(keys[PemType.Pkcs8PrivateKey]);
-        var pem = rsa.InternalExportPkcs8PrivateKeyPem();
+        rsa.ImportFromPem(Pkcs1PrivateKey);
+        var pem = rsa.ExportPem(RsaPemType.Pkcs8PrivateKey);
         Console.WriteLine(pem);
-        Assert.AreEqual(keys[PemType.Pkcs8PrivateKey], pem);
+        Assert.AreEqual(Pkcs8PrivateKey, pem);
     }
 
     [TestMethod]
     public void ExportEncryptedPkcs8PrivateKeyTest()
     {
         using var rsa = RSA.Create();
-        rsa.ImportPkcs1PrivateKeyPem(keys[PemType.Pkcs1PrivateKey]);
-        var encryptedPkcs8Pem = rsa.InternalExportEncryptedPkcs8PrivateKeyPem(passwordBytes);
+        rsa.ImportFromPem(Pkcs1PrivateKey);
+        string encryptedPkcs8Pem = rsa.ExportPem(RsaPemType.EncryptedPkcs8PrivateKey, passwordBytes);
         Console.WriteLine(encryptedPkcs8Pem);
-        Assert.AreNotEqual(keys[PemType.Pkcs1PrivateKey], encryptedPkcs8Pem);
-        Assert.AreNotEqual(keys[PemType.Pkcs8PrivateKey], encryptedPkcs8Pem);
+        Assert.AreNotEqual(Pkcs1PrivateKey, encryptedPkcs8Pem);
 
         using var newRsa = RSA.Create();
-        newRsa.ImportEncryptedPkcs8PrivateKeyPem(encryptedPkcs8Pem, passwordBytes);
+        newRsa.ImportFromEncryptedPem(encryptedPkcs8Pem, passwordBytes);
         var exportedPem = newRsa.ExportRSAPrivateKeyPem().Trim();
-        Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], exportedPem);
+        Assert.AreEqual(Pkcs1PrivateKey, exportedPem);
     }
 
     [TestMethod]
     public void ImportPkcs8PrivateKeyPemTest()
     {
         using var rsa = RSA.Create();
-        rsa.ImportPkcs8PrivateKeyPem(keys[PemType.Pkcs8PrivateKey]);
+        rsa.ImportPem(Pkcs8PrivateKey);
         var exportedPem = rsa.ExportRSAPrivateKeyPem().Trim();
-        Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], exportedPem);
+        Assert.AreEqual(Pkcs1PrivateKey, exportedPem);
     }
 
     [TestMethod]
     public void ImportEncryptedPkcs8PrivateKeyPemTest()
     {
         using var rsa = RSA.Create();
-        rsa.ImportEncryptedPkcs8PrivateKeyPem(keys[PemType.EncryptedPkcs8PrivateKey], passwordBytes);
+        rsa.ImportPem(GetKey("EncryptedPkcs8PrivateKey"), passwordBytes);
         var exportedPem = rsa.ExportRSAPrivateKeyPem().Trim();
-        Assert.AreEqual(keys[PemType.Pkcs1PrivateKey], exportedPem);
+        Assert.AreEqual(Pkcs1PrivateKey, exportedPem);
+    }
+    #endregion
+
+    #region PublicKey
+    [TestMethod]
+    public void ExportPublicKeyPemTest()
+    {
+        using var rsa = RSA.Create();
+        rsa.ImportFromPem(Pkcs1PrivateKey);
+        var pem = rsa.ExportPem(RsaPemType.PublicKey);
+        Console.WriteLine(pem);
+        Assert.AreEqual(PublicKey, pem);
     }
 
     [TestMethod]
-    public void Test()
+    public void ExportX509SubjectPublicKeyPemTest()
     {
-
-        Console.WriteLine(string.Join(" ", BitConverter.GetBytes((short)0)));
-        Console.WriteLine(string.Join(" ", BitConverter.GetBytes(1)));
-        Console.WriteLine(new HMACMD5().InputBlockSize / 8);
-        Console.WriteLine(new HMACMD5().OutputBlockSize / 8);
-
-        Console.WriteLine(SHA1.Create().InputBlockSize / 8);
-        Console.WriteLine(SHA1.Create().OutputBlockSize / 8);
-
-        Console.WriteLine(SHA256.Create().InputBlockSize / 8);
-        Console.WriteLine(SHA256.Create().OutputBlockSize / 8);
+        using var rsa = RSA.Create();
+        rsa.ImportFromPem(Pkcs1PrivateKey);
+        var pem = rsa.ExportPem(RsaPemType.X509SubjectPublicKey);
+        Console.WriteLine(pem);
+        Assert.AreEqual(GetKey("X509PublicKey"), pem);
     }
+
+    [TestMethod]
+    public void ImportPublicKeyPemTest()
+    {
+        using var rsa = RSA.Create();
+        rsa.ImportPem(PublicKey);
+        var exportedPem = rsa.ExportRSAPublicKeyPem().Trim();
+        Assert.AreEqual(PublicKey, exportedPem);
+    }
+
+    [TestMethod]
+    public void ImportX509SubjectPublicKeyPemTest()
+    {
+        using var rsa = RSA.Create();
+        rsa.ImportPem(GetKey("X509PublicKey"));
+        var exportedPem = rsa.ExportRSAPublicKeyPem().Trim();
+        Assert.AreEqual(PublicKey, exportedPem);
+    }
+    #endregion
 }
