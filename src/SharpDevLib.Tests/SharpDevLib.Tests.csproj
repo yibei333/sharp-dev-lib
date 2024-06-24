@@ -80,25 +80,34 @@
 		<None Update="TestData\Compression\zip.zip">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="TestData\Cryptography\EncryptedPkcs8PrivateKey.txt">
+		<None Update="TestData\Cryptography\RsaKeys\EncryptedPkcs8PrivateKey.txt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="TestData\Cryptography\Pkcs8PrivateKey.txt">
+		<None Update="TestData\Cryptography\Symmetric\Foo-3DES.txt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="TestData\Cryptography\X509PublicKey.txt">
+		<None Update="TestData\Cryptography\Symmetric\Foo-AES.txt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="TestData\Cryptography\PublicKey.txt">
+		<None Update="TestData\Cryptography\Symmetric\Foo-DES.txt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="TestData\Cryptography\TrippleDESEncryptedPkcs1PrivateKey.txt">
+		<None Update="TestData\Cryptography\RsaKeys\Pkcs8PrivateKey.txt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="TestData\Cryptography\AESEncryptedPkcs1PrivateKey.txt">
+		<None Update="TestData\Cryptography\RsaKeys\X509PublicKey.txt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="TestData\Cryptography\Pkcs1PrivateKey.txt">
+		<None Update="TestData\Cryptography\RsaKeys\PublicKey.txt">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="TestData\Cryptography\RsaKeys\TrippleDESEncryptedPkcs1PrivateKey.txt">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="TestData\Cryptography\RsaKeys\AESEncryptedPkcs1PrivateKey.txt">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="TestData\Cryptography\RsaKeys\Pkcs1PrivateKey.txt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="TestData\Foo.txt">

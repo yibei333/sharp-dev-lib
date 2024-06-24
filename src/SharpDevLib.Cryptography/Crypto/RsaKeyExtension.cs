@@ -125,6 +125,24 @@ public static class RsaKeyExtension
             return false;
         }
     }
+
+    /// <summary>
+    /// 获取密钥信息
+    /// </summary>
+    /// <param name="key">PEM格式的密钥</param>
+    /// <param name="password">密码（仅当PEM格式为受密码保护的私钥时适用）</param>
+    /// <returns>密钥信息</returns>
+    public static RsaKeyInfo GetKeyInfo(string key, byte[]? password = null)
+    {
+        var pemObject = PemObject.Read(key);
+        var isEncrypted = pemObject.PemType == RsaPemType.EncryptedPkcs1PrivateKey || pemObject.PemType == RsaPemType.EncryptedPkcs8PrivateKey;
+        var isPrivate = pemObject.PemType != RsaPemType.PublicKey && pemObject.PemType != RsaPemType.X509SubjectPublicKey;
+        if (isEncrypted && password.IsNullOrEmpty()) return new RsaKeyInfo(pemObject.PemType, 0, isPrivate, isEncrypted, null);
+
+        using var rsa = RSA.Create();
+        rsa.ImportPem(key, password);
+        return new RsaKeyInfo(pemObject.PemType, rsa.KeySize, isPrivate, isEncrypted, rsa.ExportParameters(isPrivate));
+    }
     #endregion
 
     #region Pkcs1
@@ -293,4 +311,96 @@ public static class RsaKeyExtension
         rsa.ImportParameters(parameters);
     }
     #endregion
+}
+
+/// <summary>
+/// RSA密钥信息
+/// </summary>
+public class RsaKeyInfo
+{
+    internal RsaKeyInfo(RsaPemType type, int keySize, bool isPrivate, bool isEncrypted, RSAParameters? parameters)
+    {
+        Type = type;
+        IsPrivate = isPrivate;
+        IsEncrypted = isEncrypted;
+        KeySize = keySize;
+        Parameters = parameters is null ? null : new RsaKeyParameters(parameters.Value);
+    }
+
+    /// <summary>
+    /// 类型
+    /// </summary>
+    public RsaPemType Type { get; }
+
+    /// <summary>
+    /// 是否是私钥
+    /// </summary>
+    public bool IsPrivate { get; }
+
+    /// <summary>
+    /// 是否受密码保护
+    /// </summary>
+    public bool IsEncrypted { get; }
+
+    /// <summary>
+    /// 密钥长度
+    /// </summary>
+    public int KeySize { get; set; }
+
+    /// <summary>
+    /// 参数
+    /// </summary>
+    public RsaKeyParameters? Parameters { get; }
+}
+
+/// <summary>
+/// RSA密钥参数
+/// </summary>
+public class RsaKeyParameters
+{
+    internal RsaKeyParameters(RSAParameters parameters)
+    {
+        Modulus = parameters.Modulus.ToHexString();
+        Exponent = parameters.Exponent.ToHexString();
+        D = parameters.D.IsNullOrEmpty() ? null : parameters.D.ToHexString();
+        P = parameters.D.IsNullOrEmpty() ? null : parameters.P.ToHexString();
+        DP = parameters.D.IsNullOrEmpty() ? null : parameters.DP.ToHexString();
+        DQ = parameters.D.IsNullOrEmpty() ? null : parameters.DQ.ToHexString();
+        InverseQ = parameters.D.IsNullOrEmpty() ? null : parameters.InverseQ.ToHexString();
+    }
+
+    /// <summary>
+    /// Modulus参数
+    /// </summary>
+    public string Modulus { get; }
+
+    /// <summary>
+    /// Exponent参数
+    /// </summary>
+    public string Exponent { get; }
+
+    /// <summary>
+    /// D参数
+    /// </summary>
+    public string? D { get; }
+
+    /// <summary>
+    /// P参数
+    /// </summary>
+    public string? P { get; }
+
+    /// <summary>
+    /// DP参数
+    /// </summary>
+    public string? DP { get; }
+
+    /// <summary>
+    /// DQ参数
+    /// </summary>
+    public string? DQ { get; }
+
+    /// <summary>
+    /// InverseQ参数
+    /// </summary>
+    public string? InverseQ { get; }
 }
