@@ -51,4 +51,25 @@ internal static class InternalExtension
         }
         return builder.ToString();
     }
+
+    internal static string Base64UrlEncode(this byte[] bytes) => Convert.ToBase64String(bytes).Replace('+', '-').Replace('/', '_').TrimEnd('=').TrimEnd('=');
+
+    internal static byte[] Base64UrlDecode(this string base64UrlEncodedString)
+    {
+        if (base64UrlEncodedString.IsNullOrWhiteSpace()) return Array.Empty<byte>();
+        base64UrlEncodedString = base64UrlEncodedString.Replace('-', '+').Replace('_', '/');
+        var lengthFormat = base64UrlEncodedString.Length % 4;
+        base64UrlEncodedString += lengthFormat switch
+        {
+            1 => throw new FormatException("illegal base64url encoded string."),
+            2 => "==",
+            3 => "=",
+            _ => string.Empty
+        };
+        return Convert.FromBase64String(base64UrlEncodedString);
+    }
+
+    internal static byte[] ToUtf8Bytes(this string str) => Encoding.UTF8.GetBytes(str);
+
+    internal static string ToUtf8String(this byte[] bytes) => Encoding.UTF8.GetString(bytes);
 }
