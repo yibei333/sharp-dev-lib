@@ -1,17 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>11.0</LangVersion>
 		<Authors>developer333</Authors>
-		<Description>加密/解密库</Description>
+		<Description>文档库</Description>
 		<Copyright>developer333</Copyright>
-		<PackageId>SharpDevLib.Cryptography</PackageId>
+		<PackageId>SharpDevLib.OpenXML</PackageId>
 		<PackageProjectUrl>https://github.com/yibei333/sharp-dev-lib</PackageProjectUrl>
 		<PackageIcon>c-sharp.png</PackageIcon>
 		<RepositoryUrl>https://github.com/yibei333/sharp-dev-lib</RepositoryUrl>
-		<PackageTags>cryptography crypto encrypt decrypt encryption decryption</PackageTags>
+		<PackageTags>excel</PackageTags>
 		<!--<PackageLicenseFile>LICENSE</PackageLicenseFile>-->
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
@@ -35,14 +36,14 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-		<None Include="../../assets/sharpdevlib.cryptography.version.txt" Link="Assets\sharpdevlib.cryptography.version.txt">
+		<None Include="../../assets/sharpdevlib.openxml.version.txt" Link="Assets\sharpdevlib.openxml.version.txt">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="System.Formats.Asn1" Version="8.0.0" />
-		<PackageReference Include="System.Text.Json" Version="8.0.3" />
+		<PackageReference Include="DocumentFormat.OpenXml" Version="3.0.2" />
 	</ItemGroup>
+
 </Project>

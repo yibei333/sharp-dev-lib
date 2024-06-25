@@ -5,17 +5,19 @@ VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDevLib.Tests", "SharpDevLib.Tests\SharpDevLib.Tests.csproj", "{79936E1A-EAB7-4869-8185-7DB9488CD640}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpDevLib.Compression", "SharpDevLib.Compression\SharpDevLib.Compression.csproj", "{94F2F27D-1BD0-41B7-892B-DF191FAF95E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDevLib.Compression", "SharpDevLib.Compression\SharpDevLib.Compression.csproj", "{94F2F27D-1BD0-41B7-892B-DF191FAF95E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpDevLib", "SharpDevLib\SharpDevLib.csproj", "{6A0C21B6-2656-4E4D-99A6-C1667CE03552}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDevLib", "SharpDevLib\SharpDevLib.csproj", "{6A0C21B6-2656-4E4D-99A6-C1667CE03552}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpDevLib.Transport", "SharpDevLib.Transport\SharpDevLib.Transport.csproj", "{85C19B96-606C-4851-8481-7BB17996149C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDevLib.Transport", "SharpDevLib.Transport\SharpDevLib.Transport.csproj", "{85C19B96-606C-4851-8481-7BB17996149C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D0542E14-8757-463C-B8C0-9DE98E396E3F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{70DF27F1-E757-45AC-A8FB-3F615E646EFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpDevLib.Cryptography", "SharpDevLib.Cryptography\SharpDevLib.Cryptography.csproj", "{83670B49-CC6E-4A4D-B880-29D608F734E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDevLib.Cryptography", "SharpDevLib.Cryptography\SharpDevLib.Cryptography.csproj", "{83670B49-CC6E-4A4D-B880-29D608F734E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpDevLib.OpenXML", "SharpDevLib.OpenXML\SharpDevLib.OpenXML.csproj", "{BF6348BC-D0FB-4571-BFD3-C83BB3EF2935}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +45,10 @@ Global
 		{83670B49-CC6E-4A4D-B880-29D608F734E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83670B49-CC6E-4A4D-B880-29D608F734E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83670B49-CC6E-4A4D-B880-29D608F734E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF6348BC-D0FB-4571-BFD3-C83BB3EF2935}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF6348BC-D0FB-4571-BFD3-C83BB3EF2935}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF6348BC-D0FB-4571-BFD3-C83BB3EF2935}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF6348BC-D0FB-4571-BFD3-C83BB3EF2935}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{6A0C21B6-2656-4E4D-99A6-C1667CE03552} = {70DF27F1-E757-45AC-A8FB-3F615E646EFF}
 		{85C19B96-606C-4851-8481-7BB17996149C} = {70DF27F1-E757-45AC-A8FB-3F615E646EFF}
 		{83670B49-CC6E-4A4D-B880-29D608F734E6} = {70DF27F1-E757-45AC-A8FB-3F615E646EFF}
+		{BF6348BC-D0FB-4571-BFD3-C83BB3EF2935} = {70DF27F1-E757-45AC-A8FB-3F615E646EFF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3D2554AD-5C6B-4AF3-ABBE-F55415D54116}
