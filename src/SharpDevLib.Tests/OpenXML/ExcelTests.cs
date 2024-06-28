@@ -3,12 +3,51 @@ using DocumentFormat.OpenXml.Office.CustomUI;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SharpDevLib.OpenXML;
+using SharpDevLib.Tests.TestData;
+using System.Collections.Generic;
+using System;
+using System.IO;
 
 namespace SharpDevLib.Tests.OpenXML;
 
 [TestClass]
 public class ExcelTests
 {
+    #region Data
+    class Foo
+    {
+        public string? StringValue { get; set; }
+        public int? IntValue { get; set; }
+        public bool? BoolValue { get; set; }
+    }
+
+    static readonly List<Foo> TestData1 =
+    [
+        new (){ StringValue="A1 Value",IntValue=1,BoolValue=true },
+        new (){ StringValue="A2 Value",IntValue=null,BoolValue=false },
+        new (){ StringValue="A3 Value",IntValue=3,BoolValue=null },
+        new (){ StringValue=null,IntValue=4,BoolValue=true },
+    ];
+
+    static readonly List<Foo> TestData2 =
+    [
+        new (){ StringValue="A11 Value",IntValue=1,BoolValue=true },
+        new (){ StringValue="A12 Value",IntValue=null,BoolValue=false },
+        new (){ StringValue="A13 Value",IntValue=3,BoolValue=null },
+        new (){ StringValue=null,IntValue=4,BoolValue=true },
+    ];
+    #endregion
+
+
+    [TestMethod]
+    public void ReadTest()
+    {
+        var path = @"C:\Users\Devel\OneDrive\桌面\2.xlsx";
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        var set = Excel.Read(stream);
+    }
+
     [TestMethod]
     public void WriteTest()
     {
