@@ -88,6 +88,41 @@ public static class DataTableExtensions
         return result;
     }
 
+    /// <summary>
+    /// 根据提供的列对DataTable进行转换,并返回新的DataTable
+    /// </summary>
+    /// <param name="sourceTable">源DataTable</param>
+    /// <param name="columns">要转换的列</param>
+    /// <returns>目标DataTable</returns>
+    public static DataTable Transfer(this DataTable sourceTable, params DataTableTransferColumn[] columns)
+    {
+        var table = new DataTable();
+
+        //columns
+        foreach (var column in columns)
+        {
+            var columnNamePrefix = column.IsRequired ? "* " : "";
+            var columnName = (column.NameConverter ?? DefaultNameConverter).Invoke(column.Name);
+            var columnType = column.TargetType ?? sourceTable.Columns[column.Name]?.DataType ?? typeof(string);
+            table.Columns.Add(new DataColumn($"{columnNamePrefix}{columnName}", columnType));
+        }
+
+        //values
+        foreach (DataRow sourceRow in sourceTable.Rows)
+        {
+            var row = table.NewRow();
+            for (int i = 0; i < columns.Length; i++)
+            {
+                var column = columns[i];
+                var value = sourceRow[column.Name];
+                row[i] = (column.ValueConverter ?? DefaultValueConverter).Invoke(value);
+            }
+            table.Rows.Add(row);
+        }
+
+        return table;
+    }
+
     static Type GetNonGenericPropertyTypeToColumnType(Type propertyType)
     {
         if (propertyType.IsGenericType)
@@ -123,4 +158,8 @@ public static class DataTableExtensions
         }
         return Convert.ChangeType(rowValue, type);
     }
+
+    static readonly Func<string, string> DefaultNameConverter = key => key;
+
+    static readonly Func<object, object> DefaultValueConverter = value => value;
 }

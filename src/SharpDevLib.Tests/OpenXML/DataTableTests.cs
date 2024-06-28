@@ -31,6 +31,7 @@ public class DataTableTests
         public double? NullalbelDouble { get; set; }
         public Gender Gender { get; set; }
         public DateTime CreateTime { get; set; }
+        public long TimestampValue { get; set; }
         public bool BoolValue { get; set; }
         public Bar? Bar { get; set; }
         public List<Foo>? FooList { get; set; }
@@ -38,15 +39,15 @@ public class DataTableTests
 
     static readonly List<Baz> TestData =
     [
-        new() {BazValue="foo",FooValue=1.1,BarValue=1.2,FooBase=1,FooString="1.4",NullalbelDouble=1.5,Gender=Gender.Male,CreateTime=new DateTime(2024,1,1),BoolValue=true },
-        new() {BazValue="bar",FooValue=2.1,BarValue=2.2,FooBase=2,FooString="2.4",Gender=Gender.Female,CreateTime=new DateTime(2024,2,1),BoolValue=false},
+        new() {BazValue="foo",FooValue=1.1,BarValue=1.2,FooBase=1,FooString="1.4",NullalbelDouble=1.5,Gender=Gender.Male,CreateTime=new DateTime(2024,1,1),BoolValue=true,TimestampValue= new DateTime(2024,1,1).ToUtcTimestamp()},
+        new() {BazValue="bar",FooValue=2.1,BarValue=2.2,FooBase=2,FooString="2.4",Gender=Gender.Female,CreateTime=new DateTime(2024,2,1),BoolValue=false,TimestampValue= new DateTime(2024,2,1).ToUtcTimestamp()},
     ];
 
     [TestMethod]
     public void ListToDataTableTest()
     {
         var table = TestData.ToDataTable();
-        Assert.AreEqual(9, table.Columns.Count);
+        Assert.AreEqual(10, table.Columns.Count);
         Assert.AreEqual(2, table.Rows.Count);
     }
 
@@ -73,6 +74,7 @@ public class DataTableTests
         table.Columns.Add(new DataColumn("Gender"));
         table.Columns.Add(new DataColumn("CreateTime"));
         table.Columns.Add(new DataColumn("BoolValue"));
+        table.Columns.Add(new DataColumn("TimestampValue"));
         var fooRow = table.NewRow();
         fooRow["BazValue"] = "foo";
         fooRow["FooValue"] = 1.1;
@@ -83,6 +85,7 @@ public class DataTableTests
         fooRow["Gender"] = (int)Gender.Male;
         fooRow["CreateTime"] = new DateTime(2024, 1, 1);
         fooRow["BoolValue"] = true;
+        fooRow["TimestampValue"] = new DateTime(2024, 1, 1).ToUtcTimestamp();
         table.Rows.Add(fooRow);
         var barRow = table.NewRow();
         barRow["BazValue"] = "bar";
@@ -93,11 +96,39 @@ public class DataTableTests
         barRow["Gender"] = (int)Gender.Female;
         barRow["CreateTime"] = new DateTime(2024, 2, 1);
         barRow["BoolValue"] = false;
+        barRow["TimestampValue"] = new DateTime(2024, 2, 1).ToUtcTimestamp();
         table.Rows.Add(barRow);
 
         var list = table.ToList<Baz>();
         var listString = list.Serialize(new JsonOption { FormatJson = true });
         Console.WriteLine(listString);
         Assert.AreEqual(TestData.Serialize(new JsonOption { FormatJson = true }), listString);
+    }
+
+    [TestMethod]
+    public void TransferTest()
+    {
+        var sourceTable = TestData.ToDataTable();
+        var columns = new DataTableTransferColumn[]
+        {
+            new("FooValue"),
+            new("BazValue") {NameConverter=key=>key+"_Converted",ValueConverter=v=>$"{v}_converted",IsRequired=true},
+            new("CreateTime") {NameConverter=key=>"创建时间",ValueConverter=v=>Convert.ToDateTime(v.ToString()).ToString("yyyy-MM-dd"),IsRequired=true},
+            new("TimestampValue") {NameConverter=key=>"创建时间戳",ValueConverter=v=>long.Parse(v.ToString()!).ToUtcTime().ToTimeString(),IsRequired=true,TargetType=typeof(string)},
+        };
+        var targetTable = sourceTable.Transfer(columns);
+        Assert.AreEqual(4, targetTable.Columns.Count);
+        Assert.AreEqual(2, targetTable.Rows.Count);
+
+        var backColumns = new DataTableTransferColumn[]
+        {
+            new("FooValue"),
+            new("* BazValue_Converted") {NameConverter=key=>key.Split("_")[0],ValueConverter=v=>v.ToString()!.Split("_")[0]},
+            new("* 创建时间") {NameConverter=key=>"CreateTime"},
+            new("* 创建时间戳") {NameConverter=key=>"TimestampValue",ValueConverter=v=>Convert.ToDateTime(v.ToString()!).ToUtcTimestamp(),TargetType=typeof(long)},
+        };
+        var tarnsferBackTable = targetTable.Transfer(backColumns);
+        Assert.AreEqual(4, tarnsferBackTable.Columns.Count);
+        Assert.AreEqual(2, tarnsferBackTable.Rows.Count);
     }
 }
