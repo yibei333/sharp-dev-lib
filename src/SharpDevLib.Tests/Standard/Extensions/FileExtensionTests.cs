@@ -57,7 +57,7 @@ public class FileExtensionTests
     [TestMethod]
     public void SaveBytesToFileTest()
     {
-        var bytes = new byte[] { 102, 111, 111, 46, 98, 97, 114 };
+        var bytes = "foo.bar".ToUtf8Bytes();
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("foo.txt");
         bytes.SaveToFile(path);
         var actual = File.ReadAllText(path);
@@ -69,7 +69,7 @@ public class FileExtensionTests
     [ExpectedException(typeof(ArgumentNullException))]
     public void SaveBytesToFilePathExceptionTest()
     {
-        var bytes = new byte[] { 102, 111, 111, 46, 98, 97, 114 };
+        var bytes = "foo.bar".ToUtf8Bytes();
         var path = string.Empty;
         bytes.SaveToFile(path);
     }
@@ -78,7 +78,7 @@ public class FileExtensionTests
     [ExpectedException(typeof(InvalidOperationException))]
     public void SaveBytesToFileExistedExceptionTest()
     {
-        var bytes = new byte[] { 102, 111, 111, 46, 98, 97, 114 };
+        var bytes = "foo.bar".ToUtf8Bytes();
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt");
         bytes.SaveToFile(path, true);
     }
@@ -86,7 +86,7 @@ public class FileExtensionTests
     [TestMethod]
     public void SaveStreamToFileTest()
     {
-        var bytes = new byte[] { 102, 111, 111, 46, 98, 97, 114 };
+        var bytes = "foo.bar".ToUtf8Bytes();
         using var stream = new MemoryStream(bytes);
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("bar.txt");
         stream.SaveToFile(path);
@@ -99,7 +99,7 @@ public class FileExtensionTests
     [ExpectedException(typeof(ArgumentNullException))]
     public void SaveStreamToFilePathExceptionTest()
     {
-        var bytes = new byte[] { 102, 111, 111, 46, 98, 97, 114 };
+        var bytes = "foo.bar".ToUtf8Bytes();
         using var stream = new MemoryStream(bytes);
         var path = string.Empty;
         stream.SaveToFile(path);
@@ -109,7 +109,7 @@ public class FileExtensionTests
     [ExpectedException(typeof(InvalidOperationException))]
     public void SaveStreamToFileExistedExceptionTest()
     {
-        var bytes = new byte[] { 102, 111, 111, 46, 98, 97, 114 };
+        var bytes = "foo.bar".ToUtf8Bytes();
         using var stream = new MemoryStream(bytes);
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt");
         stream.SaveToFile(path, true);

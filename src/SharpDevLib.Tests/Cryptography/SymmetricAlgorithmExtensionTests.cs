@@ -17,7 +17,7 @@ public class SymmetricAlgorithmExtensionTests
     const string desFileHash = "c00b686b22e9de4bb1a09259b26c6df60f80762c3e2186d04e3b57c2028b775b";
     const string trippleDesFileash = "c338cf4e2e9f6efd7cdd432db707f77f0490e910952a6d383a55809287aa261b";
 
-    SymmetricAlgorithm GetSymmetricAlgorithm(string algorithmName)
+    static SymmetricAlgorithm GetSymmetricAlgorithm(string algorithmName)
     {
         if (algorithmName.Equals("AES", StringComparison.OrdinalIgnoreCase)) return Aes.Create();
         if (algorithmName.Equals("DES", StringComparison.OrdinalIgnoreCase)) return DES.Create();

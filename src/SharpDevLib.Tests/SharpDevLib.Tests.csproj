@@ -21,6 +21,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\SharpDevLib.Compression\SharpDevLib.Compression.csproj" />
 	  <ProjectReference Include="..\SharpDevLib.Cryptography\SharpDevLib.Cryptography.csproj" />
+	  <ProjectReference Include="..\SharpDevLib.OpenXML\SharpDevLib.OpenXML.csproj" />
 	  <ProjectReference Include="..\SharpDevLib.Transport\SharpDevLib.Transport.csproj" />
 	  <ProjectReference Include="..\SharpDevLib\SharpDevLib.csproj" />
 	</ItemGroup>

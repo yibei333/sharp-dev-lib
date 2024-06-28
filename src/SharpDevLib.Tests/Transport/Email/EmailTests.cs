@@ -93,7 +93,7 @@ public class EmailTests
         Assert.IsNotNull(bccEmail);
 
         var attachments = message.FindAllAttachments();
-        Assert.AreEqual(1, attachments.Count());
+        Assert.AreEqual(1, attachments.Count);
         var attachment = attachments.First();
         Assert.IsNotNull(attachment);
         using var attachStream = new MemoryStream();
@@ -148,7 +148,7 @@ public class EmailTests
         Assert.IsNotNull(bccEmail);
 
         var attachments = message.FindAllAttachments();
-        Assert.AreEqual(1, attachments.Count());
+        Assert.AreEqual(1, attachments.Count);
         var attachment = attachments.First();
         Assert.IsNotNull(attachment);
         using var attachStream = new MemoryStream();
