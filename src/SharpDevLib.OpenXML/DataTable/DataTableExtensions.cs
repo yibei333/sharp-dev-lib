@@ -145,15 +145,28 @@ public static class DataTableExtensions
 
     static object? ConvertRowValueToPropertyValue(Type propertyType, object rowValue)
     {
-        if (rowValue == DBNull.Value) return null;
+        if (rowValue is null || rowValue == DBNull.Value || rowValue.ToString().IsNullOrWhiteSpace()) return null;
         var type = GetNonGenericPropertyTypeToColumnType(propertyType);
 
         if (type.IsEnum)
         {
             if (int.TryParse(rowValue.ToString(), out var intValue))
             {
-                var enumValue = Convert.ChangeType(Enum.ToObject(propertyType, intValue), propertyType);
+                var enumValue = Convert.ChangeType(Enum.ToObject(type, intValue), type);
                 return enumValue;
+            }
+            else
+            {
+                return Enum.Parse(type, rowValue.ToString());
+            }
+        }
+        else if (type == typeof(bool))
+        {
+            if (bool.TryParse(rowValue.ToString(), out var boolValue)) return boolValue;
+            else
+            {
+                if (int.TryParse(rowValue.ToString(), out var intValue)) return intValue != 0;
+                else throw new InvalidCastException($"unable to cast value '{rowValue}' to boolean");
             }
         }
         return Convert.ChangeType(rowValue, type);

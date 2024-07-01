@@ -1,0 +1,23 @@
+https://mermaid.live/
+
+flowchart TD
+    SpreedsheetDocument --> WorkbookPart
+    WorkbookPart --> Workbook(Workbook)
+    WorkbookPart --> WorkbookStylePart
+    WorkbookStylePart --> Stylesheet
+    Stylesheet --> Fonts
+    Stylesheet --> Fills
+    Stylesheet --> Borders
+    Stylesheet --> CellFormats
+    WorkbookPart --> SharedStringTablePart
+    SharedStringTablePart --> SharedStringTable
+    Workbook --> Sheets
+    Sheets --> Sheet[Sheet \n多个,和WorksheetPart通过rid关联]
+    WorkbookPart --> WorksheetPart[WorksheetPart 多个]
+    WorksheetPart --> Worksheet
+    Worksheet --> Columns
+    Worksheet --> SheetData
+    SheetData --> Row
+    Row --> Cell
+    Cell --> CellValue
+    

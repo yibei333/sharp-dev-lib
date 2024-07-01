@@ -1,12 +1,9 @@
-﻿using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Office.CustomUI;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.OpenXML;
 using SharpDevLib.Tests.TestData;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.IO;
 
 namespace SharpDevLib.Tests.OpenXML;
@@ -19,147 +16,103 @@ public class ExcelTests
     {
         public string? StringValue { get; set; }
         public int? IntValue { get; set; }
+        public double? DoubleValue { get; set; }
+        public decimal? DecimalValue { get; set; }
         public bool? BoolValue { get; set; }
+        public Gender? EnumValue { get; set; }
     }
 
     static readonly List<Foo> TestData1 =
     [
-        new (){ StringValue="A1 Value",IntValue=1,BoolValue=true },
-        new (){ StringValue="A2 Value",IntValue=null,BoolValue=false },
-        new (){ StringValue="A3 Value",IntValue=3,BoolValue=null },
-        new (){ StringValue=null,IntValue=4,BoolValue=true },
+        new (){ StringValue="A1 Value",IntValue=1,DoubleValue=1.1d,DecimalValue=1.2m,BoolValue=true,EnumValue=Gender.Male },
+        new (){ StringValue="A2 Value",IntValue=null,DoubleValue=null,DecimalValue=null,BoolValue=false,EnumValue=Gender.Female },
+        new (){ StringValue="A3 Value is very long",IntValue=3,DoubleValue=3.1d,DecimalValue=3.2m,BoolValue=null },
+        new (){ StringValue=null,IntValue=4,DoubleValue=4.1,DecimalValue=4.2m,BoolValue=true },
     ];
+
+    static readonly string TestJson1 = TestData1.Serialize();
 
     static readonly List<Foo> TestData2 =
     [
-        new (){ StringValue="A11 Value",IntValue=1,BoolValue=true },
-        new (){ StringValue="A12 Value",IntValue=null,BoolValue=false },
-        new (){ StringValue="A13 Value",IntValue=3,BoolValue=null },
-        new (){ StringValue=null,IntValue=4,BoolValue=true },
+        new (){ StringValue="A11 Value",IntValue=1,DoubleValue=1.1d,DecimalValue=1.2m,BoolValue=true,EnumValue=Gender.Male },
+        new (){ StringValue="A12 Value",IntValue=null,DoubleValue=null,DecimalValue=null,BoolValue=false,EnumValue=Gender.Female },
+        new (){ StringValue="A13 Value",IntValue=3,DoubleValue=3.1d,DecimalValue=3.2m,BoolValue=null },
+        new (){ StringValue=null,IntValue=4,DoubleValue=4.1,DecimalValue=4.2m,BoolValue=true },
     ];
+    static readonly string TestJson2 = TestData2.Serialize();
     #endregion
-
 
     [TestMethod]
     public void ReadTest()
     {
-        var path = @"C:\Users\Devel\OneDrive\桌面\2.xlsx";
+        var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Normal.xlsx");
         using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         var set = Excel.Read(stream);
+        Assert.AreEqual(2, set.Tables.Count);
+        var table1 = set.Tables["T1"];
+        Assert.IsNotNull(table1);
+        var list1 = table1.ToList<Foo>();
+        var json1 = list1.Serialize();
+        Console.WriteLine(json1);
+        Assert.AreEqual(TestJson1, json1);
+
+        var table2 = set.Tables["T2"];
+        Assert.IsNotNull(table2);
+        var list2 = table2.ToList<Foo>();
+        var json2 = list2.Serialize();
+        Console.WriteLine(json2);
+        Assert.AreEqual(TestJson2, json2);
     }
 
     [TestMethod]
-    public void WriteTest()
+    public void WriteSetTest()
     {
-        var path = @"C:\Users\Devel\OneDrive\桌面\1.xlsx";
-        var document = SpreadsheetDocument.Create(path, SpreadsheetDocumentType.Workbook);
+        var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/write-set.xlsx");
+        using var stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
 
-        var workbookPart = document.AddWorkbookPart();
-        workbookPart.Workbook = new Workbook();
-        var sheets = workbookPart.Workbook.AppendChild(new Sheets());
+        var writeSet = new DataSet();
+        var writeTable1 = TestData1.ToDataTable();
+        writeSet.Tables.Add(writeTable1);
 
-        var worksheetPart1 = workbookPart.AddNewPart<WorksheetPart>();
-        worksheetPart1.Worksheet = new Worksheet();
-        var sheetData1 = new SheetData();
-        worksheetPart1.Worksheet.AddChild(sheetData1);
-        var sheet1 = new Sheet { Id = workbookPart.GetIdOfPart(worksheetPart1), SheetId = 1, Name = "foo" };
-        sheets.Append(sheet1);
+        var writeTable2 = TestData2.ToDataTable();
+        writeSet.Tables.Add(writeTable2);
+        Excel.Write(writeSet, stream);
+        Assert.IsTrue(File.Exists(path));
+        Assert.IsTrue(new FileInfo(path).Length > 0);
 
-        var worksheetPart2 = workbookPart.AddNewPart<WorksheetPart>();
-        worksheetPart2.Worksheet = new Worksheet();
-        var sheetData2 = new SheetData();
-        worksheetPart2.Worksheet.AddChild(sheetData2);
-        var sheet2 = new Sheet { Id = workbookPart.GetIdOfPart(worksheetPart2), SheetId = 2, Name = "bar" };
-        sheets.Append(sheet2);
+        var readSet = Excel.Read(stream);
+        Assert.AreEqual(2, readSet.Tables.Count);
+        var readTable1 = readSet.Tables["Table1"];
+        Assert.IsNotNull(readTable1);
+        var readList1 = readTable1.ToList<Foo>();
+        var readListJson1 = readList1.Serialize();
+        Console.WriteLine(readListJson1);
+        Assert.AreEqual(TestJson1, readListJson1);
 
-        SetColumn(worksheetPart1.Worksheet);
-        SetColumn(worksheetPart2.Worksheet);
-        WriteData(sheetData1, 1);
-        WriteData(sheetData2, 2);
-
-        var customUIContent = @"<customUI xmlns=""http://schemas.microsoft.com/office/2006/01/customui"">
-    <ribbon>
-        <tabs>
-            <tab idMso=""TabAddIns"">
-                <group id=""Group1"" label=""Group1"">
-                    <button id=""Button1"" label=""Click Me!"" showImage=""false"" onAction=""SampleMacro""/>
-                </group>
-            </tab>
-        </tabs>
-    </ribbon>
-</customUI>";
-
-        var part = document.RibbonExtensibilityPart;
-        part ??= document.AddRibbonExtensibilityPart();
-
-        part.CustomUI = new CustomUI(customUIContent);
-        part.CustomUI.Save();
-
-        document.Save();
-        document.Dispose();
+        var readTable2 = readSet.Tables["Table2"];
+        Assert.IsNotNull(readTable2);
+        var readList2 = readTable2.ToList<Foo>();
+        var readListJson2 = readList2.Serialize();
+        Console.WriteLine(readListJson2);
+        Assert.AreEqual(TestJson2, readListJson2);
     }
 
-    static void WriteData(SheetData sheetData, int type)
+    [TestMethod]
+    public void WriteTableTest()
     {
-        var columns = new Row();
-        sheetData.Append(columns);
-        var column1 = new Cell
-        {
-            CellValue = new CellValue("foo"),
-            DataType = new EnumValue<CellValues>(CellValues.String)
-        };
-        var column2 = new Cell
-        {
-            CellValue = new CellValue("bar"),
-            DataType = new EnumValue<CellValues>(CellValues.String)
-        };
-        columns.Append(column1);
-        columns.Append(column2);
+        var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/write-table.xlsx");
+        using var stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
 
+        var writeTable1 = TestData1.ToDataTable();
+        Excel.Write(writeTable1, stream, false);
 
-
-        for (int i = 0; i < 100 * type; i++)
-        {
-            var row = new Row();
-            sheetData.Append(row);
-            var value1 = new Cell
-            {
-                CellValue = new CellValue($"this is foo field value {i}\r\nthis is foo field value {i}"),
-                DataType = new EnumValue<CellValues>(CellValues.String)
-            };
-            var value2 = new Cell
-            {
-                CellValue = new CellValue($"this is bar field value {i}\r\nthis is bar field value {i}"),
-                DataType = new EnumValue<CellValues>(CellValues.String)
-            };
-            row.Append(value1);
-            row.Append(value2);
-        }
-    }
-
-    static void SetColumn(Worksheet worksheet)
-    {
-        var columns = new Columns();
-        var column1 = new Column
-        {
-            Min = 1,
-            Max = 1,
-            Width = 10d,
-            BestFit = true,
-            CustomWidth = false
-        };
-        columns.Append(column1);
-
-        var column2 = new Column
-        {
-            Min = 2,
-            Max = 2,
-            Width = 10d,
-            BestFit = true,
-            CustomWidth = false
-        };
-        columns.Append(column2);
-
-        worksheet.InsertAt(columns, 0);
+        var readSet = Excel.Read(stream);
+        Assert.AreEqual(1, readSet.Tables.Count);
+        var readTable1 = readSet.Tables["Table1"];
+        Assert.IsNotNull(readTable1);
+        var readList1 = readTable1.ToList<Foo>();
+        var readListJson1 = readList1.Serialize();
+        Console.WriteLine(readListJson1);
+        Assert.AreEqual(TestJson1, readListJson1);
     }
 }
