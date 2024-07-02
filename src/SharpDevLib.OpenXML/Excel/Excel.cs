@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using SharpDevLib.OpenXML.References.ExcelEncryption;
 using System.Data;
 using System.Text.RegularExpressions;
 
@@ -11,6 +12,38 @@ namespace SharpDevLib.OpenXML;
 /// </summary>
 public static class Excel
 {
+    /// <summary>
+    /// 密码保护excel
+    /// </summary>
+    /// <param name="inputStream">excel文件流</param>
+    /// <param name="outputStream">密码保护的excel文件流</param>
+    /// <param name="password">密码</param>
+    public static void Encrypt(Stream inputStream, Stream outputStream, string password)
+    {
+        using var memoryStream = new MemoryStream(); ;
+        inputStream.CopyTo(memoryStream);
+
+        using var encryptedStream = new EncryptedPackageHandler().EncryptPackage(memoryStream.ToArray(), new ExcelEncryption { Password = password, Version = EncryptionVersion.Standard, IsEncrypted = true });
+        var array = encryptedStream.ToArray();
+        outputStream.Write(array, 0, array.Length);
+        outputStream.Flush();
+    }
+
+    /// <summary>
+    /// 去除excel密码保护
+    /// </summary>
+    /// <param name="inputStream">密码保护的excel文件流</param>
+    /// <param name="outputStream">去除密码的excel文件流</param>
+    /// <param name="password">密码</param>
+    public static void Decrypt(Stream inputStream, Stream outputStream, string password)
+    {
+        using var memoryStream = new MemoryStream(); ;
+        inputStream.CopyTo(memoryStream);
+        using var decryptedStream = new EncryptedPackageHandler().DecryptPackage(memoryStream, new ExcelEncryption { Password = password, IsEncrypted = true });
+        var zipPackage = new ZipPackage(decryptedStream);
+        zipPackage.Save(outputStream);
+    }
+
     /// <summary>
     /// 读取标准的Excel流,标准的定义为
     /// <para>1.第一行为表头</para>

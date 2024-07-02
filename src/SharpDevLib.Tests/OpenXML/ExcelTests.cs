@@ -115,4 +115,30 @@ public class ExcelTests
         Console.WriteLine(readListJson1);
         Assert.AreEqual(TestJson1, readListJson1);
     }
+
+    [TestMethod]
+    public void EncryptTest()
+    {
+        var sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Normal.xlsx");
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/encrypt.xlsx");
+        using var sourceStream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+
+        Excel.Encrypt(sourceStream, targetStream, "foo");
+        Assert.IsTrue(File.Exists(targetPath));
+        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+    }
+
+    [TestMethod]
+    public void DecryptTest()
+    {
+        var sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Encrypted.xlsx");
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/decrypt.xlsx");
+        using var sourceStream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+
+        Excel.Decrypt(sourceStream, targetStream, "foo");
+        Assert.IsTrue(File.Exists(targetPath));
+        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+    }
 }
