@@ -112,9 +112,9 @@ public class DataTableTests
         var columns = new DataTableTransferColumn[]
         {
             new("FooValue"),
-            new("BazValue") {NameConverter=key=>key+"_Converted",ValueConverter=v=>$"{v}_converted",IsRequired=true},
-            new("CreateTime") {NameConverter=key=>"创建时间",ValueConverter=v=>Convert.ToDateTime(v.ToString()).ToString("yyyy-MM-dd"),IsRequired=true},
-            new("TimestampValue") {NameConverter=key=>"创建时间戳",ValueConverter=v=>long.Parse(v.ToString()!).ToUtcTime().ToTimeString(),IsRequired=true,TargetType=typeof(string)},
+            new("BazValue") {NameConverter=key=>key+"_Converted",ValueConverter=(v,row)=>$"{v}_{row["FooValue"]}_converted",IsRequired=true},
+            new("CreateTime") {NameConverter=key=>"创建时间",ValueConverter=(v,row)=>Convert.ToDateTime(v.ToString()).ToString("yyyy-MM-dd"),IsRequired=true},
+            new("TimestampValue") {NameConverter=key=>"创建时间戳",ValueConverter=(v,row)=>long.Parse(v.ToString()!).ToUtcTime().ToTimeString(),IsRequired=true,TargetType=typeof(string)},
         };
         var targetTable = sourceTable.Transfer(columns);
         Assert.AreEqual(4, targetTable.Columns.Count);
@@ -123,9 +123,9 @@ public class DataTableTests
         var backColumns = new DataTableTransferColumn[]
         {
             new("FooValue"),
-            new("* BazValue_Converted") {NameConverter=key=>key.Split("_")[0],ValueConverter=v=>v.ToString()!.Split("_")[0]},
+            new("* BazValue_Converted") {NameConverter=key=>key.Split("_")[0],ValueConverter=(v,row)=>v.ToString()!.Split("_")[0]},
             new("* 创建时间") {NameConverter=key=>"CreateTime"},
-            new("* 创建时间戳") {NameConverter=key=>"TimestampValue",ValueConverter=v=>Convert.ToDateTime(v.ToString()!).ToUtcTimestamp(),TargetType=typeof(long)},
+            new("* 创建时间戳") {NameConverter=key=>"TimestampValue",ValueConverter=(v,row)=>Convert.ToDateTime(v.ToString()!).ToUtcTimestamp(),TargetType=typeof(long)},
         };
         var tarnsferBackTable = targetTable.Transfer(backColumns);
         Assert.AreEqual(4, tarnsferBackTable.Columns.Count);

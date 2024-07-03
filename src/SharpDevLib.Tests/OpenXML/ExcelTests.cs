@@ -1,10 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.OpenXML;
 using SharpDevLib.Tests.TestData;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 
 namespace SharpDevLib.Tests.OpenXML;
 
@@ -104,7 +107,7 @@ public class ExcelTests
         using var stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
 
         var writeTable1 = TestData1.ToDataTable();
-        Excel.Write(writeTable1, stream, false);
+        Excel.Write(writeTable1, stream);
 
         var readSet = Excel.Read(stream);
         Assert.AreEqual(1, readSet.Tables.Count);
@@ -114,6 +117,25 @@ public class ExcelTests
         var readListJson1 = readList1.Serialize();
         Console.WriteLine(readListJson1);
         Assert.AreEqual(TestJson1, readListJson1);
+    }
+
+    [TestMethod]
+    public void AutoColumnWidthTest()
+    {
+        var sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Normal.xlsx");
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/autowidth.xlsx");
+        using var sourceStream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        sourceStream.CopyTo(targetStream);
+        targetStream.Flush();
+
+        using var doc = SpreadsheetDocument.Open(targetStream, true);
+        doc.AutoColumnWidth();
+        doc.Save();
+        targetStream.Flush();
+
+        Assert.IsTrue(File.Exists(targetPath));
+        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
     }
 
     [TestMethod]
@@ -138,6 +160,135 @@ public class ExcelTests
         using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
 
         Excel.Decrypt(sourceStream, targetStream, "foo");
+        Assert.IsTrue(File.Exists(targetPath));
+        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+    }
+
+    [TestMethod]
+    public void DeleteRowTest()
+    {
+        var sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Normal.xlsx");
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/Normal_DeleteRow.xlsx");
+        using var sourceStream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        sourceStream.CopyTo(targetStream);
+        targetStream.Flush();
+
+        using var doc = SpreadsheetDocument.Open(targetStream, true);
+        doc.WorkbookPart?.GetWorksheet("T2").DeleteRow(3);
+        doc.Save();
+        targetStream.Flush();
+
+        Assert.IsTrue(File.Exists(targetPath));
+        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+
+        var readSet = Excel.Read(targetStream);
+        Assert.AreEqual(2, readSet.Tables.Count);
+        var readTable2 = readSet.Tables["T2"];
+        Assert.IsNotNull(readTable2);
+        var readList2 = readTable2.ToList<Foo>();
+        Assert.AreEqual(3, readList2.Count);
+    }
+
+    [TestMethod]
+    public void InsertRowTest()
+    {
+        var sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Normal.xlsx");
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/Normal_InsertRow.xlsx");
+        using var sourceStream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        sourceStream.CopyTo(targetStream);
+        targetStream.Flush();
+
+        using var doc = SpreadsheetDocument.Open(targetStream, true);
+        var row = doc.WorkbookPart?.GetWorksheet("T2").InsertRow(3);
+        var cell = new Cell
+        {
+            DataType = CellValues.SharedString,
+            CellReference = "A3"
+        };
+        cell.SetValue(doc.WorkbookPart!, "ok");
+        row?.AppendChild(cell);
+        doc.Save();
+        targetStream.Flush();
+
+        Assert.IsTrue(File.Exists(targetPath));
+        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+
+        var readSet = Excel.Read(targetStream);
+        Assert.AreEqual(2, readSet.Tables.Count);
+        var readTable2 = readSet.Tables["T2"];
+        Assert.IsNotNull(readTable2);
+        var readList2 = readTable2.ToList<Foo>();
+        Assert.AreEqual(5, readList2.Count);
+    }
+
+    [TestMethod]
+    public void UpdateCellValueTest()
+    {
+        var sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Normal.xlsx");
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/Normal_UpdateCellValue.xlsx");
+        using var sourceStream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        sourceStream.CopyTo(targetStream);
+        targetStream.Flush();
+
+        using var doc = SpreadsheetDocument.Open(targetStream, true);
+        var cell = doc.WorkbookPart?.GetWorksheet("T2").GetCells(x => x.CellReference == "A3").FirstOrDefault();
+        cell?.SetValue(doc.WorkbookPart!, 2);
+
+        doc.Save();
+        targetStream.Flush();
+
+        Assert.IsTrue(File.Exists(targetPath));
+        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+    }
+
+    [TestMethod]
+    public void UpdateCellFormulaTest()
+    {
+        var sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Normal.xlsx");
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/Normal_UpdateCellFormula.xlsx");
+        using var sourceStream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        sourceStream.CopyTo(targetStream);
+        targetStream.Flush();
+
+        using var doc = SpreadsheetDocument.Open(targetStream, true);
+        var cell = doc.WorkbookPart?.GetWorksheet("T2").GetCells(x => x.CellReference == "A3").FirstOrDefault();
+        cell!.CellFormula = new CellFormula("CONCATENATE(E3,F3)");
+
+        doc.Save();
+        targetStream.Flush();
+
+        Assert.IsTrue(File.Exists(targetPath));
+        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+    }
+
+    [TestMethod]
+    public void UpdateCellStyleTest()
+    {
+        var sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Normal.xlsx");
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/Normal_UpdateCellStyle.xlsx");
+        using var sourceStream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        sourceStream.CopyTo(targetStream);
+        targetStream.Flush();
+
+        using var doc = SpreadsheetDocument.Open(targetStream, true);
+        var styleIndex = doc.WorkbookPart!.CreateStyle(new SharpDevLib.OpenXML.CellStyle
+        {
+            BackgroundColor = "#0000FF",
+            FontColor = "#FFFFFF",
+            WrapText = true,
+            FontSize = 30
+        });
+        var cell = doc.WorkbookPart?.GetWorksheet("T2").GetCells(x => x.CellReference == "A3").FirstOrDefault();
+        cell!.StyleIndex = styleIndex;
+
+        doc.Save();
+        targetStream.Flush();
+
         Assert.IsTrue(File.Exists(targetPath));
         Assert.IsTrue(new FileInfo(targetPath).Length > 0);
     }

@@ -1,4 +1,6 @@
-﻿namespace SharpDevLib.OpenXML;
+﻿using System.Data;
+
+namespace SharpDevLib.OpenXML;
 
 /// <summary>
 /// DataTable转换列
@@ -30,12 +32,17 @@ public class DataTableTransferColumn
     public Type? TargetType { get; set; }
 
     /// <summary>
-    /// 值转换器,第一个参数为源单元格的值,需返回转换后的结果,注意返回的类型需要和TargetType类型一致
+    /// 值转换器,参数说明如下
+    /// <para>1.第一个参数为源单元格的值</para>
+    /// <para>2.第二个参数为DataRow</para>
+    /// <para>3.第三个参数为需返回转换后的结果,注意返回的类型需要和TargetType类型一致</para>
     /// </summary>
-    public Func<object, object>? ValueConverter { get; set; }
+    public Func<object, DataRow, object>? ValueConverter { get; set; }
 
     /// <summary>
-    /// 列明转换器,第一个参数为源列名,需返回转换后的列名
+    /// 列明转换器,参数说明如下
+    /// <para>1.第一个参数为源列名</para>
+    /// <para>2.第二个参数为需返回转换后的列名</para>
     /// </summary>
     public Func<string, string>? NameConverter { get; set; }
 }

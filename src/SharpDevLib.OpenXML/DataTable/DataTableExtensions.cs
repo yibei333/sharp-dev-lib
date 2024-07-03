@@ -115,7 +115,7 @@ public static class DataTableExtensions
             {
                 var column = columns[i];
                 var value = sourceRow[column.Name];
-                row[i] = (column.ValueConverter ?? DefaultValueConverter).Invoke(value);
+                row[i] = (column.ValueConverter ?? DefaultValueConverter).Invoke(value, row);
             }
             table.Rows.Add(row);
         }
@@ -174,5 +174,5 @@ public static class DataTableExtensions
 
     static readonly Func<string, string> DefaultNameConverter = key => key;
 
-    static readonly Func<object, object> DefaultValueConverter = value => value;
+    static readonly Func<object, DataRow, object> DefaultValueConverter = (value,row) => value;
 }
