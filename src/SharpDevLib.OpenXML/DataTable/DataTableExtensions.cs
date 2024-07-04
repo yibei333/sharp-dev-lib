@@ -174,5 +174,5 @@ public static class DataTableExtensions
 
     static readonly Func<string, string> DefaultNameConverter = key => key;
 
-    static readonly Func<object, DataRow, object> DefaultValueConverter = (value,row) => value;
+    static readonly Func<object, DataRow, object> DefaultValueConverter = (value, row) => value;
 }

@@ -1,7 +1,6 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using System.Xml;
 
 namespace SharpDevLib.OpenXML;
 
@@ -94,7 +93,7 @@ public static class SpreadsheetExtensions
     public static IEnumerable<Cell> GetCells(this Worksheet worksheet, Func<Cell, bool> condition) => worksheet.Descendants<Cell>().Where(condition);
 
     /// <summary>
-    /// 删除行
+    /// 删除行(如果该行有合并单元格,则会产生不可预期的效果)
     /// </summary>
     /// <param name="worksheet">工作表格</param>
     /// <param name="rowIndex">行号</param>
@@ -118,7 +117,7 @@ public static class SpreadsheetExtensions
     }
 
     /// <summary>
-    /// 插入空行
+    /// 插入空行(如果该行有合并单元格,则会产生不可预期的效果)
     /// </summary>
     /// <param name="worksheet">工作表格</param>
     /// <param name="rowIndex">行号</param>
@@ -143,7 +142,7 @@ public static class SpreadsheetExtensions
     }
 
     /// <summary>
-    /// 插入空白列
+    /// 插入空白列(如果该行有合并单元格,则会产生不可预期的效果)
     /// </summary>
     /// <param name="worksheet">工作表格</param>
     /// <param name="columnName">列明,如A,B,C</param>
@@ -232,7 +231,7 @@ public static class SpreadsheetExtensions
     }
 
     /// <summary>
-    /// 删除行
+    /// 删除行(如果该行有合并单元格,则会产生不可预期的效果)
     /// </summary>
     /// <param name="worksheet">工作表格</param>
     /// <param name="columnName">列明,如A,B,C</param>

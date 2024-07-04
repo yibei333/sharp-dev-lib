@@ -350,7 +350,7 @@ public class ExcelTests
         targetStream.Flush();
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
-        var mergeCell = doc.WorkbookPart?.GetWorksheet("T2").MergeCells("h1", "C3");
+        var mergeCell = doc.WorkbookPart?.GetWorksheet("T2").MergeCells("d3", "h5");
         Assert.IsNotNull(mergeCell);
         mergeCell.UseStyle(new SharpDevLib.OpenXML.CellStyle { HorizontalAlignment = HorizontalAlignmentValues.Center, VerticalAlignment = VerticalAlignmentValues.Center, BackgroundColor = "#bcd" });
 
