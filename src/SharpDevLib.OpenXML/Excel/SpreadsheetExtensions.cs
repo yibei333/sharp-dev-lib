@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using System.Text;
 
 namespace SharpDevLib.OpenXML;
 
@@ -674,6 +675,40 @@ public static class SpreadsheetExtensions
             return HexBinaryValue.FromString(color);
         }
         else return HexBinaryValue.FromString(color);
+    }
+    #endregion
+
+    #region Comments
+    public static void SetComment(this Cell cell, string author, string comment)
+    {
+        var workbookPart = cell.GetParent<WorkbookPart>() ?? throw new Exception("WorkbookPart not found");
+        var worksheetPart = cell.GetParent<WorksheetPart>() ?? throw new Exception("WorksheetPart not found");
+        var reference = new CellReference(cell.CellReference);
+        var worksheetCommentsPart = worksheetPart.WorksheetCommentsPart ?? worksheetPart.AddNewPart<WorksheetCommentsPart>();
+        worksheetCommentsPart.Comments ??= new Comments();
+        worksheetCommentsPart.Comments.Authors ??= new Authors();
+        worksheetCommentsPart.Comments.CommentList ??= new CommentList();
+        var authorNode = worksheetCommentsPart.Comments.Authors.Elements<Author>().FirstOrDefault(x => x.Text == author);
+        if (authorNode is null)
+        {
+            authorNode = new Author(author);
+            worksheetCommentsPart.Comments.Authors.AppendChild(authorNode);
+            workbookPart.Workbook.Save();
+        }
+        var authorId = (uint)worksheetCommentsPart.Comments.Authors.Elements().ToList().IndexOf(authorNode);
+        var commentNode = new Comment(new CommentText(new Run(new Text(comment)))) { Reference = cell.CellReference, AuthorId = authorId };
+        worksheetCommentsPart.Comments.CommentList.AppendChild(commentNode);
+        workbookPart.Workbook.Save();
+
+        var shapeTemplate = "<v:shape type=\"#_x0000_t202\" style='position:absolute;margin-left:78pt;margin-top:1.2pt;width:100.8pt;height:56.4pt;z-index:1;visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\" o:insetmode=\"auto\"><v:fill color2=\"infoBackground [80]\"/><v:shadow color=\"none [81]\" obscured=\"t\"/><v:path o:connecttype=\"none\"/><v:textbox style='mso-direction-alt:auto'></v:textbox><x:ClientData ObjectType=\"Note\"><x:MoveWithCells/><x:SizeWithCells/><x:Anchor>1, 12, 0, 1, 3, 18, 4, 3</x:Anchor><x:AutoFill>False</x:AutoFill><x:Row>{0}</x:Row><x:Column>{1}</x:Column></x:ClientData></v:shape>";
+        var shapes = string.Format(shapeTemplate, reference.RowIndex - 1, reference.ColumnIndex - 1);
+        var vmlStyleText = $"<xml xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:x=\"urn:schemas-microsoft-com:office:excel\"><o:shapelayout v:ext=\"edit\"><o:idmap v:ext=\"edit\" data=\"1\"/></o:shapelayout><v:shapetype id=\"_x0000_t202\" coordsize=\"21600,21600\" o:spt=\"202\" path=\"m,l,21600r21600,l21600,xe\"><v:stroke joinstyle=\"miter\"/><v:path gradientshapeok=\"t\" o:connecttype=\"rect\"/></v:shapetype>{shapes}</xml>";
+
+        var vmlDrawingPart = worksheetPart.GetPartsOfType<VmlDrawingPart>().FirstOrDefault() ?? worksheetPart.AddNewPart<VmlDrawingPart>();
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(vmlStyleText));
+        vmlDrawingPart.FeedData(stream);
+        worksheetPart.Worksheet.AppendChild(new LegacyDrawing() { Id = worksheetPart.GetIdOfPart(vmlDrawingPart) });
+        workbookPart.Workbook.Save();
     }
     #endregion
 }
