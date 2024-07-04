@@ -45,12 +45,12 @@ public class CellStyle
     /// <summary>
     /// 边框格式
     /// </summary>
-    public BorderStyleValues BorderStyle { get; set; } = BorderStyleValues.None;
+    public BorderStyleValues BorderStyle { get; set; } = BorderStyleValues.Thin;
 
     /// <summary>
-    /// 边框颜色,默认为#000000
+    /// 边框颜色,默认为#DDD
     /// </summary>
-    public string BorderColor { get; set; } = "#000000";
+    public string BorderColor { get; set; } = "#DDD";
 
     /// <summary>
     /// 是否斜体

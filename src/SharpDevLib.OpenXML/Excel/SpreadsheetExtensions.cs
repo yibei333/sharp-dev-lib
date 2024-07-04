@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using System.Xml;
 
 namespace SharpDevLib.OpenXML;
 
@@ -20,7 +21,12 @@ public static class SpreadsheetExtensions
     {
         if (element is null) return null;
 
-        if (element is OpenXmlElement xmlElement)
+        if (element is OpenXmlPartRootElement xmlElementRoot)
+        {
+            if (xmlElementRoot.OpenXmlPart is TParent parent) return parent;
+            return xmlElementRoot.OpenXmlPart.GetParent<TParent>();
+        }
+        else if (element is OpenXmlElement xmlElement)
         {
             if (xmlElement.Parent is TParent parent) return parent;
             return xmlElement.Parent.GetParent<TParent>();
@@ -137,51 +143,143 @@ public static class SpreadsheetExtensions
     }
 
     /// <summary>
-    /// 根据单元格内容长度设置列宽
+    /// 插入空白列
     /// </summary>
-    /// <param name="worksheetPart">工作表格配件</param>
-    public static void AutoColumnWidth(this WorksheetPart worksheetPart)
+    /// <param name="worksheet">工作表格</param>
+    /// <param name="columnName">列明,如A,B,C</param>
+    /// <param name="insertColumnCells">是否要插入单元格</param>
+    public static void InsertColumn(this Worksheet worksheet, string columnName, bool insertColumnCells)
     {
-        var workbookPart = worksheetPart.GetParent<WorkbookPart>() ?? throw new Exception($"unable to find WorkbookPart");
-        var worksheet = worksheetPart.Worksheet;
-
-        //analysis word length
-        var columnWordLength = new List<ColumnWordLength>();
-        foreach (Cell cell in worksheet.Descendants<Cell>())
+        var cellReference = new CellReference(columnName + 1);
+        var sheetData = worksheet.Elements<SheetData>().FirstOrDefault();
+        if (sheetData is null)
         {
-            var cellReference = new CellReference(cell.CellReference);
-            var wordLength = columnWordLength.FirstOrDefault(x => x.ColumnName == cellReference.ColumnName);
-            if (wordLength is null)
+            sheetData = new SheetData();
+            worksheet.AppendChild(sheetData);
+        }
+
+        //column
+        var columns = worksheet.Elements<Columns>().FirstOrDefault();
+        if (columns is null)
+        {
+            columns = new Columns();
+            worksheet.InsertBefore(columns, sheetData);
+        }
+
+        var columnCollection = columns.Elements<Column>().Where(x => x.Max is not null && x.Max >= cellReference.ColumnIndex).ToList();
+        foreach (var item in columnCollection)
+        {
+            if (item.Min is null || item.Max is null) continue;
+
+            if (item.Min >= cellReference.ColumnIndex)
             {
-                wordLength = new ColumnWordLength(cellReference.ColumnIndex, cellReference.ColumnName);
-                columnWordLength.Add(wordLength);
+                item.Min += 1;
+                item.Max += 1;
             }
-            wordLength.Length = Math.Max(wordLength.Length, cell.GetValue(workbookPart)?.Length ?? 0);
+            else if (item.Max == cellReference.ColumnIndex)
+            {
+                item.Max -= 1;
+            }
+            else
+            {
+                columns.AppendChild(new Column
+                {
+                    Min = cellReference.ColumnIndex + 1,
+                    Max = item.Max,
+                    BestFit = item.BestFit,
+                    CustomWidth = item.CustomWidth,
+                    Width = item.Width,
+                    Collapsed = item.Collapsed,
+                    Style = item.Style,
+                });
+                item.Max = cellReference.ColumnIndex - 1;
+            }
         }
-        columnWordLength = columnWordLength.OrderBy(x => x.ColumnIndex).ToList();
-
-        var columnIndex = 0;
-        foreach (var column in worksheet.Descendants<Column>())
+        columns.AppendChild(new Column
         {
-            column.Width = columnWordLength.FirstOrDefault(x => x.ColumnIndex == columnIndex)?.Length ?? 10;
-            column.CustomWidth = true;
-            columnIndex++;
+            Min = cellReference.ColumnIndex,
+            Max = cellReference.ColumnIndex,
+            Width = 10,
+            CustomWidth = false,
+            BestFit = true
+        });
+
+
+        //after cells
+        var afterCells = worksheet.GetCells(x => new CellReference(x.CellReference).ColumnIndex >= cellReference.ColumnIndex);
+        foreach (var item in afterCells)
+        {
+            var currentReference = new CellReference(item.CellReference);
+            var newReference = new CellReference(currentReference.RowIndex, currentReference.ColumnIndex + 1);
+            item.CellReference = newReference.Reference;
         }
 
-        worksheet.Save();
+        //new cells
+        if (insertColumnCells)
+        {
+            foreach (var item in worksheet.Descendants<Row>().Where(x => x.RowIndex is not null))
+            {
+                var cell = new Cell
+                {
+                    CellReference = new CellReference(item.RowIndex!, cellReference.ColumnIndex).Reference,
+                };
+                var afterCell = item.Elements<Cell>().FirstOrDefault(x => new CellReference(x.CellReference).ColumnIndex > cellReference.ColumnIndex);
+
+                if (afterCell is not null) item.InsertBefore(cell, afterCell);
+                else item.AppendChild(cell);
+            }
+        }
     }
 
-    class ColumnWordLength
+    /// <summary>
+    /// 删除行
+    /// </summary>
+    /// <param name="worksheet">工作表格</param>
+    /// <param name="columnName">列明,如A,B,C</param>
+    public static void DeleteColumn(this Worksheet worksheet, string columnName)
     {
-        public ColumnWordLength(uint columnIndex, string columnName)
+        var cellReference = new CellReference(columnName + 1);
+        var sheetData = worksheet.Elements<SheetData>().FirstOrDefault();
+        if (sheetData is null)
         {
-            ColumnIndex = columnIndex;
-            ColumnName = columnName;
+            sheetData = new SheetData();
+            worksheet.AppendChild(sheetData);
         }
 
-        public uint ColumnIndex { get; set; }
-        public string ColumnName { get; set; }
-        public int Length { get; set; }
+        //column
+        var columns = worksheet.Elements<Columns>().FirstOrDefault();
+        if (columns is not null)
+        {
+            var columnCollection = columns.Elements<Column>().Where(x => x.Max is not null && x.Max >= cellReference.ColumnIndex).ToList();
+            foreach (var item in columnCollection)
+            {
+                if (item.Min is null || item.Max is null) continue;
+                if (item.Min > cellReference.ColumnIndex)
+                {
+                    item.Min -= 1;
+                    item.Max -= 1;
+                }
+                else
+                {
+                    item.Max -= 1;
+                }
+            }
+        }
+
+        //current cells
+        foreach (var item in worksheet.Descendants<Cell>().Where(x => new CellReference(x.CellReference).ColumnIndex == cellReference.ColumnIndex))
+        {
+            item.Remove();
+        }
+
+        //after cells
+        var afterCells = worksheet.GetCells(x => new CellReference(x.CellReference).ColumnIndex > cellReference.ColumnIndex);
+        foreach (var item in afterCells)
+        {
+            var currentReference = new CellReference(item.CellReference);
+            var newReference = new CellReference(currentReference.RowIndex, currentReference.ColumnIndex - 1);
+            item.CellReference = newReference.Reference;
+        }
     }
     #endregion
 
@@ -242,10 +340,105 @@ public static class SpreadsheetExtensions
         }
     }
 
-    //todo
-    static void Merge()
+    /// <summary>
+    /// 合并表格
+    /// </summary>
+    /// <param name="worksheet">工作表格</param>
+    /// <param name="cellReference1">第一个单元格</param>
+    /// <param name="cellReference2">第二个单元格</param>
+    /// <returns>合并单元格</returns>
+    public static MergeCell MergeCells(this Worksheet worksheet, string cellReference1, string cellReference2)
     {
+        CreateCellIfNotExist(worksheet, cellReference1);
+        CreateCellIfNotExist(worksheet, cellReference2);
 
+        MergeCells mergeCells;
+        if (worksheet.Elements<MergeCells>().Count() > 0)
+        {
+            mergeCells = worksheet.Elements<MergeCells>().First();
+        }
+        else
+        {
+            mergeCells = new MergeCells();
+
+            // Insert a MergeCells object into the specified position.
+            if (worksheet.Elements<CustomSheetView>().Count() > 0)
+            {
+                worksheet.InsertAfter(mergeCells, worksheet.Elements<CustomSheetView>().First());
+            }
+            else if (worksheet.Elements<DataConsolidate>().Count() > 0)
+            {
+                worksheet.InsertAfter(mergeCells, worksheet.Elements<DataConsolidate>().First());
+            }
+            else if (worksheet.Elements<SortState>().Count() > 0)
+            {
+                worksheet.InsertAfter(mergeCells, worksheet.Elements<SortState>().First());
+            }
+            else if (worksheet.Elements<AutoFilter>().Count() > 0)
+            {
+                worksheet.InsertAfter(mergeCells, worksheet.Elements<AutoFilter>().First());
+            }
+            else if (worksheet.Elements<Scenarios>().Count() > 0)
+            {
+                worksheet.InsertAfter(mergeCells, worksheet.Elements<Scenarios>().First());
+            }
+            else if (worksheet.Elements<ProtectedRanges>().Count() > 0)
+            {
+                worksheet.InsertAfter(mergeCells, worksheet.Elements<ProtectedRanges>().First());
+            }
+            else if (worksheet.Elements<SheetProtection>().Count() > 0)
+            {
+                worksheet.InsertAfter(mergeCells, worksheet.Elements<SheetProtection>().First());
+            }
+            else if (worksheet.Elements<SheetCalculationProperties>().Count() > 0)
+            {
+                worksheet.InsertAfter(mergeCells, worksheet.Elements<SheetCalculationProperties>().First());
+            }
+            else
+            {
+                worksheet.InsertAfter(mergeCells, worksheet.Elements<SheetData>().First());
+            }
+        }
+
+        // Create the merged cell and append it to the MergeCells collection.
+        var mergeCell = new MergeCell() { Reference = $"{cellReference1}:{cellReference2}".ToUpper() };
+        mergeCells.AppendChild(mergeCell);
+
+        worksheet.Save();
+        return mergeCell;
+    }
+
+    /// <summary>
+    /// 如果单元格不存在则创建
+    /// </summary>
+    /// <param name="worksheet">工作表格</param>
+    /// <param name="cellReference">单元格地址</param>
+    /// <returns>单元格</returns>
+    public static Cell CreateCellIfNotExist(this Worksheet worksheet, string cellReference)
+    {
+        var reference = new CellReference(cellReference);
+
+        //cells
+        var row = worksheet.Descendants<Row>().FirstOrDefault(r => r.RowIndex?.Value == reference.RowIndex);
+        if (row is null)
+        {
+            row = new Row() { RowIndex = reference.RowIndex };
+            worksheet.Descendants<SheetData>().First().Append(row);
+            worksheet.Save();
+        }
+
+        var cell = row.Elements<Cell>().FirstOrDefault(c => c.CellReference?.Value == reference.Reference);
+        if (cell is null)
+        {
+            cell = new Cell() { CellReference = reference.Reference };
+
+            var afterCell = row.Elements<Cell>().FirstOrDefault(c => new CellReference(c.CellReference).ColumnIndex > reference.ColumnIndex);
+            if (afterCell is not null) row.InsertBefore(cell, afterCell);
+            else row.AppendChild(cell);
+            worksheet.Save();
+        }
+
+        return cell;
     }
 
     static bool IsNumericDatatype(this Type type)
@@ -267,6 +460,74 @@ public static class SpreadsheetExtensions
     {
         doc.WorkbookPart?.GetPartsOfType<WorksheetPart>().ToList().ForEach(x => x.AutoColumnWidth());
         doc.Save();
+    }
+
+    /// <summary>
+    /// 根据单元格内容长度设置列宽
+    /// </summary>
+    /// <param name="worksheetPart">工作表格配件</param>
+    public static void AutoColumnWidth(this WorksheetPart worksheetPart)
+    {
+        var workbookPart = worksheetPart.GetParent<WorkbookPart>() ?? throw new Exception($"unable to find WorkbookPart");
+        var worksheet = worksheetPart.Worksheet;
+
+        //analysis word length
+        var columnWordLength = new List<ColumnWordLength>();
+        foreach (Cell cell in worksheet.Descendants<Cell>())
+        {
+            var cellReference = new CellReference(cell.CellReference);
+            var wordLength = columnWordLength.FirstOrDefault(x => x.ColumnName == cellReference.ColumnName);
+            if (wordLength is null)
+            {
+                wordLength = new ColumnWordLength(cellReference.ColumnIndex, cellReference.ColumnName);
+                columnWordLength.Add(wordLength);
+            }
+            if (cellReference.ColumnName == "C")
+            {
+
+            }
+            wordLength.Length = Math.Max(wordLength.Length, cell.GetValue(workbookPart)?.Length ?? 0);
+        }
+        columnWordLength = columnWordLength.OrderBy(x => x.ColumnIndex).ToList();
+
+        var columns = worksheet.Elements<Columns>().FirstOrDefault();
+        if (columns is null)
+        {
+            columns = new Columns();
+            worksheet.InsertBefore(columns, worksheet.Elements<SheetData>().FirstOrDefault());
+            worksheet.Save();
+        }
+        var oldColumns = worksheet.Descendants<Column>().ToList();
+        columnWordLength.ForEach(x =>
+        {
+            var old = oldColumns.FirstOrDefault(y => y.Min is not null && y.Max is not null && y.Min <= x.ColumnIndex && y.Max >= x.ColumnIndex);
+            var column = new Column
+            {
+                Min = x.ColumnIndex,
+                Max = x.ColumnIndex,
+                CustomWidth = true,
+                BestFit = false,
+                Width = x.Length + 2,
+                Collapsed = old?.Collapsed//copy some value
+            };
+            columns.AppendChild(column);
+        });
+
+        oldColumns.ForEach(x => x.Remove());
+        worksheet.Save();
+    }
+
+    class ColumnWordLength
+    {
+        public ColumnWordLength(uint columnIndex, string columnName)
+        {
+            ColumnIndex = columnIndex;
+            ColumnName = columnName;
+        }
+
+        public uint ColumnIndex { get; set; }
+        public string ColumnName { get; set; }
+        public int Length { get; set; }
     }
 
     /// <summary>
@@ -356,17 +617,63 @@ public static class SpreadsheetExtensions
         return (uint)(workbookStylesPart.Stylesheet.CellFormats.ToList().IndexOf(cellFormat));
     }
 
+    /// <summary>
+    /// 合并单元格样式
+    /// </summary>
+    /// <param name="mergeCell">合并单元格</param>
+    /// <param name="style">样式</param>
+    public static void UseStyle(this MergeCell mergeCell, CellStyle style)
+    {
+        var workbookPart = mergeCell.GetParent<WorkbookPart>() ?? throw new Exception("unable to find WorkbookPart");
+        var cells = mergeCell.GetCells();
+        var styleId = workbookPart.CreateStyle(style);
+        cells.ForEach(x => x.StyleIndex = styleId);
+    }
+
+    /// <summary>
+    /// 获取合并单元格中的所有单元格
+    /// </summary>
+    /// <param name="mergeCell">合并单元格</param>
+    public static List<Cell> GetCells(this MergeCell mergeCell)
+    {
+        var worksheet = mergeCell.GetParent<Worksheet>() ?? throw new Exception("unable to find Worksheet");
+        var references = mergeCell.Reference!.Value!.Split(':');
+        var refernece1 = new CellReference(references[0]);
+        var refernece2 = new CellReference(references[1]);
+        var cells = new List<Cell>();
+
+        for (uint rowIndex = Math.Min(refernece1.RowIndex, refernece2.RowIndex); rowIndex <= Math.Max(refernece1.RowIndex, refernece2.RowIndex); rowIndex++)
+        {
+            var row = worksheet.Descendants<Row>().FirstOrDefault(x => x.RowIndex is not null && x.RowIndex == rowIndex);
+            if (row is null)
+            {
+                row = new Row { RowIndex = rowIndex };
+                worksheet.AppendChild(row);
+            }
+
+            for (uint columnIndex = Math.Min(refernece1.ColumnIndex, refernece2.ColumnIndex); columnIndex <= Math.Max(refernece1.ColumnIndex, refernece2.ColumnIndex); columnIndex++)
+            {
+                var cellReference = new CellReference(rowIndex, columnIndex);
+                var cell = worksheet.CreateCellIfNotExist(cellReference.Reference);
+                cells.Add(cell);
+            }
+        }
+        worksheet.Save();
+        return cells;
+    }
+
     static HexBinaryValue? WrapColor(string? color)
     {
         if (color.IsNullOrWhiteSpace()) return null;
-        color = color.TrimStart('#');
-        if (color!.Length == 6) return HexBinaryValue.FromString($"FF{color}");
-        if (color.Length == 8)
+        color = color.TrimStart('#').ToUpper();
+        if (color.Length == 3) return HexBinaryValue.FromString($"FF{string.Join("", color.Select(x => $"{x}{x}"))}");
+        if (color.Length == 6) return HexBinaryValue.FromString($"FF{color}");
+        else if (color.Length == 8)
         {
             if (color.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) return HexBinaryValue.FromString($"00{color.Substring(2)}");
             return HexBinaryValue.FromString(color);
         }
-        throw new Exception($"invalid color('{color}') length:{color.Length}");
+        else return HexBinaryValue.FromString(color);
     }
     #endregion
 }

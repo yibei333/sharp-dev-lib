@@ -148,7 +148,7 @@ public static class Excel
         //header
         var headerRow = new Row { RowIndex = 1 };
         sheetData.AppendChild(headerRow);
-        uint headerColumnIndex = 0;
+        uint headerColumnIndex = 1;
 
         foreach (DataColumn item in table.Columns)
         {
@@ -167,7 +167,7 @@ public static class Excel
         {
             var contentRow = new Row { RowIndex = rowIndex };
             sheetData.AppendChild(contentRow);
-            uint contentColumnIndex = 0;
+            uint contentColumnIndex = 1;
 
             foreach (DataColumn item in table.Columns)
             {

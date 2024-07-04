@@ -18,16 +18,16 @@ public class CellReference
     public CellReference(uint rowIndex, string columnName)
     {
         RowIndex = rowIndex;
-        ColumnName = columnName;
-        ColumnIndex = GetColumnIndex(columnName);
-        Reference = columnName + rowIndex;
+        ColumnName = columnName.ToUpper();
+        ColumnIndex = GetColumnIndex(ColumnName);
+        Reference = ColumnName + rowIndex;
     }
 
     /// <summary>
     /// 实例化单元格引用
     /// </summary>
     /// <param name="rowIndex">行号,以1开始</param>
-    /// <param name="columnIndex">列号,以0开始</param>
+    /// <param name="columnIndex">列号,以1开始</param>
     public CellReference(uint rowIndex, uint columnIndex)
     {
         RowIndex = rowIndex;
@@ -35,9 +35,9 @@ public class CellReference
 
         var prefixCount = columnIndex / 26;
         if (prefixCount >= 26) throw new NotSupportedException($"max cellreference is ZZ");
-        var prefix = prefixCount > 0 ? ((char)(prefixCount + 65)).ToString() : "";
+        var prefix = prefixCount > 0 ? ((char)(prefixCount + 65 - 1)).ToString() : "";
         var nameCount = columnIndex % 26;
-        var name = ((char)(nameCount + 65)).ToString();
+        var name = ((char)(nameCount + 65 - 1)).ToString();
         ColumnName = prefix + name;
         Reference = ColumnName + rowIndex;
     }
@@ -49,20 +49,20 @@ public class CellReference
     public CellReference(string? reference)
     {
         if (reference.IsNullOrWhiteSpace()) throw new ArgumentException("reference could not be null or whitespace");
-        Reference = reference;
+        Reference = reference.ToUpper();
 
-        var match = Regex.Match(reference, _columnExpression);
-        if (!match.Success) throw new Exception($"{reference} is not a valid CellReference");
+        var match = Regex.Match(Reference, _columnExpression);
+        if (!match.Success) throw new Exception($"{Reference} is not a valid CellReference");
         ColumnName = match.Value;
         ColumnIndex = GetColumnIndex(ColumnName);
-        RowIndex = uint.Parse(Regex.Match(reference, _rowExpression).Value);
+        RowIndex = uint.Parse(Regex.Match(Reference, _rowExpression).Value);
     }
 
     uint GetColumnIndex(string columnName)
     {
         if (columnName.Length > 2) throw new NotSupportedException($"max cellreference is ZZ");
-        if (columnName.Length == 2) return (uint)((columnName[0] - 65 + 1) * 26 + columnName[1] - 65);
-        else return (uint)(columnName[0] - 65);
+        if (columnName.Length == 2) return (uint)((columnName[0] - 65 + 1) * 26 + columnName[1] - 65) + 1;
+        else return (uint)(columnName[0] - 65) + 1;
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public class CellReference
     public uint RowIndex { get; }
 
     /// <summary>
-    /// 列号,以0开始
+    /// 列号,以1开始
     /// </summary>
     public uint ColumnIndex { get; }
 

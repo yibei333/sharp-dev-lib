@@ -38,7 +38,7 @@ public class ExcelTests
     static readonly List<Foo> TestData2 =
     [
         new (){ StringValue="A11 Value",IntValue=1,DoubleValue=1.1d,DecimalValue=1.2m,BoolValue=true,EnumValue=Gender.Male },
-        new (){ StringValue="A12 Value",IntValue=null,DoubleValue=null,DecimalValue=null,BoolValue=false,EnumValue=Gender.Female },
+        new (){ StringValue="A12 Value",IntValue=null,DoubleValue=null,DecimalValue=null,BoolValue=false,EnumValue=Gender.SomeVeryLongLongLongLongLongLongValue },
         new (){ StringValue="A13 Value",IntValue=3,DoubleValue=3.1d,DecimalValue=3.2m,BoolValue=null },
         new (){ StringValue=null,IntValue=4,DoubleValue=4.1,DecimalValue=4.2m,BoolValue=true },
     ];
@@ -224,6 +224,52 @@ public class ExcelTests
     }
 
     [TestMethod]
+    public void InsertColumnTest()
+    {
+        var sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Normal.xlsx");
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/Normal_InsertColumn.xlsx");
+        using var sourceStream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        sourceStream.CopyTo(targetStream);
+        targetStream.Flush();
+
+        using var doc = SpreadsheetDocument.Open(targetStream, true);
+        doc.WorkbookPart?.GetWorksheet("T2").InsertColumn("C", true);
+        var cell = doc.WorkbookPart?.GetWorksheet("T2").GetCells(x => x.CellReference == "C2").FirstOrDefault();
+        Assert.IsNotNull(cell);
+        cell.DataType = CellValues.Number;
+        cell.CellValue = new CellValue(100);
+        doc.Save();
+        targetStream.Flush();
+
+        Assert.IsTrue(File.Exists(targetPath));
+        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+    }
+
+    [TestMethod]
+    public void DeleteColumnTest()
+    {
+        var sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Normal.xlsx");
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/Normal_DeleteColumn.xlsx");
+        using var sourceStream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        sourceStream.CopyTo(targetStream);
+        targetStream.Flush();
+
+        using var doc = SpreadsheetDocument.Open(targetStream, true);
+        doc.WorkbookPart?.GetWorksheet("T2").DeleteColumn("C");
+        var cell = doc.WorkbookPart?.GetWorksheet("T2").GetCells(x => x.CellReference == "C2").FirstOrDefault();
+        Assert.IsNotNull(cell);
+        cell.DataType = CellValues.Number;
+        cell.CellValue = new CellValue(100);
+        doc.Save();
+        targetStream.Flush();
+
+        Assert.IsTrue(File.Exists(targetPath));
+        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+    }
+
+    [TestMethod]
     public void UpdateCellValueTest()
     {
         var sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Normal.xlsx");
@@ -285,6 +331,28 @@ public class ExcelTests
         });
         var cell = doc.WorkbookPart?.GetWorksheet("T2").GetCells(x => x.CellReference == "A3").FirstOrDefault();
         cell!.StyleIndex = styleIndex;
+
+        doc.Save();
+        targetStream.Flush();
+
+        Assert.IsTrue(File.Exists(targetPath));
+        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+    }
+
+    [TestMethod]
+    public void MergeCellsTest()
+    {
+        var sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Normal.xlsx");
+        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/Normal_MergeCells.xlsx");
+        using var sourceStream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        sourceStream.CopyTo(targetStream);
+        targetStream.Flush();
+
+        using var doc = SpreadsheetDocument.Open(targetStream, true);
+        var mergeCell = doc.WorkbookPart?.GetWorksheet("T2").MergeCells("h1", "C3");
+        Assert.IsNotNull(mergeCell);
+        mergeCell.UseStyle(new SharpDevLib.OpenXML.CellStyle { HorizontalAlignment = HorizontalAlignmentValues.Center, VerticalAlignment = VerticalAlignmentValues.Center, BackgroundColor = "#bcd" });
 
         doc.Save();
         targetStream.Flush();
