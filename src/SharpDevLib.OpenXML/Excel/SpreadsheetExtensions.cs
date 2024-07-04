@@ -482,11 +482,12 @@ public static class SpreadsheetExtensions
                 wordLength = new ColumnWordLength(cellReference.ColumnIndex, cellReference.ColumnName);
                 columnWordLength.Add(wordLength);
             }
-            if (cellReference.ColumnName == "C")
+            var cellValue = cell.GetValue(workbookPart);
+            if (double.TryParse(cellValue, out var doubleValue))
             {
-
+                if ((cellValue?.Split('.')?.LastOrDefault()?.Length ?? 0) > 10) cellValue = doubleValue.ToString("0.0000");//float number
             }
-            wordLength.Length = Math.Max(wordLength.Length, cell.GetValue(workbookPart)?.Length ?? 0);
+            wordLength.Length = Math.Max(wordLength.Length, cellValue?.Length ?? 0);
         }
         columnWordLength = columnWordLength.OrderBy(x => x.ColumnIndex).ToList();
 
