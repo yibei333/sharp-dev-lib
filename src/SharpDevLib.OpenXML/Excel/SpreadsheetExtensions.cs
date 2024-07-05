@@ -748,4 +748,40 @@ public static class SpreadsheetExtensions
         workbookPart.Workbook.Save();
     }
     #endregion
+
+    #region Image
+    /// <summary>
+    /// 添加背景
+    /// </summary>
+    /// <param name="worksheetPart">工作表格部件</param>
+    /// <param name="background">背景图文件流</param>
+    /// <param name="contentType">content type</param>
+    public static void AddBackground(this WorksheetPart worksheetPart, Stream background, string contentType = "image/png")
+    {
+        var imagePart = worksheetPart.ImageParts.FirstOrDefault();
+        imagePart ??= worksheetPart.AddNewPart<ImagePart>(contentType);
+        var imageId = worksheetPart.GetIdOfPart(imagePart);
+        imagePart.FeedData(background);
+        var picture = new Picture { Id = imageId };
+        worksheetPart.Worksheet.Append(picture);
+        worksheetPart.Worksheet.Save();
+    }
+
+    /// <summary>
+    /// 删除背景
+    /// </summary>
+    /// <param name="worksheetPart">工作表格部件</param>
+    public static void RemoveBackground(this WorksheetPart worksheetPart)
+    {
+        worksheetPart.ImageParts.ToList().ForEach(x =>
+        {
+            worksheetPart.DeletePart(x);
+        });
+        worksheetPart.Worksheet.Elements<Picture>().ToList().ForEach(x =>
+        {
+            x.Remove();
+        });
+        worksheetPart.Worksheet.Save();
+    }
+    #endregion
 }

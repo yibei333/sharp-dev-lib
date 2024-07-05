@@ -50,10 +50,10 @@ public class ExcelTests
         return new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
     }
 
-    static FileStream GetTargetStream(string name, out string targetPath)
+    static FileStream GetTargetStream(string name, out string targetPath, bool remove = true)
     {
         targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{name}.xlsx");
-        targetPath.RemoveFileIfExist();
+        if (remove) targetPath.RemoveFileIfExist();
         return new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
     }
 
@@ -63,6 +63,7 @@ public class ExcelTests
         targetPath.RemoveFileIfExist();
 
         var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        if (sourceStream.CanSeek) sourceStream.Seek(0, SeekOrigin.Begin);
         sourceStream.CopyTo(targetStream);
         targetStream.Flush();
         return targetStream;
@@ -332,7 +333,7 @@ public class ExcelTests
         using var targetStream = CopySourceStream(sourceStream, "MergeCells", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
-        var mergeCell = doc.WorkbookPart?.GetWorksheet("T2").MergeCells("h8","d3");
+        var mergeCell = doc.WorkbookPart?.GetWorksheet("T2").MergeCells("h8", "d3");
         Assert.IsNotNull(mergeCell);
         mergeCell.UseStyle(new SharpDevLib.OpenXML.CellStyle { HorizontalAlignment = HorizontalAlignmentValues.Center, VerticalAlignment = VerticalAlignmentValues.Center, BackgroundColor = "#bcd" });
 
@@ -359,5 +360,28 @@ public class ExcelTests
 
         Assert.IsTrue(File.Exists(targetPath));
         Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+    }
+
+    [TestMethod]
+    public void BackgroundTest()
+    {
+        using var imageStream = new FileStream(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/water-remark.png"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var sourceStream = GetSourceStream("Normal", out _);
+        using var targetStream = CopySourceStream(sourceStream, "AddBackground", out var path);
+        using var doc = SpreadsheetDocument.Open(targetStream, true);
+        var worksheetPart = doc.WorkbookPart!.WorksheetParts.First();
+        worksheetPart.AddBackground(imageStream);
+        targetStream.Flush();
+        Assert.IsTrue(File.Exists(path));
+        Assert.IsTrue(new FileInfo(path).Length > 0);
+
+        using var removeBackgorundStream = CopySourceStream(targetStream, "RemoveBackground", out var removePath);
+        using var removeDoc = SpreadsheetDocument.Open(removeBackgorundStream, true);
+        var removeWorksheetPart = removeDoc.WorkbookPart!.WorksheetParts.First();
+        removeWorksheetPart.RemoveBackground();
+        removeBackgorundStream.Flush();
+
+        Assert.IsTrue(File.Exists(removePath));
+        Assert.IsTrue(new FileInfo(removePath).Length > 0);
     }
 }

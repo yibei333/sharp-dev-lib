@@ -1,23 +1,42 @@
 https://mermaid.live/
 
 flowchart TD
-    SpreedsheetDocument --> WorkbookPart
+    SpreadsheetDocument --> WorkbookPart
     WorkbookPart --> Workbook(Workbook)
     WorkbookPart --> WorkbookStylePart
     WorkbookStylePart --> Stylesheet
     Stylesheet --> Fonts
+    Fonts --> Font
     Stylesheet --> Fills
+    Fills --> Fill
     Stylesheet --> Borders
+    Borders --> Border
     Stylesheet --> CellFormats
+    CellFormats --> CellFormat(CellFormat \n索引为单元格的StyleIndex)
     WorkbookPart --> SharedStringTablePart
     SharedStringTablePart --> SharedStringTable
+    SharedStringTable --> SharedStringItem
     Workbook --> Sheets
     Sheets --> Sheet[Sheet \n多个,和WorksheetPart通过rid关联]
     WorkbookPart --> WorksheetPart[WorksheetPart 多个]
     WorksheetPart --> Worksheet
     Worksheet --> Columns
+    Columns --> Column
     Worksheet --> SheetData
     SheetData --> Row
     Row --> Cell
     Cell --> CellValue
+    Worksheet --> MergeCells
+    MergeCells --> MergeCell
+    Worksheet --> Picture[Picture \n Id为对应的ImagePart]
+    WorksheetPart --> ImagePart
+    WorksheetPart --> WorksheetCommentsPart
+    WorksheetCommentsPart --> Comments
+    Comments --> Authors
+    Authors --> Author
+    Comments --> CommentList
+    CommentList --> Comment
+    WorksheetPart --> VmlDrawingPart
+    VmlDrawingPart --> LegacyDrawing
+
     

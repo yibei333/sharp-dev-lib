@@ -7,8 +7,8 @@ namespace SharpDevLib.Tests.Standard.Extensions;
 [TestClass]
 public class EnumExtensionTests
 {
-    const string _json = "[{\"Key\":\"Male\",\"Value\":1},{\"Key\":\"Female\",\"Value\":2},{\"Key\":\"Other\",\"Value\":3}]";
-    const string _dicJson = "{\"Male\":1,\"Female\":2,\"Other\":3}";
+    const string _json = "[{\"Key\":\"Male\",\"Value\":1},{\"Key\":\"Female\",\"Value\":2},{\"Key\":\"Other\",\"Value\":3},{\"Key\":\"SomeVeryLongLongLongLongLongLongValue\",\"Value\":4}]";
+    const string _dicJson = "{\"Male\":1,\"Female\":2,\"Other\":3,\"SomeVeryLongLongLongLongLongLongValue\":4}";
 
     [TestMethod]
     [DataRow(1, Gender.Male)]
@@ -20,7 +20,7 @@ public class EnumExtensionTests
 
     [TestMethod]
     [DataRow(0)]
-    [DataRow(4)]
+    [DataRow(5)]
     [ExpectedException(typeof(ArgumentException))]
     public void IntToEnumExceptionTest(int intValue)
     {
