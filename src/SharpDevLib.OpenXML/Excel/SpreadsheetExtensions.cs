@@ -153,7 +153,7 @@ public static class SpreadsheetExtensions
         }
 
         var newRow = new Row { RowIndex = rowIndex };
-        worksheet.Elements<SheetData>().FirstOrDefault()?.InsertBefore(newRow, belowRows.FirstOrDefault());
+        worksheet.Elements<SheetData>().First().AppendRow(newRow);
         return newRow;
     }
 
@@ -238,10 +238,7 @@ public static class SpreadsheetExtensions
                 {
                     CellReference = new CellReference(item.RowIndex!, cellReference.ColumnIndex).Reference,
                 };
-                var afterCell = item.Elements<Cell>().FirstOrDefault(x => new CellReference(x.CellReference).ColumnIndex > cellReference.ColumnIndex);
-
-                if (afterCell is not null) item.InsertBefore(cell, afterCell);
-                else item.AppendChild(cell);
+                item.AppendCell(cell);
             }
         }
     }
@@ -356,7 +353,7 @@ public static class SpreadsheetExtensions
     }
 
     /// <summary>
-    /// 合并表格
+    /// 合并单元格,只保存左上角的单元格(如果值为空,则根据RowIndex,ColumnIndex排序找到一个有值的单元格赋值),其余单元格删除
     /// </summary>
     /// <param name="worksheet">工作表格</param>
     /// <param name="cellReference1">第一个单元格</param>
