@@ -44,19 +44,27 @@ public class ExcelTests
     ];
     static readonly string TestJson2 = TestData2.Serialize();
 
-    FileStream GetFileStream(string source, string? target, out string sourcePath, out string targetPath)
+    static FileStream GetSourceStream(string source, out string sourcePath)
     {
         sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/OpenXML/{source}.xlsx");
-        targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{source}_{target}.xlsx");
-        targetPath.RemoveFileIfExist();
-        var sourceStream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        return new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+    }
 
-        if (target.IsNullOrWhiteSpace()) return sourceStream;
+    static FileStream GetTargetStream(string name, out string targetPath)
+    {
+        targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{name}.xlsx");
+        targetPath.RemoveFileIfExist();
+        return new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+    }
+
+    static FileStream CopySourceStream(FileStream sourceStream, string name, out string targetPath)
+    {
+        targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{name}.xlsx");
+        targetPath.RemoveFileIfExist();
 
         var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
         sourceStream.CopyTo(targetStream);
         targetStream.Flush();
-        sourceStream.Dispose();
         return targetStream;
     }
     #endregion
@@ -64,7 +72,7 @@ public class ExcelTests
     [TestMethod]
     public void ReadTest()
     {
-        using var stream = GetFileStream("Normal", null, out _, out _);
+        using var stream = GetSourceStream("Normal", out _);
 
         var set = Excel.Read(stream);
         Assert.AreEqual(2, set.Tables.Count);
@@ -86,8 +94,7 @@ public class ExcelTests
     [TestMethod]
     public void WriteSetTest()
     {
-        var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/WriteSet.xlsx");
-        using var stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var stream = GetTargetStream("WriteSet", out var path);
 
         var writeSet = new DataSet();
         var writeTable1 = TestData1.ToDataTable();
@@ -119,8 +126,7 @@ public class ExcelTests
     [TestMethod]
     public void WriteTableTest()
     {
-        var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/WriteTable.xlsx");
-        using var stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var stream = GetTargetStream("WriteTable", out _);
 
         var writeTable1 = TestData1.ToDataTable();
         Excel.Write(writeTable1, stream);
@@ -138,7 +144,8 @@ public class ExcelTests
     [TestMethod]
     public void AutoColumnWidthTest()
     {
-        using var targetStream = GetFileStream("Normal", "AutoWidth", out _, out var targetPath);
+        using var sourceStream = GetSourceStream("Normal", out _);
+        using var targetStream = CopySourceStream(sourceStream, "AutoWidth", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
         doc.AutoColumnWidth();
@@ -152,10 +159,8 @@ public class ExcelTests
     [TestMethod]
     public void EncryptTest()
     {
-        var sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Normal.xlsx");
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/Encrypt.xlsx");
-        using var sourceStream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-        using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var sourceStream = GetSourceStream("Normal", out _);
+        using var targetStream = GetTargetStream("Encrypt", out var targetPath);
 
         Excel.Encrypt(sourceStream, targetStream, "foo");
         Assert.IsTrue(File.Exists(targetPath));
@@ -165,10 +170,8 @@ public class ExcelTests
     [TestMethod]
     public void DecryptTest()
     {
-        var sourcePath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/OpenXML/Encrypted.xlsx");
-        var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/Decrypt.xlsx");
-        using var sourceStream = new FileStream(sourcePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-        using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var sourceStream = GetSourceStream("Encrypted", out _);
+        using var targetStream = GetTargetStream("Decrypt", out var targetPath);
 
         Excel.Decrypt(sourceStream, targetStream, "foo");
         Assert.IsTrue(File.Exists(targetPath));
@@ -178,7 +181,8 @@ public class ExcelTests
     [TestMethod]
     public void DeleteRowTest()
     {
-        using var targetStream = GetFileStream("Normal", "DeleteRow", out _, out var targetPath);
+        using var sourceStream = GetSourceStream("Normal", out _);
+        using var targetStream = CopySourceStream(sourceStream, "DeleteRow", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
         doc.WorkbookPart?.GetWorksheet("T2").DeleteRow(3);
@@ -199,7 +203,8 @@ public class ExcelTests
     [TestMethod]
     public void InsertRowTest()
     {
-        using var targetStream = GetFileStream("Normal", "InsertRow", out _, out var targetPath);
+        using var sourceStream = GetSourceStream("Normal", out _);
+        using var targetStream = CopySourceStream(sourceStream, "InsertRow", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
         var row = doc.WorkbookPart?.GetWorksheet("T2").InsertRow(3);
@@ -227,7 +232,8 @@ public class ExcelTests
     [TestMethod]
     public void InsertColumnTest()
     {
-        using var targetStream = GetFileStream("Normal", "InsertColumn", out _, out var targetPath);
+        using var sourceStream = GetSourceStream("Normal", out _);
+        using var targetStream = CopySourceStream(sourceStream, "InsertColumn", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
         doc.WorkbookPart?.GetWorksheet("T2").InsertColumn("C", true);
@@ -245,7 +251,8 @@ public class ExcelTests
     [TestMethod]
     public void DeleteColumnTest()
     {
-        using var targetStream = GetFileStream("Normal", "DeleteColumn", out _, out var targetPath);
+        using var sourceStream = GetSourceStream("Normal", out _);
+        using var targetStream = CopySourceStream(sourceStream, "DeleteColumn", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
         doc.WorkbookPart?.GetWorksheet("T2").DeleteColumn("C");
@@ -263,7 +270,8 @@ public class ExcelTests
     [TestMethod]
     public void UpdateCellValueTest()
     {
-        using var targetStream = GetFileStream("Normal", "UpdateCellValue", out _, out var targetPath);
+        using var sourceStream = GetSourceStream("Normal", out _);
+        using var targetStream = CopySourceStream(sourceStream, "UpdateCellValue", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
         var cell = doc.WorkbookPart?.GetWorksheet("T2").GetCells(x => x.CellReference == "A3").FirstOrDefault();
@@ -279,7 +287,8 @@ public class ExcelTests
     [TestMethod]
     public void UpdateCellFormulaTest()
     {
-        using var targetStream = GetFileStream("Normal", "UpdateCellFormula", out _, out var targetPath);
+        using var sourceStream = GetSourceStream("Normal", out _);
+        using var targetStream = CopySourceStream(sourceStream, "UpdateCellFormula", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
         var cell = doc.WorkbookPart?.GetWorksheet("T2").GetCells(x => x.CellReference == "A3").FirstOrDefault();
@@ -295,7 +304,8 @@ public class ExcelTests
     [TestMethod]
     public void UpdateCellStyleTest()
     {
-        using var targetStream = GetFileStream("Normal", "UpdateCellStyle", out _, out var targetPath);
+        using var sourceStream = GetSourceStream("Normal", out _);
+        using var targetStream = CopySourceStream(sourceStream, "UpdateCellStyle", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
         var styleIndex = doc.WorkbookPart!.CreateStyle(new SharpDevLib.OpenXML.CellStyle
@@ -318,10 +328,11 @@ public class ExcelTests
     [TestMethod]
     public void MergeCellsTest()
     {
-        using var targetStream = GetFileStream("Normal", "MergeCells", out _, out var targetPath);
+        using var sourceStream = GetSourceStream("Normal", out _);
+        using var targetStream = CopySourceStream(sourceStream, "MergeCells", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
-        var mergeCell = doc.WorkbookPart?.GetWorksheet("T2").MergeCells("d3", "h5");
+        var mergeCell = doc.WorkbookPart?.GetWorksheet("T2").MergeCells("h8","d3");
         Assert.IsNotNull(mergeCell);
         mergeCell.UseStyle(new SharpDevLib.OpenXML.CellStyle { HorizontalAlignment = HorizontalAlignmentValues.Center, VerticalAlignment = VerticalAlignmentValues.Center, BackgroundColor = "#bcd" });
 
@@ -335,7 +346,8 @@ public class ExcelTests
     [TestMethod]
     public void SetCommentTest()
     {
-        using var targetStream = GetFileStream("Normal", "SetComment", out _, out var targetPath);
+        using var sourceStream = GetSourceStream("Normal", out _);
+        using var targetStream = CopySourceStream(sourceStream, "SetComment", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
         var cell = doc.WorkbookPart?.GetWorksheet("T2").GetCells(x => x.CellReference == "C2").FirstOrDefault();

@@ -41,6 +41,21 @@ public static class SpreadsheetExtensions
         }
         return null;
     }
+
+    static void AppendCell(this Row row, Cell cell)
+    {
+        var columnIndex = new CellReference(cell.CellReference).ColumnIndex;
+        var afterCell = row.Elements<Cell>().FirstOrDefault(x => new CellReference(x.CellReference).ColumnIndex > columnIndex);
+        if (afterCell is null) row.Append(cell);
+        else row.InsertBefore(cell, afterCell);
+    }
+
+    static void AppendRow(this SheetData sheetData, Row row)
+    {
+        var afterRow = sheetData.Elements<Row>().FirstOrDefault(x => x.RowIndex > row.RowIndex);
+        if (afterRow is null) sheetData.Append(row);
+        else sheetData.InsertBefore(row, afterRow);
+    }
     #endregion
 
     #region Workbook
@@ -349,6 +364,7 @@ public static class SpreadsheetExtensions
     /// <returns>合并单元格</returns>
     public static MergeCell MergeCells(this Worksheet worksheet, string cellReference1, string cellReference2)
     {
+        var workbookPart = worksheet.GetParent<WorkbookPart>() ?? throw new Exception("WorkbookPart not found");
         CreateCellIfNotExist(worksheet, cellReference1);
         CreateCellIfNotExist(worksheet, cellReference2);
 
@@ -404,6 +420,30 @@ public static class SpreadsheetExtensions
         var mergeCell = new MergeCell() { Reference = $"{cellReference1}:{cellReference2}".ToUpper() };
         mergeCells.AppendChild(mergeCell);
 
+        //cells
+        var cells = mergeCell.GetCells();
+        var leftTopCellReference = new CellReference(Math.Min(new CellReference(cellReference1).RowIndex, new CellReference(cellReference2).RowIndex), Math.Min(new CellReference(cellReference1).ColumnIndex, new CellReference(cellReference2).ColumnIndex));
+        var leftTopCell = worksheet.Descendants<Cell>().FirstOrDefault(x => x.CellReference == leftTopCellReference.Reference);
+        if (leftTopCell is null)
+        {
+            var row = worksheet.Descendants<Row>().FirstOrDefault(x => x.RowIndex is not null && x.RowIndex == leftTopCellReference.RowIndex);
+            if (row is null)
+            {
+                row = new Row { RowIndex = leftTopCellReference.RowIndex };
+                worksheet.Elements<SheetData>().First().AppendRow(row);
+            }
+            leftTopCell = new Cell { CellReference = leftTopCellReference.Reference };
+            row.AppendCell(leftTopCell);
+        }
+        var mainValueCell = cells.Where(x => x.GetValue(workbookPart).NotNullOrWhiteSpace()).OrderBy(x => new CellReference(x.CellReference).RowIndex).ThenBy(x => new CellReference(x.CellReference).ColumnIndex).FirstOrDefault();
+        if (mainValueCell is not null)
+        {
+            //copy value to leftTopCell
+            leftTopCell.DataType = mainValueCell.DataType;
+            leftTopCell.CellValue = new CellValue(mainValueCell.CellValue!.Text);
+        }
+        cells.Where(x => x != leftTopCell).ToList().ForEach(x => x.Remove());
+
         worksheet.Save();
         return mergeCell;
     }
@@ -418,12 +458,11 @@ public static class SpreadsheetExtensions
     {
         var reference = new CellReference(cellReference);
 
-        //cells
         var row = worksheet.Descendants<Row>().FirstOrDefault(r => r.RowIndex?.Value == reference.RowIndex);
         if (row is null)
         {
             row = new Row() { RowIndex = reference.RowIndex };
-            worksheet.Descendants<SheetData>().First().Append(row);
+            worksheet.Descendants<SheetData>().First().AppendRow(row);
             worksheet.Save();
         }
 
@@ -431,10 +470,7 @@ public static class SpreadsheetExtensions
         if (cell is null)
         {
             cell = new Cell() { CellReference = reference.Reference };
-
-            var afterCell = row.Elements<Cell>().FirstOrDefault(c => new CellReference(c.CellReference).ColumnIndex > reference.ColumnIndex);
-            if (afterCell is not null) row.InsertBefore(cell, afterCell);
-            else row.AppendChild(cell);
+            row.AppendCell(cell);
             worksheet.Save();
         }
 
@@ -655,8 +691,8 @@ public static class SpreadsheetExtensions
             for (uint columnIndex = Math.Min(refernece1.ColumnIndex, refernece2.ColumnIndex); columnIndex <= Math.Max(refernece1.ColumnIndex, refernece2.ColumnIndex); columnIndex++)
             {
                 var cellReference = new CellReference(rowIndex, columnIndex);
-                var cell = worksheet.CreateCellIfNotExist(cellReference.Reference);
-                cells.Add(cell);
+                var cell = worksheet.Descendants<Cell>().FirstOrDefault(x => x.CellReference == cellReference.Reference);
+                if (cell is not null) cells.Add(cell);
             }
         }
         worksheet.Save();
@@ -679,6 +715,12 @@ public static class SpreadsheetExtensions
     #endregion
 
     #region Comments
+    /// <summary>
+    /// 设置单元格批注
+    /// </summary>
+    /// <param name="cell">单元格</param>
+    /// <param name="author">批注者</param>
+    /// <param name="comment">批注</param>
     public static void SetComment(this Cell cell, string author, string comment)
     {
         var workbookPart = cell.GetParent<WorkbookPart>() ?? throw new Exception("WorkbookPart not found");
@@ -693,12 +735,10 @@ public static class SpreadsheetExtensions
         {
             authorNode = new Author(author);
             worksheetCommentsPart.Comments.Authors.AppendChild(authorNode);
-            workbookPart.Workbook.Save();
         }
         var authorId = (uint)worksheetCommentsPart.Comments.Authors.Elements().ToList().IndexOf(authorNode);
         var commentNode = new Comment(new CommentText(new Run(new Text(comment)))) { Reference = cell.CellReference, AuthorId = authorId };
         worksheetCommentsPart.Comments.CommentList.AppendChild(commentNode);
-        workbookPart.Workbook.Save();
 
         var shapeTemplate = "<v:shape type=\"#_x0000_t202\" style='position:absolute;margin-left:78pt;margin-top:1.2pt;width:100.8pt;height:56.4pt;z-index:1;visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\" o:insetmode=\"auto\"><v:fill color2=\"infoBackground [80]\"/><v:shadow color=\"none [81]\" obscured=\"t\"/><v:path o:connecttype=\"none\"/><v:textbox style='mso-direction-alt:auto'></v:textbox><x:ClientData ObjectType=\"Note\"><x:MoveWithCells/><x:SizeWithCells/><x:Anchor>1, 12, 0, 1, 3, 18, 4, 3</x:Anchor><x:AutoFill>False</x:AutoFill><x:Row>{0}</x:Row><x:Column>{1}</x:Column></x:ClientData></v:shape>";
         var shapes = string.Format(shapeTemplate, reference.RowIndex - 1, reference.ColumnIndex - 1);

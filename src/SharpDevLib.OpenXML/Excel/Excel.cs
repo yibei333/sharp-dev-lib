@@ -36,7 +36,7 @@ public static class Excel
     /// <param name="password">密码</param>
     public static void Decrypt(Stream inputStream, Stream outputStream, string password)
     {
-        using var memoryStream = new MemoryStream(); ;
+        using var memoryStream = new MemoryStream();
         inputStream.CopyTo(memoryStream);
         using var decryptedStream = new EncryptedPackageHandler().DecryptPackage(memoryStream, new ExcelEncryption { Password = password, IsEncrypted = true });
         var zipPackage = new ZipPackage(decryptedStream);
