@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>11.0</LangVersion>
+		<Authors>developer333</Authors>
+		<Description>数据库相关</Description>
+		<Copyright>developer333</Copyright>
+		<PackageId>SharpDevLib.Data</PackageId>
+		<PackageProjectUrl>https://github.com/yibei333/sharp-dev-lib</PackageProjectUrl>
+		<PackageIcon>c-sharp.png</PackageIcon>
+		<RepositoryUrl>https://github.com/yibei333/sharp-dev-lib</RepositoryUrl>
+		<PackageTags>Database DbContext SqlHelper</PackageTags>
+		<!--<PackageLicenseFile>LICENSE</PackageLicenseFile>-->
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<Version>1.0.0.1-alpha</Version>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="../../assets/c-sharp.png" Link="Assets\c-sharp.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="../../LICENSE" Link="Assets\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="../../README.md" Link="Assets\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="../../assets/sharpdevlib.data.version.txt" Link="Assets\sharpdevlib.data.version.txt">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.32" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.32" />
+	</ItemGroup>
+
+</Project>

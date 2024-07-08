@@ -1,14 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib.OpenXML;
 using SharpDevLib.Tests.TestData;
 using System;
 using System.Collections.Generic;
 using System.Data;
 
-namespace SharpDevLib.Tests.OpenXML;
+namespace SharpDevLib.Tests.Standard.Extensions;
 
 [TestClass]
-public class DataTableTests
+public class DataTableExtensionTests
 {
     class Foo
     {

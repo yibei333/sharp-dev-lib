@@ -1,7 +1,7 @@
 ﻿[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/yibei333/sharp-dev-lib/main/LICENSE)
 
 ## 简介
-sharp-dev-lib封装c#开发中常用功能,分为如下5个包
+sharp-dev-lib封装c#开发中常用功能,分为如下包
 
 <table>
     <thead>
@@ -96,6 +96,23 @@ sharp-dev-lib封装c#开发中常用功能,分为如下5个包
             <td>
                 <a href="https://github.com/yibei333/sharp-dev-lib/actions/workflows/sharpdevlib.transport.yml">
                     <img src="https://github.com/yibei333/sharp-dev-lib/actions/workflows/sharpdevlib.transport.yml/badge.svg?branch=main">
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="https://github.com/yibei333/sharp-dev-lib/blob/main/doc/sharpdevlib.data/index.md" title="点击查看文档">SharpDevLib.Data</a>
+            </td>
+            <td>数据库相关</td>
+            <td>netstandard2.0</td>
+            <td>
+                <a href="https://www.nuget.org/packages/SharpDevLib.Data">
+                    <img src="https://img.shields.io/nuget/v/SharpDevLib.Data.svg">
+                </a>
+            </td>
+            <td>
+                <a href="https://github.com/yibei333/sharp-dev-lib/actions/workflows/sharpdevlib.data.yml">
+                    <img src="https://github.com/yibei333/sharp-dev-lib/actions/workflows/sharpdevlib.data.yml/badge.svg?branch=main">
                 </a>
             </td>
         </tr>
