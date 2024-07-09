@@ -30,8 +30,16 @@ public sealed class SqlHelper : IDisposable
     /// <summary>
     /// 实例化Sql帮助类
     /// </summary>
-    /// <param name="dbProviderFactory">数据库提供商工厂</param>
-    /// <param name="connectionString">连接字符串</param>
+    /// <param name="dbProviderFactory">数据库提供商工厂,例如
+    /// <para>1.引用Microsoft.Data.Sqlite,则用SqliteFactory.Instance</para>
+    /// <para>2.引用Microsoft.Data.SqlClient,则用SqlClientFactory.Instance</para>
+    /// <para>3.引用Pomelo.EntityFrameworkCore.MySql,则用MySqlConnectorFactory.Instance</para>
+    /// </param>
+    /// <param name="connectionString">连接字符串
+    /// <para>1.Sqlite,"data source=dbFilePath"</para>
+    /// <para>2.SqlServer,"Server=server;Database=database;User Id=user;Password=password;"</para>
+    /// <para>3.MySql,"server=server;user=user;password=password;database=database"</para>
+    /// </param>
     public SqlHelper(DbProviderFactory dbProviderFactory, string connectionString)
     {
         DbProviderFactory = dbProviderFactory;
