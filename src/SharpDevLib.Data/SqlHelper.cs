@@ -1,5 +1,7 @@
-﻿using System.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Data.Common;
+using System.Reflection;
 
 namespace SharpDevLib.Data;
 
@@ -43,7 +45,7 @@ public sealed class SqlHelper : IDisposable
     /// </summary>
     public SqlHelper()
     {
-        if (GlobalDbProviderFactory is null || GlobalConnectionString.IsNullOrWhiteSpace()) throw new Exception($"please call SqlHelper.Config() method first or provider parameters");
+        if (GlobalDbProviderFactory is null || GlobalConnectionString.IsNullOrWhiteSpace()) throw new Exception($"please call SqlHelper.Config() method first or provide parameters");
 
         DbProviderFactory = GlobalDbProviderFactory;
         Connection = DbProviderFactory.CreateConnection();
@@ -52,7 +54,18 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 数据库连接
+    /// 实例化Sql帮助类
+    /// </summary>
+    /// <param name="dbContext">DbContext</param>
+    public SqlHelper(DbContext dbContext)
+    {
+        Connection = dbContext.Database.GetDbConnection();
+        DbProviderFactory = (Connection.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Instance).FirstOrDefault(x => x.Name == nameof(DbProviderFactory))?.GetValue(Connection) as DbProviderFactory) ?? throw new Exception("unable to get DbProviderFactory from DbConnection");
+        Connection.Open();
+    }
+
+    /// <summary>
+    /// 连接
     /// </summary>
     public DbConnection Connection { get; }
 

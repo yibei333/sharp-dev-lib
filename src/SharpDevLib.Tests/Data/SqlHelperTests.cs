@@ -1,10 +1,15 @@
 ﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Data;
 using SharpDevLib.Tests.TestData;
+using SharpDevLib.Tests.TestData.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace SharpDevLib.Tests.Data;
@@ -129,5 +134,129 @@ public class SqlHelperTests
         Assert.AreEqual(4, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [User]"));
         Assert.AreEqual(6, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [UserFavorite]"));
         Assert.AreEqual(3, affectRowsCount);
+    }
+
+    [TestMethod]
+    public void TransactionRollbackTest()
+    {
+        var path = GetFileConnectionString("transaction-rollback");
+        SqlHelper.Config(SqliteFactory.Instance, path);
+        using var sqlHelper = new SqlHelper();
+
+        using var fooTransaction = sqlHelper.Connection.BeginTransaction();
+        try
+        {
+            sqlHelper.ExecuteNonQuery("INSERT INTO [User]([Name],Age) Values('Baz',30),('Qux',40);");
+            sqlHelper.ExecuteNonQuery("INSERT INTO [User]([Name],Age) Values('Baz',30),('Qux',40);");
+            sqlHelper.ExecuteNonQuery("INSERT INTO [UserFavorite]([Name],Favorite) Values('Baz','Game');");
+            fooTransaction.Commit();
+        }
+        catch
+        {
+            fooTransaction.Rollback();
+        }
+
+        Assert.AreEqual(2, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [User]"));
+        Assert.AreEqual(5, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [UserFavorite]"));
+    }
+
+    [TestMethod]
+    public void TransactionCommitTest()
+    {
+        var path = GetFileConnectionString("transaction-commit");
+        SqlHelper.Config(SqliteFactory.Instance, path);
+        using var sqlHelper = new SqlHelper();
+
+        using var fooTransaction = sqlHelper.Connection.BeginTransaction();
+        try
+        {
+            sqlHelper.ExecuteNonQuery("INSERT INTO [User]([Name],Age) Values('Baz',30),('Qux',40);");
+            sqlHelper.ExecuteNonQuery("INSERT INTO [UserFavorite]([Name],Favorite) Values('Baz','Game');");
+            fooTransaction.Commit();
+        }
+        catch
+        {
+            fooTransaction.Rollback();
+        }
+
+        Assert.AreEqual(4, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [User]"));
+        Assert.AreEqual(6, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [UserFavorite]"));
+    }
+
+    [TestMethod]
+    public void DbContextTransactionRollbackTest()
+    {
+        var path = GetFileConnectionString("dbcontext-transaction-rollback");
+        IServiceCollection services = new ServiceCollection();
+        services.AddDbContext<SampleDbContext>(x => x.UseSqlite(path));
+        using var dbContext = services.BuildServiceProvider().GetRequiredService<SampleDbContext>();
+
+        using var sqlHelper = new SqlHelper(dbContext);
+        SqlHelper.Config(SqliteFactory.Instance, path);
+
+        using var fooTransaction = sqlHelper.Connection.BeginTransaction();
+        try
+        {
+            dbContext.User.Add(new User("Baz", 30));
+            dbContext.SaveChanges();
+            sqlHelper.ExecuteNonQuery("INSERT INTO [User]([Name],Age) Values('Qux',40);");
+            Assert.AreEqual(4, dbContext.User.Count());
+            Assert.AreEqual(4, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [User]"));
+
+            sqlHelper.ExecuteNonQuery("INSERT INTO [User]([Name],Age) Values('Qux',40);");
+            sqlHelper.ExecuteNonQuery("INSERT INTO [UserFavorite]([Name],Favorite) Values('Baz','Game');");
+            fooTransaction.Commit();
+        }
+        catch
+        {
+            fooTransaction.Rollback();
+        }
+
+        Assert.AreEqual(2, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [User]"));
+        Assert.AreEqual(5, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [UserFavorite]"));
+
+        Assert.AreEqual(2, dbContext.User.Count());
+        Assert.AreEqual(5, dbContext.UserFavorite.Count());
+    }
+
+    [TestMethod]
+    public void DbContextTransactionCommitTest()
+    {
+        var path = GetFileConnectionString("dbcontext-transaction-commit");
+        IServiceCollection services = new ServiceCollection();
+        services.AddDbContext<SampleDbContext>(x => x.UseSqlite(path));
+        using var dbContext = services.BuildServiceProvider().GetRequiredService<SampleDbContext>();
+
+        using var sqlHelper = new SqlHelper(dbContext);
+        SqlHelper.Config(SqliteFactory.Instance, path);
+
+        using var fooTransaction = sqlHelper.Connection.BeginTransaction();
+        try
+        {
+            dbContext.User.Add(new User("Baz", 30));
+            dbContext.SaveChanges();
+            sqlHelper.ExecuteNonQuery("INSERT INTO [User]([Name],Age) Values('Qux',40);");
+            Assert.AreEqual(4, dbContext.User.Count());
+            Assert.AreEqual(4, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [User]"));
+
+            sqlHelper.ExecuteNonQuery("INSERT INTO [UserFavorite]([Name],Favorite) Values('Baz','Game');");
+            fooTransaction.Commit();
+        }
+        catch
+        {
+            fooTransaction.Rollback();
+        }
+
+        Assert.AreEqual(4, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [User]"));
+        Assert.AreEqual(6, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [UserFavorite]"));
+
+        Assert.AreEqual(4, dbContext.User.Count());
+        Assert.AreEqual(6, dbContext.UserFavorite.Count());
+
+        //temptable
+        sqlHelper.ExecuteNonQuery("CREATE TEMP TABLE TempTable([Name] TEXT,Age INT);INSERT INTO TempTable VALUES('foo',10),('bar',70)");
+        var table = sqlHelper.ExecuteDataSet("SELECT * FROM TempTable").Tables[0];
+        var users = dbContext.Database.SqlQuery<User>(FormattableStringFactory.Create("SELECT * FROM TempTable")).ToList();
+        Console.WriteLine(users.Serialize());
     }
 }

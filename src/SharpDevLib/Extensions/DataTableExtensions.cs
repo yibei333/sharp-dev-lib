@@ -86,7 +86,7 @@ public static class DataTableExtensions
                     var value = ConvertRowValueToPropertyValue(property.PropertyType, row[columnName]);
                     args.Add(value);
                 }
-                var instance = (T)Activator.CreateInstance(typeof(T),args.ToArray());
+                var instance = (T)Activator.CreateInstance(typeof(T), args.ToArray());
                 result.Add(instance);
             }
             else
