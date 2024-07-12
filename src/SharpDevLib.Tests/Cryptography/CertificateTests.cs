@@ -117,10 +117,14 @@ public class CertificateTests
 
         var keyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/server.key");
         var certPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/server.crt");
+        var pfxCertPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/server.pfx");
+        var derCertPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/server.der");
         var csrPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/server.csr");
         keyPath.RemoveFileIfExist();
         certPath.RemoveFileIfExist();
         csrPath.RemoveFileIfExist();
+        pfxCertPath.RemoveFileIfExist();
+        derCertPath.RemoveFileIfExist();
 
         using var rsa = RSA.Create();
         rsa.KeySize = 2048;
@@ -140,11 +144,17 @@ public class CertificateTests
         };
         var cert = X509.GenerateServerCert(caKey, caCert, csr, serialNumber, 360, altNames);
         cert.SaveCrt(certPath);
+        cert.SaveDer(derCertPath);
+        cert.SavePfx(pfxCertPath, privateKey, "foo");
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
         Assert.IsTrue(new FileInfo(keyPath).Length > 0);
         Assert.IsTrue(new FileInfo(certPath).Exists);
         Assert.IsTrue(new FileInfo(certPath).Length > 0);
+        Assert.IsTrue(new FileInfo(derCertPath).Exists);
+        Assert.IsTrue(new FileInfo(derCertPath).Length > 0);
+        Assert.IsTrue(new FileInfo(pfxCertPath).Exists);
+        Assert.IsTrue(new FileInfo(pfxCertPath).Length > 0);
     }
 
     [TestMethod]

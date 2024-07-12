@@ -201,7 +201,9 @@ public static class X509
     {
         using var rsa = RSA.Create();
         rsa.ImportPem(privateKey);
-        certificate.PrivateKey = rsa;
+
+        //todo:set private key
+        // certificate.PrivateKey = rsa;
         var bytes = certificate.Export(X509ContentType.Pfx, password);
         bytes.SaveToFile(path);
     }

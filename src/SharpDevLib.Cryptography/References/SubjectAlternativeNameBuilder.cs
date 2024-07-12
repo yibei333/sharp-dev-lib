@@ -109,6 +109,10 @@ internal struct GeneralNameAsn
     internal string? RegisteredId = null;
     internal string? Uri = null;
 
+    public GeneralNameAsn()
+    {
+    }
+
 #if DEBUG
     static GeneralNameAsn()
     {
@@ -132,10 +136,6 @@ internal struct GeneralNameAsn
         ensureUniqueTag(new Asn1Tag(TagClass.ContextSpecific, 6), "Uri");
         ensureUniqueTag(new Asn1Tag(TagClass.ContextSpecific, 7), "IPAddress");
         ensureUniqueTag(new Asn1Tag(TagClass.ContextSpecific, 8), "RegisteredId");
-    }
-
-    public GeneralNameAsn()
-    {
     }
 #endif
 
@@ -340,6 +340,10 @@ internal partial struct DirectoryStringAsn
     internal string? Utf8String = null;
     internal string? BmpString = null;
 
+    public DirectoryStringAsn()
+    {
+    }
+
 #if DEBUG
     static DirectoryStringAsn()
     {
@@ -359,10 +363,6 @@ internal partial struct DirectoryStringAsn
         ensureUniqueTag(new Asn1Tag((UniversalTagNumber)28), "UniversalString");
         ensureUniqueTag(new Asn1Tag(UniversalTagNumber.UTF8String), "Utf8String");
         ensureUniqueTag(new Asn1Tag(UniversalTagNumber.BMPString), "BmpString");
-    }
-
-    public DirectoryStringAsn()
-    {
     }
 #endif
 
