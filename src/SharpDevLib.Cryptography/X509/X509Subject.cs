@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-namespace SharpDevLib.Cryptography;
+﻿namespace SharpDevLib.Cryptography;
 
 /// <summary>
 /// X509Subject
@@ -41,7 +39,11 @@ public class X509Subject
     /// </summary>
     public string CommonName { get; set; }
 
-    internal X500DistinguishedName CreateX500DistinguishedName()
+    /// <summary>
+    /// get text
+    /// </summary>
+    /// <returns>text</returns>
+    public string Text()
     {
         var collection = new List<string>();
         if (CommonName.NotNullOrWhiteSpace()) collection.Add($"CN = {CommonName}");
@@ -51,6 +53,6 @@ public class X509Subject
         if (Organization.NotNullOrWhiteSpace()) collection.Add($"O = {Organization}");
         if (OrganizationalUnit.NotNullOrWhiteSpace()) collection.Add($"OU = {OrganizationalUnit}");
         if (collection.IsNullOrEmpty()) throw new Exception($"subject info can not be empty");
-        return new X500DistinguishedName(string.Join(",", collection));
+        return string.Join(",", collection);
     }
 }

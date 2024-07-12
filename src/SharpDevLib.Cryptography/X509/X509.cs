@@ -20,26 +20,25 @@ public static class X509
     /// </summary>
     /// <param name="issuerPrivateKey">PEM格式的颁发者私钥</param>
     /// <param name="issuerCert">颁发者证书</param>
-    /// <param name="publicKey">PEM格式的公钥</param>
-    /// <param name="subject">subject</param>
+    /// <param name="csr">证书签名请求</param>
     /// <param name="serialNumber">序列号</param>
     /// <param name="days">过期天数</param>
     /// <param name="extensions">扩展</param>
     /// <returns>X509Certificate2</returns>
-    public static X509Certificate2 GenerateCert(string issuerPrivateKey, X509Certificate2 issuerCert, string publicKey, X509Subject subject, byte[] serialNumber, int days, List<X509Extension> extensions) => GenerateCert(issuerPrivateKey, issuerCert.SubjectName, publicKey, subject, serialNumber, days, extensions);
+    public static X509Certificate2 GenerateCert(string issuerPrivateKey, X509Certificate2 issuerCert, X509CertificateSigningRequest csr, byte[] serialNumber, int days, List<X509Extension> extensions) => csr.GenerateCert(issuerPrivateKey, issuerCert.SubjectName, serialNumber, days, extensions);
 
     /// <summary>
     /// 生成自签名证书
     /// </summary>
     /// <param name="privateKey">PEM格式的私钥</param>
-    /// <param name="subject">subject</param>
+    /// <param name="csr">证书签名请求</param>
     /// <param name="serialNumber">序列号</param>
     /// <param name="days">过期天数</param>
     /// <param name="extensions">扩展</param>
     /// <returns>X509Certificate2</returns>
-    public static X509Certificate2 GenerateSelfSignedCert(string privateKey, X509Subject subject, byte[] serialNumber, int days, List<X509Extension> extensions)
+    public static X509Certificate2 GenerateSelfSignedCert(string privateKey, X509CertificateSigningRequest csr, byte[] serialNumber, int days, List<X509Extension> extensions)
     {
-        return GenerateSelfSignedCert(privateKey, privateKey.GetPublicKey(), subject, serialNumber, days, extensions);
+        return csr.GenerateSelfSignedCert(privateKey, serialNumber, days, extensions);
     }
 
     /// <summary>
@@ -47,28 +46,26 @@ public static class X509
     /// </summary>
     /// <param name="issuerPrivateKey">PEM格式的颁发者私钥</param>
     /// <param name="issuerCert">颁发者证书</param>
-    /// <param name="publicKey">PEM格式的公钥</param>
-    /// <param name="subject">subject</param>
+    /// <param name="csr">证书签名请求</param>
     /// <param name="serialNumber">序列号</param>
     /// <param name="days">过期天数</param>
     /// <returns>X509Certificate2</returns>
-    public static X509Certificate2 GenerateCACert(string issuerPrivateKey, X509Certificate2 issuerCert, string publicKey, X509Subject subject, byte[] serialNumber, int days)
+    public static X509Certificate2 GenerateCACert(string issuerPrivateKey, X509Certificate2 issuerCert, X509CertificateSigningRequest csr, byte[] serialNumber, int days)
     {
-        return GenerateCert(issuerPrivateKey, issuerCert, publicKey, subject, serialNumber, days, X509ExtensionHelper.CreateCAExtensions(publicKey, issuerCert));
+        return GenerateCert(issuerPrivateKey, issuerCert, csr, serialNumber, days, X509ExtensionHelper.CreateCAExtensions(csr.PublicKey, issuerCert));
     }
 
     /// <summary>
     /// 生成自签名CA证书
     /// </summary>
     /// <param name="privateKey">PEM格式的私钥</param>
-    /// <param name="subject">subject</param>
+    /// <param name="csr">证书签名请求</param>
     /// <param name="serialNumber">序列号</param>
     /// <param name="days">过期天数</param>
     /// <returns>X509Certificate2</returns>
-    public static X509Certificate2 GenerateSelfSignedCACert(string privateKey, X509Subject subject, byte[] serialNumber, int days)
+    public static X509Certificate2 GenerateSelfSignedCACert(string privateKey, X509CertificateSigningRequest csr, byte[] serialNumber, int days)
     {
-        var publicKey = privateKey.GetPublicKey();
-        return GenerateSelfSignedCert(privateKey, publicKey, subject, serialNumber, days, X509ExtensionHelper.CreateCAExtensions(publicKey, null));
+        return GenerateSelfSignedCert(privateKey, csr, serialNumber, days, X509ExtensionHelper.CreateCAExtensions(csr.PublicKey, null));
     }
 
     /// <summary>
@@ -76,29 +73,28 @@ public static class X509
     /// </summary>
     /// <param name="issuerPrivateKey">PEM格式的颁发者私钥</param>
     /// <param name="issuerCert">颁发者证书</param>
-    /// <param name="publicKey">PEM格式的公钥</param>
-    /// <param name="subject">subject</param>
+    /// <param name="csr">证书签名请求</param>
     /// <param name="serialNumber">序列号</param>
     /// <param name="days">过期天数</param>
     /// <param name="alternativeNames">SubjectAlternativeName集合</param>
     /// <returns>X509Certificate2</returns>
-    public static X509Certificate2 GenerateServerCert(string issuerPrivateKey, X509Certificate2 issuerCert, string publicKey, X509Subject subject, byte[] serialNumber, int days, List<SubjectAlternativeName> alternativeNames)
+    public static X509Certificate2 GenerateServerCert(string issuerPrivateKey, X509Certificate2 issuerCert, X509CertificateSigningRequest csr, byte[] serialNumber, int days, List<SubjectAlternativeName> alternativeNames)
     {
-        return GenerateCert(issuerPrivateKey, issuerCert, publicKey, subject, serialNumber, days, X509ExtensionHelper.CreateServerExtensions(alternativeNames));
+        return GenerateCert(issuerPrivateKey, issuerCert, csr, serialNumber, days, X509ExtensionHelper.CreateServerExtensions(alternativeNames));
     }
 
     /// <summary>
     /// 生成自签名服务端证书
     /// </summary>
     /// <param name="privateKey">PEM格式的私钥</param>
-    /// <param name="subject">subject</param>
+    /// <param name="csr">证书签名请求</param>
     /// <param name="serialNumber">序列号</param>
     /// <param name="days">过期天数</param>
     /// <param name="alternativeNames">SubjectAlternativeName集合</param>
     /// <returns>X509Certificate2</returns>
-    public static X509Certificate2 GenerateSelfSignedServerCert(string privateKey, X509Subject subject, byte[] serialNumber, int days, List<SubjectAlternativeName> alternativeNames)
+    public static X509Certificate2 GenerateSelfSignedServerCert(string privateKey, X509CertificateSigningRequest csr, byte[] serialNumber, int days, List<SubjectAlternativeName> alternativeNames)
     {
-        return GenerateSelfSignedCert(privateKey, privateKey.GetPublicKey(), subject, serialNumber, days, X509ExtensionHelper.CreateServerExtensions(alternativeNames));
+        return GenerateSelfSignedCert(privateKey, csr, serialNumber, days, X509ExtensionHelper.CreateServerExtensions(alternativeNames));
     }
 
     /// <summary>
@@ -106,27 +102,26 @@ public static class X509
     /// </summary>
     /// <param name="issuerPrivateKey">PEM格式的颁发者私钥</param>
     /// <param name="issuerCert">颁发者证书</param>
-    /// <param name="publicKey">PEM格式的公钥</param>
-    /// <param name="subject">subject</param>
+    /// <param name="csr">证书签名请求</param>
     /// <param name="serialNumber">序列号</param>
     /// <param name="days">过期天数</param>
     /// <returns>X509Certificate2</returns>
-    public static X509Certificate2 GenerateClientCert(string issuerPrivateKey, X509Certificate2 issuerCert, string publicKey, X509Subject subject, byte[] serialNumber, int days)
+    public static X509Certificate2 GenerateClientCert(string issuerPrivateKey, X509Certificate2 issuerCert, X509CertificateSigningRequest csr, byte[] serialNumber, int days)
     {
-        return GenerateCert(issuerPrivateKey, issuerCert, publicKey, subject, serialNumber, days, X509ExtensionHelper.CreateClientExtensions());
+        return GenerateCert(issuerPrivateKey, issuerCert, csr, serialNumber, days, X509ExtensionHelper.CreateClientExtensions());
     }
 
     /// <summary>
     /// 生成自签名客户端证书
     /// </summary>
     /// <param name="privateKey">PEM格式的私钥</param>
-    /// <param name="subject">subject</param>
+    /// <param name="csr">证书签名请求</param>
     /// <param name="serialNumber">序列号</param>
     /// <param name="days">过期天数</param>
     /// <returns>X509Certificate2</returns>
-    public static X509Certificate2 GenerateSelfSignedClientCert(string privateKey, X509Subject subject, byte[] serialNumber, int days)
+    public static X509Certificate2 GenerateSelfSignedClientCert(string privateKey, X509CertificateSigningRequest csr, byte[] serialNumber, int days)
     {
-        return GenerateSelfSignedCert(privateKey, privateKey.GetPublicKey(), subject, serialNumber, days, X509ExtensionHelper.CreateClientExtensions());
+        return GenerateSelfSignedCert(privateKey, csr, serialNumber, days, X509ExtensionHelper.CreateClientExtensions());
     }
 
     /// <summary>
@@ -250,44 +245,11 @@ public static class X509
         return bytes;
     }
 
-    static string GetPublicKey(this string privateKey)
+    internal static string GetPublicKey(this string privateKey)
     {
         using var keyRsa = RSA.Create();
         keyRsa.ImportPem(privateKey);
         return keyRsa.ExportPem(PemType.X509SubjectPublicKey);
     }
-
-    static X509Certificate2 GenerateCert(string issuerPrivateKey, X500DistinguishedName issuer, string publicKey, X509Subject subject, byte[] serialNumber, int days, List<X509Extension> extensions)
-    {
-        var tbsCertificate = new TBSCertificate(serialNumber, issuer, days, subject, publicKey, extensions);
-        var tbsCertificateBytes = tbsCertificate.Encode();
-        using var hashAlgorithm = SHA256.Create();
-        var hash = hashAlgorithm.ComputeHash(tbsCertificateBytes);
-        using var rsa = RSA.Create();
-        rsa.ImportPem(issuerPrivateKey);
-        var signature = rsa.SignHash(hash, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-
-        //Certificate  ::=  SEQUENCE  {
-        //     tbsCertificate       TBSCertificate,
-        //     signatureAlgorithm   AlgorithmIdentifier,
-        //     signature            BIT STRING  }
-        var writer = new AsnWriter(AsnEncodingRules.DER);
-        writer.PushSequence();
-        writer.WriteEncodedValue(tbsCertificateBytes);
-        writer.PushSequence();
-        writer.WriteObjectIdentifier("1.2.840.113549.1.1.11");//sha256rsa
-        writer.WriteNull();
-        writer.PopSequence();
-        writer.WriteBitString(signature, 0);
-        writer.PopSequence();
-        var cert = writer.Encode();
-        return new X509Certificate2(cert);
-    }
-
-    static X509Certificate2 GenerateSelfSignedCert(string privateKey, string publicKey, X509Subject subject, byte[] serialNumber, int days, List<X509Extension> extensions)
-    {
-        return GenerateCert(privateKey, subject.CreateX500DistinguishedName(), publicKey, subject, serialNumber, days, extensions);
-    }
-
     #endregion
 }

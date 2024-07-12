@@ -19,4 +19,8 @@ internal static class PemStatics
 
     public const string X509CertificateStart = "-----BEGIN CERTIFICATE-----";
     public const string X509CertificateEnd = "-----END CERTIFICATE-----";
+
+    public const string X509CertificateSigningRequestStart = "-----BEGIN CERTIFICATE REQUEST-----";
+    public const string X509CertificateSigningRequestEnd = "-----END CERTIFICATE REQUEST-----";
+
 }

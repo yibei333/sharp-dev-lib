@@ -37,4 +37,8 @@ public enum PemType
     /// X.509 Certificate
     /// </summary>
     X509Certificate,
+    /// <summary>
+    /// X.509 csr
+    /// </summary>
+    X509CertificateSigningRequest,
 }

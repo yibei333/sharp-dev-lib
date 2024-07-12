@@ -1,12 +1,11 @@
 ﻿using System.Formats.Asn1;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
 namespace SharpDevLib.Cryptography;
 
 internal class TBSCertificate
 {
-    public TBSCertificate(byte[] serialNumber, X500DistinguishedName issuer, int days, X509Subject subject, string subjectPublicKey, List<X509Extension> extensions)
+    public TBSCertificate(byte[] serialNumber, X500DistinguishedName issuer, int days, X500DistinguishedName subject, byte[] subjectPublicKey, List<X509Extension> extensions)
     {
         Version = 2;
         SerialNumber = serialNumber;
@@ -25,8 +24,8 @@ internal class TBSCertificate
     public X500DistinguishedName Issuer { get; }
     public DateTimeOffset NotBefore { get; }
     public DateTimeOffset NotAfter { get; }
-    public X509Subject Subject { get; }
-    public string SubjectPublicKey { get; }
+    public X500DistinguishedName Subject { get; }
+    public byte[] SubjectPublicKey { get; }
     public List<X509Extension> Extensions { get; }
 
 
@@ -96,13 +95,10 @@ internal class TBSCertificate
         writer.PopSequence();
 
         //subject
-        writer.WriteEncodedValue(Subject.CreateX500DistinguishedName().RawData);
+        writer.WriteEncodedValue(Subject.RawData);
 
         //subjectPublicKeyInfo
-        using var rsa = RSA.Create();
-        rsa.ImportPem(SubjectPublicKey);
-        var key = X509.EncodeSubjectPublicKeyInfo(rsa.ExportParameters(false));
-        writer.WriteEncodedValue(key);
+        writer.WriteEncodedValue(SubjectPublicKey);
 
         //extensions
         if (Extensions.NotNullOrEmpty())

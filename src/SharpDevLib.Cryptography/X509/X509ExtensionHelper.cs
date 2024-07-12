@@ -6,11 +6,11 @@ namespace SharpDevLib.Cryptography;
 
 internal static class X509ExtensionHelper
 {
-    public static List<X509Extension> CreateCAExtensions(string publicKey, X509Certificate2? caCert)
+    public static List<X509Extension> CreateCAExtensions(byte[] publicKey, X509Certificate2? caCert)
     {
         var subjectKeyIdentifierExtension = CreateSubjectKeyIdentifierExtension(publicKey);
         var subjectKeyIdentifierRawData = subjectKeyIdentifierExtension.RawData;
-        if (caCert is not null) subjectKeyIdentifierRawData = caCert.Extensions.OfType<X509SubjectKeyIdentifierExtension>().FirstOrDefault()?.RawData;
+        if (caCert is not null) subjectKeyIdentifierRawData = caCert.Extensions.OfType<X509SubjectKeyIdentifierExtension>().FirstOrDefault()?.RawData ?? throw new Exception("unable to find ca X509SubjectKeyIdentifierExtension");
         var extensions = new List<X509Extension>
         {
             new X509BasicConstraintsExtension(true, false, 0, false),
@@ -67,10 +67,9 @@ internal static class X509ExtensionHelper
         return extensions;
     }
 
-    static X509SubjectKeyIdentifierExtension CreateSubjectKeyIdentifierExtension(string publicKey)
+    static X509SubjectKeyIdentifierExtension CreateSubjectKeyIdentifierExtension(byte[] publicKey)
     {
-        var pem = PemObject.Read(publicKey);
-        var keyValue = new AsnEncodedData(Convert.FromBase64String(pem.Body));
+        var keyValue = new AsnEncodedData(publicKey);
         var keyParam = new AsnEncodedData(new byte[] { 05, 00 });
         var key = new PublicKey(new Oid(Oids.Rsa), keyParam, keyValue);
         return new X509SubjectKeyIdentifierExtension(key, false);

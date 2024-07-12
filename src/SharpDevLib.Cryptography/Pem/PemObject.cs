@@ -114,6 +114,13 @@ internal class PemObject
             var body = key.Replace(header, "").Replace(PemStatics.RsaX509SubjectPublicEnd, "");
             return new PemObject(header, RemoveWrapLineAndTrim(body), PemStatics.RsaX509SubjectPublicEnd, PemType.X509SubjectPublicKey);
         }
+        //csr
+        else if (header.Equals(PemStatics.X509CertificateSigningRequestStart))
+        {
+            if (!key.EndsWith(PemStatics.X509CertificateSigningRequestEnd)) throw new InvalidDataException($"key should ends with '{PemStatics.X509CertificateSigningRequestEnd}'");
+            var body = key.Replace(header, "").Replace(PemStatics.X509CertificateSigningRequestEnd, "");
+            return new PemObject(header, RemoveWrapLineAndTrim(body), PemStatics.X509CertificateSigningRequestEnd, PemType.X509CertificateSigningRequest);
+        }
         //unkonw
         else
         {
