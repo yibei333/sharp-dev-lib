@@ -65,8 +65,8 @@ public class JwtCreateWithRS256Request : JwtCreateRequest
     public JwtCreateWithRS256Request(object payload, string pemKey, byte[]? keyPassword = null, RSASignaturePadding? padding = null) : base(JwtAlgorithm.RS256, payload, pemKey, keyPassword, padding)
     {
         var pemObject = PemObject.Read(pemKey);
-        if (pemObject.PemType == RsaPemType.PublicKey || pemObject.PemType == RsaPemType.X509SubjectPublicKey) throw new ArgumentException("pemKey parameter should be private key type");
-        if (pemObject.PemType == RsaPemType.EncryptedPkcs1PrivateKey || pemObject.PemType == RsaPemType.EncryptedPkcs8PrivateKey)
+        if (pemObject.PemType == PemType.PublicKey || pemObject.PemType == PemType.X509SubjectPublicKey) throw new ArgumentException("pemKey parameter should be private key type");
+        if (pemObject.PemType == PemType.EncryptedPkcs1PrivateKey || pemObject.PemType == PemType.EncryptedPkcs8PrivateKey)
         {
             if (keyPassword.IsNullOrEmpty()) throw new ArgumentException("keyPassword parameter required");
         }

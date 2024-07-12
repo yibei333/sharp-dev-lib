@@ -15,7 +15,7 @@ public class HttpBaseTests
     [ClassInitialize(InheritanceBehavior.BeforeEachDerivedClass)]
     public static void Initialize(TestContext context)
     {
-        Console.WriteLine(context.TestDir);
+        Console.WriteLine(context.TestRunDirectory);
         _server = new WebServer(o => o.WithUrlPrefix(BaseUrl)
                         .WithMode(HttpListenerMode.EmbedIO))
                         .WithLocalSessionManager()

@@ -72,4 +72,24 @@ internal static class InternalExtension
     internal static byte[] ToUtf8Bytes(this string str) => Encoding.UTF8.GetBytes(str);
 
     internal static string ToUtf8String(this byte[] bytes) => Encoding.UTF8.GetString(bytes);
+
+    internal static void EnsureDirectoryExist(this string directory)
+    {
+        if (directory.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(directory));
+        if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+    }
+
+    internal static void SaveToFile(this byte[] bytes, string filePath, bool throwIfFileExist = false)
+    {
+        if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
+        if (File.Exists(filePath))
+        {
+            if (throwIfFileExist) throw new InvalidOperationException($"file '{filePath}' already existed");
+            File.Delete(filePath);
+        }
+        new FileInfo(filePath).DirectoryName.EnsureDirectoryExist();
+        using var stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        stream.Write(bytes, 0, bytes.Length);
+        stream.Flush();
+    }
 }

@@ -1,9 +1,9 @@
 ﻿namespace SharpDevLib.Cryptography;
 
 /// <summary>
-/// Rsa PEM格式类型
+/// PEM格式类型
 /// </summary>
-public enum RsaPemType
+public enum PemType
 {
     /// <summary>
     /// 未知格式
@@ -33,4 +33,8 @@ public enum RsaPemType
     /// X.509SubjectPublicKey
     /// </summary>
     X509SubjectPublicKey,
+    /// <summary>
+    /// X.509 Certificate
+    /// </summary>
+    X509Certificate,
 }

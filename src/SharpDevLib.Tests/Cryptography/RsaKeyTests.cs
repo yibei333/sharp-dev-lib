@@ -34,7 +34,7 @@ public class RsaKeyTests
     {
         using var rsa = RSA.Create();
         rsa.ImportFromPem(Pkcs1PrivateKey);
-        var pem = rsa.ExportPem(RsaPemType.Pkcs1PrivateKey);
+        var pem = rsa.ExportPem(PemType.Pkcs1PrivateKey);
         Console.WriteLine(pem);
         Assert.AreEqual(Pkcs1PrivateKey, pem);
     }
@@ -44,7 +44,7 @@ public class RsaKeyTests
     {
         using var rsa = RSA.Create();
         rsa.ImportFromPem(Pkcs1PrivateKey);
-        var encryptedPkcs1Pem = rsa.ExportPem(RsaPemType.EncryptedPkcs1PrivateKey, passwordBytes);
+        var encryptedPkcs1Pem = rsa.ExportPem(PemType.EncryptedPkcs1PrivateKey, passwordBytes);
         Console.WriteLine(encryptedPkcs1Pem);
         Assert.AreNotEqual(Pkcs1PrivateKey, encryptedPkcs1Pem);
 
@@ -59,7 +59,7 @@ public class RsaKeyTests
     {
         using var rsa = RSA.Create();
         rsa.ImportFromPem(Pkcs1PrivateKey);
-        var encryptedPkcs1Pem = rsa.ExportPem(RsaPemType.EncryptedPkcs1PrivateKey, passwordBytes, "DES-EDE3-CBC");
+        var encryptedPkcs1Pem = rsa.ExportPem(PemType.EncryptedPkcs1PrivateKey, passwordBytes, "DES-EDE3-CBC");
         Console.WriteLine(encryptedPkcs1Pem);
         Assert.AreNotEqual(Pkcs1PrivateKey, encryptedPkcs1Pem);
 
@@ -103,7 +103,7 @@ public class RsaKeyTests
     {
         using var rsa = RSA.Create();
         rsa.ImportFromPem(Pkcs1PrivateKey);
-        var pem = rsa.ExportPem(RsaPemType.Pkcs8PrivateKey);
+        var pem = rsa.ExportPem(PemType.Pkcs8PrivateKey);
         Console.WriteLine(pem);
         Assert.AreEqual(Pkcs8PrivateKey, pem);
     }
@@ -113,7 +113,7 @@ public class RsaKeyTests
     {
         using var rsa = RSA.Create();
         rsa.ImportFromPem(Pkcs1PrivateKey);
-        string encryptedPkcs8Pem = rsa.ExportPem(RsaPemType.EncryptedPkcs8PrivateKey, passwordBytes);
+        string encryptedPkcs8Pem = rsa.ExportPem(PemType.EncryptedPkcs8PrivateKey, passwordBytes);
         Console.WriteLine(encryptedPkcs8Pem);
         Assert.AreNotEqual(Pkcs1PrivateKey, encryptedPkcs8Pem);
 
@@ -148,7 +148,7 @@ public class RsaKeyTests
     {
         using var rsa = RSA.Create();
         rsa.ImportFromPem(Pkcs1PrivateKey);
-        var pem = rsa.ExportPem(RsaPemType.PublicKey);
+        var pem = rsa.ExportPem(PemType.PublicKey);
         Console.WriteLine(pem);
         Assert.AreEqual(PublicKey, pem);
     }
@@ -158,7 +158,7 @@ public class RsaKeyTests
     {
         using var rsa = RSA.Create();
         rsa.ImportFromPem(Pkcs1PrivateKey);
-        var pem = rsa.ExportPem(RsaPemType.X509SubjectPublicKey);
+        var pem = rsa.ExportPem(PemType.X509SubjectPublicKey);
         Console.WriteLine(pem);
         Assert.AreEqual(X509PublicKey, pem);
     }
@@ -194,15 +194,15 @@ public class RsaKeyTests
     }
 
     [TestMethod]
-    [DataRow("Pkcs1PrivateKey", false, RsaPemType.Pkcs1PrivateKey, true, false, 2048)]
-    [DataRow("AESEncryptedPkcs1PrivateKey", true, RsaPemType.EncryptedPkcs1PrivateKey, true, true, 2048)]
-    [DataRow("AESEncryptedPkcs1PrivateKey", false, RsaPemType.EncryptedPkcs1PrivateKey, true, true, 0)]
-    [DataRow("TrippleDESEncryptedPkcs1PrivateKey", true, RsaPemType.EncryptedPkcs1PrivateKey, true, true, 2048)]
-    [DataRow("Pkcs8PrivateKey", false, RsaPemType.Pkcs8PrivateKey, true, false, 2048)]
-    [DataRow("EncryptedPkcs8PrivateKey", true, RsaPemType.EncryptedPkcs8PrivateKey, true, true, 2048)]
-    [DataRow("PublicKey", false, RsaPemType.PublicKey, false, false, 2048)]
-    [DataRow("X509PublicKey", false, RsaPemType.X509SubjectPublicKey, false, false, 2048)]
-    public void GetKeyInfoTest(string keyName, bool requirePassword, RsaPemType type, bool isPrivate, bool isEncrypted, int keySize)
+    [DataRow("Pkcs1PrivateKey", false, PemType.Pkcs1PrivateKey, true, false, 2048)]
+    [DataRow("AESEncryptedPkcs1PrivateKey", true, PemType.EncryptedPkcs1PrivateKey, true, true, 2048)]
+    [DataRow("AESEncryptedPkcs1PrivateKey", false, PemType.EncryptedPkcs1PrivateKey, true, true, 0)]
+    [DataRow("TrippleDESEncryptedPkcs1PrivateKey", true, PemType.EncryptedPkcs1PrivateKey, true, true, 2048)]
+    [DataRow("Pkcs8PrivateKey", false, PemType.Pkcs8PrivateKey, true, false, 2048)]
+    [DataRow("EncryptedPkcs8PrivateKey", true, PemType.EncryptedPkcs8PrivateKey, true, true, 2048)]
+    [DataRow("PublicKey", false, PemType.PublicKey, false, false, 2048)]
+    [DataRow("X509PublicKey", false, PemType.X509SubjectPublicKey, false, false, 2048)]
+    public void GetKeyInfoTest(string keyName, bool requirePassword, PemType type, bool isPrivate, bool isEncrypted, int keySize)
     {
         var key = GetKey(keyName);
         var info = RsaKeyExtension.GetKeyInfo(key, requirePassword ? passwordBytes : null);

@@ -16,4 +16,7 @@ internal static class PemStatics
 
     public const string RsaX509SubjectPublicStart = "-----BEGIN PUBLIC KEY-----";
     public const string RsaX509SubjectPublicEnd = "-----END PUBLIC KEY-----";
+
+    public const string X509CertificateStart = "-----BEGIN CERTIFICATE-----";
+    public const string X509CertificateEnd = "-----END CERTIFICATE-----";
 }
