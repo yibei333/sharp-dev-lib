@@ -145,7 +145,7 @@ public class CertificateTests
         var cert = X509.GenerateServerCert(caKey, caCert, csr, serialNumber, 360, altNames);
         cert.SaveCrt(certPath);
         cert.SaveDer(derCertPath);
-        cert.SavePfx(pfxCertPath, privateKey, "foo");
+        SavePfxTest(cert, keyPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
         Assert.IsTrue(new FileInfo(keyPath).Length > 0);
@@ -155,6 +155,17 @@ public class CertificateTests
         Assert.IsTrue(new FileInfo(derCertPath).Length > 0);
         Assert.IsTrue(new FileInfo(pfxCertPath).Exists);
         Assert.IsTrue(new FileInfo(pfxCertPath).Length > 0);
+    }
+
+    static void SavePfxTest(X509Certificate2 certificate, string keyPath)
+    {
+        var pfxPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/server.pfx");
+        pfxPath.RemoveFileIfExist();
+        certificate.SavePfx(pfxPath, File.ReadAllText(keyPath), "foo");
+
+        Assert.IsTrue(File.Exists(pfxPath));
+        Assert.IsTrue(new FileInfo(pfxPath).Length > 0);
+        Assert.IsTrue(new X509Certificate2(pfxPath, "foo").Subject.NotNullOrEmpty());
     }
 
     [TestMethod]

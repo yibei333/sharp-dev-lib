@@ -247,7 +247,8 @@ public static class RsaKeyExtension
 
     private static string ExportEncryptedPkcs8PrivateKeyPem(this RSA rsa, byte[] password)
     {
-        var bytes = Pkcs8.EncodeEncryptedPrivateKey(rsa.ExportParameters(true), password);
+        var privateKey = Pkcs8.EncodePrivateKey(rsa.ExportParameters(true));
+        var bytes = Pkcs8.EncodeEncryptedPrivateKey(privateKey, password);
         var pemObject = new PemObject(PemStatics.RsaEncryptedPkcs8PrivateStart, Convert.ToBase64String(bytes), PemStatics.RsaEncryptedPkcs8PrivateEnd, PemType.EncryptedPkcs8PrivateKey);
         return pemObject.Write();
     }

@@ -3,7 +3,7 @@
 namespace SharpDevLib.Cryptography;
 
 //rfc8018
-internal static class Pkcs5
+public static class Pkcs5
 {
     public static byte[] PBKDF1(HashAlgorithm hashAlgorithm, byte[] password, byte[] salt, int iterationCount, int dkLen)
     {
@@ -82,7 +82,7 @@ internal static class Pkcs5
             if (j == 0)
             {
                 lastKey = hashAlgorithm.ComputeHash(salt.Concat(BitConverter.GetBytes(i).Reverse()).ToArray());
-                lastKey.CopyTo(key, 0);
+                lastKey.CopyTo(key, 0, key.Length);
             }
             else
             {

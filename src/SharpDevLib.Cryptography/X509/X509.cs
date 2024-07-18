@@ -199,12 +199,7 @@ public static class X509
     /// <param name="password">密码</param>
     public static void SavePfx(this X509Certificate2 certificate, string path, string privateKey, string password)
     {
-        using var rsa = RSA.Create();
-        rsa.ImportPem(privateKey);
-
-        //todo:set private key
-        // certificate.PrivateKey = rsa;
-        var bytes = certificate.Export(X509ContentType.Pfx, password);
+        var bytes = Pkcs12.Encode(certificate, privateKey, password);
         bytes.SaveToFile(path);
     }
 

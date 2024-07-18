@@ -196,7 +196,7 @@ internal static class Pkcs8
         return bytes;
     }
 
-    public static byte[] EncodeEncryptedPrivateKey(RSAParameters parameters, byte[] password)
+    public static byte[] EncodeEncryptedPrivateKey(byte[] data, byte[] password)
     {
         var writer = new AsnWriter(AsnEncodingRules.DER);
         writer.PushSequence();
@@ -236,8 +236,7 @@ internal static class Pkcs8
         var derivedKey = Pkcs5.PBKDF2(hMAC, salt, iterationCount, 32);
         using var aes = Aes.Create();
         using var transform = aes.CreateEncryptor(derivedKey, iv);
-        var key = EncodePrivateKey(parameters);
-        var encryptedKey = transform.TransformFinalBlock(key, 0, key.Length);
+        var encryptedKey = transform.TransformFinalBlock(data, 0, data.Length);
         writer.WriteOctetString(encryptedKey);
 
         writer.PopSequence();
