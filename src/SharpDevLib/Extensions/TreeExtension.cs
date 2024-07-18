@@ -200,7 +200,7 @@ public class BuildTreeOption<TMetaData> where TMetaData : class
 /// <summary>
 /// 树形结构扩展
 /// </summary>
-public static class TreeExtension
+public static class Tree
 {
     /// <summary>
     /// 将集合构建树形结构集合

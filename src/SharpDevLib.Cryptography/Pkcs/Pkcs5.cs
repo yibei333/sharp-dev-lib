@@ -3,7 +3,7 @@
 namespace SharpDevLib.Cryptography;
 
 //rfc8018
-public static class Pkcs5
+internal static class Pkcs5
 {
     public static byte[] PBKDF1(HashAlgorithm hashAlgorithm, byte[] password, byte[] salt, int iterationCount, int dkLen)
     {
