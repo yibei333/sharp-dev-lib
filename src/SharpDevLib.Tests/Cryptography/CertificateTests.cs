@@ -30,7 +30,7 @@ public class CertificateTests
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
         csr.Export().ToUtf8Bytes().SaveToFile(csrPath);
         var serialNumber = X509.GenerateSerialNumber();
-        var cert = X509.GenerateSelfSignedCACert(privateKey, csr, serialNumber, 360000);
+        var cert = X509.GenerateSelfSignedCACert(privateKey, csr, serialNumber, 360000, "Test CA Cert");
         cert.SaveCrt(certPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
@@ -64,7 +64,7 @@ public class CertificateTests
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
         csr.Export().ToUtf8Bytes().SaveToFile(csrPath);
         var serialNumber = X509.GenerateSerialNumber();
-        var cert = X509.GenerateCACert(caKey, caCert, csr, serialNumber, 360);
+        var cert = X509.GenerateCACert(caKey, caCert, csr, serialNumber, 360, "Test Second Level CA Cert");
         cert.SaveCrt(certPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
@@ -98,7 +98,7 @@ public class CertificateTests
             new(SubjectAlternativeNameType.Dns,"*.localhost"),
             new(SubjectAlternativeNameType.IP,"127.0.0.1"),
         };
-        var cert = X509.GenerateSelfSignedServerCert(privateKey, csr, serialNumber, 360, altNames);
+        var cert = X509.GenerateSelfSignedServerCert(privateKey, csr, serialNumber, 360, altNames, "Test Self Signed Server Cert");
         cert.SaveCrt(certPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
@@ -142,7 +142,7 @@ public class CertificateTests
             new(SubjectAlternativeNameType.Dns,"*.localhost"),
             new(SubjectAlternativeNameType.IP,"127.0.0.1"),
         };
-        var cert = X509.GenerateServerCert(caKey, caCert, csr, serialNumber, 360, altNames);
+        var cert = X509.GenerateServerCert(caKey, caCert, csr, serialNumber, 360, altNames, "Test Server Cert");
         cert.SaveCrt(certPath);
         cert.SaveDer(derCertPath);
         SavePfxTest(cert, keyPath);
@@ -187,7 +187,7 @@ public class CertificateTests
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
         csr.Export().ToUtf8Bytes().SaveToFile(csrPath);
         var serialNumber = X509.GenerateSerialNumber();
-        var cert = X509.GenerateSelfSignedClientCert(privateKey, csr, serialNumber, 360);
+        var cert = X509.GenerateSelfSignedClientCert(privateKey, csr, serialNumber, 360, "Test Self Signed Client Cert");
         cert.SaveCrt(certPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
@@ -221,7 +221,7 @@ public class CertificateTests
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
         csr.Export().ToUtf8Bytes().SaveToFile(csrPath);
         var serialNumber = X509.GenerateSerialNumber();
-        var cert = X509.GenerateClientCert(caKey, caCert, csr, serialNumber, 360);
+        var cert = X509.GenerateClientCert(caKey, caCert, csr, serialNumber, 360, "Test Client Cert");
         cert.SaveCrt(certPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);

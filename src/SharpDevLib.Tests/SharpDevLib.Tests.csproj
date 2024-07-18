@@ -95,6 +95,9 @@
 		<None Update="TestData\Cryptography\Certificate\ca.key">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="TestData\Cryptography\Certificate\ca.pfx">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="TestData\Cryptography\RsaKeys\EncryptedPkcs8PrivateKey.txt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

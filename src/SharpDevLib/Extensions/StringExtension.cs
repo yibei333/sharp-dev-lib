@@ -118,4 +118,11 @@ public static class StringExtension
     /// <param name="str">字符串</param>
     /// <returns>字符串</returns>
     public static string RemoveLineBreak(this string str) => str.Replace("\r\n", "").Replace("\r", "").Replace("\n", "");
+
+    /// <summary>
+    /// 字符串删除空格
+    /// </summary>
+    /// <param name="str">字符串</param>
+    /// <returns>字符串</returns>
+    public static string RemoveSpace(this string str) => str.Replace(" ", "");
 }

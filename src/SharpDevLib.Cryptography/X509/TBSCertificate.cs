@@ -28,7 +28,6 @@ internal class TBSCertificate
     public byte[] SubjectPublicKey { get; }
     public List<X509Extension> Extensions { get; }
 
-
     public byte[] Encode()
     {
         //TBSCertificate  ::=  SEQUENCE  {

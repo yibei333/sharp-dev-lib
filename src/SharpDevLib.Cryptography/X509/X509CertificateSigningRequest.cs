@@ -133,8 +133,9 @@ public class X509CertificateSigningRequest
     /// <param name="serialNumber">序列号</param>
     /// <param name="days">过期天数</param>
     /// <param name="extensions">扩展集合</param>
+    /// <param name="friendlyName">友好名称</param>
     /// <returns>X509Certificate2</returns>
-    public X509Certificate2 GenerateCert(string issuerPrivateKey, X500DistinguishedName issuer, byte[] serialNumber, int days, List<X509Extension> extensions)
+    public X509Certificate2 GenerateCert(string issuerPrivateKey, X500DistinguishedName issuer, byte[] serialNumber, int days, List<X509Extension> extensions, string? friendlyName = null)
     {
         var tbsCertificate = new TBSCertificate(serialNumber, issuer, days, Subject, PublicKey, extensions);
         var tbsCertificateBytes = tbsCertificate.Encode();
@@ -157,8 +158,10 @@ public class X509CertificateSigningRequest
         writer.PopSequence();
         writer.WriteBitString(signature, 0);
         writer.PopSequence();
-        var cert = writer.Encode();
-        return new X509Certificate2(cert);
+        var rawData = writer.Encode();
+        var cert = new X509Certificate2(rawData);
+        if (friendlyName.NotNullOrWhiteSpace()) cert.FriendlyName = friendlyName;
+        return cert;
     }
 
     /// <summary>
@@ -168,9 +171,10 @@ public class X509CertificateSigningRequest
     /// <param name="serialNumber">序列号</param>
     /// <param name="days">过期天数</param>
     /// <param name="extensions">扩展集合</param>
-    /// <returns>X509Certificate2</returns>
-    public X509Certificate2 GenerateSelfSignedCert(string privateKey, byte[] serialNumber, int days, List<X509Extension> extensions)
+    /// <param name="friendlyName">友好名称</param>
+    /// <returns>X509Certificate2</returns>    
+    public X509Certificate2 GenerateSelfSignedCert(string privateKey, byte[] serialNumber, int days, List<X509Extension> extensions, string? friendlyName = null)
     {
-        return GenerateCert(privateKey, Subject, serialNumber, days, extensions);
+        return GenerateCert(privateKey, Subject, serialNumber, days, extensions, friendlyName);
     }
 }

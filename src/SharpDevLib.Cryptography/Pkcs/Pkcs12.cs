@@ -101,10 +101,6 @@ internal static class Pkcs12
 
         //3.encryptedContent
         var certificateData = GetCertificateBagData(certificate);
-        //Console.WriteLine(certificate.GetRawCertDataString());
-        //var certificateData = certificate.GetRawCertData();
-        Console.WriteLine(certificateData.Length);
-        Console.WriteLine(certificateData.ToHexString());
         using var hMAC = new HMACSHA256(password.ToUtf8Bytes());
         var derivedKey = Pkcs5.PBKDF2(hMAC, salt, iterationCount, 32);
         using var aes = Aes.Create();
@@ -156,12 +152,26 @@ internal static class Pkcs12
 
         //3.bagAttribute
         writer.PushSetOf();
+
+        //3.1 Thumbprint
         writer.PushSequence();
         writer.WriteObjectIdentifier("1.2.840.113549.1.9.21");//localKeyId
         writer.PushSetOf();
         writer.WriteOctetString(certificate.Thumbprint.FromHexString());
         writer.PopSetOf();
         writer.PopSequence();
+
+        //3.2 friendlyName
+        if (certificate.FriendlyName.NotNullOrWhiteSpace())
+        {
+            writer.PushSequence();
+            writer.WriteObjectIdentifier("1.2.840.113549.1.9.20");//friendlyName
+            writer.PushSetOf();
+            writer.WriteCharacterString(UniversalTagNumber.BMPString, certificate.FriendlyName);
+            writer.PopSetOf();
+            writer.PopSequence();
+        }
+
         writer.PopSetOf();
 
         writer.PopSequence();
@@ -195,14 +205,28 @@ internal static class Pkcs12
         writer.WriteEncodedValue(encryptedPrivateKey);
         writer.PopSetOf(bagTag);
 
-        //3.attribute,Thumbprint
+        //3.bagAttribute
         writer.PushSetOf();
+
+        //3.1 Thumbprint
         writer.PushSequence();
         writer.WriteObjectIdentifier("1.2.840.113549.1.9.21");//localKeyId
         writer.PushSetOf();
         writer.WriteOctetString(certificate.Thumbprint.FromHexString());
         writer.PopSetOf();
         writer.PopSequence();
+
+        //3.2 friendlyName
+        if (certificate.FriendlyName.NotNullOrWhiteSpace())
+        {
+            writer.PushSequence();
+            writer.WriteObjectIdentifier("1.2.840.113549.1.9.20");//friendlyName
+            writer.PushSetOf();
+            writer.WriteCharacterString(UniversalTagNumber.BMPString, certificate.FriendlyName);
+            writer.PopSetOf();
+            writer.PopSequence();
+        }
+
         writer.PopSetOf();
 
         writer.PopSequence();
