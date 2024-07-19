@@ -30,23 +30,23 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
 
     private bool IsUserLoginAllowed => service.RequireSecureLogin == false || activeConnection.IsSecure || activeConnection.IsLocalHost;
 
-    private static readonly List<string> capabilities =
+    static readonly List<string> capabilities =
     [
         "TOP", "RESP-CODES", "PIPELINING", "UIDL", "AUTH-RESP-CODE",
         "UID-PARAM", "MULTI-LINE-IND", "DELI", "SLEE-WAKE", "QAUT"
     ];
 
-    private static readonly List<string> allowedUnauth =
+    static readonly List<string> allowedUnauth =
     [
         "NOOP", "CAPA", "USER", "PASS", "XLOG", "STLS", "QUIT"
     ];
 
-    private static readonly List<string> allowedSleeping =
+    static readonly List<string> allowedSleeping =
     [
         "NOOP", "WAKE", "QUIT"
     ];
 
-    private static PopResponse BadCommandSyntaxResponse => PopResponse.ERR("Bad command syntax.");
+    static PopResponse BadCommandSyntaxResponse => PopResponse.ERR("Bad command syntax.");
 
     private const string UidParamPrefix = "UID:";
 
@@ -337,9 +337,9 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         return PopResponse.OKSingle(ActivityResponseCode(isNewMessages), "Welcome back.");
     }
 
-    private static string ActivityResponseCode(bool isNewMessages) => "ACTIVITY/" + (isNewMessages ? "NEW" : "NONE");
+    static string ActivityResponseCode(bool isNewMessages) => "ACTIVITY/" + (isNewMessages ? "NEW" : "NONE");
 
-    private static PopResponse NOOP() => PopResponse.OKSingle("There's no-one here but us POP3 services.");
+    static PopResponse NOOP() => PopResponse.OKSingle("There's no-one here but us POP3 services.");
 
     private void ParseForUniqueId(string id, out int messageID, out string uniqueID)
     {
@@ -386,7 +386,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         throw new POP3ResponseException("Bad parameters.");
     }
 
-    private static bool IsValidUniqueID(string uniqueID)
+    static bool IsValidUniqueID(string uniqueID)
     {
         if (string.IsNullOrEmpty(uniqueID)) return false;
 

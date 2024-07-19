@@ -76,7 +76,7 @@ internal class ZipPackage : ZipPackageRelationshipBase
         _contentTypes.Add("rels", new ContentType(schemaRelsExtension, true, "rels"));
     }
 
-    private static bool IsEncodingRegistered = false;
+    static bool IsEncodingRegistered = false;
     internal ZipPackage(Stream stream)
     {
         bool hasContentTypeXml = false;

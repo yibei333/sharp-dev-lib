@@ -51,7 +51,7 @@ internal class PopResponse
 
     internal static PopResponse Quit(string text) => new(ResponseClass.OKQuit, null!, text, null!);
 
-    private static NextLineFn ItterableToLineGen(IEnumerable<string> lines)
+    static NextLineFn ItterableToLineGen(IEnumerable<string> lines)
     {
         var lineIter = lines.GetEnumerator();
 

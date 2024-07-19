@@ -160,7 +160,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
 
         internal InternalHashAlogorithm HashAlgorithm { get => GetHashAlgorithm(GetXmlNodeString("@hashAlgorithm")); set => SetXmlNodeString("@hashAlgorithm", GetHashAlgorithmString(value)); }
 
-        private static InternalHashAlogorithm GetHashAlgorithm(string v)
+        static InternalHashAlogorithm GetHashAlgorithm(string v)
         {
             return v switch
             {
@@ -171,7 +171,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
             };
         }
 
-        private static string GetHashAlgorithmString(InternalHashAlogorithm value)
+        static string GetHashAlgorithmString(InternalHashAlogorithm value)
         {
             return value switch
             {
@@ -188,7 +188,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
             set => SetXmlNodeString("@cipherAlgorithm", GetCipherAlgorithmString(value));
         }
 
-        private static InternalCipherAlgorithm GetCipherAlgorithm(string v)
+        static InternalCipherAlgorithm GetCipherAlgorithm(string v)
         {
             return v switch
             {
@@ -198,7 +198,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
             };
         }
 
-        private static string GetCipherAlgorithmString(InternalCipherAlgorithm alg)
+        static string GetCipherAlgorithmString(InternalCipherAlgorithm alg)
         {
             return alg switch
             {

@@ -4,7 +4,7 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib;
 
 internal static class ContentWrappers
 {
-    private static readonly UTF8Encoding UTF8_NO_BOM = new(false);
+    static readonly UTF8Encoding UTF8_NO_BOM = new(false);
 
     internal static long MessageSizeByRetrieval(POP3Events.OnMessageRetrievalDelegate onRetrieveHandler, string mailboxID, string messageUniqueID)
     {

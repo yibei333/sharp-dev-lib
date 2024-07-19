@@ -40,20 +40,21 @@ internal static class Pkcs12
     {
         var writer = new AsnWriter(AsnEncodingRules.DER);
         writer.PushSequence();
+        var localKeyId = new byte[] { 1, 0, 0, 0 };
 
-        //1.certificate
-        var certificateBag = GetCertificateBag(certificate, password);
-        writer.WriteEncodedValue(Pkcs7.Encode(Pkcs7ContentType.EncryptedData, certificateBag));
-
-        //2.private key
-        var privateKeyBag = GetPrivateKeyBag(certificate, privateKey, password);
+        //1.private key
+        var privateKeyBag = GetPrivateKeyBag(certificate, privateKey, password, localKeyId);
         writer.WriteEncodedValue(Pkcs7.Encode(Pkcs7ContentType.Data, privateKeyBag));
+
+        //2.certificate
+        var certificateBag = GetCertificateBag(certificate, password, localKeyId);
+        writer.WriteEncodedValue(Pkcs7.Encode(Pkcs7ContentType.EncryptedData, certificateBag));
 
         writer.PopSequence();
         return writer.Encode();
     }
 
-    static byte[] GetCertificateBag(X509Certificate2 certificate, string password)
+    static byte[] GetCertificateBag(X509Certificate2 certificate, string password, byte[] localKeyId)
     {
         //rfc2315(10.1)中定义
         //EncryptedContentInfo ::= SEQUENCE {
@@ -69,7 +70,7 @@ internal static class Pkcs12
         writer.WriteObjectIdentifier(Pkcs7.GetOidByType(Pkcs7ContentType.Data));
 
         //2.contentEncryptionAlgorithm
-        //1.EncryptionAlgorithmIdentifier
+        //EncryptionAlgorithmIdentifier
         writer.PushSequence();
         writer.WriteObjectIdentifier("1.2.840.113549.1.5.13");//pbes2
         writer.PushSequence();
@@ -100,7 +101,7 @@ internal static class Pkcs12
         writer.PopSequence();
 
         //3.encryptedContent
-        var certificateData = GetCertificateBagData(certificate);
+        var certificateData = GetCertificateBagData(certificate, localKeyId);
         using var hMAC = new HMACSHA256(password.ToUtf8Bytes());
         var derivedKey = Pkcs5.PBKDF2(hMAC, salt, iterationCount, 32);
         using var aes = Aes.Create();
@@ -112,7 +113,7 @@ internal static class Pkcs12
         return writer.Encode();
     }
 
-    static byte[] GetCertificateBagData(X509Certificate2 certificate)
+    static byte[] GetCertificateBagData(X509Certificate2 certificate, byte[] localKeyId)
     {
         //SafeBag::= SEQUENCE {
         //           bagId BAG-TYPE.& id({ PKCS12BagSet})
@@ -153,11 +154,11 @@ internal static class Pkcs12
         //3.bagAttribute
         writer.PushSetOf();
 
-        //3.1 Thumbprint
+        //3.1 localKeyId
         writer.PushSequence();
         writer.WriteObjectIdentifier("1.2.840.113549.1.9.21");//localKeyId
         writer.PushSetOf();
-        writer.WriteOctetString(certificate.Thumbprint.FromHexString());
+        writer.WriteOctetString(localKeyId);
         writer.PopSetOf();
         writer.PopSequence();
 
@@ -179,7 +180,7 @@ internal static class Pkcs12
         return writer.Encode();
     }
 
-    static byte[] GetPrivateKeyBag(X509Certificate2 certificate, string privateKey, string password)
+    static byte[] GetPrivateKeyBag(X509Certificate2 certificate, string privateKey, string password, byte[] localKeyId)
     {
         //SafeContents::= SEQUENCE OF SafeBag
         //SafeBag::= SEQUENCE {
@@ -208,11 +209,11 @@ internal static class Pkcs12
         //3.bagAttribute
         writer.PushSetOf();
 
-        //3.1 Thumbprint
+        //3.1 localKeyId
         writer.PushSequence();
         writer.WriteObjectIdentifier("1.2.840.113549.1.9.21");//localKeyId
         writer.PushSetOf();
-        writer.WriteOctetString(certificate.Thumbprint.FromHexString());
+        writer.WriteOctetString(localKeyId);
         writer.PopSetOf();
         writer.PopSequence();
 
@@ -222,7 +223,7 @@ internal static class Pkcs12
             writer.PushSequence();
             writer.WriteObjectIdentifier("1.2.840.113549.1.9.20");//friendlyName
             writer.PushSetOf();
-            writer.WriteCharacterString(UniversalTagNumber.BMPString, certificate.FriendlyName);
+            writer.WriteCharacterString(UniversalTagNumber.BMPString, $"{certificate.FriendlyName} Key");
             writer.PopSetOf();
             writer.PopSequence();
         }

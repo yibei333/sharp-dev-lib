@@ -57,24 +57,32 @@ internal static class Pkcs1
 
     internal static byte[] EncodePrivateKey(RSAParameters parameters)
     {
-        var writer = new AsnWriter(AsnEncodingRules.DER);
+        try
+        {
+            var writer = new AsnWriter(AsnEncodingRules.DER);
 
-        writer.PushSequence();
-        writer.WriteInteger(0x00);//version
-        writer.WriteIntegerValue(parameters.Modulus);//module
-        writer.WriteIntegerValue(parameters.Exponent);//publicExponent
-        writer.WriteIntegerValue(parameters.D);//privateExponent
-        writer.WriteIntegerValue(parameters.P);//prime1
-        writer.WriteIntegerValue(parameters.Q);//prime2
-        writer.WriteIntegerValue(parameters.DP);//exponent1
-        writer.WriteIntegerValue(parameters.DQ);//exponent2
-        writer.WriteIntegerValue(parameters.InverseQ);//coefficient
-        writer.PopSequence();
+            writer.PushSequence();
+            writer.WriteInteger(0x00);//version
+            writer.WriteIntegerValue(parameters.Modulus);//module
+            writer.WriteIntegerValue(parameters.Exponent);//publicExponent
+            writer.WriteIntegerValue(parameters.D);//privateExponent
+            writer.WriteIntegerValue(parameters.P);//prime1
+            writer.WriteIntegerValue(parameters.Q);//prime2
+            writer.WriteIntegerValue(parameters.DP);//exponent1
+            writer.WriteIntegerValue(parameters.DQ);//exponent2
+            writer.WriteIntegerValue(parameters.InverseQ);//coefficient
+            writer.PopSequence();
 
-        var length = writer.GetEncodedLength();
-        var bytes = new byte[length];
-        writer.Encode(bytes);
-        return bytes;
+            var length = writer.GetEncodedLength();
+            var bytes = new byte[length];
+            writer.Encode(bytes);
+            return bytes;
+        }
+        catch (Exception ex)
+        {
+            //todo：some bug
+            throw ex;
+        }
     }
 
     static void WriteIntegerValue(this AsnWriter writer, byte[] bytes)

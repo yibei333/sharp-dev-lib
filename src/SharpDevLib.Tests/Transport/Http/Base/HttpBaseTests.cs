@@ -9,7 +9,7 @@ namespace SharpDevLib.Tests.Transport.Http.Base;
 
 public class HttpBaseTests
 {
-    private static WebServer? _server;
+    static WebServer? _server;
     protected const string BaseUrl = "http://localhost:23456";
 
     [ClassInitialize(InheritanceBehavior.BeforeEachDerivedClass)]

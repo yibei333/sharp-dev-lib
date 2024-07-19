@@ -13,7 +13,12 @@ public static class X509
     /// 生成随机序列号
     /// </summary>
     /// <returns></returns>
-    public static byte[] GenerateSerialNumber() => Guid.NewGuid().ToString().ToUtf8Bytes();
+    public static byte[] GenerateSerialNumber()
+    {
+        var bytes = new byte[8];
+        new Random().NextBytes(bytes);
+        return bytes;
+    }
 
     /// <summary>
     /// 生成证书
@@ -85,7 +90,7 @@ public static class X509
     /// <returns>X509Certificate2</returns>
     public static X509Certificate2 GenerateServerCert(string issuerPrivateKey, X509Certificate2 issuerCert, X509CertificateSigningRequest csr, byte[] serialNumber, int days, List<SubjectAlternativeName> alternativeNames, string? friendlyName = null)
     {
-        return GenerateCert(issuerPrivateKey, issuerCert, csr, serialNumber, days, X509ExtensionHelper.CreateServerExtensions(alternativeNames), friendlyName);
+        return GenerateCert(issuerPrivateKey, issuerCert, csr, serialNumber, days, X509ExtensionHelper.CreateServerExtensions(csr.PublicKey, issuerCert, alternativeNames), friendlyName);
     }
 
     /// <summary>
@@ -100,7 +105,7 @@ public static class X509
     /// <returns>X509Certificate2</returns>
     public static X509Certificate2 GenerateSelfSignedServerCert(string privateKey, X509CertificateSigningRequest csr, byte[] serialNumber, int days, List<SubjectAlternativeName> alternativeNames, string? friendlyName = null)
     {
-        return GenerateSelfSignedCert(privateKey, csr, serialNumber, days, X509ExtensionHelper.CreateServerExtensions(alternativeNames), friendlyName);
+        return GenerateSelfSignedCert(privateKey, csr, serialNumber, days, X509ExtensionHelper.CreateServerExtensions(csr.PublicKey, null, alternativeNames), friendlyName);
     }
 
     /// <summary>
@@ -115,7 +120,7 @@ public static class X509
     /// <returns>X509Certificate2</returns>
     public static X509Certificate2 GenerateClientCert(string issuerPrivateKey, X509Certificate2 issuerCert, X509CertificateSigningRequest csr, byte[] serialNumber, int days, string? friendlyName = null)
     {
-        return GenerateCert(issuerPrivateKey, issuerCert, csr, serialNumber, days, X509ExtensionHelper.CreateClientExtensions(), friendlyName);
+        return GenerateCert(issuerPrivateKey, issuerCert, csr, serialNumber, days, X509ExtensionHelper.CreateClientExtensions(csr.PublicKey, issuerCert), friendlyName);
     }
 
     /// <summary>
@@ -129,7 +134,7 @@ public static class X509
     /// <returns>X509Certificate2</returns>
     public static X509Certificate2 GenerateSelfSignedClientCert(string privateKey, X509CertificateSigningRequest csr, byte[] serialNumber, int days, string? friendlyName = null)
     {
-        return GenerateSelfSignedCert(privateKey, csr, serialNumber, days, X509ExtensionHelper.CreateClientExtensions(), friendlyName);
+        return GenerateSelfSignedCert(privateKey, csr, serialNumber, days, X509ExtensionHelper.CreateClientExtensions(csr.PublicKey, null), friendlyName);
     }
 
     /// <summary>

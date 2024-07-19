@@ -9,7 +9,7 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib;
 
 internal static class Helpers
 {
-    private static readonly HashSet<string> allowedDisposedObjectNames = ["System.Net.Sockets.Socket", "System.Net.Sockets.NetworkStream"];
+    static readonly HashSet<string> allowedDisposedObjectNames = ["System.Net.Sockets.Socket", "System.Net.Sockets.NetworkStream"];
 
     internal static void TryCallCatch(Action fn)
     {

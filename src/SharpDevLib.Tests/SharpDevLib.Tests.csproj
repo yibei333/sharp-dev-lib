@@ -92,6 +92,9 @@
 		<None Update="TestData\Cryptography\Certificate\ca.crt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="TestData\Cryptography\Certificate\ca.csr">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="TestData\Cryptography\Certificate\ca.key">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

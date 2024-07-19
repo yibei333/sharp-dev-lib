@@ -135,7 +135,7 @@ public static class StreamLineReader
         }
     }
 
-    private static byte[] ExtractBytes(byte[] from, int startIndex, int length)
+    static byte[] ExtractBytes(byte[] from, int startIndex, int length)
     {
         var toBuffer = new byte[length];
         Buffer.BlockCopy(from, startIndex, toBuffer, 0, length);

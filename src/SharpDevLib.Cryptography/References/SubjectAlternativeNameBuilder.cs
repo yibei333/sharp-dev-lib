@@ -9,7 +9,7 @@ namespace SharpDevLib.Cryptography;
 
 internal sealed class SubjectAlternativeNameBuilder
 {
-    private static readonly IdnMapping s_idnMapping = new();
+    static readonly IdnMapping s_idnMapping = new();
 
     // Because GeneralNames is a SEQUENCE, just make a rolling list, it doesn't need to be re-sorted.
     private readonly List<byte[]> _encodedNames = new();

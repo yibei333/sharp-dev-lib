@@ -146,14 +146,14 @@ public static class RsaKeyExtension
     #endregion
 
     #region Pkcs1
-    private static string ExportPkcs1PrivateKeyPem(this RSA rsa)
+    static string ExportPkcs1PrivateKeyPem(this RSA rsa)
     {
         var bytes = Pkcs1.EncodePrivateKey(rsa.ExportParameters(true));
         var pemObject = new PemObject(PemStatics.RsaPkcs1PrivateStart, Convert.ToBase64String(bytes), PemStatics.RsaPkcs1PrivateEnd, PemType.Pkcs1PrivateKey);
         return pemObject.Write();
     }
 
-    private static string ExportEncryptedPkcs1PrivateKeyPem(this RSA rsa, byte[] password, string algorithm = "AES-256-CBC")
+    static string ExportEncryptedPkcs1PrivateKeyPem(this RSA rsa, byte[] password, string algorithm = "AES-256-CBC")
     {
         var iv = GenterateRandomIVByAlgorithm(algorithm);
         var fields = new PemHeaderFields("Proc-Type: 4,ENCRYPTED", $"DEK-Info: {algorithm},{iv.ToHexString()}");
@@ -164,15 +164,23 @@ public static class RsaKeyExtension
         return pemObject.Write();
     }
 
-    private static void ImportPkcs1PrivateKeyPem(this RSA rsa, string pkcs1PrivateKeyPem)
+    static void ImportPkcs1PrivateKeyPem(this RSA rsa, string pkcs1PrivateKeyPem)
     {
-        var pemObject = PemObject.Read(pkcs1PrivateKeyPem);
-        if (pemObject.PemType != PemType.Pkcs1PrivateKey) throw new InvalidDataException($"key type({pemObject.PemType}) is not pkcs1 private key");
-        var bytes = Convert.FromBase64String(pemObject.Body);
-        rsa.ImportPkcs1PrivateKeyPem(bytes);
+        try
+        {
+            var pemObject = PemObject.Read(pkcs1PrivateKeyPem);
+            if (pemObject.PemType != PemType.Pkcs1PrivateKey) throw new InvalidDataException($"key type({pemObject.PemType}) is not pkcs1 private key");
+            var bytes = Convert.FromBase64String(pemObject.Body);
+            rsa.ImportPkcs1PrivateKeyPem(bytes);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(pkcs1PrivateKeyPem);
+            throw ex;
+        }
     }
 
-    private static void ImportEncryptedPkcs1PrivateKeyPem(this RSA rsa, string pkcs1PrivateKeyPem, byte[] password)
+    static void ImportEncryptedPkcs1PrivateKeyPem(this RSA rsa, string pkcs1PrivateKeyPem, byte[] password)
     {
         if (password.IsNullOrEmpty()) throw new Exception("password required");
         var pemObject = PemObject.Read(pkcs1PrivateKeyPem);
@@ -184,7 +192,7 @@ public static class RsaKeyExtension
         rsa.ImportPkcs1PrivateKeyPem(decryptedKey);
     }
 
-    private static byte[] GenterateRandomIVByAlgorithm(string algorithm)
+    static byte[] GenterateRandomIVByAlgorithm(string algorithm)
     {
         int ivLength;
         if (algorithm == "AES-256-CBC") ivLength = 16;
@@ -196,27 +204,27 @@ public static class RsaKeyExtension
         return iv;
     }
 
-    private static void ImportPkcs1PrivateKeyPem(this RSA rsa, byte[] bytes)
+    static void ImportPkcs1PrivateKeyPem(this RSA rsa, byte[] bytes)
     {
         var parameter = Pkcs1.DecodePrivateKey(bytes);
         rsa.ImportParameters(parameter);
     }
 
-    private static byte[] DecryptPkcs1Key(PemHeaderFields fields, byte[] data, byte[] key)
+    static byte[] DecryptPkcs1Key(PemHeaderFields fields, byte[] data, byte[] key)
     {
         using var algorithm = GetSymmetricAlgorithmByFields(fields);
         using var transform = algorithm.CreateDecryptor(key, fields.DEKInfoIVBytes);
         return transform.TransformFinalBlock(data, 0, data.Length);
     }
 
-    private static byte[] EncryptPkcs1Key(PemHeaderFields fields, byte[] data, byte[] key)
+    static byte[] EncryptPkcs1Key(PemHeaderFields fields, byte[] data, byte[] key)
     {
         using var algorithm = GetSymmetricAlgorithmByFields(fields);
         using var transform = algorithm.CreateEncryptor(key, fields.DEKInfoIVBytes);
         return transform.TransformFinalBlock(data, 0, data.Length);
     }
 
-    private static SymmetricAlgorithm GetSymmetricAlgorithmByFields(PemHeaderFields fields)
+    static SymmetricAlgorithm GetSymmetricAlgorithmByFields(PemHeaderFields fields)
     {
         SymmetricAlgorithm algorithm;
         if (fields.DEKInfoAlgorithmFileds![0].Equals(nameof(Aes), StringComparison.OrdinalIgnoreCase))
@@ -238,14 +246,14 @@ public static class RsaKeyExtension
     #endregion
 
     #region Pkcs8
-    private static string ExportPkcs8PrivateKeyPem(this RSA rsa)
+    static string ExportPkcs8PrivateKeyPem(this RSA rsa)
     {
         var bytes = Pkcs8.EncodePrivateKey(rsa.ExportParameters(true));
         var pemObject = new PemObject(PemStatics.RsaPkcs8PrivateStart, Convert.ToBase64String(bytes), PemStatics.RsaPkcs8PrivateEnd, PemType.Pkcs8PrivateKey);
         return pemObject.Write();
     }
 
-    private static string ExportEncryptedPkcs8PrivateKeyPem(this RSA rsa, byte[] password)
+    static string ExportEncryptedPkcs8PrivateKeyPem(this RSA rsa, byte[] password)
     {
         var privateKey = Pkcs8.EncodePrivateKey(rsa.ExportParameters(true));
         var bytes = Pkcs8.EncodeEncryptedPrivateKey(privateKey, password);
@@ -253,7 +261,7 @@ public static class RsaKeyExtension
         return pemObject.Write();
     }
 
-    private static void ImportPkcs8PrivateKeyPem(this RSA rsa, string pkcs8PrivateKeyPem)
+    static void ImportPkcs8PrivateKeyPem(this RSA rsa, string pkcs8PrivateKeyPem)
     {
         var pemObject = PemObject.Read(pkcs8PrivateKeyPem);
         if (pemObject.PemType != PemType.Pkcs8PrivateKey) throw new InvalidDataException($"key type({pemObject.PemType}) is not pkcs8 private key");
@@ -262,7 +270,7 @@ public static class RsaKeyExtension
         ImportPkcs8PrivateKeyPem(rsa, bytes);
     }
 
-    private static void ImportEncryptedPkcs8PrivateKeyPem(this RSA rsa, string encryptedPkcs8PrivateKeyPem, byte[] password)
+    static void ImportEncryptedPkcs8PrivateKeyPem(this RSA rsa, string encryptedPkcs8PrivateKeyPem, byte[] password)
     {
         var pemObject = PemObject.Read(encryptedPkcs8PrivateKeyPem);
         if (pemObject.PemType != PemType.EncryptedPkcs8PrivateKey) throw new InvalidDataException($"key type({pemObject.PemType}) is not encrypted pkcs8 private key");
@@ -272,7 +280,7 @@ public static class RsaKeyExtension
         ImportPkcs8PrivateKeyPem(rsa, key);
     }
 
-    private static void ImportPkcs8PrivateKeyPem(this RSA rsa, byte[] bytes)
+    static void ImportPkcs8PrivateKeyPem(this RSA rsa, byte[] bytes)
     {
         var key = Pkcs8.DecodePrivateKeyInfo(bytes);
         rsa.ImportPkcs1PrivateKeyPem(key);
@@ -280,21 +288,21 @@ public static class RsaKeyExtension
     #endregion
 
     #region Public Key
-    private static string ExportPublicKeyPem(this RSA rsa)
+    static string ExportPublicKeyPem(this RSA rsa)
     {
         var bytes = Pkcs1.EncodePublicKey(rsa.ExportParameters(false));
         var pemObject = new PemObject(PemStatics.RsaPublicStart, Convert.ToBase64String(bytes), PemStatics.RsaPublicEnd, PemType.PublicKey);
         return pemObject.Write();
     }
 
-    private static string ExportX509SubjectPublicKeyPem(this RSA rsa)
+    static string ExportX509SubjectPublicKeyPem(this RSA rsa)
     {
         var bytes = X509.EncodeSubjectPublicKeyInfo(rsa.ExportParameters(false));
         var pemObject = new PemObject(PemStatics.RsaX509SubjectPublicStart, Convert.ToBase64String(bytes), PemStatics.RsaX509SubjectPublicEnd, PemType.X509SubjectPublicKey);
         return pemObject.Write();
     }
 
-    private static void ImportPublicKeyPem(this RSA rsa, string publicKeyPem)
+    static void ImportPublicKeyPem(this RSA rsa, string publicKeyPem)
     {
         var pemObject = PemObject.Read(publicKeyPem);
         if (pemObject.PemType != PemType.PublicKey) throw new InvalidDataException($"key type({pemObject.PemType}) is not rsa public key");
@@ -303,7 +311,7 @@ public static class RsaKeyExtension
         rsa.ImportParameters(parameters);
     }
 
-    private static void ImportX509SubjectPublicKeyPem(this RSA rsa, string x509SubjectPublicKeyPem)
+    static void ImportX509SubjectPublicKeyPem(this RSA rsa, string x509SubjectPublicKeyPem)
     {
         var pemObject = PemObject.Read(x509SubjectPublicKeyPem);
         if (pemObject.PemType != PemType.X509SubjectPublicKey) throw new InvalidDataException($"key type({pemObject.PemType}) is not x509 subject public key");

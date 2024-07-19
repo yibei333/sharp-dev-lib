@@ -16,7 +16,7 @@ public class POP3Listener : IDisposable
     public bool RequireSecureLogin { get; set; }
     public X509Certificate SecureCertificate { get; set; } = null!;
     internal readonly ManualResetEvent stopService;
-    private static long nextConnectionID = 5000000001;
+    static long nextConnectionID = 5000000001;
     internal static long GenConnectionID() => Interlocked.Increment(ref nextConnectionID);
     public POP3Events Events { get; } = new POP3Events();
     public bool AllowUnknownIDRequests { get; set; } = true;

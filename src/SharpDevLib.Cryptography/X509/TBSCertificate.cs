@@ -11,8 +11,9 @@ internal class TBSCertificate
         SerialNumber = serialNumber;
         SignatureAlgorithmIdentifier = "1.2.840.113549.1.1.11";//sha256rsa
         Issuer = issuer;
-        NotBefore = DateTimeOffset.Now;
-        NotAfter = DateTimeOffset.Now.AddDays(days);
+        var now = DateTime.UtcNow.Date.AddDays(-1);
+        NotBefore = new DateTimeOffset(now, TimeSpan.Zero);
+        NotAfter = NotBefore.AddDays(days);
         Subject = subject;
         SubjectPublicKey = subjectPublicKey;
         Extensions = extensions;
@@ -76,7 +77,16 @@ internal class TBSCertificate
         writer.PopSequence(versionTag);
 
         //serialNumber
-        writer.WriteInteger(SerialNumber);
+        try
+        {
+            writer.WriteInteger(SerialNumber);
+        }
+        catch (Exception ex)
+        {
+            //todo:some bug
+            Console.WriteLine(SerialNumber.ToHexString());
+            throw ex;
+        }
 
         //signature
         writer.PushSequence();
@@ -89,8 +99,8 @@ internal class TBSCertificate
 
         //validity
         writer.PushSequence();
-        writer.WriteGeneralizedTime(NotBefore);
-        writer.WriteGeneralizedTime(NotAfter);
+        WriteTime(writer, NotBefore);
+        WriteTime(writer, NotAfter);
         writer.PopSequence();
 
         //subject
@@ -110,6 +120,7 @@ internal class TBSCertificate
             {
                 writer.PushSequence();
                 writer.WriteObjectIdentifier(extension.Oid.Value);
+                if (extension.Critical) writer.WriteBoolean(true);
                 writer.PushOctetString();
                 writer.WriteEncodedValue(extension.RawData);
                 writer.PopOctetString();
@@ -122,5 +133,12 @@ internal class TBSCertificate
 
         writer.PopSequence();
         return writer.Encode();
+    }
+
+    static void WriteTime(AsnWriter writer, DateTimeOffset dateTime)
+    {
+        //https://www.rfc-editor.org/rfc/rfc5280.html#section-4.1.2.5
+        if (dateTime.Year < 2050) writer.WriteUtcTime(dateTime);
+        else writer.WriteGeneralizedTime(dateTime);
     }
 }

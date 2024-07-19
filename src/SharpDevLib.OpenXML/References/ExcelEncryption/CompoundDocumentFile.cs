@@ -230,7 +230,7 @@ internal class CompoundDocumentFile : IDisposable
         }
     }
 
-    private static byte[] GetStream(int startingSectorLocation, long streamSize, List<int> FAT, List<byte[]> sectors)
+    static byte[] GetStream(int startingSectorLocation, long streamSize, List<int> FAT, List<byte[]> sectors)
     {
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
@@ -301,7 +301,7 @@ internal class CompoundDocumentFile : IDisposable
         return l;
     }
 
-    private static void ReadDirectory(List<byte[]> sectors, int index, List<CompoundDocumentItem> l)
+    static void ReadDirectory(List<byte[]> sectors, int index, List<CompoundDocumentItem> l)
     {
 
         using var br = new BinaryReader(new MemoryStream(sectors[index]));
@@ -422,7 +422,7 @@ internal class CompoundDocumentFile : IDisposable
         return l;
     }
 
-    private static void InitItem(CompoundDocumentItem item)
+    static void InitItem(CompoundDocumentItem item)
     {
         item.LeftSibling = -1;
         item.RightSibling = -1;
@@ -480,7 +480,7 @@ internal class CompoundDocumentFile : IDisposable
         return pos + listAdd;
     }
 
-    private static int GetPos(int fromPos, int toPos)
+    static int GetPos(int fromPos, int toPos)
     {
         var div = (toPos - fromPos) / 2;
         return fromPos + div;
@@ -510,7 +510,7 @@ internal class CompoundDocumentFile : IDisposable
         bw.Seek(pos, SeekOrigin.Begin);
     }
 
-    private static void WritePosition(BinaryWriter bw, int[] sectors, ref int writePos)
+    static void WritePosition(BinaryWriter bw, int[] sectors, ref int writePos)
     {
         int pos = (int)bw.BaseStream.Position;
         bw.Seek(writePos, SeekOrigin.Begin);
@@ -710,7 +710,7 @@ internal class CompoundDocumentFile : IDisposable
         _currentFATSectorPos = (int)bw.BaseStream.Position;
     }
 
-    private static int GetSectors(int v, int size) => (v % size == 0) ? (v / size) : (v / size + 1);
+    static int GetSectors(int v, int size) => (v % size == 0) ? (v / size) : (v / size + 1);
 
     private byte[] SetMiniStream(List<CompoundDocumentItem> dirs)
     {
@@ -742,7 +742,7 @@ internal class CompoundDocumentFile : IDisposable
         return ((MemoryStream)bwMiniFAT.BaseStream).ToArray();
     }
 
-    private static void WriteStreamFullSector(BinaryWriter bw, int sectorSize)
+    static void WriteStreamFullSector(BinaryWriter bw, int sectorSize)
     {
         var rest = sectorSize - (bw.BaseStream.Length % sectorSize);
         if (rest > 0 && rest < sectorSize) bw.Write(new byte[rest]);
@@ -785,7 +785,7 @@ internal class CompoundDocumentFile : IDisposable
         foreach (var c in item.Children) CreateFATStreams(c, bw, bwMini, dwi);
     }
 
-    private static int WriteStream(BinaryWriter bw, List<int> fat, byte[] stream, int FATSectorSize)
+    static int WriteStream(BinaryWriter bw, List<int> fat, byte[] stream, int FATSectorSize)
     {
         var rest = FATSectorSize - (stream.Length % FATSectorSize);
         bw.Write(stream);
@@ -796,7 +796,7 @@ internal class CompoundDocumentFile : IDisposable
         return ret; //Returns the start sector
     }
 
-    private static void AddFAT(List<int> fat, long streamSize, int sectorSize)
+    static void AddFAT(List<int> fat, long streamSize, int sectorSize)
     {
         var size = 0;
         while (size < streamSize)

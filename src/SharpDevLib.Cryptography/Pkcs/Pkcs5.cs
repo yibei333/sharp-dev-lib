@@ -2,9 +2,20 @@
 
 namespace SharpDevLib.Cryptography;
 
-//rfc8018
-internal static class Pkcs5
+/// <summary>
+/// Pkcs5,rfc8018
+/// </summary>
+public static class Pkcs5
 {
+    /// <summary>
+    /// PBKDF1
+    /// </summary>
+    /// <param name="hashAlgorithm">hashAlgorithm</param>
+    /// <param name="password">password</param>
+    /// <param name="salt">salt</param>
+    /// <param name="iterationCount">iterationCount</param>
+    /// <param name="dkLen">dkLen</param>
+    /// <returns>derived key</returns>
     public static byte[] PBKDF1(HashAlgorithm hashAlgorithm, byte[] password, byte[] salt, int iterationCount, int dkLen)
     {
         VerifyPBKDF1Parameters(hashAlgorithm, iterationCount, dkLen, out var hLen);
@@ -43,6 +54,14 @@ internal static class Pkcs5
         else throw new Exception($"algorithm only support:{nameof(MD5)},{nameof(SHA1)}");
     }
 
+    /// <summary>
+    /// PBKDF2
+    /// </summary>
+    /// <param name="hashAlgorithm">hashAlgorithm</param>
+    /// <param name="salt">salt</param>
+    /// <param name="iterationCount">iterationCount</param>
+    /// <param name="dkLen">dkLen</param>
+    /// <returns>derived key</returns>
     public static byte[] PBKDF2(HashAlgorithm hashAlgorithm, byte[] salt, int iterationCount, int dkLen)
     {
         VerifyPBKDF2Parameters(hashAlgorithm, iterationCount, dkLen, out var hLen);

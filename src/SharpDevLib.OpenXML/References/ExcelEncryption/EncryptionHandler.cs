@@ -134,7 +134,7 @@ internal class EncryptedPackageHandler
         return ms4;
     }
 
-    private static byte[] EncryptDataAgile(byte[] data, EncryptionInfoAgile encryptionInfo, HashAlgorithm hashProvider)
+    static byte[] EncryptDataAgile(byte[] data, EncryptionInfoAgile encryptionInfo, HashAlgorithm hashProvider)
     {
         var ke = encryptionInfo.KeyEncryptors[0];
         var aes = Aes.Create();
@@ -182,7 +182,7 @@ internal class EncryptedPackageHandler
         if (ei.DataIntegrity != null) ei.DataIntegrity.EncryptedHmacValue = msOther.ToArray();
     }
 
-    private static HMAC GetHmacProvider(EncryptionInfoAgile.EncryptionKeyData ei, byte[] salt)
+    static HMAC GetHmacProvider(EncryptionInfoAgile.EncryptionKeyData ei, byte[] salt)
     {
         return ei.HashAlgorithm switch
         {
@@ -195,7 +195,7 @@ internal class EncryptedPackageHandler
         };
     }
 
-    private static MemoryStream EncryptPackageBinary(byte[] package, ExcelEncryption encryption)
+    static MemoryStream EncryptPackageBinary(byte[] package, ExcelEncryption encryption)
     {
         var encryptionInfo = CreateEncryptionInfo(encryption.Password, encryption.Algorithm == EncryptionAlgorithm.AES128 ? AlgorithmID.AES128 : (encryption.Algorithm == EncryptionAlgorithm.AES192 ? AlgorithmID.AES192 : AlgorithmID.AES256), out var encryptionKey);
         var doc = new CompoundDocument();
@@ -217,7 +217,7 @@ internal class EncryptedPackageHandler
     }
 
     #region "Dataspaces Stream methods"
-    private static void CreateDataSpaces(CompoundDocument doc)
+    static void CreateDataSpaces(CompoundDocument doc)
     {
         var ds = new CompoundDocument.StoragePart();
         doc.Storage.SubStorage.Add("\x06" + "DataSpaces", ds);
@@ -237,7 +237,7 @@ internal class EncryptedPackageHandler
         strEncTrans.DataStreams.Add("\x06Primary", CreateTransformInfoPrimary());
     }
 
-    private static byte[] CreateStrongEncryptionDataSpaceStream()
+    static byte[] CreateStrongEncryptionDataSpaceStream()
     {
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
@@ -253,7 +253,7 @@ internal class EncryptedPackageHandler
         return ms.ToArray();
     }
 
-    private static byte[] CreateVersionStream()
+    static byte[] CreateVersionStream()
     {
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
@@ -269,7 +269,7 @@ internal class EncryptedPackageHandler
         return ms.ToArray();
     }
 
-    private static byte[] CreateDataSpaceMap()
+    static byte[] CreateDataSpaceMap()
     {
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
@@ -290,7 +290,7 @@ internal class EncryptedPackageHandler
         return ms.ToArray();
     }
 
-    private static byte[] CreateTransformInfoPrimary()
+    static byte[] CreateTransformInfoPrimary()
     {
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
@@ -316,7 +316,7 @@ internal class EncryptedPackageHandler
     }
     #endregion
 
-    private static EncryptionInfoBinary CreateEncryptionInfo(string password, AlgorithmID algID, out byte[] key)
+    static EncryptionInfoBinary CreateEncryptionInfo(string password, AlgorithmID algID, out byte[] key)
     {
         if (algID == AlgorithmID.Flags || algID == AlgorithmID.RC4) throw new ArgumentException("algID must be AES128, AES192 or AES256");
         var encryptionInfo = new EncryptionInfoBinary
@@ -362,7 +362,7 @@ internal class EncryptedPackageHandler
         return encryptionInfo;
     }
 
-    private static byte[] EncryptData(byte[] key, byte[] data, bool useDataSize)
+    static byte[] EncryptData(byte[] key, byte[] data, bool useDataSize)
     {
         using var aes = Aes.Create();
         aes.KeySize = key.Length * 8;
@@ -475,7 +475,7 @@ internal class EncryptedPackageHandler
         return doc;
     }
 
-    private static HashAlgorithm GetHashProvider(EncryptionInfoAgile.EncryptionKeyData encr)
+    static HashAlgorithm GetHashProvider(EncryptionInfoAgile.EncryptionKeyData encr)
     {
         return encr.HashAlgorithm switch
         {
@@ -488,7 +488,7 @@ internal class EncryptedPackageHandler
         };
     }
 
-    private static MemoryStream DecryptBinary(EncryptionInfoBinary encryptionInfo, string password, long size, byte[] encryptedData)
+    static MemoryStream DecryptBinary(EncryptionInfoBinary encryptionInfo, string password, long size, byte[] encryptedData)
     {
         var doc = new MemoryStream();
         if (encryptionInfo.Header?.AlgID == AlgorithmID.AES128 || (encryptionInfo.Header?.AlgID == AlgorithmID.Flags && ((encryptionInfo.Flags & (Flags.fAES | Flags.fExternal | Flags.fCryptoAPI)) == (Flags.fAES | Flags.fCryptoAPI))) || encryptionInfo.Header?.AlgID == AlgorithmID.AES192 || encryptionInfo.Header?.AlgID == AlgorithmID.AES256)
@@ -513,7 +513,7 @@ internal class EncryptedPackageHandler
         return doc;
     }
 
-    private static bool IsPasswordValid(byte[] key, EncryptionInfoBinary encryptionInfo)
+    static bool IsPasswordValid(byte[] key, EncryptionInfoBinary encryptionInfo)
     {
         using var decryptKey = Aes.Create();
         decryptKey.KeySize = encryptionInfo.Header?.KeySize ?? 0;
@@ -546,7 +546,7 @@ internal class EncryptedPackageHandler
         return true;
     }
 
-    private static bool IsPasswordValid(HashAlgorithm sha, EncryptionInfoAgile.EncryptionKeyEncryptor encr)
+    static bool IsPasswordValid(HashAlgorithm sha, EncryptionInfoAgile.EncryptionKeyEncryptor encr)
     {
         var valHash = sha.ComputeHash(encr.VerifierHashInput);
         for (int i = 0; i < valHash.Length; i++)
@@ -556,7 +556,7 @@ internal class EncryptedPackageHandler
         return true;
     }
 
-    private static byte[] DecryptAgileFromKey(EncryptionInfoAgile.EncryptionKeyData encr, byte[] key, byte[] encryptedData, long size, byte[] iv)
+    static byte[] DecryptAgileFromKey(EncryptionInfoAgile.EncryptionKeyData encr, byte[] key, byte[] encryptedData, long size, byte[] iv)
     {
         using var decryptKey = GetEncryptionAlgorithm(encr);
         decryptKey.BlockSize = encr.BlockSize << 3;
@@ -573,7 +573,7 @@ internal class EncryptedPackageHandler
         return decryptedData;
     }
 
-    private static SymmetricAlgorithm GetEncryptionAlgorithm(EncryptionInfoAgile.EncryptionKeyData encr)
+    static SymmetricAlgorithm GetEncryptionAlgorithm(EncryptionInfoAgile.EncryptionKeyData encr)
     {
         return encr.CipherAlgorithm switch
         {
@@ -583,7 +583,7 @@ internal class EncryptedPackageHandler
         };
     }
 
-    private static void EncryptAgileFromKey(EncryptionInfoAgile.EncryptionKeyEncryptor encr, byte[] key, byte[] data, long pos, long size, byte[] iv, MemoryStream ms)
+    static void EncryptAgileFromKey(EncryptionInfoAgile.EncryptionKeyEncryptor encr, byte[] key, byte[] data, long pos, long size, byte[] iv, MemoryStream ms)
     {
         using var encryptKey = GetEncryptionAlgorithm(encr);
         encryptKey.BlockSize = encr.BlockSize << 3;
@@ -605,7 +605,7 @@ internal class EncryptedPackageHandler
         }
     }
 
-    private static byte[] GetPasswordHashBinary(string password, EncryptionInfoBinary encryptionInfo)
+    static byte[] GetPasswordHashBinary(string password, EncryptionInfoBinary encryptionInfo)
     {
         try
         {
@@ -664,7 +664,7 @@ internal class EncryptedPackageHandler
         }
     }
 
-    private static byte[] GetFinalHash(HashAlgorithm hashProvider, byte[] blockKey, byte[] hash)
+    static byte[] GetFinalHash(HashAlgorithm hashProvider, byte[] blockKey, byte[] hash)
     {
         //2.3.4.13 MS-OFFCRYPTO
         var tempHash = new byte[hash.Length + blockKey.Length];
@@ -674,7 +674,7 @@ internal class EncryptedPackageHandler
         return hashFinal;
     }
 
-    private static byte[] GetPasswordHash(HashAlgorithm hashProvider, byte[] salt, string password, int spinCount, int hashSize)
+    static byte[] GetPasswordHash(HashAlgorithm hashProvider, byte[] salt, string password, int spinCount, int hashSize)
     {
         var tempHash = new byte[4 + hashSize];    //Iterator + prev. hash
         var hash = hashProvider.ComputeHash(CombinePassword(salt, password));
@@ -689,7 +689,7 @@ internal class EncryptedPackageHandler
         return hash;
     }
 
-    private static byte[] FixHashSize(byte[] hash, int size, byte fill = 0)
+    static byte[] FixHashSize(byte[] hash, int size, byte fill = 0)
     {
         if (hash.Length == size) return hash;
         else if (hash.Length < size)
@@ -707,7 +707,7 @@ internal class EncryptedPackageHandler
         }
     }
 
-    private static byte[] CombinePassword(byte[] salt, string password)
+    static byte[] CombinePassword(byte[] salt, string password)
     {
         if (password == "") password = "VelvetSweatshop";   //Used if Password is blank
         // Convert password to unicode...
