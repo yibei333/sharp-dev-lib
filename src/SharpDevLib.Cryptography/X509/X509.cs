@@ -16,7 +16,11 @@ public static class X509
     public static byte[] GenerateSerialNumber()
     {
         var bytes = new byte[8];
-        new Random().NextBytes(bytes);
+        var random = new Random();
+        do
+        {
+            random.NextBytes(bytes);
+        } while (bytes[0] == 0);//may cause exception:The first 9 bits of the integer value all have the same value. Ensure the input is in big-endian byte order and that all redundant leading bytes have been removed. (Parameter 'value')
         return bytes;
     }
 

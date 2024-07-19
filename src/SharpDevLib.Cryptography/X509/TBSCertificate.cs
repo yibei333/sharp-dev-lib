@@ -77,16 +77,7 @@ internal class TBSCertificate
         writer.PopSequence(versionTag);
 
         //serialNumber
-        try
-        {
-            writer.WriteInteger(SerialNumber);
-        }
-        catch (Exception ex)
-        {
-            //todo:some bug
-            Console.WriteLine(SerialNumber.ToHexString());
-            throw ex;
-        }
+        writer.WriteInteger(SerialNumber);
 
         //signature
         writer.PushSequence();

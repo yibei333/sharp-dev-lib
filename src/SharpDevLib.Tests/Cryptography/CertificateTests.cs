@@ -2,7 +2,9 @@
 using SharpDevLib.Cryptography;
 using System;
 using System.Collections.Generic;
+using System.Formats.Asn1;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -237,36 +239,38 @@ public class CertificateTests
     [TestMethod]
     public void Test()
     {
-        var pem = @"
------BEGIN RSA PRIVATE KEY-----
-MIIEpAIBAAKCAQEAy73ZQN3YT9SSXxMRVwZxDH4UE6YpSQ4MNqTj/GEpM9/m88TE
-ZQUvq/jPP7UzNbWLR35bTPCEkHspYjb5f+c/Na6kU97HQAn6lF1zLjxkrICTggGO
-bmr8zxE8NNuDe2DaS6EfciPgZgoj7izAEVShIPw3k7adky74bt96mdT9eet4iEUU
-tdZcyw1QBnBMNWzwPx9g/bp1v52nGIiJLNjqAE9UJ8jC8f+cj1WiHa1JlSmc50bR
-q3zrsSkpWqtv0xZR9LUZAxnWh+V4trwORaGs/X1Wy5snTi5ZY4Z3HausK+uLc+19
-tOV8B0Y/PN5MYYIWnzsaNduTbMjf/uDDjTklcQIDAQABAoIBAAC3C9okbSvqjRD0
-Wi06Ao+Oqbdf7+knuXc/oOUz2hcqg/77A81u9TnfR6rrkeBwYKrBkMR2W6C+LekA
-VGPUhe5ETKNWttBMuKpooYzZ/Wh1kw7zvnI4weZgIxv0YUO/lUSKrjeSVKlHA9VE
-JvBooaAiAnfsPiVUFt8cvatoifMxlMJUGaqSHmmtQEH6HyxPb4kuo6iw1+gzeoTL
-QNgS4sCjoCoPc90/SQniW0OBkVkdhlrCewlxZ88W0DERmVc3+RR6FDTrDezDYyFj
-hnn3Yjb9Hsb56/mzpWJGShvl9KdGawU0ZusxVkNqeB9aw2tGFxHaYk6bLIGgjGo0
-PR+vDDkCgYEA5elTYJZm9Cs+MZj586Gg29SDApfT0GgK95KkfQmmyP1K+QNFNGwi
-1fILfqj5vw7Rd8JTxtYWiaOrfj7drRGkIHnOYI+9+6Hm0Fk9MkL0iYyz+A3AZJoW
-FXrxAI0ql18poDvvNVI9xcotdVp0aTjZRfg9h09PCyC2OS8lWPFvR9MCgYEA4txR
-bl4BPFR/DXple7a8qxpG11o2Hp1D+K420Mg6HRahg4/K4Bv08dWdc792fGhu/vvz
-RMwA0M53yme5RS9JypRTCbS83VPWtNunFDp79oEb/umZJRIDBaqd8MpPfkg5zHkx
-WGtGXpVTLkEmPmMVgs1xJvJB1VGTt8hTidwndysCgYEA3n7KCJwk8ED1BEyV//e3
-02Y6jwTdoD8/9c09UCBJ/xJZPtiyXYQUxlViWGYwo3w0rKAsMS24S+VPrnIqVzXO
-TvtyBLK22dEZrSHffkebnY3EENdGDFWt74W1u6HhyPH4N7Ao08JOM55wFbS/GaFB
-a1xMNylCRnOWxYphq0yjM68CgYBDZKn4PIrnbj6UNXEicGXZ+qNi5FTBgXyoyrBU
-E7dX3to6aCQfsY5xrUDqGs3LJYcbzqM1I9l2Lm/dvDSIvgSQ3sFQV9XndjmJXtti
-ogEjeLVlY+Xv4krtiwMCfkdhP3mUKcij+LJd9MRSMF55GBxS0E81/6/Y/DQC28sd
-YD6FIwKBgQDVMsQeisp3Ah/BAWvSRRtZkmH+z+IrunRGD3ogOn+5KsibhPDPLbgG
-8ArSy+OQi10YVKcCZInu2iXE2L2Uko18L7kw9WamdBkg+j0P7B0BHDuQDT3Q6E4O
-gMgAbDrNUTe7MOjRjTVGa7zgV2EyvK9fA0DivME8saO0Jjx/fTOXVA==
------END RSA PRIVATE KEY-----";
-        using var rsa = RSA.Create();
-        rsa.ImportPem(pem);
-        Console.WriteLine(rsa.KeySize);
+        try
+        {
+            while (true)
+            {
+                GenerateSelfSignedCATest();
+                GenerateCATest();
+                GenerateSelfSignedServerCertTest();
+                GenerateServerCertTest();
+                GenerateSelfSignedClientCertTest();
+                GenerateClientCertTest();
+            }
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
     }
+
+    [TestMethod]
+    public void AA()
+    {
+        var data = "001cd2e3497038c5ee2e2bb2a31a3584f3894a623c6501071f66f102dbde1dab24b3addf7f5012847907f0a710b49ee382347a4ffd4d2747eb6b3d902a6ee8730bcfe3d3231f5fb7bb0b9a1078d7403e44d3a6790a3e8951702029c37dfc29578d862c92d92c6bd8980223dff967e0c9f6b28b660b8c12355d61ffd2d5a7cae3".FromHexString();
+        var writer = new AsnWriter(AsnEncodingRules.DER);
+        WriteIntegerValue(writer, data);
+        //writer.WriteInteger(data);
+    }
+
+    static void WriteIntegerValue(AsnWriter writer, byte[] bytes)
+    {
+        if (bytes.First() < 128) writer.WriteInteger(bytes);
+        else writer.WriteIntegerUnsigned(bytes);
+    }
+
 }
