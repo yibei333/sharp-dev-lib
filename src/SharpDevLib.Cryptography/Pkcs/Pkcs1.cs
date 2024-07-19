@@ -51,7 +51,7 @@ internal static class Pkcs1
         var tag = reader.PeekTag();
         if (tag != Asn1Tag.Integer) throw new InvalidDataException($"expected tag is '{Asn1Tag.Integer}',current is '{tag}'");
         var array = reader.ReadInteger().ToByteArray().Reverse();
-        if (array.First() == 0x00) array = array.Skip(1);//https://stackoverflow.com/questions/48404917/rsa-private-key-pem-in-asn-1-format-contains-extra-bytes
+        if (array.First() == 0x00 && array.Count() % 8 != 0) array = array.Skip(1);//https://stackoverflow.com/questions/48404917/rsa-private-key-pem-in-asn-1-format-contains-extra-bytes
         return array.ToArray();
     }
 

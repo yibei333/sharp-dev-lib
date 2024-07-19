@@ -166,18 +166,10 @@ public static class RsaKeyExtension
 
     static void ImportPkcs1PrivateKeyPem(this RSA rsa, string pkcs1PrivateKeyPem)
     {
-        try
-        {
-            var pemObject = PemObject.Read(pkcs1PrivateKeyPem);
-            if (pemObject.PemType != PemType.Pkcs1PrivateKey) throw new InvalidDataException($"key type({pemObject.PemType}) is not pkcs1 private key");
-            var bytes = Convert.FromBase64String(pemObject.Body);
-            rsa.ImportPkcs1PrivateKeyPem(bytes);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(pkcs1PrivateKeyPem);
-            throw ex;
-        }
+        var pemObject = PemObject.Read(pkcs1PrivateKeyPem);
+        if (pemObject.PemType != PemType.Pkcs1PrivateKey) throw new InvalidDataException($"key type({pemObject.PemType}) is not pkcs1 private key");
+        var bytes = Convert.FromBase64String(pemObject.Body);
+        rsa.ImportPkcs1PrivateKeyPem(bytes);
     }
 
     static void ImportEncryptedPkcs1PrivateKeyPem(this RSA rsa, string pkcs1PrivateKeyPem, byte[] password)
