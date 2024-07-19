@@ -5,7 +5,7 @@ namespace SharpDevLib.Cryptography;
 /// <summary>
 /// Pkcs5,rfc8018
 /// </summary>
-public static class Pkcs5
+internal static class Pkcs5
 {
     /// <summary>
     /// PBKDF1
