@@ -53,9 +53,11 @@ public class CertificateTests
         var keyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/ca.key");
         var certPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/ca.crt");
         var csrPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/ca.csr");
+        var pfxPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/ca.pfx");
         keyPath.RemoveFileIfExist();
         certPath.RemoveFileIfExist();
         csrPath.RemoveFileIfExist();
+        pfxPath.RemoveFileIfExist();
 
         using var rsa = RSA.Create();
         rsa.KeySize = 2048;
@@ -69,11 +71,14 @@ public class CertificateTests
         var serialNumber = X509.GenerateSerialNumber();
         var cert = X509.GenerateCACert(caKey, caCert, csr, serialNumber, 360, "Test Second Level CA Cert");
         cert.SaveCrt(certPath);
+        SavePfxTest(cert, keyPath, pfxPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
         Assert.IsTrue(new FileInfo(keyPath).Length > 0);
         Assert.IsTrue(new FileInfo(certPath).Exists);
         Assert.IsTrue(new FileInfo(certPath).Length > 0);
+
+        GenerateServerCertByCATest(keyPath, certPath, "level3 server", "Level3 Test Server");
     }
 
     [TestMethod]
@@ -118,14 +123,19 @@ public class CertificateTests
     {
         var caKeyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Cryptography/Certificate/ca.key");
         var caCertPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Cryptography/Certificate/ca.crt");
+        GenerateServerCertByCATest(caKeyPath, caCertPath, "server", "Test Server");
+    }
+
+    static void GenerateServerCertByCATest(string caKeyPath, string caCertPath, string keyName, string subjectName)
+    {
         var caKey = File.ReadAllText(caKeyPath);
         var caCert = new X509Certificate2(caCertPath);
 
-        var keyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/server.key");
-        var certPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/server.crt");
-        var pfxCertPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/server.pfx");
-        var derCertPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/server.der");
-        var csrPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/server.csr");
+        var keyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{keyName}.key");
+        var certPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{keyName}.crt");
+        var pfxCertPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{keyName}.pfx");
+        var derCertPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{keyName}.der");
+        var csrPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{keyName}.csr");
         keyPath.RemoveFileIfExist();
         certPath.RemoveFileIfExist();
         csrPath.RemoveFileIfExist();
@@ -138,7 +148,7 @@ public class CertificateTests
         var publicKey = rsa.ExportPem(PemType.X509SubjectPublicKey);
         privateKey.ToUtf8Bytes().SaveToFile(keyPath);
 
-        var subject = new X509Subject("TestServer") { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
+        var subject = new X509Subject(subjectName) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
         csr.Export().ToUtf8Bytes().SaveToFile(csrPath);
         var serialNumber = X509.GenerateSerialNumber();
@@ -148,7 +158,7 @@ public class CertificateTests
             new(SubjectAlternativeNameType.Dns,"*.localhost"),
             new(SubjectAlternativeNameType.IP,"127.0.0.1"),
         };
-        var cert = X509.GenerateServerCert(caKey, caCert, csr, serialNumber, 360, altNames, "Test Server Cert");
+        var cert = X509.GenerateServerCert(caKey, caCert, csr, serialNumber, 360, altNames, $"{subjectName} Cert");
         cert.SaveCrt(certPath);
         cert.SaveDer(derCertPath);
         SavePfxTest(cert, keyPath, pfxCertPath);
