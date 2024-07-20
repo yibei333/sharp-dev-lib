@@ -177,7 +177,7 @@ internal static class Pkcs8
         writer.PushSequence();
 
         //1.version
-        writer.WriteInteger(0x00);
+        writer.WriteIntegerValue(0);
 
         //2.PrivateKeyAlgorithmIdentifier
         writer.PushSequence();
@@ -213,7 +213,7 @@ internal static class Pkcs8
         new Random().NextBytes(salt);
         writer.WriteOctetString(salt);
         var iterationCount = 2048;//iterationCount
-        writer.WriteInteger(iterationCount);
+        writer.WriteIntegerValue(iterationCount);
         writer.PushSequence();
         writer.WriteObjectIdentifier("1.2.840.113549.2.9");//hmacsha259
         writer.WriteNull();

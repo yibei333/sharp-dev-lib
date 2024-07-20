@@ -2,9 +2,7 @@
 using SharpDevLib.Cryptography;
 using System;
 using System.Collections.Generic;
-using System.Formats.Asn1;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -235,42 +233,4 @@ public class CertificateTests
         Assert.IsTrue(new FileInfo(certPath).Exists);
         Assert.IsTrue(new FileInfo(certPath).Length > 0);
     }
-
-    [TestMethod]
-    public void Test()
-    {
-        try
-        {
-            while (true)
-            {
-                GenerateSelfSignedCATest();
-                GenerateCATest();
-                GenerateSelfSignedServerCertTest();
-                GenerateServerCertTest();
-                GenerateSelfSignedClientCertTest();
-                GenerateClientCertTest();
-            }
-        }
-        catch (Exception ex)
-        {
-
-            throw;
-        }
-    }
-
-    [TestMethod]
-    public void AA()
-    {
-        var data = "001cd2e3497038c5ee2e2bb2a31a3584f3894a623c6501071f66f102dbde1dab24b3addf7f5012847907f0a710b49ee382347a4ffd4d2747eb6b3d902a6ee8730bcfe3d3231f5fb7bb0b9a1078d7403e44d3a6790a3e8951702029c37dfc29578d862c92d92c6bd8980223dff967e0c9f6b28b660b8c12355d61ffd2d5a7cae3".FromHexString();
-        var writer = new AsnWriter(AsnEncodingRules.DER);
-        WriteIntegerValue(writer, data);
-        //writer.WriteInteger(data);
-    }
-
-    static void WriteIntegerValue(AsnWriter writer, byte[] bytes)
-    {
-        if (bytes.First() < 128) writer.WriteInteger(bytes);
-        else writer.WriteIntegerUnsigned(bytes);
-    }
-
 }

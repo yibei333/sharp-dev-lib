@@ -20,7 +20,7 @@ internal static class Pkcs12
         var writer = new AsnWriter(AsnEncodingRules.DER);
         writer.PushSequence();
         //1.version
-        writer.WriteInteger(3);
+        writer.WriteIntegerValue(3);
 
         //2.authSafe
         var safeContents = GetSafeContents(certificate, privateKey, password);
@@ -82,7 +82,7 @@ internal static class Pkcs12
         new Random().NextBytes(salt);
         writer.WriteOctetString(salt);
         var iterationCount = 2048;//iterationCount
-        writer.WriteInteger(iterationCount);
+        writer.WriteIntegerValue(iterationCount);
         writer.PushSequence();
         writer.WriteObjectIdentifier("1.2.840.113549.2.9");//hmacsha259
         writer.WriteNull();
@@ -268,7 +268,7 @@ internal static class Pkcs12
         writer.WriteOctetString(salt);
 
         //3.iterations
-        writer.WriteInteger(iterationCount);
+        writer.WriteIntegerValue(iterationCount);
 
         writer.PopSequence();
         return writer.Encode();

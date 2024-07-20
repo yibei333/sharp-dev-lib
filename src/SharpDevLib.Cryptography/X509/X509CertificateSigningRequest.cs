@@ -37,7 +37,7 @@ public class X509CertificateSigningRequest
 
         var writer = new AsnWriter(AsnEncodingRules.DER);
         writer.PushSequence();
-        writer.WriteInteger(0);
+        writer.WriteIntegerValue(0);
         writer.WriteEncodedValue(Subject.RawData);
         writer.WriteEncodedValue(PublicKey);
         writer.WriteNull(new Asn1Tag(TagClass.ContextSpecific, 0));

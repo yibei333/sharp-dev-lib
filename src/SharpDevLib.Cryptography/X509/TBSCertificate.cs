@@ -73,11 +73,11 @@ internal class TBSCertificate
         //version
         var versionTag = new Asn1Tag(TagClass.ContextSpecific, 0);
         writer.PushSequence(versionTag);
-        writer.WriteInteger(Version);
+        writer.WriteIntegerValue(Version);
         writer.PopSequence(versionTag);
 
         //serialNumber
-        writer.WriteInteger(SerialNumber);
+        writer.WriteIntegerValue(SerialNumber);
 
         //signature
         writer.PushSequence();

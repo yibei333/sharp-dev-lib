@@ -72,7 +72,7 @@ internal static class Pkcs7
             writer.PushSequence();
 
             //1.version
-            writer.WriteInteger(0);
+            writer.WriteIntegerValue(0);
 
             //2.encryptedContentInfo
             writer.WriteEncodedValue(content);
