@@ -29,7 +29,6 @@ internal static class X509ExtensionHelper
 
     public static List<X509Extension> CreateServerExtensions(byte[] publicKey, X509Certificate2? caCert, List<SubjectAlternativeName> alternativeNames)
     {
-
         var extensions = new List<X509Extension>
         {
             new X509BasicConstraintsExtension(false, false, 0, false),

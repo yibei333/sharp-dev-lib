@@ -89,16 +89,16 @@
 		<None Update="TestData\Compression\zip.zip">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="TestData\Cryptography\Certificate\ca.crt">
+		<None Update="TestData\Cryptography\Certificate\TestRootCA.crt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="TestData\Cryptography\Certificate\ca.csr">
+		<None Update="TestData\Cryptography\Certificate\TestRootCA.csr">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="TestData\Cryptography\Certificate\ca.key">
+		<None Update="TestData\Cryptography\Certificate\TestRootCA.key">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="TestData\Cryptography\Certificate\ca.pfx">
+		<None Update="TestData\Cryptography\Certificate\TestRootCA.pfx">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="TestData\Cryptography\RsaKeys\EncryptedPkcs8PrivateKey.txt">
