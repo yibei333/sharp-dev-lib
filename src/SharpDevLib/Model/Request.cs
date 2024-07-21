@@ -486,8 +486,11 @@ public class PageRequest : BaseRequest
     /// </summary>
     /// <param name="index">索引(当前位置),默认为1</param>
     /// <param name="size">每页数据条数</param>
-    public PageRequest(uint index, uint size)
+    public PageRequest(int index, int size)
     {
+        if (index < 0) throw new Exception("index must greater than equal 0");
+        if (size < 0) throw new Exception("index must greater than equal 0");
+
         Index = index;
         Size = size;
     }
@@ -495,10 +498,10 @@ public class PageRequest : BaseRequest
     /// <summary>
     /// 索引(当前位置),默认为1
     /// </summary>
-    public uint Index { get; set; }
+    public int Index { get; set; }
 
     /// <summary>
     /// 每页数据条数
     /// </summary>
-    public uint Size { get; set; }
+    public int Size { get; set; }
 }

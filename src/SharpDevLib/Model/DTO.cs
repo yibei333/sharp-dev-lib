@@ -17,7 +17,6 @@ public class IdDto : BaseDto
     /// </summary>
     public IdDto()
     {
-
     }
 
     /// <summary>
