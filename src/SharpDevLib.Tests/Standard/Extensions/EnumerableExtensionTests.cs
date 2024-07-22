@@ -10,6 +10,13 @@ namespace SharpDevLib.Tests.Standard.Extensions;
 public class EnumerableExtensionTests
 {
     [TestMethod]
+    public void ForEachTest()
+    {
+        IEnumerable<int> list = new List<int> { 1, 2, 3 };
+        list.ForEach(x => Console.WriteLine(x));
+    }
+
+    [TestMethod]
     public void DistinctByObjectValueTest()
     {
         List<User?> users =

@@ -58,8 +58,7 @@ public class EnumExtensionTests
     [TestMethod]
     public void GetKeyValuesTest()
     {
-        var actual = EnumExtension.GetKeyValues<Gender>();
-        Console.WriteLine(actual);
+        var actual = EnumExtension.GetKeyValues<Gender>().Serialize();
         Assert.AreEqual(_json, actual);
     }
 }

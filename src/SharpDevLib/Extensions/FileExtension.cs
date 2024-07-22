@@ -9,6 +9,7 @@ public static class FileExtension
     static readonly double _mbUnit = 1024 * _kbUnit;
     static readonly double _gbUnit = 1024 * _mbUnit;
     static readonly double _tbUnit = 1024 * _gbUnit;
+    static readonly double _pbUnit = 1024 * _tbUnit;
     // https://github.com/hey-red/MimeTypesMap/blob/master/src/MimeTypesMap/MimeTypesMap.cs
     // http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types
     static readonly Lazy<Dictionary<string, string>> _mimeTypeMap = new(() => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -1134,7 +1135,8 @@ public static class FileExtension
     public static string ToFileSizeString(this long size)
     {
         if (size < 0) throw new ArgumentException("file size should greater than equal 0", nameof(size));
-        if (size > _tbUnit) return $"{(Math.Round(size / _tbUnit, 2))}TB";
+        if (size > _pbUnit) return $"{(Math.Round(size / _pbUnit, 2))}PB";
+        else if (size > _tbUnit) return $"{(Math.Round(size / _tbUnit, 2))}TB";
         else if (size > _gbUnit) return $"{(Math.Round(size / _gbUnit, 2))}GB";
         else if (size > _mbUnit) return $"{(Math.Round(size / _mbUnit, 2))}MB";
         else if (size > _kbUnit) return $"{(Math.Round(size / _kbUnit, 2))}KB";

@@ -169,7 +169,7 @@ public class FileExtensionTests
     [DataRow(4730880, "4.51MB")]
     [DataRow(4844421120, "4.51GB")]
     [DataRow(4960687226880, "4.51TB")]
-    [DataRow(5079743720325120, "4620TB")]
+    [DataRow(5079743720325120, "4.51PB")]
     public void ToFileSizeStringTest(long size, string expected)
     {
         var actual = size.ToFileSizeString();
