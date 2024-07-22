@@ -50,7 +50,7 @@ public static class DataTableExtensions
     }
 
     /// <summary>
-    /// 将DataTable转换为列表,以下元素属性复制将被忽略:
+    /// 将DataTable转换为列表,以下元素属性赋值将被忽略:
     /// <para>1.非公共属性</para>
     /// <para>2.属性不可写</para>
     /// <para>3.属性类型为Class(string除外)</para>
@@ -215,7 +215,7 @@ public class DataTableTransferColumn
     public string Name { get; set; }
 
     /// <summary>
-    /// 是否必需,如果是则在列名签名加*号
+    /// 是否必需,如果是则在列名前面加*号
     /// </summary>
     public bool IsRequired { get; set; }
 
