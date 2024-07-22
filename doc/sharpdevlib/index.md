@@ -6,7 +6,7 @@
  ``` c#
  //(官方)
  //用于序列化和反序列化
- <PackageReference Include="System.Text.Json" Version="8.0.3" />
+ <PackageReference Include="System.Text.Json" Version="8.0.4" />
  ```
 
 ## 2.使用方法 
