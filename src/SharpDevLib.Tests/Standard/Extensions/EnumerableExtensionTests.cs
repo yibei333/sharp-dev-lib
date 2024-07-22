@@ -12,8 +12,8 @@ public class EnumerableExtensionTests
     [TestMethod]
     public void ForEachTest()
     {
-        IEnumerable<int> list = new List<int> { 1, 2, 3 };
-        list.ForEach(x => Console.WriteLine(x));
+        IEnumerable<int> list = [1, 2, 3];
+        list.ForEach(Console.WriteLine);
     }
 
     [TestMethod]
