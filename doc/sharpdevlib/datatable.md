@@ -1,4 +1,4 @@
-﻿## ```1.ToDataTable<T>```
+﻿## 1. ```ToDataTable<T>```
 集合转DataTable
 * T为非string的引用类型
 * 以下元素属性将被忽略
@@ -32,7 +32,7 @@ public class User
 }
 ```
 
-## ```2.ToList<T>```
+## 2. ```ToList<T>```
 DataTable转集合
 * T为非string的引用类型
 * 以下元素属性赋值将被忽略
@@ -96,7 +96,7 @@ public class User
 }
 ```
 
-## ```3.Transfer```
+## 3. ```Transfer```
 源DataTable转换为目标DataTable
 
 ``` csharp
@@ -151,7 +151,7 @@ public DataTable GetSourceTable()
 
 ```
 
-## ```4.DataTableTransferColumn```
+## 4. ```DataTableTransferColumn```
 
 ``` csharp
 /// <summary>
