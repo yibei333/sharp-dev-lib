@@ -11,10 +11,11 @@ public static class EnumExtension
     /// <typeparam name="TEnum">指定的枚举类型</typeparam>
     /// <param name="intValue">整型值</param>
     /// <returns>枚举</returns>
+    /// <exception cref="InvalidDataException">转换失败时引发异常</exception>
     public static TEnum ToEnum<TEnum>(this int intValue) where TEnum : struct
     {
         var enumValue = (TEnum)Enum.ToObject(typeof(TEnum), intValue);
-        if (!Enum.IsDefined(typeof(TEnum), enumValue)) throw new ArgumentException($"value '{intValue}' not defined in type '{typeof(TEnum).FullName}'");
+        if (!Enum.IsDefined(typeof(TEnum), enumValue)) throw new InvalidDataException($"value '{intValue}' not defined in type '{typeof(TEnum).FullName}'");
         return enumValue;
     }
 
@@ -25,10 +26,11 @@ public static class EnumExtension
     /// <param name="stringValue">字符串</param>
     /// <param name="ignoreCase">是否忽略大小写</param>
     /// <returns>枚举</returns>
+    /// <exception cref="InvalidDataException">转换失败时引发异常</exception>
     public static TEnum ToEnum<TEnum>(this string stringValue, bool ignoreCase = true) where TEnum : struct
     {
         if (Enum.TryParse<TEnum>(stringValue, ignoreCase, out var enumValue)) return (TEnum)enumValue;
-        throw new ArgumentException($"value '{stringValue}' not defined in type '{typeof(TEnum).FullName}'");
+        throw new InvalidDataException($"value '{stringValue}' not defined in type '{typeof(TEnum).FullName}'");
     }
 
     /// <summary>
