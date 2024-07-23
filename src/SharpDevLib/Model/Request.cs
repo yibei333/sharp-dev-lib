@@ -37,6 +37,7 @@ public class IdRequest : BaseRequest
 /// <summary>
 /// id request
 /// </summary>
+/// <typeparam name="TId">id type</typeparam>
 public class IdRequest<TId> : BaseRequest
 {
     /// <summary>
@@ -136,6 +137,7 @@ public class IdNameRequest : IdRequest
 /// <summary>
 /// id name request
 /// </summary>
+/// <typeparam name="TId">id type</typeparam>
 public class IdNameRequest<TId> : IdRequest<TId>
 {
     /// <summary>
@@ -181,6 +183,7 @@ public class IdNameRequest<TId> : IdRequest<TId>
 /// <summary>
 /// data requesst
 /// </summary>
+/// <typeparam name="TData">data type</typeparam>
 public class DataRequest<TData> : BaseRequest
 {
     /// <summary>
@@ -208,6 +211,7 @@ public class DataRequest<TData> : BaseRequest
 /// <summary>
 /// id data requesst
 /// </summary>
+/// <typeparam name="TData">data type</typeparam>
 public class IdDataRequest<TData> : IdRequest
 {
     /// <summary>
@@ -253,6 +257,8 @@ public class IdDataRequest<TData> : IdRequest
 /// <summary>
 /// id data requesst
 /// </summary>
+/// <typeparam name="TId">id type</typeparam>
+/// <typeparam name="TData">data type</typeparam>
 public class IdDataRequest<TId, TData> : IdRequest<TId>
 {
     /// <summary>
@@ -298,6 +304,7 @@ public class IdDataRequest<TId, TData> : IdRequest<TId>
 /// <summary>
 /// id name data request
 /// </summary>
+/// <typeparam name="TData">data type</typeparam>
 public class IdNameDataRequest<TData> : IdDataRequest<TData>
 {
     /// <summary>
@@ -385,6 +392,8 @@ public class IdNameDataRequest<TData> : IdDataRequest<TData>
 /// <summary>
 /// id name data request
 /// </summary>
+/// <typeparam name="TId">id type</typeparam>
+/// <typeparam name="TData">data type</typeparam>
 public class IdNameDataRequest<TId, TData> : IdDataRequest<TId, TData>
 {
     /// <summary>

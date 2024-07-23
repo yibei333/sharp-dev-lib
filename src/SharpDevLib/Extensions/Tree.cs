@@ -131,6 +131,7 @@ public class TreeItem<TMetaData> where TMetaData : class
 /// <summary>
 /// 构建属性结构选项
 /// </summary>
+/// <typeparam name="TMetaData">元数据类型</typeparam>
 public class BuildTreeOption<TMetaData> where TMetaData : class
 {
     string _sortPropertyName = string.Empty;

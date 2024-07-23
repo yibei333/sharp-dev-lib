@@ -37,6 +37,7 @@ public class IdDto : BaseDto
 /// <summary>
 /// id dto
 /// </summary>
+/// <typeparam name="TId">id type</typeparam>
 public class IdDto<TId> : BaseDto
 {
     /// <summary>
@@ -139,6 +140,7 @@ public class IdNameDto : IdDto
 /// <summary>
 /// id name dto
 /// </summary>
+/// <typeparam name="TId">id type</typeparam>
 public class IdNameDto<TId> : IdDto<TId>
 {
     /// <summary>
@@ -185,6 +187,7 @@ public class IdNameDto<TId> : IdDto<TId>
 /// <summary>
 /// data dto
 /// </summary>
+/// <typeparam name="TData">data type</typeparam>
 public class DataDto<TData> : BaseDto
 {
     /// <summary>
@@ -212,6 +215,7 @@ public class DataDto<TData> : BaseDto
 /// <summary>
 /// id data dto
 /// </summary>
+/// <typeparam name="TData">data type</typeparam>
 public class IdDataDto<TData> : DataDto<TData>
 {
     /// <summary>
@@ -257,6 +261,8 @@ public class IdDataDto<TData> : DataDto<TData>
 /// <summary>
 /// id data dto
 /// </summary>
+/// <typeparam name="TId">id type</typeparam>
+/// <typeparam name="TData">data type</typeparam>
 public class IdDataDto<TId, TData> : DataDto<TData>
 {
     /// <summary>
@@ -302,6 +308,7 @@ public class IdDataDto<TId, TData> : DataDto<TData>
 /// <summary>
 /// id name data dto
 /// </summary>
+/// <typeparam name="TData">data type</typeparam>
 public class IdNameDataDto<TData> : DataDto<TData>
 {
     /// <summary>
@@ -393,6 +400,8 @@ public class IdNameDataDto<TData> : DataDto<TData>
 /// <summary>
 /// id name data dto
 /// </summary>
+/// <typeparam name="TId">id type</typeparam>
+/// <typeparam name="TData">data type</typeparam>
 public class IdNameDataDto<TId, TData> : DataDto<TData>
 {
     /// <summary>

@@ -86,6 +86,7 @@ public class Reply
 /// <summary>
 /// 响应
 /// </summary>
+/// <typeparam name="TData">数据类型</typeparam>
 public class Reply<TData> : Reply
 {
     /// <summary>
@@ -97,6 +98,7 @@ public class Reply<TData> : Reply
 /// <summary>
 /// 分页响应
 /// </summary>
+/// <typeparam name="TData">数据类型</typeparam>
 public class PageReply<TData> : Reply
 {
     /// <summary>

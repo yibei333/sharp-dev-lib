@@ -179,6 +179,7 @@ public class HttpResponse
 /// <summary>
 /// http响应
 /// </summary>
+/// <typeparam name="T">响应数据类型</typeparam>
 public class HttpResponse<T> : HttpResponse
 {
 
