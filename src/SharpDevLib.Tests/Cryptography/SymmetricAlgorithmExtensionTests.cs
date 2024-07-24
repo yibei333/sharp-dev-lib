@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Cryptography;
+using SharpDevLib.Hash.Sha;
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -75,7 +76,7 @@ public class SymmetricAlgorithmExtensionTests
         algorithm.Encrypt(sourceStream, targetStream);
 
         Assert.IsTrue(File.Exists(targetPath));
-        var hash = targetStream.SHA256Hash();
+        var hash = targetStream.Sha256();
         Assert.AreEqual(expected, hash);
     }
 
@@ -101,7 +102,7 @@ public class SymmetricAlgorithmExtensionTests
         algorithm.Decrypt(sourceStream, targetStream);
 
         Assert.IsTrue(File.Exists(targetPath));
-        var hash = targetStream.SHA256Hash();
+        var hash = targetStream.Sha256();
         Assert.AreEqual(plainFileHash, hash);
     }
 }

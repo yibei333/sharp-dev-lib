@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Tests.TestData;
 using System;
+using System.IO;
 
 namespace SharpDevLib.Tests.Standard.Extensions;
 
@@ -21,7 +22,7 @@ public class EnumExtensionTests
     [TestMethod]
     [DataRow(0)]
     [DataRow(5)]
-    [ExpectedException(typeof(ArgumentException))]
+    [ExpectedException(typeof(InvalidDataException))]
     public void IntToEnumExceptionTest(int intValue)
     {
         intValue.ToEnum<Gender>();
@@ -41,7 +42,7 @@ public class EnumExtensionTests
     [DataRow(" ")]
     [DataRow("male")]
     [DataRow("Male1")]
-    [ExpectedException(typeof(ArgumentException))]
+    [ExpectedException(typeof(InvalidDataException))]
     public void StringToEnumExceptionTest(string stringValue)
     {
         stringValue.ToEnum<Gender>(false);

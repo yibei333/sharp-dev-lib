@@ -4,10 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace SharpDevLib.Tests.Standard.Extensions;
+namespace SharpDevLib.Tests.Standard.Tree;
 
 [TestClass]
-public class TreeExtensionTests
+public class TreeTests
 {
     [TestMethod]
     public void StringIdBuildTreeTest()
@@ -24,7 +24,7 @@ public class TreeExtensionTests
             new ("2","bar"),
             new ("3","baz","0"),
         };
-        var option = new BuildTreeOption<Department<string>>
+        var option = new TreeBuildOption<Department<string>>
         {
             IdPropertyName = "Identity",
             ParentIdPropertyName = "PId",
@@ -68,7 +68,7 @@ public class TreeExtensionTests
             new (Guid.NewGuid(),"bar"),
             new (Guid.NewGuid(),"baz",Guid.NewGuid()),
         };
-        var option = new BuildTreeOption<Department<Guid>>
+        var option = new TreeBuildOption<Department<Guid>>
         {
             IdPropertyName = "Identity",
             ParentIdPropertyName = "PId",
@@ -110,7 +110,7 @@ public class TreeExtensionTests
             new (2,"bar"),
             new (3,"baz",0),
         };
-        var option = new BuildTreeOption<Department<int>>
+        var option = new TreeBuildOption<Department<int>>
         {
             IdPropertyName = "Identity",
             ParentIdPropertyName = "PId",
@@ -144,7 +144,7 @@ public class TreeExtensionTests
         {
             new ("","foo"),
         };
-        var option = new BuildTreeOption<Department<string>>
+        var option = new TreeBuildOption<Department<string>>
         {
             IdPropertyName = "Identity",
             ParentIdPropertyName = "PId",
@@ -164,7 +164,7 @@ public class TreeExtensionTests
             new ("2","foo","1"),
             new ("3","foo","2"),
         };
-        var option = new BuildTreeOption<Department<string>>
+        var option = new TreeBuildOption<Department<string>>
         {
             IdPropertyName = "Identity",
             ParentIdPropertyName = "PId",
@@ -182,7 +182,7 @@ public class TreeExtensionTests
         {
             new ("1","foo","1"),
         };
-        var option = new BuildTreeOption<Department<string>>
+        var option = new TreeBuildOption<Department<string>>
         {
             IdPropertyName = "Identity",
             ParentIdPropertyName = "PId",
@@ -203,7 +203,7 @@ public class TreeExtensionTests
         {
             new ("1","foo","3"),
         };
-        var option = new BuildTreeOption<Department<string>>
+        var option = new TreeBuildOption<Department<string>>
         {
             IdPropertyName = idPropertyName,
             ParentIdPropertyName = parentIdPropertyName,
@@ -224,7 +224,7 @@ public class TreeExtensionTests
         {
             new ("1","foo","3"),
         };
-        var option = new BuildTreeOption<Department<string>>
+        var option = new TreeBuildOption<Department<string>>
         {
             IdPropertyName = idPropertyName,
             ParentIdPropertyName = parentIdPropertyName,
@@ -243,7 +243,7 @@ public class TreeExtensionTests
             new ("1","foo","3"),
             new ("1","bar","0"),
         };
-        var option = new BuildTreeOption<Department<string>>
+        var option = new TreeBuildOption<Department<string>>
         {
             IdPropertyName = "Identity",
             ParentIdPropertyName = "PId",
