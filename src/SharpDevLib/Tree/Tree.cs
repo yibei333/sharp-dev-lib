@@ -14,6 +14,7 @@ public static class Tree
     /// <param name="items">集合</param>
     /// <param name="option">选项</param>
     /// <returns>树形结构集合</returns>
+    /// <exception cref="InvalidDataException">当出现循环引用时引发异常</exception>
     public static List<TreeItem<TMetaData>> BuildTree<TMetaData>(this IEnumerable<TMetaData> items, TreeBuildOption<TMetaData>? option = null) where TMetaData : class
     {
         var list = items.Select(x => new TreeItem<TMetaData>(x, option)).ToList();

@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using SharpDevLib.Cryptography.Internal.References;
+using System.Security.Cryptography;
 
 namespace SharpDevLib.Cryptography;
 
@@ -15,6 +16,7 @@ public static class SymmetricAlgorithmExtension
     /// <param name="algorithm">对称算法</param>
     /// <param name="data">已加密的字节数组</param>
     /// <returns>解密的字节数组</returns>
+    /// <exception cref="ArgumentNullException">当data参数为空时引发异常</exception>
     public static byte[] Decrypt(this SymmetricAlgorithm algorithm, byte[] data)
     {
         if (data.IsNullOrEmpty()) throw new ArgumentNullException(nameof(data));
@@ -52,6 +54,7 @@ public static class SymmetricAlgorithmExtension
     /// <param name="algorithm">对称算法</param>
     /// <param name="data">需要加密的字节数组</param>
     /// <returns>加密的字节数组</returns>
+    /// <exception cref="ArgumentNullException">当data参数为空时引发异常</exception>
     public static byte[] Encrypt(this SymmetricAlgorithm algorithm, byte[] data)
     {
         if (data.IsNullOrEmpty()) throw new ArgumentNullException(nameof(data));

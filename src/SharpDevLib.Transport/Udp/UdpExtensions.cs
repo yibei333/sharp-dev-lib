@@ -12,7 +12,7 @@ public static class UdpExtensions
     /// </summary>
     /// <param name="services">service collection</param>
     /// <returns>service collection</returns>
-    public static IServiceCollection AddUdp(this IServiceCollection services)
+    public static IServiceCollection AddUdpService(this IServiceCollection services)
     {
         services.AddSingleton<IUdpClientFactory, UdpClientFactory>();
         return services;

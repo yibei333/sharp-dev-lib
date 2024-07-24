@@ -15,6 +15,7 @@ public class TransportFixedHeaderSendAdapter : ITransportSendAdapter
     /// </summary>
     /// <param name="socket">套接字</param>
     /// <param name="bytes">字节数组</param>
+    /// <exception cref="NotSupportedException">当字节长度超过2040109465时引发异常</exception>
     public void Send(Socket socket, byte[] bytes)
     {
         if (bytes.Length > maxLength) throw new NotSupportedException("data is too long,just cut the data to transfer");
@@ -31,6 +32,7 @@ public class TransportFixedHeaderSendAdapter : ITransportSendAdapter
     /// <param name="remoteAddressPort">远程端口</param>
     /// <param name="socket">套接字</param>
     /// <param name="bytes">字节数组</param>
+    /// <exception cref="NotSupportedException">当字节长度超过2040109465时引发异常</exception>
     public void SendTo(Socket socket, IPAddress remoteAddress, int remoteAddressPort, byte[] bytes)
     {
         if (bytes.Length > maxLength) throw new NotSupportedException("data is too long,just cut the data to transfer");

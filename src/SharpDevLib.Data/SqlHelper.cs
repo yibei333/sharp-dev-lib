@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SharpDevLib.Data.References;
 using System.Data;
 using System.Data.Common;
 using System.Reflection;
@@ -47,10 +48,10 @@ public sealed class SqlHelper : IDisposable
         Connection.ConnectionString = connectionString;
         Connection.Open();
     }
-
     /// <summary>
     /// 实例化Sql帮助类
     /// </summary>
+    /// <exception cref="Exception">在没有全局配置时引发异常</exception>
     public SqlHelper()
     {
         if (GlobalDbProviderFactory is null || GlobalConnectionString.IsNullOrWhiteSpace()) throw new Exception($"please call SqlHelper.Config() method first or provide parameters");
@@ -65,6 +66,7 @@ public sealed class SqlHelper : IDisposable
     /// 实例化Sql帮助类
     /// </summary>
     /// <param name="dbContext">DbContext</param>
+    /// <exception cref="Exception">当获取DbCproviderFactory失败时引发异常</exception>
     public SqlHelper(DbContext dbContext)
     {
         Connection = dbContext.Database.GetDbConnection();
@@ -89,6 +91,7 @@ public sealed class SqlHelper : IDisposable
     /// <param name="sql">sql语句</param>
     /// <param name="parameters">sql参数</param>
     /// <returns>类型为T的值</returns>
+    /// <exception cref="Exception">当T的类型为引用类型时(排除string类型)引发异常</exception>
     public T ExecuteScalar<T>(string sql, params DbParameter[] parameters)
     {
         var type = typeof(T);
@@ -106,6 +109,7 @@ public sealed class SqlHelper : IDisposable
     /// <param name="sql">sql语句</param>
     /// <param name="parameters">sql参数</param>
     /// <returns>类型为T的值</returns>
+    /// <exception cref="Exception">当T的类型为引用类型时(排除string类型)引发异常</exception>
     public async Task<T> ExecuteScalarAsync<T>(string sql, params DbParameter[] parameters)
     {
         var type = typeof(T);
@@ -124,6 +128,7 @@ public sealed class SqlHelper : IDisposable
     /// <param name="parameters">sql参数</param>
     /// <param name="cancellationToken">CancellationToken</param>
     /// <returns>类型为T的值</returns>
+    /// <exception cref="Exception">当T的类型为引用类型时(排除string类型)引发异常</exception>
     public async Task<T?> ExecuteScalarAsync<T>(string sql, DbParameter[] parameters, CancellationToken cancellationToken)
     {
         var type = typeof(T);

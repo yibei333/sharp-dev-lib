@@ -1,4 +1,6 @@
-﻿namespace SharpDevLib.Cryptography;
+﻿using SharpDevLib.Cryptography.Internal.References;
+
+namespace SharpDevLib.Cryptography.Pem;
 
 internal class PemHeaderFields
 {
@@ -9,12 +11,12 @@ internal class PemHeaderFields
 
         if (DEKInfo.NotNullOrWhiteSpace())
         {
-            var array = DEKInfo.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries).Last().Trim().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            if (array.Length != 2) throw new Exception("DEK-INFO require 2 fields");
+            var array = DEKInfo?.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries).Last().Trim().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (array is null || array.Length != 2) throw new Exception("DEK-INFO require 2 fields");
             DEKInfoAlgorithm = array[0];
             DEKInfoAlgorithmFileds = array[0].Split(new[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
             DEKInfoIV = array[1];
-            DEKInfoIVBytes = DEKInfoIV.FromHexString();
+            DEKInfoIVBytes = DEKInfoIV.HexStringDecode();
         }
     }
 

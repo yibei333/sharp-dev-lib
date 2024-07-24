@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace SharpDevLib.Hash;
+namespace SharpDevLib;
 
 internal static class HashExtension
 {
@@ -17,14 +17,14 @@ internal static class HashExtension
     public static string Hash(string algorithmName, byte[] bytes)
     {
         using var algorithm = GetHashAlgorithm(algorithmName);
-        return algorithm.ComputeHash(bytes).ToHexString();
+        return algorithm.ComputeHash(bytes).HexStringEncode();
     }
 
     public static string Hash(string algorithmName, Stream stream)
     {
         if (stream.CanSeek) stream.Seek(0, SeekOrigin.Begin);
         using var algorithm = GetHashAlgorithm(algorithmName);
-        return algorithm.ComputeHash(stream).ToHexString();
+        return algorithm.ComputeHash(stream).HexStringEncode();
     }
 
     public static HashAlgorithm GetHMacHashAlgorithm(string algorithmName, byte[] secret)
@@ -40,13 +40,13 @@ internal static class HashExtension
     public static string HMacHash(string algorithmName, byte[] secret, byte[] bytes)
     {
         using var algorithm = GetHMacHashAlgorithm(algorithmName, secret);
-        return algorithm.ComputeHash(bytes).ToHexString();
+        return algorithm.ComputeHash(bytes).HexStringEncode();
     }
 
     public static string HMacHash(string algorithmName, byte[] secret, Stream stream)
     {
         if (stream.CanSeek) stream.Seek(0, SeekOrigin.Begin);
         using var algorithm = GetHMacHashAlgorithm(algorithmName, secret);
-        return algorithm.ComputeHash(stream).ToHexString();
+        return algorithm.ComputeHash(stream).HexStringEncode();
     }
 }

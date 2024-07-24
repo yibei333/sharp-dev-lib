@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using SharpDevLib.OpenXML.References;
 using SharpDevLib.OpenXML.References.ExcelEncryption;
 using System.Data;
 
@@ -51,6 +52,7 @@ public static class Excel
     /// </summary>
     /// <param name="stream">标准的Excel流</param>
     /// <returns>DataSet</returns>
+    /// <exception cref="Exception">读取失败时引发异常</exception>
     public static DataSet Read(Stream stream)
     {
         using var doc = SpreadsheetDocument.Open(stream, false);

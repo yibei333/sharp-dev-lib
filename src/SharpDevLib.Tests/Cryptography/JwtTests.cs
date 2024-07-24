@@ -20,7 +20,7 @@ public class JwtTests
             sub = 123,
             name = "lee"
         };
-        var result = JwtExtension.Create(new JwtCreateWithHMACSHA256Request(payload, key.ToUtf8Bytes()));
+        var result = Jwt.Create(new JwtCreateWithHMACSHA256Request(payload, key.Utf8Decode()));
         Assert.AreEqual(expected, result);
     }
 
@@ -64,7 +64,7 @@ yyovRlVVcYhuJKJU4Zf7iY/cr0ZekQsecl6h5bW04xqwinfmMXyUWQ==
             sub = 123,
             name = "lee"
         };
-        var result = JwtExtension.Create(new JwtCreateWithRS256Request(payload, key, null));
+        var result = Jwt.Create(new JwtCreateWithRS256Request(payload, key, null));
         Assert.AreEqual(expected, result);
     }
 
@@ -73,7 +73,7 @@ yyovRlVVcYhuJKJU4Zf7iY/cr0ZekQsecl6h5bW04xqwinfmMXyUWQ==
     {
         var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJqYXJ2YW4iLCJleHAiOjE2NDMzMzU0NDMsInN1YiI6MTIzLCJuYW1lIjoibGVlIn0.3-k3ooDm1tFi1odWiI2p7UqNL56vc7JeeJ3h-5OSgFo";
         var key = "12345678901234567890123456789012";
-        var result = JwtExtension.Verify(new JwtVerifyWithHMACSHA256Request(token, key.ToUtf8Bytes()));
+        var result = Jwt.Verify(new JwtVerifyWithHMACSHA256Request(token, key.Utf8Decode()));
         Console.WriteLine(result.Payload);
         Assert.IsTrue(result.IsVerified);
     }
@@ -91,7 +91,7 @@ LyWW+Iqr7JFIsIWLmp/xaeX7JD7WAv319BYCO4kyLYQxVn+Gq+X6cjYNcCWCrtRc
 RfsPXQS8w967FIDM/AhFvni2yvYQJU2L8hNNC6it91ehpMx1KkxeZKFxDLRt1jTc
 nQIDAQAB
 -----END PUBLIC KEY-----";
-        var result = JwtExtension.Verify(new JwtVerifyWithRS256Request(token, key));
+        var result = Jwt.Verify(new JwtVerifyWithRS256Request(token, key));
         Console.WriteLine(result.Payload);
         Assert.IsTrue(result.IsVerified);
     }

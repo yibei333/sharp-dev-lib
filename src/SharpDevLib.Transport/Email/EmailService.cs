@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SharpDevLib.Transport.Internal.References;
 using System.Net;
 using System.Net.Mail;
 

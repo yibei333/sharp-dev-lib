@@ -116,6 +116,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
     /// </summary>
     /// <param name="cancellationToken">cancellationToken</param>
     /// <returns>task</returns>
+    /// <exception cref="Exception">断开连接时引发异常</exception>
     public async Task ListenAsync(CancellationToken? cancellationToken = null)
     {
         if (State == TcpListnerStates.Listening) return;

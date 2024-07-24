@@ -11,7 +11,7 @@ public class RsaKeyTests
 {
     #region Data
     const string password = "foo";
-    static readonly byte[] passwordBytes = password.ToUtf8Bytes();
+    static readonly byte[] passwordBytes = password.Utf8Decode();
     static readonly string Pkcs1PrivateKey = GetKey(nameof(Pkcs1PrivateKey));
     static readonly string Pkcs8PrivateKey = GetKey(nameof(Pkcs8PrivateKey));
     static readonly string PublicKey = GetKey(nameof(PublicKey));
@@ -186,11 +186,11 @@ public class RsaKeyTests
     [TestMethod]
     public void IsKeyPairMatchTest()
     {
-        Assert.IsTrue(RsaKeyExtension.IsKeyPairMatch(Pkcs1PrivateKey, PublicKey));
-        Assert.IsTrue(RsaKeyExtension.IsKeyPairMatch(Pkcs8PrivateKey, PublicKey));
-        Assert.IsTrue(RsaKeyExtension.IsKeyPairMatch(Pkcs1PrivateKey, X509PublicKey));
-        Assert.IsTrue(RsaKeyExtension.IsKeyPairMatch(Pkcs8PrivateKey, X509PublicKey));
-        Assert.IsFalse(RsaKeyExtension.IsKeyPairMatch(Pkcs1PrivateKey, Pkcs8PrivateKey));
+        Assert.IsTrue(RsaKey.IsKeyPairMatch(Pkcs1PrivateKey, PublicKey));
+        Assert.IsTrue(RsaKey.IsKeyPairMatch(Pkcs8PrivateKey, PublicKey));
+        Assert.IsTrue(RsaKey.IsKeyPairMatch(Pkcs1PrivateKey, X509PublicKey));
+        Assert.IsTrue(RsaKey.IsKeyPairMatch(Pkcs8PrivateKey, X509PublicKey));
+        Assert.IsFalse(RsaKey.IsKeyPairMatch(Pkcs1PrivateKey, Pkcs8PrivateKey));
     }
 
     [TestMethod]
@@ -205,7 +205,7 @@ public class RsaKeyTests
     public void GetKeyInfoTest(string keyName, bool requirePassword, PemType type, bool isPrivate, bool isEncrypted, int keySize)
     {
         var key = GetKey(keyName);
-        var info = RsaKeyExtension.GetKeyInfo(key, requirePassword ? passwordBytes : null);
+        var info = RsaKey.GetKeyInfo(key, requirePassword ? passwordBytes : null);
         Assert.AreEqual(type, info.Type);
         Assert.AreEqual(isPrivate, info.IsPrivate);
         Assert.AreEqual(isEncrypted, info.IsEncrypted);

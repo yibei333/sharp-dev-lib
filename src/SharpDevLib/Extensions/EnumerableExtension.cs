@@ -59,18 +59,18 @@ public static class EnumerableExtension
         var resultExpression = Expression.Call(typeof(Queryable), command, new Type[] { typeof(T), sortProperty.PropertyType }, query.Expression, orderByExpression);
         return query.Provider.CreateQuery<T>(resultExpression);
     }
-}
 
-internal class ObjectValueComparer<T> : IEqualityComparer<T?> where T : class
-{
-    public bool Equals(T? x, T? y)
+    internal class ObjectValueComparer<T> : IEqualityComparer<T?> where T : class
     {
-        if (x is null && y is null) return true;
-        return x?.Serialize() == y?.Serialize();
-    }
+        public bool Equals(T? x, T? y)
+        {
+            if (x is null && y is null) return true;
+            return x?.Serialize() == y?.Serialize();
+        }
 
-    public int GetHashCode(T? obj)
-    {
-        return obj is null ? -1 : 1;
+        public int GetHashCode(T? obj)
+        {
+            return obj is null ? -1 : 1;
+        }
     }
 }

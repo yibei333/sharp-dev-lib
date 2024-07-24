@@ -88,7 +88,7 @@ public class HttpGetTests : HttpBaseTests
         var response = request.GetStreamAsync().GetAwaiter().GetResult();
         using var memoryStream = new MemoryStream();
         response.CopyTo(memoryStream);
-        var actual = memoryStream.ToArray().ToUtf8String();
+        var actual = memoryStream.ToArray().Utf8Encode();
         Assert.AreEqual("Hello,World!", actual);
         Assert.IsTrue(count > 0);
     }

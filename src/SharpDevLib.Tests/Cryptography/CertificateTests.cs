@@ -27,11 +27,11 @@ public class CertificateTests
         using var rsa = RSA.Create();
         rsa.KeySize = 2048;
         var privateKey = rsa.ExportPem(PemType.Pkcs1PrivateKey);
-        privateKey.ToUtf8Bytes().SaveToFile(keyPath);
+        privateKey.Utf8Decode().SaveToFile(keyPath);
 
         var subject = new X509Subject(name) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
-        csr.Export().ToUtf8Bytes().SaveToFile(csrPath);
+        csr.Export().Utf8Decode().SaveToFile(csrPath);
         var serialNumber = X509.GenerateSerialNumber();
         var cert = X509.GenerateSelfSignedCACert(privateKey, csr, serialNumber, 360000, subject.CommonName);
         cert.SaveCrt(certPath);
@@ -66,11 +66,11 @@ public class CertificateTests
         rsa.KeySize = 2048;
         var privateKey = rsa.ExportPem(PemType.Pkcs1PrivateKey);
         var publicKey = rsa.ExportPem(PemType.X509SubjectPublicKey);
-        privateKey.ToUtf8Bytes().SaveToFile(keyPath);
+        privateKey.Utf8Decode().SaveToFile(keyPath);
 
         var subject = new X509Subject(name) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
-        csr.Export().ToUtf8Bytes().SaveToFile(csrPath);
+        csr.Export().Utf8Decode().SaveToFile(csrPath);
         var serialNumber = X509.GenerateSerialNumber();
         var cert = X509.GenerateCACert(caKey, caCert, csr, serialNumber, 360, subject.CommonName);
         cert.SaveCrt(certPath);
@@ -100,11 +100,11 @@ public class CertificateTests
         using var rsa = RSA.Create();
         rsa.KeySize = 2048;
         var privateKey = rsa.ExportPem(PemType.Pkcs1PrivateKey);
-        privateKey.ToUtf8Bytes().SaveToFile(keyPath);
+        privateKey.Utf8Decode().SaveToFile(keyPath);
 
         var subject = new X509Subject(name) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
-        csr.Export().ToUtf8Bytes().SaveToFile(csrPath);
+        csr.Export().Utf8Decode().SaveToFile(csrPath);
         var serialNumber = X509.GenerateSerialNumber();
         var altNames = new List<SubjectAlternativeName>
         {
@@ -151,11 +151,11 @@ public class CertificateTests
         rsa.KeySize = 2048;
         var privateKey = rsa.ExportPem(PemType.Pkcs1PrivateKey);
         var publicKey = rsa.ExportPem(PemType.X509SubjectPublicKey);
-        privateKey.ToUtf8Bytes().SaveToFile(keyPath);
+        privateKey.Utf8Decode().SaveToFile(keyPath);
 
         var subject = new X509Subject(keyName) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
-        csr.Export().ToUtf8Bytes().SaveToFile(csrPath);
+        csr.Export().Utf8Decode().SaveToFile(csrPath);
         var serialNumber = X509.GenerateSerialNumber();
         var altNames = new List<SubjectAlternativeName>
         {
@@ -201,11 +201,11 @@ public class CertificateTests
         using var rsa = RSA.Create();
         rsa.KeySize = 2048;
         var privateKey = rsa.ExportPem(PemType.Pkcs1PrivateKey);
-        privateKey.ToUtf8Bytes().SaveToFile(keyPath);
+        privateKey.Utf8Decode().SaveToFile(keyPath);
 
         var subject = new X509Subject(name) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
-        csr.Export().ToUtf8Bytes().SaveToFile(csrPath);
+        csr.Export().Utf8Decode().SaveToFile(csrPath);
         var serialNumber = X509.GenerateSerialNumber();
         var cert = X509.GenerateSelfSignedClientCert(privateKey, csr, serialNumber, 360, subject.CommonName);
         cert.SaveCrt(certPath);
@@ -237,11 +237,11 @@ public class CertificateTests
         rsa.KeySize = 2048;
         var privateKey = rsa.ExportPem(PemType.Pkcs1PrivateKey);
         var publicKey = rsa.ExportPem(PemType.X509SubjectPublicKey);
-        privateKey.ToUtf8Bytes().SaveToFile(keyPath);
+        privateKey.Utf8Decode().SaveToFile(keyPath);
 
         var subject = new X509Subject(name) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
-        csr.Export().ToUtf8Bytes().SaveToFile(csrPath);
+        csr.Export().Utf8Decode().SaveToFile(csrPath);
         var serialNumber = X509.GenerateSerialNumber();
         var cert = X509.GenerateClientCert(caKey, caCert, csr, serialNumber, 360, subject.CommonName);
         cert.SaveCrt(certPath);

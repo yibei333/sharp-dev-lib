@@ -1,4 +1,4 @@
-﻿namespace SharpDevLib.Cryptography;
+﻿namespace SharpDevLib.Cryptography.Pem;
 
 internal static class PemStatics
 {

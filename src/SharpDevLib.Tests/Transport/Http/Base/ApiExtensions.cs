@@ -23,6 +23,6 @@ public static class ApiExtensions
         }
         writer.Write(text);
 
-        context.Response.ContentLength64 = text.IsNullOrWhiteSpace() ? 0 : text.ToUtf8Bytes().Length;
+        context.Response.ContentLength64 = text.IsNullOrWhiteSpace() ? 0 : text.Utf8Decode().Length;
     }
 }

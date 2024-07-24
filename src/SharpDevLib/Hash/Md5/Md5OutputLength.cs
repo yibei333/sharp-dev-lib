@@ -1,4 +1,4 @@
-﻿namespace SharpDevLib.Hash.Md5;
+﻿namespace SharpDevLib;
 
 /// <summary>
 /// md5输出长度

@@ -22,7 +22,7 @@ public class TcpTests
         ClientStartConnectAndReceive(client);
         await Task.Delay(500);
 
-        client.Send("hello,world".ToUtf8Bytes());
+        client.Send("hello,world".Utf8Decode());
         await Task.Delay(500);
 
         listener.Dispose();
@@ -33,7 +33,7 @@ public class TcpTests
     public async Task ServiceTest()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddTcp();
+        services.AddTcpService();
         var serviceProvider = services.BuildServiceProvider();
         var listenerFactory = serviceProvider.GetRequiredService<ITcpListenerFactory>();
         var clientFactory = serviceProvider.GetRequiredService<ITcpClientFactory>();
@@ -45,7 +45,7 @@ public class TcpTests
         ClientStartConnectAndReceive(client);
         await Task.Delay(500);
 
-        client.Send("hello,world".ToUtf8Bytes());
+        client.Send("hello,world".Utf8Decode());
         await Task.Delay(500);
 
         listener.Dispose();
@@ -63,8 +63,8 @@ public class TcpTests
             Console.WriteLine("session added");
             e.Session.Received += (ss, ee) =>
             {
-                Console.WriteLine($"server received:{ee.Bytes.ToUtf8String()}");
-                ee.Session.Send("server reply".ToUtf8Bytes());
+                Console.WriteLine($"server received:{ee.Bytes.Utf8Encode()}");
+                ee.Session.Send("server reply".Utf8Decode());
             };
             e.Session.Error += (ss, ee) =>
             {
@@ -86,7 +86,7 @@ public class TcpTests
         };
         client.Received += (s, e) =>
         {
-            Console.WriteLine($"client received:{e.Bytes.ToUtf8String()}");
+            Console.WriteLine($"client received:{e.Bytes.Utf8Encode()}");
         };
         client.Error += (s, e) =>
         {

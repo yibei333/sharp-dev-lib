@@ -12,7 +12,7 @@ public static class TcpExtensions
     /// </summary>
     /// <param name="services">service collection</param>
     /// <returns>service collection</returns>
-    public static IServiceCollection AddTcp(this IServiceCollection services)
+    public static IServiceCollection AddTcpService(this IServiceCollection services)
     {
         services.AddSingleton<ITcpListenerFactory, TcpListenerFactory>();
         services.AddSingleton<ITcpClientFactory, TcpClientFactory>();

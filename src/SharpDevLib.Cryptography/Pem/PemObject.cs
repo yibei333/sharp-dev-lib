@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿using SharpDevLib.Cryptography.Internal.References;
+using System.Text;
 
-namespace SharpDevLib.Cryptography;
+namespace SharpDevLib.Cryptography.Pem;
 
 //rfc1421
 internal class PemObject

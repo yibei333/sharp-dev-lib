@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace SharpDevLib.Hash.Md5;
+namespace SharpDevLib;
 
 /// <summary>
 /// MD5哈希扩展
@@ -40,6 +40,7 @@ public static class Md5Extension
     /// <param name="secret">密钥</param>
     /// <param name="length">长度</param>
     /// <returns>HmacMd5哈希值</returns>
+    /// <exception cref="InvalidOperationException">当secret参数长度错误时引发异常</exception>
     public static string HmacMd5(this byte[] bytes, byte[] secret, Md5OutputLength length = Md5OutputLength.ThirtyTwo)
     {
         if (secret.Length > 64) throw new InvalidOperationException("md5 secret length should less than equal 64 bytes");
@@ -55,6 +56,7 @@ public static class Md5Extension
     /// <param name="secret">密钥</param>
     /// <param name="length">长度</param>
     /// <returns>HmacMd5哈希值</returns>
+    /// <exception cref="InvalidOperationException">当secret参数长度错误时引发异常</exception>
     public static string HmacMd5(this Stream stream, byte[] secret, Md5OutputLength length = Md5OutputLength.ThirtyTwo)
     {
         if (secret.Length > 64) throw new InvalidOperationException("md5 secret length should less than equal 64 bytes");

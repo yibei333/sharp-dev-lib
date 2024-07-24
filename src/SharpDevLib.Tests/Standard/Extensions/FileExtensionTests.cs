@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
-using SharpDevLib.Hash.Md5;
 
 namespace SharpDevLib.Tests.Standard.Extensions;
 
@@ -58,7 +57,7 @@ public class FileExtensionTests
     [TestMethod]
     public void SaveBytesToFileTest()
     {
-        var bytes = "foo.bar".ToUtf8Bytes();
+        var bytes = "foo.bar".Utf8Decode();
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("foo.txt");
         bytes.SaveToFile(path);
         var actual = File.ReadAllText(path);
@@ -70,7 +69,7 @@ public class FileExtensionTests
     [ExpectedException(typeof(ArgumentNullException))]
     public void SaveBytesToFilePathExceptionTest()
     {
-        var bytes = "foo.bar".ToUtf8Bytes();
+        var bytes = "foo.bar".Utf8Decode();
         var path = string.Empty;
         bytes.SaveToFile(path);
     }
@@ -79,7 +78,7 @@ public class FileExtensionTests
     [ExpectedException(typeof(InvalidOperationException))]
     public void SaveBytesToFileExistedExceptionTest()
     {
-        var bytes = "foo.bar".ToUtf8Bytes();
+        var bytes = "foo.bar".Utf8Decode();
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt");
         bytes.SaveToFile(path, true);
     }
@@ -87,7 +86,7 @@ public class FileExtensionTests
     [TestMethod]
     public void SaveStreamToFileTest()
     {
-        var bytes = "foo.bar".ToUtf8Bytes();
+        var bytes = "foo.bar".Utf8Decode();
         using var stream = new MemoryStream(bytes);
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("bar.txt");
         stream.SaveToFile(path);
@@ -100,7 +99,7 @@ public class FileExtensionTests
     [ExpectedException(typeof(ArgumentNullException))]
     public void SaveStreamToFilePathExceptionTest()
     {
-        var bytes = "foo.bar".ToUtf8Bytes();
+        var bytes = "foo.bar".Utf8Decode();
         using var stream = new MemoryStream(bytes);
         var path = string.Empty;
         stream.SaveToFile(path);
@@ -110,7 +109,7 @@ public class FileExtensionTests
     [ExpectedException(typeof(InvalidOperationException))]
     public void SaveStreamToFileExistedExceptionTest()
     {
-        var bytes = "foo.bar".ToUtf8Bytes();
+        var bytes = "foo.bar".Utf8Decode();
         using var stream = new MemoryStream(bytes);
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt");
         stream.SaveToFile(path, true);

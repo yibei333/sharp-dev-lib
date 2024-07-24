@@ -41,6 +41,7 @@ public static class StringExtension
     /// <param name="str">字符串</param>
     /// <param name="throwException">如果转换失败是否抛出异常,如果位false则返回Guid.Empty</param>
     /// <returns>Guid</returns>
+    /// <exception cref="InvalidCastException">当转换失败时引发异常</exception>
     public static Guid ToGuid(this string? str, bool throwException = false)
     {
         var success = Guid.TryParse(str, out var guid);
@@ -57,6 +58,8 @@ public static class StringExtension
     /// <param name="throwException">如果转换失败是否抛出异常,如果位false则返回Guid.Empty</param>
     /// <param name="distinct">是否去重</param>
     /// <returns>Guid集合</returns>
+    /// <exception cref="ArgumentException">当separator参数为'-'时引发异常</exception>
+    /// <exception cref="InvalidCastException">当转换失败且throwException为true时引发异常</exception>
     public static List<Guid> SplitToGuidList(this string? str, char separator = ',', bool removeEmptyEntries = true, bool throwException = false, bool distinct = true)
     {
         if (str.IsNullOrWhiteSpace()) return new List<Guid>();
@@ -79,6 +82,7 @@ public static class StringExtension
     /// <param name="removeEmptyEntries">是否删除空白</param>
     /// <param name="distinct">是否去重</param>
     /// <returns>Guid集合</returns>
+    /// <exception cref="ArgumentException">当separator参数为'-'时引发异常</exception>
     public static List<string> SplitToList(this string? str, char separator = ',', bool removeEmptyEntries = true, bool distinct = true)
     {
         if (str.IsNullOrWhiteSpace()) return new List<string>();

@@ -86,8 +86,8 @@ public class HttpPostTests : HttpBaseTests
             { "Age","10" },
         },
         [
-            new FormFile("file","TestFile.txt",File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))),
-            new FormFile("file","Foo.txt",File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Foo.txt"))),
+            new HttpFormFile("file","TestFile.txt",File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))),
+            new HttpFormFile("file","Foo.txt",File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Foo.txt"))),
         ]);
         var response = request.PostAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
@@ -104,8 +104,8 @@ public class HttpPostTests : HttpBaseTests
             { "Age","10" },
         },
         [
-            new FormFile("file","TestFile.txt",File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))),
-            new FormFile("file","Foo.txt",File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Foo.txt"))),
+            new HttpFormFile("file","TestFile.txt",File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))),
+            new HttpFormFile("file","Foo.txt",File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Foo.txt"))),
         ])
         {
             OnReceiveProgress = p =>

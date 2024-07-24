@@ -85,7 +85,7 @@ public class EmailTests
 
         Console.WriteLine(message.ToString());
 
-        Assert.IsTrue(message.FindAllTextVersions().Any(x => x.Body.ToUtf8String().Contains(content.Body!)));
+        Assert.IsTrue(message.FindAllTextVersions().Any(x => x.Body.Utf8Encode().Contains(content.Body!)));
         Assert.AreEqual(content.Receivers?.First(), message.Headers.To.First().ToString());
         Assert.AreEqual(content.CC?.First(), message.Headers.Cc.First().ToString());
         Assert.AreEqual(true, message.Headers.Bcc.IsNullOrEmpty());
@@ -98,7 +98,7 @@ public class EmailTests
         Assert.IsNotNull(attachment);
         using var attachStream = new MemoryStream();
         attachment.Save(attachStream);
-        var attachmentText = attachStream.ToArray().ToUtf8String();
+        var attachmentText = attachStream.ToArray().Utf8Encode();
         Assert.AreEqual("Hello,World!", attachmentText);
     }
 
@@ -112,7 +112,7 @@ public class EmailTests
         EmailGlobalOptions.SenderPassword = "baz_password";
 
         IServiceCollection services = new ServiceCollection();
-        services.AddEmail();
+        services.AddEmailService();
         var serviceProvider = services.BuildServiceProvider().CreateScope().ServiceProvider;
         var service = serviceProvider.GetRequiredService<IEmailService>();
 
@@ -140,7 +140,7 @@ public class EmailTests
 
         Console.WriteLine(message.ToString());
 
-        Assert.IsTrue(message.FindAllTextVersions().Any(x => x.Body.ToUtf8String().Contains(content.Body!)));
+        Assert.IsTrue(message.FindAllTextVersions().Any(x => x.Body.Utf8Encode().Contains(content.Body!)));
         Assert.AreEqual(content.Receivers?.First(), message.Headers.To.First().ToString());
         Assert.AreEqual(content.CC?.First(), message.Headers.Cc.First().ToString());
         Assert.AreEqual(true, message.Headers.Bcc.IsNullOrEmpty());
@@ -153,7 +153,7 @@ public class EmailTests
         Assert.IsNotNull(attachment);
         using var attachStream = new MemoryStream();
         attachment.Save(attachStream);
-        var attachmentText = attachStream.ToArray().ToUtf8String();
+        var attachmentText = attachStream.ToArray().Utf8Encode();
         Assert.AreEqual("Hello,World!", attachmentText);
     }
 }

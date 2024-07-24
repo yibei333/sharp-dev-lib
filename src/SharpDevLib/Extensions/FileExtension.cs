@@ -1005,6 +1005,7 @@ public static class FileExtension
     /// <param name="filePath">文件路径,文件名也可以</param>
     /// <param name="includePoint">是否包含"."</param>
     /// <returns>扩展名</returns>
+    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
     public static string GetFileExtension(this string filePath, bool includePoint = true)
     {
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
@@ -1018,6 +1019,7 @@ public static class FileExtension
     /// <param name="filePath">文件路径</param>
     /// <param name="includeExtension">是否包含扩展名</param>
     /// <returns>文件名</returns>
+    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
     public static string GetFileName(this string filePath, bool includeExtension = true)
     {
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
@@ -1031,6 +1033,8 @@ public static class FileExtension
     /// <param name="bytes">字节数组</param>
     /// <param name="filePath">文件路径</param>
     /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
+    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
+    /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时引发异常</exception>
     public static void SaveToFile(this byte[] bytes, string filePath, bool throwIfFileExist = false)
     {
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
@@ -1052,6 +1056,8 @@ public static class FileExtension
     /// <param name="filePath">文件路径</param>
     /// <param name="cancellationToken">cancellationToken</param>
     /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
+    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
+    /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时引发异常</exception>
     public static async Task SaveToFileAsync(this byte[] bytes, string filePath, CancellationToken? cancellationToken, bool throwIfFileExist = false)
     {
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
@@ -1072,6 +1078,8 @@ public static class FileExtension
     /// <param name="stream">流</param>
     /// <param name="filePath">文件路径</param>
     /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
+    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
+    /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时引发异常</exception>
     public static void SaveToFile(this Stream stream, string filePath, bool throwIfFileExist = false)
     {
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
@@ -1093,6 +1101,8 @@ public static class FileExtension
     /// <param name="filePath">文件路径</param>
     /// <param name="cancellationToken">cancellationToken</param>
     /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
+    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
+    /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时引发异常</exception>
     public static async Task SaveToFileAsync(this Stream stream, string filePath, CancellationToken? cancellationToken, bool throwIfFileExist = false)
     {
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
@@ -1111,6 +1121,7 @@ public static class FileExtension
     /// 确保文件夹存在,如果不存在则创建
     /// </summary>
     /// <param name="directory">文件夹路径</param>
+    /// <exception cref="ArgumentNullException">当directory参数为空时引发异常</exception>
     public static void EnsureDirectoryExist(this string directory)
     {
         if (directory.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(directory));
@@ -1121,6 +1132,8 @@ public static class FileExtension
     /// 确保文件存在,如果不存在则抛出异常
     /// </summary>
     /// <param name="filePath">文件路径</param>
+    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
+    /// <exception cref="FileNotFoundException">当文件不存在时引发异常</exception>
     public static void EnsureFileExist(this string filePath)
     {
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
@@ -1132,6 +1145,7 @@ public static class FileExtension
     /// </summary>
     /// <param name="size">文件字节长度</param>
     /// <returns>文件大小</returns>
+    /// <exception cref="ArgumentException">当size参数小于0时引发异常</exception>
     public static string ToFileSizeString(this long size)
     {
         if (size < 0) throw new ArgumentException("file size should greater than equal 0", nameof(size));
@@ -1178,11 +1192,13 @@ public static class FileExtension
         return $"data:{mime};base64,{Convert.ToBase64String(bytes)}";
     }
 
-    /// <summary>
+    //// <summary>
     /// 将base64格式字符串转换为字节数组
     /// </summary>
     /// <param name="base64FileString">base64格式字符串</param>
     /// <returns>字节数组</returns>
+    /// <exception cref="ArgumentNullException">当base64FileString参数为空时引发异常</exception>
+    /// <exception cref="FormatException">当解码失败时引发异常</exception>
     public static byte[] FileBase64Decode(this string base64FileString)
     {
         if (base64FileString.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(base64FileString));

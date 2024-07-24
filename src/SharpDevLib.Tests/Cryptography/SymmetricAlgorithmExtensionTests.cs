@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Cryptography;
-using SharpDevLib.Hash.Sha;
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -11,8 +10,8 @@ namespace SharpDevLib.Tests.Cryptography;
 public class SymmetricAlgorithmExtensionTests
 {
     const string plainText = "foo";
-    static readonly byte[] key = "1234567".ToUtf8Bytes();
-    static readonly byte[] iv = "12345678".ToUtf8Bytes();
+    static readonly byte[] key = "1234567".Utf8Decode();
+    static readonly byte[] iv = "12345678".Utf8Decode();
     const string plainFileHash = "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae";
     const string aesFileHash = "3ccf2755b13f7635337bd8b54fb8d80c3e306751c7bbeb052baaeb7a318bbc1e";
     const string desFileHash = "c00b686b22e9de4bb1a09259b26c6df60f80762c3e2186d04e3b57c2028b775b";
@@ -37,7 +36,7 @@ public class SymmetricAlgorithmExtensionTests
         algorithm.Padding = PaddingMode.PKCS7;
         algorithm.SetKey(key);
         algorithm.SetIV(iv);
-        var encrypted = algorithm.Encrypt(plainText.ToUtf8Bytes());
+        var encrypted = algorithm.Encrypt(plainText.Utf8Decode());
         Assert.AreEqual(expected, encrypted.Base64Encode());
     }
 
@@ -51,7 +50,7 @@ public class SymmetricAlgorithmExtensionTests
         algorithm.SetKey(key);
         algorithm.SetIV(iv);
         var decrypted = algorithm.Decrypt(encrypted.Base64Decode());
-        Assert.AreEqual(plainText, decrypted.ToUtf8String());
+        Assert.AreEqual(plainText, decrypted.Utf8Encode());
     }
 
     [TestMethod]

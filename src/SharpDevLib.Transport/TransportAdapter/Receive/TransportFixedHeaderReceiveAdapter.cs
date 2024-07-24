@@ -13,6 +13,7 @@ public class TransportFixedHeaderReceiveAdapter : ITransportReceiveAdapter
     /// </summary>
     /// <param name="socket">套接字</param>
     /// <returns>字节数组</returns>
+    /// <exception cref="InvalidDataException">获取头部字节长度失败时引发异常</exception>
     public byte[] Receive(Socket socket)
     {
         var sizeBuffer = new byte[4];
@@ -32,6 +33,7 @@ public class TransportFixedHeaderReceiveAdapter : ITransportReceiveAdapter
     /// <param name="socket">套接字</param>
     /// <param name="remoteEndPoint">远程终结点</param>
     /// <returns>字节数组</returns>
+    /// <exception cref="InvalidDataException">获取头部字节长度失败时引发异常</exception>
     public byte[] ReceiveFrom(Socket socket, ref EndPoint remoteEndPoint)
     {
         var sizeBuffer = new byte[4];

@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace SharpDevLib.Hash.Sha;
+namespace SharpDevLib;
 
 /// <summary>
 /// Sha128哈希扩展

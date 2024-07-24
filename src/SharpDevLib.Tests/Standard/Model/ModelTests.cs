@@ -26,7 +26,7 @@ public class ModelTests
         }
         var totalCount = query.Count();
         var data = query.OrderBy(u => u.Name).Skip(request.Index * request.Size).Take(request.Size).ToList();
-        return Reply.PageSucceed(data, totalCount, request);
+        return PageReply<NameDto>.Succeed(data, totalCount, request);
     }
 
     static readonly List<NameDto> _repository =

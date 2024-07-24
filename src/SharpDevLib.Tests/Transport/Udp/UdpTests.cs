@@ -20,8 +20,8 @@ public class UdpTests
         ClientStartReceive(client2);
         await Task.Delay(500);
 
-        client1.Send(IPAddress.Loopback, 6001, "i am client1".ToUtf8Bytes());
-        client2.Send(IPAddress.Loopback, 6000, "i am client2".ToUtf8Bytes());
+        client1.Send(IPAddress.Loopback, 6001, "i am client1".Utf8Decode());
+        client2.Send(IPAddress.Loopback, 6000, "i am client2".Utf8Decode());
         await Task.Delay(1000);
 
         client1.Dispose();
@@ -32,7 +32,7 @@ public class UdpTests
     public async Task ServiceTest()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddUdp();
+        services.AddUdpService();
         var serviceProvider = services.BuildServiceProvider();
         var clientFactory = serviceProvider.GetRequiredService<IUdpClientFactory>();
 
@@ -42,8 +42,8 @@ public class UdpTests
         ClientStartReceive(client2);
         await Task.Delay(500);
 
-        client1.Send(IPAddress.Loopback, 6003, "i am client1".ToUtf8Bytes());
-        client2.Send(IPAddress.Loopback, 6002, "i am client2".ToUtf8Bytes());
+        client1.Send(IPAddress.Loopback, 6003, "i am client1".Utf8Decode());
+        client2.Send(IPAddress.Loopback, 6002, "i am client2".Utf8Decode());
         await Task.Delay(1000);
 
         client1.Dispose();
@@ -54,10 +54,10 @@ public class UdpTests
     {
         client.Received += (s, e) =>
         {
-            var content = e.Bytes.ToUtf8String();
+            var content = e.Bytes.Utf8Encode();
             var remoteEndPoint = e.RemoteEndPoint as IPEndPoint;
             Console.WriteLine($"client received:{content}");
-            if (!content.StartsWith("ok")) e.Client.Send(remoteEndPoint!.Address, remoteEndPoint.Port, $"ok,{e.Bytes.ToUtf8String()}".ToUtf8Bytes());
+            if (!content.StartsWith("ok")) e.Client.Send(remoteEndPoint!.Address, remoteEndPoint.Port, $"ok,{e.Bytes.Utf8Encode()}".Utf8Decode());
         };
         client.Error += (s, e) =>
         {

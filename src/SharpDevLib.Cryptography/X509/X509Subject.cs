@@ -1,4 +1,6 @@
-﻿namespace SharpDevLib.Cryptography;
+﻿using SharpDevLib.Cryptography.Internal.References;
+
+namespace SharpDevLib.Cryptography;
 
 /// <summary>
 /// X509Subject
@@ -43,6 +45,7 @@ public class X509Subject
     /// get text
     /// </summary>
     /// <returns>text</returns>
+    /// <exception cref="Exception">当所有参数都为空时引发异常</exception>
     public string Text()
     {
         var collection = new List<string>();

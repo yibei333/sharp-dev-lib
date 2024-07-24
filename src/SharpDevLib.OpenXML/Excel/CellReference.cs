@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using SharpDevLib.OpenXML.References;
+using System.Text.RegularExpressions;
 
 namespace SharpDevLib.OpenXML;
 
@@ -28,6 +29,7 @@ public class CellReference
     /// </summary>
     /// <param name="rowIndex">行号,以1开始</param>
     /// <param name="columnIndex">列号,以1开始</param>
+    /// <exception cref="NotSupportedException">当列号超过ZZ时引发异常</exception>
     public CellReference(uint rowIndex, uint columnIndex)
     {
         RowIndex = rowIndex;
@@ -46,9 +48,11 @@ public class CellReference
     /// 实例化单元格引用
     /// </summary>
     /// <param name="reference">引用,如A1,B2</param>
+    /// <exception cref="ArgumentNullException">当参数reference为空时引发异常</exception>
+    /// <exception cref="Exception">当参数reference不合法时时引发异常</exception>
     public CellReference(string? reference)
     {
-        if (reference.IsNullOrWhiteSpace()) throw new ArgumentException("reference could not be null or whitespace");
+        if (reference.IsNullOrWhiteSpace()) throw new ArgumentNullException("reference could not be null or whitespace");
         Reference = reference.ToUpper();
 
         var match = Regex.Match(Reference, _columnExpression);

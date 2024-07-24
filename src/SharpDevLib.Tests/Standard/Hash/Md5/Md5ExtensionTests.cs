@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib.Hash.Md5;
 using System;
 using System.IO;
 
@@ -47,7 +46,7 @@ public class Md5ExtensionTests : HashTests
     [ExpectedException(typeof(InvalidOperationException))]
     public void HMACMD5HashExceptionTest()
     {
-        _bytes.HmacMd5("01234567890123456789012345678901234567890123456789012345678901234".ToUtf8Bytes());
+        _bytes.HmacMd5("01234567890123456789012345678901234567890123456789012345678901234".Utf8Decode());
     }
     #endregion
 }

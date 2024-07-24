@@ -1,4 +1,7 @@
-﻿using System.Formats.Asn1;
+﻿using SharpDevLib.Cryptography.Internal.Pkcs;
+using SharpDevLib.Cryptography.Internal.References;
+using SharpDevLib.Cryptography.Pem;
+using System.Formats.Asn1;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -173,7 +176,7 @@ public static class X509
         var bytes = certificate.Export(X509ContentType.Cert);
         var pem = new PemObject(PemStatics.X509CertificateStart, Convert.ToBase64String(bytes), PemStatics.X509CertificateEnd, PemType.X509Certificate);
         var crt = pem.Write();
-        var crtBytes = crt.ToUtf8Bytes();
+        var crtBytes = crt.Utf8Decode();
         stream.Write(crtBytes, 0, crtBytes.Length);
     }
 
@@ -187,7 +190,7 @@ public static class X509
         var bytes = certificate.Export(X509ContentType.Cert);
         var pem = new PemObject(PemStatics.X509CertificateStart, Convert.ToBase64String(bytes), PemStatics.X509CertificateEnd, PemType.X509Certificate);
         var crt = pem.Write();
-        var crtBytes = crt.ToUtf8Bytes();
+        var crtBytes = crt.Utf8Decode();
         crtBytes.SaveToFile(path);
     }
 
