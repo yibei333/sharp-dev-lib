@@ -1,4 +1,4 @@
-﻿namespace SharpDevLib.Transport.Tcp.EventArgs;
+﻿namespace SharpDevLib.Transport;
 
 /// <summary>
 /// Tcp客户端异常事件参数

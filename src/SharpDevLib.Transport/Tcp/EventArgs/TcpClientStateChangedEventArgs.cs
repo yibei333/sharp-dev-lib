@@ -1,4 +1,4 @@
-﻿namespace SharpDevLib.Transport.Tcp.EventArgs;
+﻿namespace SharpDevLib.Transport;
 
 /// <summary>
 /// Tcp客户端状态变更事件参数
