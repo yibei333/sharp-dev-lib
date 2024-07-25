@@ -1192,7 +1192,7 @@ public static class FileExtension
         return $"data:{mime};base64,{Convert.ToBase64String(bytes)}";
     }
 
-    //// <summary>
+    /// <summary>
     /// 将base64格式字符串转换为字节数组
     /// </summary>
     /// <param name="base64FileString">base64格式字符串</param>
