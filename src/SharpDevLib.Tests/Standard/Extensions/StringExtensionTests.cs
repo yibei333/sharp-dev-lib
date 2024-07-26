@@ -196,9 +196,9 @@ public class StringExtensionTests
     [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/b.md", "../../b.md")]
     [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/a12/b.md", "../../a12/b.md")]
     [DataRow("d:/foo/a.md", "e:/foo/b.md", "../../../e:/foo/b.md")]
-    public void ResolveUrlRelativePathTest(string sourcePath, string targetPath, string expectedPath)
+    public void GetUrlRelativePathTest(string sourcePath, string targetPath, string expectedPath)
     {
-        var actual = sourcePath.ResolveUrlRelativePath(targetPath);
+        var actual = sourcePath.GetUrlRelativePath(targetPath);
         Assert.AreEqual(expectedPath, actual);
     }
 

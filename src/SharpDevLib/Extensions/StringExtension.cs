@@ -139,7 +139,7 @@ public static class StringExtension
     /// <param name="targetPath">目标路径</param>
     /// <returns>相对路径</returns>
     /// <exception cref="InvalidDataException">当源路径和目标路径相同时引发异常</exception>
-    public static string ResolveUrlRelativePath(this string sourcePath, string targetPath)
+    public static string GetUrlRelativePath(this string sourcePath, string targetPath)
     {
         sourcePath = sourcePath.FormatPath();
         targetPath = targetPath.FormatPath();
