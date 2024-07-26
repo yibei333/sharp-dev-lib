@@ -1,5 +1,4 @@
 ﻿using SharpDevLib.Cryptography.Internal.Pkcs;
-using SharpDevLib.Cryptography.Internal.References;
 using SharpDevLib.Cryptography.Pem;
 using System.Formats.Asn1;
 using System.Security.Cryptography;

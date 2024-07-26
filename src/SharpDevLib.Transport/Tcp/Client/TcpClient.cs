@@ -1,5 +1,4 @@
-﻿using SharpDevLib.Transport.Internal.References;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 
 namespace SharpDevLib.Transport;

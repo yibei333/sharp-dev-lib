@@ -1,6 +1,4 @@
-﻿using SharpDevLib.Cryptography.Internal.References;
-
-namespace SharpDevLib.Cryptography;
+﻿namespace SharpDevLib.Cryptography;
 
 /// <summary>
 /// 使用HMACSHA256算法验证JWT请求模型

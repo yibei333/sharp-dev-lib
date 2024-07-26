@@ -1,6 +1,5 @@
 ﻿using SharpCompress.Common;
 using SharpCompress.Readers;
-using SharpDevLib.Compression.Internal.References;
 
 namespace SharpDevLib.Compression.Internal.DeCompress;
 
@@ -16,7 +15,7 @@ internal abstract class DeCompressHandler
 
     public virtual async Task HandleAsync()
     {
-        Option.TargetPath.EnsureDirectoryExist();
+        Option.TargetPath.CreateDirectoryIfNotExist();
         await Task.Yield();
 
         var fileInfo = new FileInfo(Option.SourceFile);

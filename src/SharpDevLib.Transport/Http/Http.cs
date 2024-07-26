@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SharpDevLib.Transport.Internal.References;
 using System.Net;
 
 namespace SharpDevLib.Transport;
@@ -165,7 +164,7 @@ public static class Http
             else if (keyValue.Key.Equals("Expires", StringComparison.InvariantCultureIgnoreCase)) cookie.Expires = DateTime.TryParse(keyValue.Value, out var time) ? time : DateTime.Now;
             else if (keyValue.Key.Equals("Max-Age", StringComparison.InvariantCultureIgnoreCase))
             {
-                if (!array.Any(x => x.Contains("Expires"))) cookie.Expires = InternalExtensions.UtcStartTime.AddSeconds(int.TryParse(keyValue.Value, out var seconds) ? seconds : 0);
+                if (!array.Any(x => x.Contains("Expires"))) cookie.Expires = TimeExtension.UtcStartTime.AddSeconds(int.TryParse(keyValue.Value, out var seconds) ? seconds : 0);
             }
             else if (keyValue.Key.Equals("HttpOnly", StringComparison.InvariantCultureIgnoreCase)) cookie.HttpOnly = true;
             else if (keyValue.Key.Equals("Path", StringComparison.InvariantCultureIgnoreCase)) cookie.Path = keyValue.Value ?? "/";

@@ -1,5 +1,4 @@
 ﻿using ICSharpCode.SharpZipLib.BZip2;
-using SharpDevLib.Compression.Internal.References;
 
 namespace SharpDevLib.Compression.Internal.DeCompress;
 

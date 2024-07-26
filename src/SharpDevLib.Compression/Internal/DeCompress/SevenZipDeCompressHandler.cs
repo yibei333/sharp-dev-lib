@@ -2,7 +2,6 @@
 using SharpCompress.Archives.SevenZip;
 using SharpCompress.Common;
 using SharpCompress.Readers;
-using SharpDevLib.Compression.Internal.References;
 
 namespace SharpDevLib.Compression.Internal.DeCompress;
 
@@ -15,7 +14,7 @@ internal class SevenZipDeCompressHandler : DeCompressHandler
     public override async Task HandleAsync()
     {
         await Task.Yield();
-        Option.TargetPath.EnsureDirectoryExist();
+        Option.TargetPath.CreateDirectoryIfNotExist();
         using var archive = SevenZipArchive.Open(Option.SourceFile, new ReaderOptions { Password = Option.Password });
         var progress = Option.OnProgress is null ? null : new CompressionProgressArgs { Total = archive.TotalUncompressSize };
 

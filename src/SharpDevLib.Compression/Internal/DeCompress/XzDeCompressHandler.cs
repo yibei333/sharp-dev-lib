@@ -1,5 +1,4 @@
 ﻿using SharpCompress.Compressors.Xz;
-using SharpDevLib.Compression.Internal.References;
 
 namespace SharpDevLib.Compression.Internal.DeCompress;
 

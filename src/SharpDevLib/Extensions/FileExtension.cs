@@ -1033,17 +1033,16 @@ public static class FileExtension
     /// <param name="bytes">字节数组</param>
     /// <param name="filePath">文件路径</param>
     /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
-    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
     /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时引发异常</exception>
     public static void SaveToFile(this byte[] bytes, string filePath, bool throwIfFileExist = false)
     {
-        if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
-        if (File.Exists(filePath))
+        var fileInfo = new FileInfo(filePath);
+        if (fileInfo.Exists)
         {
             if (throwIfFileExist) throw new InvalidOperationException($"file '{filePath}' already existed");
-            File.Delete(filePath);
+            fileInfo.Delete();
         }
-        new FileInfo(filePath).DirectoryName.EnsureDirectoryExist();
+        fileInfo.CreateFileIfNotExist();
         using var stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
         stream.Write(bytes, 0, bytes.Length);
         stream.Flush();
@@ -1056,17 +1055,16 @@ public static class FileExtension
     /// <param name="filePath">文件路径</param>
     /// <param name="cancellationToken">cancellationToken</param>
     /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
-    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
     /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时引发异常</exception>
     public static async Task SaveToFileAsync(this byte[] bytes, string filePath, CancellationToken? cancellationToken, bool throwIfFileExist = false)
     {
-        if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
-        if (File.Exists(filePath))
+        var fileInfo = new FileInfo(filePath);
+        if (fileInfo.Exists)
         {
             if (throwIfFileExist) throw new InvalidOperationException($"file '{filePath}' already existed");
-            File.Delete(filePath);
+            fileInfo.Delete();
         }
-        new FileInfo(filePath).DirectoryName.EnsureDirectoryExist();
+        fileInfo.CreateFileIfNotExist();
         using var stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
         await stream.WriteAsync(bytes, 0, bytes.Length, cancellationToken ?? CancellationToken.None);
         await stream.FlushAsync(cancellationToken ?? CancellationToken.None);
@@ -1118,26 +1116,71 @@ public static class FileExtension
     }
 
     /// <summary>
-    /// 确保文件夹存在,如果不存在则创建
+    /// 如果文件夹不存在抛出异常
     /// </summary>
     /// <param name="directory">文件夹路径</param>
-    /// <exception cref="ArgumentNullException">当directory参数为空时引发异常</exception>
-    public static void EnsureDirectoryExist(this string directory)
+    /// <exception cref="Exception">当文件夹不存在时引发异常</exception>
+    public static void ThrowIfDirectoryNotExist(this string directory) => new DirectoryInfo(directory).ThrowIfDirectoryNotExist();
+
+    /// <summary>
+    /// 如果文件夹不存在抛出异常
+    /// </summary>
+    /// <param name="directory">文件夹路径</param>
+    /// <exception cref="Exception">当文件夹不存在时引发异常</exception>
+    public static void ThrowIfDirectoryNotExist(this DirectoryInfo directory)
     {
-        if (directory.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(directory));
-        if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+        if (!directory.Exists) throw new Exception($"directory '{directory}' not exist");
     }
 
     /// <summary>
-    /// 确保文件存在,如果不存在则抛出异常
+    /// 如果文件不存在抛出异常
     /// </summary>
     /// <param name="filePath">文件路径</param>
-    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
     /// <exception cref="FileNotFoundException">当文件不存在时引发异常</exception>
-    public static void EnsureFileExist(this string filePath)
+    public static void ThrowIfFileNotExist(this string filePath) => new FileInfo(filePath).ThrowIfFileNotExist();
+
+    /// <summary>
+    /// 如果文件不存在抛出异常
+    /// </summary>
+    /// <param name="fileInfo">文件信息</param>
+    /// <exception cref="FileNotFoundException">当文件不存在时引发异常</exception>
+    public static void ThrowIfFileNotExist(this FileInfo fileInfo)
     {
-        if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
-        if (!File.Exists(filePath)) throw new FileNotFoundException($"file not found", filePath);
+        if (!fileInfo.Exists) throw new FileNotFoundException(null, fileInfo.FullName);
+    }
+
+    /// <summary>
+    /// 如果文件夹不存在则创建
+    /// </summary>
+    /// <param name="directory">文件夹路径</param>
+    public static void CreateDirectoryIfNotExist(this string directory) => new DirectoryInfo(directory).CreateDirectoryIfNotExist();
+
+    /// <summary>
+    /// 如果文件夹不存在则创建
+    /// </summary>
+    /// <param name="directory">文件夹路径</param>
+    public static void CreateDirectoryIfNotExist(this DirectoryInfo directory)
+    {
+        if (!directory.Exists) Directory.CreateDirectory(directory.FullName);
+    }
+
+    /// <summary>
+    /// 如果文件不存在则创建
+    /// </summary>
+    /// <param name="filePath">文件路径</param>
+    public static void CreateFileIfNotExist(this string filePath) => new FileInfo(filePath).CreateFileIfNotExist();
+
+    /// <summary>
+    /// 如果文件不存在则创建
+    /// </summary>
+    /// <param name="fileInfo">文件信息</param>
+    public static void CreateFileIfNotExist(this FileInfo fileInfo)
+    {
+        if (!fileInfo.Exists)
+        {
+            fileInfo.DirectoryName.CreateDirectoryIfNotExist();
+            File.Create(fileInfo.FullName).Dispose();
+        }
     }
 
     /// <summary>
@@ -1186,7 +1229,7 @@ public static class FileExtension
     /// <returns>base64格式字符串</returns>
     public static string FileBase64Encode(this string filePath)
     {
-        filePath.EnsureFileExist();
+        filePath.CreateFileIfNotExist();
         var mime = filePath.GetMimeType();
         var bytes = File.ReadAllBytes(filePath);
         return $"data:{mime};base64,{Convert.ToBase64String(bytes)}";
@@ -1225,10 +1268,8 @@ public static class FileExtension
     /// <returns>文件流</returns>
     public static FileStream OpenOrCreate(this FileInfo fileInfo)
     {
-        fileInfo.Directory.FullName.EnsureDirectoryExist();
-        var stream = new FileStream(fileInfo.FullName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-        if (stream.CanSeek) stream.Seek(0, SeekOrigin.Begin);
-        return stream;
+        fileInfo.CreateFileIfNotExist();
+        return new FileStream(fileInfo.FullName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
     }
 
     /// <summary>

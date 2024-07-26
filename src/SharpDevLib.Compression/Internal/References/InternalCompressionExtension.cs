@@ -1,6 +1,5 @@
 ﻿using SharpDevLib.Compression.Internal.Compress;
 using SharpDevLib.Compression.Internal.DeCompress;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SharpDevLib.Compression.Internal.References;
 
@@ -93,84 +92,4 @@ internal static class InternalCompressionExtension
             _ => 5,
         };
     }
-
-    #region internal simple extesnions
-    internal static bool IsNullOrWhiteSpace([NotNullWhen(false)] this string? str) => string.IsNullOrWhiteSpace(str);
-
-    internal static bool NotNullOrWhiteSpace([NotNullWhen(true)] this string? str) => !string.IsNullOrWhiteSpace(str);
-
-    internal static string GetFileExtension(this string? filePath, bool includePoint = true)
-    {
-        if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
-        var extension = new FileInfo(filePath).Extension;
-        return includePoint ? extension : extension.TrimStart('.');
-    }
-
-    internal static bool IsNullOrEmpty<T>([NotNullWhen(false)] this IEnumerable<T>? source) => source is null || source.Count() <= 0;
-
-    internal static void RemoveFileIfExist(this string path)
-    {
-        if (path.IsNullOrWhiteSpace()) return;
-        if (File.Exists(path)) File.Delete(path);
-    }
-
-    internal static string TrimStart(this string source, string target)
-    {
-        if (source.IsNullOrWhiteSpace() || target.IsNullOrWhiteSpace()) return source.Trim();
-        source = source.Trim();
-        target = target.Trim();
-        if (source.StartsWith(target)) return source.Substring(source.IndexOf(target) + target.Length);
-        return source;
-    }
-
-    internal static string TrimEnd(this string source, string target)
-    {
-        if (source.IsNullOrWhiteSpace() || target.IsNullOrWhiteSpace()) return source.Trim();
-        source = source.Trim();
-        target = target.Trim();
-        if (source.EndsWith(target)) return source.Substring(0, source.IndexOf(target));
-        return source;
-    }
-
-    internal static void EnsureDirectoryExist(this string directory)
-    {
-        if (directory.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(directory));
-        if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
-    }
-
-    internal static FileStream OpenOrCreate(this FileInfo fileInfo)
-    {
-        fileInfo.Directory.FullName.EnsureDirectoryExist();
-        var stream = new FileStream(fileInfo.FullName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-        if (stream.CanSeek) stream.Seek(0, SeekOrigin.Begin);
-        return stream;
-    }
-
-    internal static async Task CopyToAsync(this Stream source, Stream target, CancellationToken cancellationToken, Action<long>? transfered = null)
-    {
-        await Task.Yield();
-        var buffer = new byte[2048];
-        int length;
-        if (source.CanSeek) source.Seek(0, SeekOrigin.Begin);
-
-        while ((length = source.Read(buffer, 0, buffer.Length)) > 0)
-        {
-            if (cancellationToken.IsCancellationRequested) break;
-            target.Write(buffer, 0, length);
-
-            transfered?.Invoke(length);
-        }
-    }
-
-    internal static string FormatPath(this string path) => path.Trim().Replace("\\", "/");
-
-    internal static string GetFileName(this string filePath, bool includeExtension = true)
-    {
-        if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
-        var fileInfo = new FileInfo(filePath);
-        return includeExtension ? fileInfo.Name : fileInfo.Name.TrimEnd(fileInfo.Extension);
-    }
-
-    internal static string CombinePath(this string leftPath, string rightPath) => Path.Combine(leftPath.Trim(), rightPath.Trim().TrimStart('/').TrimStart('\\')).FormatPath();
-    #endregion
 }

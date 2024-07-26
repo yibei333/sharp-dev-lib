@@ -1,6 +1,4 @@
-﻿using SharpDevLib.Compression.Internal.References;
-
-namespace SharpDevLib.Compression.Internal.Compress;
+﻿namespace SharpDevLib.Compression.Internal.Compress;
 
 internal abstract class CompressHandler
 {

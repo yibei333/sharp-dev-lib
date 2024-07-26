@@ -1,5 +1,4 @@
-﻿using SharpDevLib.Cryptography.Internal.References;
-using SharpDevLib.Cryptography.Pem;
+﻿using SharpDevLib.Cryptography.Pem;
 using System.Security.Cryptography;
 
 namespace SharpDevLib.Cryptography;

@@ -64,7 +64,7 @@ public class SymmetricAlgorithmExtensionTests
 
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Cryptography/Symmetric/Output/Foo-{algorithmName}.txt");
         targetPath.RemoveFileIfExist();
-        new FileInfo(targetPath).DirectoryName?.EnsureDirectoryExist();
+        new FileInfo(targetPath).Directory?.CreateDirectoryIfNotExist();
         using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
 
         using var algorithm = GetSymmetricAlgorithm(algorithmName);
@@ -90,7 +90,7 @@ public class SymmetricAlgorithmExtensionTests
 
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Cryptography/Symmetric/Output/Foo-Decrypt-{algorithmName}.txt");
         targetPath.RemoveFileIfExist();
-        new FileInfo(targetPath).DirectoryName?.EnsureDirectoryExist();
+        new FileInfo(targetPath).Directory?.CreateDirectoryIfNotExist();
         using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
 
         using var algorithm = GetSymmetricAlgorithm(algorithmName);

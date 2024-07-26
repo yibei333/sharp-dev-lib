@@ -66,15 +66,6 @@ public class FileExtensionTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
-    public void SaveBytesToFilePathExceptionTest()
-    {
-        var bytes = "foo.bar".Utf8Decode();
-        var path = string.Empty;
-        bytes.SaveToFile(path);
-    }
-
-    [TestMethod]
     [ExpectedException(typeof(InvalidOperationException))]
     public void SaveBytesToFileExistedExceptionTest()
     {
@@ -116,50 +107,23 @@ public class FileExtensionTests
     }
 
     [TestMethod]
-    public void EnsureDirectoryExistTest()
+    public void CreateDirectoryIfNotExistTest()
     {
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("Data");
-        path.EnsureDirectoryExist();
+        path.CreateDirectoryIfNotExist();
         Assert.IsTrue(Directory.Exists(path));
 
         path = path.CombinePath("Foo Bar");
         if (Directory.Exists(path)) Directory.Delete(path, true);
-        path.EnsureDirectoryExist();
+        path.CreateDirectoryIfNotExist();
         Assert.IsTrue(Directory.Exists(path));
     }
 
     [TestMethod]
-    [DataRow("")]
-    [DataRow(" ")]
-    [ExpectedException(typeof(ArgumentNullException))]
-    public void EnsureDirectoryExistExceptionTest(string path)
-    {
-        path.EnsureDirectoryExist();
-    }
-
-    [TestMethod]
-    public void EnsureFileExistTest()
+    public void CreateFileIfNotExistTest()
     {
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt");
-        path.EnsureFileExist();
-    }
-
-    [TestMethod]
-    [DataRow("")]
-    [DataRow(" ")]
-    [ExpectedException(typeof(ArgumentNullException))]
-    public void EnsureFileExistPathExceptionTest(string path)
-    {
-        path.EnsureFileExist();
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(FileNotFoundException))]
-    public void EnsureFileExistNotFoundExceptionTest()
-    {
-        var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/xxxx.txt");
-        if (File.Exists(path)) File.Delete(path);
-        path.EnsureFileExist();
+        path.CreateFileIfNotExist();
     }
 
     [TestMethod]

@@ -24,7 +24,7 @@ public class SqlHelperTests
     static string GetFileConnectionString(string name)
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{name}.db");
-        new FileInfo(targetPath).Directory?.FullName.EnsureDirectoryExist();
+        new FileInfo(targetPath).Directory?.CreateDirectoryIfNotExist();
         targetPath.RemoveFileIfExist();
         using var sourceStream = new FileStream(SourceFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var targetStream = new FileStream(targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);

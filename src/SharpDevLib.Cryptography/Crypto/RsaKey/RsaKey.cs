@@ -1,6 +1,5 @@
 ﻿using SharpDevLib.Cryptography.Internal.OpenSSL;
 using SharpDevLib.Cryptography.Internal.Pkcs;
-using SharpDevLib.Cryptography.Internal.References;
 using SharpDevLib.Cryptography.Pem;
 using System.Diagnostics;
 using System.Security.Cryptography;

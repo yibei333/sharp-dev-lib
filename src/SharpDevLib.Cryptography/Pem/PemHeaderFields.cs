@@ -1,6 +1,4 @@
-﻿using SharpDevLib.Cryptography.Internal.References;
-
-namespace SharpDevLib.Cryptography.Pem;
+﻿namespace SharpDevLib.Cryptography.Pem;
 
 internal class PemHeaderFields
 {

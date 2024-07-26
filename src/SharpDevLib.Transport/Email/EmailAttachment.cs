@@ -1,6 +1,4 @@
-﻿using SharpDevLib.Transport.Internal.References;
-
-namespace SharpDevLib.Transport;
+﻿namespace SharpDevLib.Transport;
 
 /// <summary>
 /// 邮件附件
@@ -15,7 +13,7 @@ public class EmailAttachment
     /// <param name="path">文件路径</param>
     public EmailAttachment(string path)
     {
-        path.EnsureFileExist();
+        path.ThrowIfFileNotExist();
         Path = path;
         Name = new FileInfo(path).Name;
         Bytes = File.ReadAllBytes(path);

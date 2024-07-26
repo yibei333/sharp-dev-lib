@@ -1,6 +1,4 @@
-﻿using SharpDevLib.Cryptography.Internal.References;
-
-namespace SharpDevLib.Cryptography;
+﻿namespace SharpDevLib.Cryptography;
 
 /// <summary>
 /// X509Subject

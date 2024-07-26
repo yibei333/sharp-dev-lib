@@ -1,5 +1,4 @@
 ﻿using ICSharpCode.SharpZipLib.Tar;
-using SharpDevLib.Compression.Internal.References;
 using System.Text;
 
 namespace SharpDevLib.Compression.Internal.Compress;
