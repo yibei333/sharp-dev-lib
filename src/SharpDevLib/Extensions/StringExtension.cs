@@ -1,4 +1,6 @@
-﻿namespace SharpDevLib;
+﻿using System.Text;
+
+namespace SharpDevLib;
 
 /// <summary>
 /// 字符串扩展
@@ -129,4 +131,79 @@ public static class StringExtension
     /// <param name="str">字符串</param>
     /// <returns>字符串</returns>
     public static string RemoveSpace(this string str) => str.Replace(" ", "");
+
+    /// <summary>
+    /// 获取相对路径
+    /// </summary>
+    /// <param name="sourcePath">源路径</param>
+    /// <param name="targetPath">目标路径</param>
+    /// <returns>相对路径</returns>
+    /// <exception cref="InvalidDataException">当源路径和目标路径相同时引发异常</exception>
+    public static string ResolveUrlRelativePath(this string sourcePath, string targetPath)
+    {
+        sourcePath = sourcePath.FormatPath();
+        targetPath = targetPath.FormatPath();
+        if (sourcePath.Equals(targetPath)) throw new InvalidDataException();
+
+        var commonPrefix = GetUrlCommonPrefix(sourcePath, targetPath);
+        sourcePath = sourcePath.TrimStart(commonPrefix).TrimStart('/');
+        targetPath = targetPath.TrimStart(commonPrefix).TrimStart('/');
+
+        var sourceCount = sourcePath.Split('/').Count();
+        if (sourceCount == 1) return $"./{targetPath}";
+        else
+        {
+            var builder = new StringBuilder();
+            for (int i = 0; i < sourceCount; i++)
+            {
+                builder.Append("../");
+            }
+            builder.Append(targetPath);
+            return builder.ToString();
+        }
+    }
+
+    /// <summary>
+    /// 获取地址相同的前缀
+    /// </summary>
+    /// <param name="url1">地址1</param>
+    /// <param name="url2">地址2</param>
+    /// <returns>相同的前缀</returns>
+    public static string GetUrlCommonPrefix(this string url1, string url2)
+    {
+        url1 = url1.FormatPath();
+        url2 = url2.FormatPath();
+        var array1 = url1.SplitToList('/');
+        var array2 = url2.SplitToList('/');
+        int minCount = Math.Min(array1.Count, array2.Count);
+        int i;
+        for (i = 0; i < minCount; i++)
+        {
+            if (array1[i] != array2[i])
+            {
+                break;
+            }
+        }
+        return string.Join("/", array1.Take(i));
+    }
+
+    /// <summary>
+    /// 获取字符串相同的前缀
+    /// </summary>
+    /// <param name="str1">字符串1</param>
+    /// <param name="str2">字符串2</param>
+    /// <returns>相同的前缀</returns>
+    public static string GetCommonPrefix(this string str1, string str2)
+    {
+        int length = Math.Min(str1.Length, str2.Length);
+        int i;
+        for (i = 0; i < length; i++)
+        {
+            if (str1[i] != str2[i])
+            {
+                break;
+            }
+        }
+        return str1.Substring(0, i);
+    }
 }

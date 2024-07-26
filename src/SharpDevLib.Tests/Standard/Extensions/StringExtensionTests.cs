@@ -188,4 +188,40 @@ public class StringExtensionTests
         var actual = str.RemoveLineBreak();
         Assert.AreEqual(expected, actual);
     }
+
+    [TestMethod]
+    [DataRow("http:/foo/a/a1/a11/a.md", "http:/foo/a/a1/a11/a111/b.md", "./a111/b.md")]
+    [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/a11/a111/b.md", "./a111/b.md")]
+    [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/a11/b.md", "./b.md")]
+    [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/b.md", "../../b.md")]
+    [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/a12/b.md", "../../a12/b.md")]
+    [DataRow("d:/foo/a.md", "e:/foo/b.md", "../../../e:/foo/b.md")]
+    public void ResolveUrlRelativePathTest(string sourcePath, string targetPath, string expectedPath)
+    {
+        var actual = sourcePath.ResolveUrlRelativePath(targetPath);
+        Assert.AreEqual(expectedPath, actual);
+    }
+
+    [TestMethod]
+    [DataRow("http:/foo/a/a1/a11/a.md", "http:/foo/a/a1/a11/a111/b.md", "http:/foo/a/a1/a11")]
+    [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/a11/a111/b.md", "d:/foo/a/a1/a11")]
+    [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/a11/b.md", "d:/foo/a/a1/a11")]
+    [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/b.md", "d:/foo/a/a1")]
+    [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/a12/b.md", "d:/foo/a/a1")]
+    public void GetUrlCommonPrefixTest(string sourcePath, string targetPath, string expectedPath)
+    {
+        var actual = sourcePath.GetUrlCommonPrefix(targetPath);
+        Assert.AreEqual(expectedPath, actual);
+    }
+
+    [TestMethod]
+    [DataRow("abcd:/ef", "abcd:/efg", "abcd:/ef")]
+    [DataRow("abcd:/efg", "abcd:/ef", "abcd:/ef")]
+    [DataRow("abcd:/efg", "abcd:/efi", "abcd:/ef")]
+    [DataRow("xabcd:/efg", "abcd:/efi", "")]
+    public void GetCommonPrefixTest(string str1, string str2, string expectedPath)
+    {
+        var actual = str1.GetCommonPrefix(str2);
+        Assert.AreEqual(expectedPath, actual);
+    }
 }
