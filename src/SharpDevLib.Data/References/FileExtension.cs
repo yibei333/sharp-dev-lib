@@ -1,4 +1,6 @@
-﻿namespace SharpDevLib;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace SharpDevLib;
 
 /// <summary>
 /// 文件扩展
@@ -1033,9 +1035,12 @@ internal static class FileExtension
     /// <param name="bytes">字节数组</param>
     /// <param name="filePath">文件路径</param>
     /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
+    /// <exception cref="ArgumentNullException">当bytes或filePath参数为空时引发异常</exception>
     /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时引发异常</exception>
     public static void SaveToFile(this byte[] bytes, string filePath, bool throwIfFileExist = false)
     {
+        if (bytes.IsNullOrEmpty()) throw new ArgumentNullException(nameof(bytes));
+        if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
         var fileInfo = new FileInfo(filePath);
         if (fileInfo.Exists)
         {
@@ -1055,9 +1060,12 @@ internal static class FileExtension
     /// <param name="filePath">文件路径</param>
     /// <param name="cancellationToken">cancellationToken</param>
     /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
+    /// <exception cref="ArgumentNullException">当bytes或filePath参数为空时引发异常</exception>
     /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时引发异常</exception>
     public static async Task SaveToFileAsync(this byte[] bytes, string filePath, CancellationToken? cancellationToken, bool throwIfFileExist = false)
     {
+        if (bytes.IsNullOrEmpty()) throw new ArgumentNullException(nameof(bytes));
+        if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
         var fileInfo = new FileInfo(filePath);
         if (fileInfo.Exists)
         {
@@ -1076,10 +1084,11 @@ internal static class FileExtension
     /// <param name="stream">流</param>
     /// <param name="filePath">文件路径</param>
     /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
-    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
+    /// <exception cref="ArgumentNullException">当stream或filePath参数为空时引发异常</exception>
     /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时引发异常</exception>
     public static void SaveToFile(this Stream stream, string filePath, bool throwIfFileExist = false)
     {
+        if (stream is null) throw new ArgumentNullException(nameof(stream));
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
         if (File.Exists(filePath))
         {
@@ -1099,10 +1108,11 @@ internal static class FileExtension
     /// <param name="filePath">文件路径</param>
     /// <param name="cancellationToken">cancellationToken</param>
     /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
-    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
+    /// <exception cref="ArgumentNullException">当stream或filePath参数为空时引发异常</exception>
     /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时引发异常</exception>
     public static async Task SaveToFileAsync(this Stream stream, string filePath, CancellationToken? cancellationToken, bool throwIfFileExist = false)
     {
+        if (stream is null) throw new ArgumentNullException(nameof(stream));
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
         if (File.Exists(filePath))
         {
@@ -1119,16 +1129,23 @@ internal static class FileExtension
     /// 如果文件夹不存在抛出异常
     /// </summary>
     /// <param name="directory">文件夹路径</param>
+    /// <exception cref="ArgumentNullException">当directory参数为空时引发异常</exception>
     /// <exception cref="Exception">当文件夹不存在时引发异常</exception>
-    public static void ThrowIfDirectoryNotExist(this string directory) => new DirectoryInfo(directory).ThrowIfDirectoryNotExist();
+    public static void ThrowIfDirectoryNotExist([NotNull] this string? directory)
+    {
+        if (directory.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(directory));
+        new DirectoryInfo(directory).ThrowIfDirectoryNotExist();
+    }
 
     /// <summary>
     /// 如果文件夹不存在抛出异常
     /// </summary>
     /// <param name="directory">文件夹路径</param>
+    /// <exception cref="ArgumentNullException">当directory参数为空时引发异常</exception>
     /// <exception cref="Exception">当文件夹不存在时引发异常</exception>
-    public static void ThrowIfDirectoryNotExist(this DirectoryInfo directory)
+    public static void ThrowIfDirectoryNotExist([NotNull] this DirectoryInfo? directory)
     {
+        if (directory is null) throw new ArgumentNullException(nameof(directory));
         if (!directory.Exists) throw new Exception($"directory '{directory}' not exist");
     }
 
@@ -1136,16 +1153,23 @@ internal static class FileExtension
     /// 如果文件不存在抛出异常
     /// </summary>
     /// <param name="filePath">文件路径</param>
+    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
     /// <exception cref="FileNotFoundException">当文件不存在时引发异常</exception>
-    public static void ThrowIfFileNotExist(this string filePath) => new FileInfo(filePath).ThrowIfFileNotExist();
+    public static void ThrowIfFileNotExist([NotNull] this string? filePath)
+    {
+        if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
+        new FileInfo(filePath).ThrowIfFileNotExist();
+    }
 
     /// <summary>
     /// 如果文件不存在抛出异常
     /// </summary>
     /// <param name="fileInfo">文件信息</param>
+    /// <exception cref="ArgumentNullException">当fileInfo参数为空时引发异常</exception>
     /// <exception cref="FileNotFoundException">当文件不存在时引发异常</exception>
-    public static void ThrowIfFileNotExist(this FileInfo fileInfo)
+    public static void ThrowIfFileNotExist([NotNull] this FileInfo? fileInfo)
     {
+        if (fileInfo is null) throw new ArgumentNullException(nameof(fileInfo));
         if (!fileInfo.Exists) throw new FileNotFoundException(null, fileInfo.FullName);
     }
 
@@ -1153,14 +1177,21 @@ internal static class FileExtension
     /// 如果文件夹不存在则创建
     /// </summary>
     /// <param name="directory">文件夹路径</param>
-    public static void CreateDirectoryIfNotExist(this string directory) => new DirectoryInfo(directory).CreateDirectoryIfNotExist();
+    /// <exception cref="ArgumentNullException">当directory参数为空时引发异常</exception>
+    public static void CreateDirectoryIfNotExist([NotNull] this string? directory)
+    {
+        if (directory.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(directory));
+        new DirectoryInfo(directory).CreateDirectoryIfNotExist();
+    }
 
     /// <summary>
     /// 如果文件夹不存在则创建
     /// </summary>
     /// <param name="directory">文件夹路径</param>
-    public static void CreateDirectoryIfNotExist(this DirectoryInfo directory)
+    /// <exception cref="ArgumentNullException">当directory参数为空时引发异常</exception>
+    public static void CreateDirectoryIfNotExist([NotNull] this DirectoryInfo? directory)
     {
+        if (directory is null) throw new ArgumentNullException(nameof(directory));
         if (!directory.Exists) Directory.CreateDirectory(directory.FullName);
     }
 
@@ -1168,14 +1199,21 @@ internal static class FileExtension
     /// 如果文件不存在则创建
     /// </summary>
     /// <param name="filePath">文件路径</param>
-    public static void CreateFileIfNotExist(this string filePath) => new FileInfo(filePath).CreateFileIfNotExist();
+    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
+    public static void CreateFileIfNotExist([NotNull] this string? filePath)
+    {
+        if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
+        new FileInfo(filePath).CreateFileIfNotExist();
+    }
 
     /// <summary>
     /// 如果文件不存在则创建
     /// </summary>
     /// <param name="fileInfo">文件信息</param>
-    public static void CreateFileIfNotExist(this FileInfo fileInfo)
+    /// <exception cref="ArgumentNullException">当fileInfo参数为空时引发异常</exception>
+    public static void CreateFileIfNotExist([NotNull] this FileInfo? fileInfo)
     {
+        if (fileInfo is null) throw new ArgumentNullException(nameof(fileInfo));
         if (!fileInfo.Exists)
         {
             fileInfo.DirectoryName.CreateDirectoryIfNotExist();
@@ -1220,7 +1258,8 @@ internal static class FileExtension
     /// </summary>
     /// <param name="path">路径</param>
     /// <returns>格式化字符串</returns>
-    public static string FormatPath(this string path) => path.Trim().Replace("\\", "/");
+    /// <exception cref="ArgumentNullException">当path参数为空时引发异常</exception>
+    public static string FormatPath([NotNull] this string? path) => path?.Trim().Replace("\\", "/") ?? throw new ArgumentNullException(nameof(path));
 
     /// <summary>
     /// 将文件转换base64格式字符串
@@ -1255,7 +1294,7 @@ internal static class FileExtension
     /// 如果文件存在则删除
     /// </summary>
     /// <param name="path">文件路径</param>
-    public static void RemoveFileIfExist(this string path)
+    public static void RemoveFileIfExist(this string? path)
     {
         if (path.IsNullOrWhiteSpace()) return;
         if (File.Exists(path)) File.Delete(path);
