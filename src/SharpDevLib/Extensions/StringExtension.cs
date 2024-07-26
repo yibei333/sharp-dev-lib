@@ -154,7 +154,7 @@ public static class StringExtension
         else
         {
             var builder = new StringBuilder();
-            for (int i = 0; i < sourceCount; i++)
+            for (int i = 0; i < sourceCount - 1; i++)
             {
                 builder.Append("../");
             }

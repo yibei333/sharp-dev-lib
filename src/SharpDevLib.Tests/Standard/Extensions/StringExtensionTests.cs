@@ -193,9 +193,9 @@ public class StringExtensionTests
     [DataRow("http:/foo/a/a1/a11/a.md", "http:/foo/a/a1/a11/a111/b.md", "./a111/b.md")]
     [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/a11/a111/b.md", "./a111/b.md")]
     [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/a11/b.md", "./b.md")]
-    [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/b.md", "../../b.md")]
-    [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/a12/b.md", "../../a12/b.md")]
-    [DataRow("d:/foo/a.md", "e:/foo/b.md", "../../../e:/foo/b.md")]
+    [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/b.md", "../b.md")]
+    [DataRow("d:/foo/a/a1/a11/a.md", "d:/foo/a/a1/a12/b.md", "../a12/b.md")]
+    [DataRow("d:/foo/a.md", "e:/foo/b.md", "../../e:/foo/b.md")]
     public void GetUrlRelativePathTest(string sourcePath, string targetPath, string expectedPath)
     {
         var actual = sourcePath.GetUrlRelativePath(targetPath);
