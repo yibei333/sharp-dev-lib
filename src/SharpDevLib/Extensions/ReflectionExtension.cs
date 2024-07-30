@@ -39,9 +39,8 @@ public static class ReflectionExtension
     /// 获取方法定义名称
     /// </summary>
     /// <param name="methodInfo">methodInfo</param>
-    /// <param name="isParameterTypeFullName">参数类型是否全名</param>
     /// <returns>方法定义名称</returns>
-    public static string GetMethodDefinitionName(this MethodInfo methodInfo, bool isParameterTypeFullName = false)
+    public static string GetMethodDefinitionName(this MethodInfo methodInfo)
     {
         var builder = new StringBuilder();
         builder.Append(methodInfo.Name);
@@ -55,7 +54,7 @@ public static class ReflectionExtension
         var parameters = methodInfo.GetParameters();
         if (parameters.Any())
         {
-            builder.Append(string.Join(",", methodInfo.GetParameters().Select(x => $"{x.ParameterType.GetTypeDefinitionName(isParameterTypeFullName)} {x.Name}")));
+            builder.Append(string.Join(",", methodInfo.GetParameters().Select(x => $"{x.ParameterType.GetTypeDefinitionName()} {x.Name}")));
         }
         builder.Append(')');
 
