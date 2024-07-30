@@ -347,7 +347,7 @@ internal class HttpService : IHttpService
     void Log(Exception? ex, HttpRequest request, HttpResponse? response, string methodName, Type? genericType = null)
     {
         var builder = new StringBuilder();
-        builder.AppendLine("HttpService." + methodName + (genericType is not null ? $"<{genericType.GetTypeName()}>" : ""));
+        builder.AppendLine("HttpService." + methodName + (genericType is not null ? $"<{genericType.GetTypeDefinitionName()}>" : ""));
         if (ex is not null) builder.AppendLine(ex.Message);
         if (request is not null) builder.AppendLine(request.ToString());
         if (response is not null) builder.AppendLine(response.ToString());

@@ -7,20 +7,20 @@ namespace SharpDevLib.Tests.Standard.Extensions;
 public class ReflectionExtensionTests
 {
     [TestMethod]
-    public void GetTypeNameTest()
+    public void GetTypeDefinitionNameTest()
     {
         var type = typeof(A<B<int>, C<string>>);
-        var actual = type.GetTypeName();
+        var actual = type.GetTypeDefinitionName();
         var expected = "A<B<Int32>,C<String>>";
         Console.WriteLine(actual);
         Assert.AreEqual(expected, actual);
     }
 
     [TestMethod]
-    public void GetTypeFullNameTest()
+    public void GetTypeDefinitionFullNameTest()
     {
         var type = typeof(A<B<int>, C<string>>);
-        var actual = type.GetTypeName(true);
+        var actual = type.GetTypeDefinitionName(true);
         var expected = "SharpDevLib.Tests.Standard.Extensions.A<SharpDevLib.Tests.Standard.Extensions.B<System.Int32>,SharpDevLib.Tests.Standard.Extensions.C<System.String>>";
         Console.WriteLine(actual);
         Assert.AreEqual(expected, actual);
