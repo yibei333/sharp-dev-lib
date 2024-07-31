@@ -3,7 +3,7 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<LangVersion>11.0</LangVersion>
+		<LangVersion>12.0</LangVersion>
 		<Authors>developer333</Authors>
 		<Description>基于netstandard2.0的常用开发扩展和服务</Description>
 		<Copyright>developer333</Copyright>
