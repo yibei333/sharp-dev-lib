@@ -29,6 +29,7 @@ public static class ReflectionExtension
 
     static string GetTypeName(this Type type, bool isFullName)
     {
+        if (type.IsGenericParameter) return type.Name;
         if (!isFullName) return type.Name;
         var typeName = type.FullName;
         if (typeName.IsNullOrWhiteSpace())
@@ -64,7 +65,7 @@ public static class ReflectionExtension
         }
         builder.Append('(');
         var parameters = methodInfo.GetParameters();
-        if (parameters.Any())
+        if (parameters.Length != 0)
         {
             builder.Append(string.Join(",", methodInfo.GetParameters().Select(x => $"{x.ParameterType.GetTypeDefinitionName(isFullName)} {x.Name}")));
         }
@@ -84,15 +85,9 @@ public static class ReflectionExtension
     {
         var builder = new StringBuilder();
         builder.Append(constructorInfo.DeclaringType?.Name?.Split('`')[0]);
-        if (constructorInfo.IsGenericMethod)
-        {
-            builder.Append('<');
-            builder.Append(string.Join(",", constructorInfo.GetGenericArguments().Select(x => x.Name)));
-            builder.Append('>');
-        }
         builder.Append('(');
         var parameters = constructorInfo.GetParameters();
-        if (parameters.Any())
+        if (parameters.Length != 0)
         {
             builder.Append(string.Join(",", parameters.Select(x => $"{x.ParameterType.GetTypeDefinitionName(isFullName)}{(containParameterName ? $" {x.Name}" : "")}")));
         }
