@@ -101,7 +101,7 @@ public class HttpGetTests : HttpBaseTests
         var url = "/api/get/cookie";
         var request = new HttpKeyValueRequest(url)
         {
-            Headers = new Dictionary<string, IEnumerable<string>>
+            Headers = new Dictionary<string, string[]>
             {
                 { "Cookie", value }
             }

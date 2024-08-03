@@ -37,7 +37,7 @@ public static class Http
     /// <summary>
     /// http get请求
     /// </summary>
-    /// <typeparam name="T">返回类型</typeparam>
+    /// <typeparam name="T">返回类型,如果T为byte[]且数据较大建议用GetStreamAsync方法</typeparam>
     /// <param name="request">请求</param>
     /// <param name="cancellationToken">cancellationToken</param>
     /// <param name="serviceProvider">serviceProvider(获取ILogger和全局配置用)</param>

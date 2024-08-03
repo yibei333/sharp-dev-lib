@@ -36,7 +36,7 @@ public abstract class HttpRequest
     /// <summary>
     /// 请求头
     /// </summary>
-    public Dictionary<string, IEnumerable<string>>? Headers { get; set; }
+    public Dictionary<string, string[]>? Headers { get; set; }
 
     /// <summary>
     /// 请求Cookie

@@ -205,7 +205,7 @@ internal class HttpService : IHttpService
 
         if (request.UseEdgeUserAgent && !(request.Headers?.ContainsKey("User-Agent") ?? false))
         {
-            request.Headers ??= new Dictionary<string, IEnumerable<string>>();
+            request.Headers ??= new Dictionary<string, string[]>();
             request.Headers.Add("User-Agent", new string[] { _edgeUA });
         }
 
@@ -316,24 +316,31 @@ internal class HttpService : IHttpService
         T? data = default;
         if (content is not null)
         {
-            var responseText = await content.ReadAsStringAsync();
-            if (responseText.NotNullOrWhiteSpace())
+            var type = typeof(T);
+            if (type == typeof(byte[]))
             {
-                if (isGenericMethod && responseMonitor.ResponseMessage.IsSuccessStatusCode)
+                data = (T)Convert.ChangeType(content.ReadAsByteArrayAsync().Result, type);
+            }
+            else
+            {
+                var responseText = await content.ReadAsStringAsync();
+                if (responseText.NotNullOrWhiteSpace())
                 {
-                    var type = typeof(T);
-                    if (type.IsClass)
+                    if (isGenericMethod && responseMonitor.ResponseMessage.IsSuccessStatusCode)
                     {
-                        if (type == typeof(string)) data = (T)Convert.ChangeType(responseText, type);
+                        if (type.IsClass)
+                        {
+                            if (type == typeof(string)) data = (T)Convert.ChangeType(responseText, type);
+                            else
+                            {
+                                var obj = responseText.DeSerialize(type);
+                                if (obj is not null) data = (T)obj;
+                            }
+                        }
                         else
                         {
-                            var obj = responseText.DeSerialize(type);
-                            if (obj is not null) data = (T)obj;
+                            data = (T)Convert.ChangeType(responseText, type);
                         }
-                    }
-                    else
-                    {
-                        data = (T)Convert.ChangeType(responseText, type);
                     }
                 }
             }
