@@ -118,19 +118,6 @@ public class HttpResponse
     }
 
     /// <summary>
-    /// 创建失败响应
-    /// </summary>
-    /// <typeparam name="T">数据类型</typeparam>
-    /// <param name="url">请求地址</param>
-    /// <param name="code">http状态码</param>
-    /// <param name="message">消息</param>
-    /// <returns>http响应</returns>
-    public static HttpResponse Failed<T>(string url, HttpStatusCode code, string message)
-    {
-        return new HttpResponse<T>(url, false, code, message, default, 0, TimeSpan.Zero, TimeSpan.Zero);
-    }
-
-    /// <summary>
     /// 创建成功响应
     /// </summary>
     /// <param name="url">请求地址</param>
@@ -139,19 +126,6 @@ public class HttpResponse
     public static HttpResponse Succeed(string url, string? message = null)
     {
         return new HttpResponse(url, true, HttpStatusCode.OK, message ?? string.Empty, 0, TimeSpan.Zero, TimeSpan.Zero);
-    }
-
-    /// <summary>
-    /// 创建成功响应
-    /// </summary>
-    /// <typeparam name="T">数据类型</typeparam>
-    /// <param name="url">请求地址</param>
-    /// <param name="data">数据</param>
-    /// <param name="message">消息</param>
-    /// <returns>http响应</returns>
-    public static HttpResponse Succeed<T>(string url, T? data, string? message = null)
-    {
-        return new HttpResponse<T>(url, true, HttpStatusCode.OK, message ?? string.Empty, data, 0, TimeSpan.Zero, TimeSpan.Zero);
     }
 
     /// <summary>
@@ -182,7 +156,6 @@ public class HttpResponse
 /// <typeparam name="T">响应数据类型</typeparam>
 public class HttpResponse<T> : HttpResponse
 {
-
     /// <summary>
     /// 实例化http响应
     /// </summary>
@@ -253,5 +226,29 @@ public class HttpResponse<T> : HttpResponse
             else builder.AppendLine($"Data:{Data}");
         }
         return builder.ToString();
+    }
+
+    /// <summary>
+    /// 创建失败响应
+    /// </summary>
+    /// <param name="url">请求地址</param>
+    /// <param name="code">http状态码</param>
+    /// <param name="message">消息</param>
+    /// <returns>http响应</returns>
+    public static new HttpResponse<T> Failed(string url, HttpStatusCode code, string message)
+    {
+        return new HttpResponse<T>(url, false, code, message, default, 0, TimeSpan.Zero, TimeSpan.Zero);
+    }
+
+    /// <summary>
+    /// 创建成功响应
+    /// </summary>
+    /// <param name="url">请求地址</param>
+    /// <param name="data">数据</param>
+    /// <param name="message">消息</param>
+    /// <returns>http响应</returns>
+    public static HttpResponse<T> Succeed(string url, T? data, string? message = null)
+    {
+        return new HttpResponse<T>(url, true, HttpStatusCode.OK, message ?? string.Empty, data, 0, TimeSpan.Zero, TimeSpan.Zero);
     }
 }
