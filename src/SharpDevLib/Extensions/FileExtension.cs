@@ -1243,7 +1243,7 @@ public static class FileExtension
     /// </summary>
     /// <param name="filePathOrName">文件名或路径</param>
     /// <returns>MimeType</returns>
-    public static string GetMimeType(this string filePathOrName) => _mimeTypeMap.Value.TryGetValue(filePathOrName.GetFileExtension(false), out var type) ? type : string.Empty;
+    public static string GetMimeType(this string filePathOrName) => _mimeTypeMap.Value.TryGetValue(filePathOrName.GetFileExtension(false), out var type) ? type : "application/octet-stream";
 
     /// <summary>
     /// 合并路径

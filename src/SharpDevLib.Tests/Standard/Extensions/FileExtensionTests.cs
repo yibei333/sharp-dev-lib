@@ -148,7 +148,7 @@ public class FileExtensionTests
     }
 
     [TestMethod]
-    [DataRow("foobar", "")]
+    [DataRow("foobar", "application/octet-stream")]
     [DataRow("foo.txt", "text/plain")]
     [DataRow("foo/bar.txt", "text/plain")]
     public void GetMimeTypeTest(string filePathOrName, string expected)
