@@ -1,4 +1,5 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.Collections.Concurrent;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -9,7 +10,7 @@ namespace SharpDevLib;
 /// </summary>
 public class JsonOption
 {
-    readonly Dictionary<string, JsonSerializerOptions> _cache = new();
+    readonly ConcurrentDictionary<string, JsonSerializerOptions> _cache = new();
     static readonly AlphabeticalOrderContractResolver _propertyNameOrderResolver = new();
     internal static JsonOption DefaultFormatJson = new() { FormatJson = true };
     internal static JsonOption DefaultFormatJsonWithoutOrder = new() { FormatJson = true, OrderByNameProperty = false };
@@ -72,7 +73,8 @@ public class JsonOption
             PropertyNamingPolicy = namePolicy,
             TypeInfoResolver = _propertyNameOrderResolver
         };
-        _cache.Add(key, optoins);
+        var addResult = _cache.TryAdd(key, optoins);
+        if (!addResult) throw new Exception($"json option add key '{key}' failed");
         return optoins;
     }
 
