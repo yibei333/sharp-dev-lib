@@ -5,6 +5,7 @@ namespace SharpDevLib;
 /// <summary>
 /// 字符串扩展
 /// </summary>
+[BelongDirectory("Extensions")]
 public static class StringExtension
 {
     /// <summary>
@@ -64,7 +65,7 @@ public static class StringExtension
     /// <exception cref="InvalidCastException">当转换失败且throwException为true时引发异常</exception>
     public static List<Guid> SplitToGuidList(this string? str, char separator = ',', bool removeEmptyEntries = true, bool throwException = false, bool distinct = true)
     {
-        if (str.IsNullOrWhiteSpace()) return new List<Guid>();
+        if (str.IsNullOrWhiteSpace()) return [];
         if (separator == '-') throw new ArgumentException("separator can not be '-'");
         var list = str.Split(new[] { separator }, removeEmptyEntries ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None).Select(x =>
         {
@@ -87,7 +88,7 @@ public static class StringExtension
     /// <exception cref="ArgumentException">当separator参数为'-'时引发异常</exception>
     public static List<string> SplitToList(this string? str, char separator = ',', bool removeEmptyEntries = true, bool distinct = true)
     {
-        if (str.IsNullOrWhiteSpace()) return new List<string>();
+        if (str.IsNullOrWhiteSpace()) return [];
         if (separator == '-') throw new ArgumentException("separator can not be '-'");
         var list = str.Split(new[] { separator }, removeEmptyEntries ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None).ToList();
         if (distinct) list = list.Distinct().ToList();

@@ -6,6 +6,7 @@ namespace SharpDevLib;
 /// <summary>
 /// 集合扩展
 /// </summary>
+[BelongDirectory("Extensions")]
 public static class EnumerableExtension
 {
     /// <summary>
@@ -56,7 +57,7 @@ public static class EnumerableExtension
         string command = descending ? "OrderByDescending" : "OrderBy";
         var propertyAccess = Expression.MakeMemberAccess(parameter, sortProperty);
         var orderByExpression = Expression.Lambda(propertyAccess, parameter);
-        var resultExpression = Expression.Call(typeof(Queryable), command, new Type[] { typeof(T), sortProperty.PropertyType }, query.Expression, orderByExpression);
+        var resultExpression = Expression.Call(typeof(Queryable), command, [typeof(T), sortProperty.PropertyType], query.Expression, orderByExpression);
         return query.Provider.CreateQuery<T>(resultExpression);
     }
 

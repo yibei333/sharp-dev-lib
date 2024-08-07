@@ -3,6 +3,7 @@
 /// <summary>
 /// Base64编码扩展
 /// </summary>
+[BelongDirectory("Encode")]
 public static class Base64
 {
     /// <summary>

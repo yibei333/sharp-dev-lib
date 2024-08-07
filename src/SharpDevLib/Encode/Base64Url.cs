@@ -3,6 +3,7 @@
 /// <summary>
 /// Base64Url编码扩展
 /// </summary>
+[BelongDirectory("Encode")]
 public static class Base64Url
 {
     /// <summary>
@@ -20,7 +21,7 @@ public static class Base64Url
     /// <exception cref="InvalidDataException">当转换失败时引发异常</exception>
     public static byte[] Base64UrlDecode(this string base64UrlEncodedString)
     {
-        if (base64UrlEncodedString.IsNullOrWhiteSpace()) return Array.Empty<byte>();
+        if (base64UrlEncodedString.IsNullOrWhiteSpace()) return [];
         base64UrlEncodedString = base64UrlEncodedString.Replace('-', '+').Replace('_', '/');
         var lengthFormat = base64UrlEncodedString.Length % 4;
         base64UrlEncodedString += lengthFormat switch

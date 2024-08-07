@@ -3,6 +3,7 @@
 /// <summary>
 /// 克隆扩展
 /// </summary>
+[BelongDirectory("Extensions")]
 public static class CloneExtension
 {
     /// <summary>

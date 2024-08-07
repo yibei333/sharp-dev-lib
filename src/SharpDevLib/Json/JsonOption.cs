@@ -8,6 +8,7 @@ namespace SharpDevLib;
 /// <summary>
 /// json选项
 /// </summary>
+[BelongDirectory("Json")]
 public class JsonOption
 {
     readonly ConcurrentDictionary<string, JsonSerializerOptions> _cache = new();

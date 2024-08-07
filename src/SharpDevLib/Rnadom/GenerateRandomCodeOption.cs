@@ -3,6 +3,7 @@
 /// <summary>
 /// 生成随机码选项
 /// </summary>
+[BelongDirectory("Random")]
 public class GenerateRandomCodeOption
 {
     /// <summary>

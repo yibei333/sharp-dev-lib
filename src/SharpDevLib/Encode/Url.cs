@@ -5,6 +5,7 @@ namespace SharpDevLib;
 /// <summary>
 /// Url编码扩展
 /// </summary>
+[BelongDirectory("Encode")]
 public static class Url
 {
     /// <summary>

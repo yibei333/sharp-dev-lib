@@ -5,6 +5,7 @@ namespace SharpDevLib;
 /// <summary>
 /// MD5哈希扩展
 /// </summary>
+[BelongDirectory("Hash/Md5")]
 public static class Md5Extension
 {
     /// <summary>

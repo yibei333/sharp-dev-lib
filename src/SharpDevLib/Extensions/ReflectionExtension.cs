@@ -6,6 +6,7 @@ namespace SharpDevLib;
 /// <summary>
 /// 反射扩展
 /// </summary>
+[BelongDirectory("Extensions")]
 public static class ReflectionExtension
 {
     /// <summary>

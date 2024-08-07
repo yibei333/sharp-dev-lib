@@ -5,6 +5,7 @@ namespace SharpDevLib;
 /// <summary>
 /// 字符串空断言扩展
 /// </summary>
+[BelongDirectory("NullCheck")]
 public static class StringNullCheck
 {
     /// <summary>

@@ -7,6 +7,7 @@ namespace SharpDevLib;
 /// 树形结构项
 /// </summary>
 /// <typeparam name="TMetaData">元数据类型</typeparam>
+[BelongDirectory("Tree")]
 public class TreeItem<TMetaData> where TMetaData : class
 {
     [JsonConstructor]
@@ -53,7 +54,7 @@ public class TreeItem<TMetaData> where TMetaData : class
     /// 子项
     /// </summary>
     [JsonPropertyOrder(2)]
-    public List<TreeItem<TMetaData>> Children { get; internal set; } = new();
+    public List<TreeItem<TMetaData>> Children { get; internal set; } = [];
 
     /// <summary>
     /// 转换为元数据集合

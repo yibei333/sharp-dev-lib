@@ -5,6 +5,7 @@ namespace SharpDevLib;
 /// <summary>
 /// json扩展
 /// </summary>
+[BelongDirectory("Json")]
 public static class Json
 {
     /// <summary>

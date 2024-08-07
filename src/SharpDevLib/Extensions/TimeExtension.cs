@@ -3,6 +3,7 @@
 /// <summary>
 /// 时间扩展
 /// </summary>
+[BelongDirectory("Extensions")]
 public static class TimeExtension
 {
     /// <summary>

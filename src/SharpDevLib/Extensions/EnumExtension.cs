@@ -3,6 +3,7 @@
 /// <summary>
 /// 枚举扩展
 /// </summary>
+[BelongDirectory("Extensions")]
 public static class EnumExtension
 {
     /// <summary>

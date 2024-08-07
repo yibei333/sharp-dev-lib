@@ -5,6 +5,7 @@ namespace SharpDevLib;
 /// <summary>
 /// 树形结构扩展
 /// </summary>
+[BelongDirectory("Tree")]
 public static class Tree
 {
     /// <summary>

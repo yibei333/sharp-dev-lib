@@ -5,6 +5,7 @@ namespace SharpDevLib;
 /// <summary>
 /// DataTable扩展
 /// </summary>
+[BelongDirectory("DataTable")]
 public static class DataTableExtensions
 {
     /// <summary>

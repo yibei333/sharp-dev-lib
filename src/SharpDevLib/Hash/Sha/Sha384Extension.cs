@@ -5,6 +5,7 @@ namespace SharpDevLib;
 /// <summary>
 /// Sha384哈希扩展
 /// </summary>
+[BelongDirectory("Hash/Sha")]
 public static class Sha384Extension
 {
     /// <summary>

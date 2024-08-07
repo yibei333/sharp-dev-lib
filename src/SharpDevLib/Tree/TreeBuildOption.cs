@@ -6,11 +6,12 @@ namespace SharpDevLib;
 /// 树形结构构建选项
 /// </summary>
 /// <typeparam name="TMetaData">元数据类型</typeparam>
+[BelongDirectory("Tree")]
 public class TreeBuildOption<TMetaData> where TMetaData : class
 {
     string _sortPropertyName = string.Empty;
     readonly Type _type = typeof(TMetaData);
-    readonly Dictionary<string, PropertyInfo> _cache = new();
+    readonly Dictionary<string, PropertyInfo> _cache = [];
 
     /// <summary>
     /// Id属性名称

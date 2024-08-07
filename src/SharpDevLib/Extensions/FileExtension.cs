@@ -5,6 +5,7 @@ namespace SharpDevLib;
 /// <summary>
 /// 文件扩展
 /// </summary>
+[BelongDirectory("Extensions")]
 public static class FileExtension
 {
     static readonly double _kbUnit = 1024;

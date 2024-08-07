@@ -5,6 +5,7 @@ namespace SharpDevLib;
 /// <summary>
 /// Utf8编码扩展
 /// </summary>
+[BelongDirectory("Encode")]
 public static class Utf8
 {
     /// <summary>

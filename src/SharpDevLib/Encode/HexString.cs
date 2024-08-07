@@ -5,6 +5,7 @@ namespace SharpDevLib;
 /// <summary>
 /// 16进制编码扩展
 /// </summary>
+[BelongDirectory("Encode")]
 public static class HexString
 {
     /// <summary>
@@ -30,7 +31,7 @@ public static class HexString
     /// <exception cref="InvalidDataException">当解码失败是引发异常</exception>
     public static byte[] HexStringDecode(this string hexString)
     {
-        if (hexString.IsNullOrWhiteSpace()) return Array.Empty<byte>();
+        if (hexString.IsNullOrWhiteSpace()) return [];
         if (hexString.Length % 2 != 0) throw new InvalidDataException($"'{hexString}' is not a valid hex string");
         var list = new List<byte>();
 
@@ -38,6 +39,6 @@ public static class HexString
         {
             list.Add(Convert.ToByte(string.Join("", hexString.Skip(i * 2).Take(2)), 16));
         }
-        return list.ToArray();
+        return [.. list];
     }
 }

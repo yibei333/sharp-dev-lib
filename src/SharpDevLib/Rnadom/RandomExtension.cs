@@ -5,6 +5,7 @@ namespace SharpDevLib;
 /// <summary>
 /// 随机扩展
 /// </summary>
+[BelongDirectory("Random")]
 public static class RandomExtension
 {
     /// <summary>
