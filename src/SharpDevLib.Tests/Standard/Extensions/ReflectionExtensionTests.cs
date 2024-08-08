@@ -11,7 +11,7 @@ public class ReflectionExtensionTests
     {
         var type = typeof(A<B<int>, C<string>>);
         var actual = type.GetTypeDefinitionName();
-        var expected = "A<B<Int32>,C<String>>";
+        var expected = "A<B<Int32>, C<String>>";
         Console.WriteLine(actual);
         Assert.AreEqual(expected, actual);
     }
@@ -21,7 +21,7 @@ public class ReflectionExtensionTests
     {
         var type = typeof(A<B<int>, C<string>>);
         var actual = type.GetTypeDefinitionName(true);
-        var expected = "SharpDevLib.Tests.Standard.Extensions.A<SharpDevLib.Tests.Standard.Extensions.B<System.Int32>,SharpDevLib.Tests.Standard.Extensions.C<System.String>>";
+        var expected = "SharpDevLib.Tests.Standard.Extensions.A<SharpDevLib.Tests.Standard.Extensions.B<System.Int32>, SharpDevLib.Tests.Standard.Extensions.C<System.String>>";
         Console.WriteLine(actual);
         Assert.AreEqual(expected, actual);
     }
