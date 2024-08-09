@@ -1,4 +1,6 @@
 ﻿using SharpDevLib;
+using System.Collections;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace SharpDevLib
@@ -28,7 +30,7 @@ namespace SharpDevLib
     /// <summary>
     /// test class
     /// </summary>
-    public class Test : Test<int>
+    public class Test : Test<int>, ITest1
     {
         /// <summary>
         /// create instance of type test
@@ -51,6 +53,12 @@ namespace SharpDevLib
         /// name property
         /// </summary>
         public string Name { get; }
+
+
+        /// <summary>
+        /// xx
+        /// </summary>
+        public string TestClassField = "qux";
 
         /// <summary>
         /// bar method
@@ -76,9 +84,18 @@ namespace SharpDevLib
     }
 
     /// <summary>
-    /// test interface
+    /// test1 interface
     /// </summary>
-    public interface ITest
+    public interface ITest1
+    {
+
+    }
+
+    /// <summary>
+    /// test2 interface
+    /// </summary>
+    [Test("baz")]
+    public interface ITest2 : ITest1
     {
 
     }
@@ -90,7 +107,9 @@ namespace SharpDevLib
     /// <typeparam name="T2">cc</typeparam>
     /// <typeparam name="T3">dd</typeparam>
     /// <typeparam name="T4">ee</typeparam>
-    public abstract class AA<T1, T2, T3, T4> : ITest where T1 : Test, ITest, new() where T2 : struct where T3 : class, new()
+    [Test("foo")]
+    [Test("bar", Age = 2)]
+    public abstract class AA<T1, T2, T3, T4> : Test, ITest2, IEnumerable<Test> where T1 : Test, ITest1, new() where T2 : struct where T3 : class, new()
     {
         /// <summary>
         /// 静态构造函数
@@ -133,7 +152,13 @@ namespace SharpDevLib
         /// 名称字段
         /// </summary>
         [XmlAttribute]
-        public string Name = "foo";
+        public new string Name = "foo";
+
+        /// <summary>
+        /// 名称字段
+        /// </summary>
+        [XmlAttribute]
+        public static string StaticField = "bar";
 
         ///// <summary>
         ///// 静态名称字段
@@ -152,14 +177,39 @@ namespace SharpDevLib
         public static int StaticProperty { get; set; }
 
         /// <summary>
+        /// 虚拟属性
+        /// </summary>
+        public virtual int VirtualProperty { get; set; }
+
+        /// <summary>
+        /// 抽象属性
+        /// </summary>
+        public abstract int AbstractProperty { get; set; }
+
+        /// <summary>
+        /// 私有属性
+        /// </summary>
+        public int PrivateProperty { get; private set; }
+
+        /// <summary>
+        /// 内部属性
+        /// </summary>
+        public int InternalProperty { get; internal set; }
+
+        /// <summary>
+        /// 保护属性
+        /// </summary>
+        public int ProtectedProperty { get; protected set; }
+
+        /// <summary>
         /// 获取或设置年龄
         /// </summary>
-        public int Age { get; set; }
+        public new int Age { get; set; }
 
         /// <summary>
         /// 获取Foo
         /// </summary>
-        public int Foo { get; }
+        public new int Foo { get; }
 
         /// <summary>
         /// 设置Foo
@@ -169,18 +219,110 @@ namespace SharpDevLib
         /// <summary>
         /// xx
         /// </summary>
+        /// <typeparam name="T">type of t</typeparam>
+        /// <param name="x">xxx</param>
         /// <param name="a">x</param>
         /// <param name="b">y</param>
         /// <param name="c">z</param>
         /// <param name="d">xx</param>
-        public void Test(IEnumerable<T2> a, List<IEnumerable<T1>> b, string c, List<int> d)
+        public void Test<T>(T x, IEnumerable<T2> a, List<IEnumerable<T1>> b, string c, List<int> d) where T : class, new()
         {
-
         }
+
+        public IEnumerator<Test> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected string GetData() { return string.Empty; }
 
         /// <summary>
         /// 测试事件
         /// </summary>
         public event EventHandler TestHandler = null!;
+
+        /// <summary>
+        /// TestInnerClass1 summary
+        /// </summary>
+        public class TestInnerClass1<T6>
+        {
+            /// <summary>
+            /// TestInnerClass2 summary
+            /// </summary>
+            public class TestInnerClass2
+            {
+            }
+
+            /// <summary>
+            /// aaa
+            /// </summary>
+            public string? Name { get; set; }
+        }
     }
+
+    /// <summary>
+    /// aa
+    /// </summary>
+    public class TestDerivedA : AA<Test, int, object, object>
+    {
+        /// <summary>
+        /// aa
+        /// </summary>
+        /// <param name="a">aa</param>
+        public TestDerivedA(Test a) : base(a)
+        {
+        }
+
+        public override int AbstractProperty { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    }
+
+    /// <summary>
+    /// aa
+    /// </summary>
+    public class TestDerivedB : AA<Test, int, object, object>
+    {
+        /// <summary>
+        /// aa
+        /// </summary>
+        /// <param name="a">aa</param>
+        public TestDerivedB(Test a) : base(a)
+        {
+        }
+
+        public override int AbstractProperty { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    }
+
+    /// <summary>
+    /// test attribute
+    /// </summary>
+    /// <param name="name"></param>
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true)]
+    public class TestAttribute(string name) : Attribute
+    {
+        public string Name { get; } = name;
+        public int Age { get; set; }
+
+        /// <summary>
+        /// test b delegate
+        /// </summary>
+        public delegate void TestBDelegate();
+
+        /// <summary>
+        /// test event
+        /// </summary>
+        public event TestBDelegate TestEvent = null!;
+    }
+
+    /// <summary>
+    /// TestADelegate summber
+    /// </summary>
+    /// <param name="a">xx</param>
+    /// <returns>yy</returns>
+    public delegate string TestADelegate(object a);
 }
+
