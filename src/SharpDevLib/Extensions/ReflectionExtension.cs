@@ -52,23 +52,24 @@ public static class ReflectionExtension
     /// 获取方法定义名称
     /// </summary>
     /// <param name="methodInfo">methodInfo</param>
+    /// <param name="containParameterName">是否包含参数名称</param>
     /// <param name="isFullName">是否全名</param>
     /// <returns>方法定义名称</returns>
-    public static string GetMethodDefinitionName(this MethodInfo methodInfo, bool isFullName = false)
+    public static string GetMethodDefinitionName(this MethodInfo methodInfo, bool containParameterName, bool isFullName = false)
     {
         var builder = new StringBuilder();
         builder.Append(methodInfo.Name);
         if (methodInfo.IsGenericMethod)
         {
             builder.Append('<');
-            builder.Append(string.Join(", ", methodInfo.GetGenericArguments().Select(x => x.Name)));
+            builder.Append(string.Join(",", methodInfo.GetGenericArguments().Select(x => x.Name)));
             builder.Append('>');
         }
         builder.Append('(');
         var parameters = methodInfo.GetParameters();
         if (parameters.Length != 0)
         {
-            builder.Append(string.Join(", ", methodInfo.GetParameters().Select(x => $"{x.ParameterType.GetTypeDefinitionName(isFullName)} {x.Name}")));
+            builder.Append(string.Join(", ", methodInfo.GetParameters().Select(x => $"{x.ParameterType.GetTypeDefinitionName(isFullName)}{(containParameterName ? $" {x.Name}" : "")}")));
         }
         builder.Append(')');
 
