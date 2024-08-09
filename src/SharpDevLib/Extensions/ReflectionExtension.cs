@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace SharpDevLib;
@@ -62,10 +63,15 @@ public static class ReflectionExtension
         if (methodInfo.IsGenericMethod)
         {
             builder.Append('<');
-            builder.Append(string.Join(",", methodInfo.GetGenericArguments().Select(x => x.Name)));
+            builder.Append(string.Join(", ", methodInfo.GetGenericArguments().Select(x => x.Name)));
             builder.Append('>');
         }
         builder.Append('(');
+
+        if (methodInfo.CustomAttributes.Any(x => x.AttributeType == typeof(ExtensionAttribute)))
+        {
+            builder.Append("this ");
+        }
         var parameters = methodInfo.GetParameters();
         if (parameters.Length != 0)
         {
