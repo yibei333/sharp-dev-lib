@@ -15,7 +15,7 @@ public class PageRequest : BaseRequest
     /// <summary>
     /// 实例化分页request
     /// </summary>
-    /// <param name="index">索引(当前位置),默认为1</param>
+    /// <param name="index">索引(当前位置),默认为0</param>
     /// <param name="size">每页数据条数</param>
     /// <exception cref="ArgumentException">index和size需要大于等于0,否则引发异常</exception>
     public PageRequest(int index, int size)
@@ -28,7 +28,7 @@ public class PageRequest : BaseRequest
     }
 
     /// <summary>
-    /// 索引(当前位置),默认为1
+    /// 索引(当前位置),默认为0
     /// </summary>
     public int Index { get; set; }
 

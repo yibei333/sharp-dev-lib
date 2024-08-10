@@ -11,7 +11,7 @@ namespace SharpDevLib;
 public static class ReflectionExtension
 {
     /// <summary>
-    /// 获取类型定义名称(支持泛型)
+    /// 获取类型定义名称(支持泛型,不支持嵌套类型)
     /// </summary>
     /// <param name="type">类型</param>
     /// <param name="isFullName">是否全名</param>
