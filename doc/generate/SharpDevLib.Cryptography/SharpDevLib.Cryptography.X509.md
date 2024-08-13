@@ -1,16 +1,26 @@
 ###### [主页](./Index.md "主页")
+
 ## X509 类
+
 ### 定义
+
 **程序集** : [SharpDevLib.Cryptography.dll](./SharpDevLib.Cryptography.assembly.md "SharpDevLib.Cryptography.dll")
+
 **命名空间** : [SharpDevLib.Cryptography](./SharpDevLib.Cryptography.namespace.md "SharpDevLib.Cryptography")
+
 **继承** : [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object")
+
 ``` csharp
 public static class X509 : Object
 ```
+
 **注释**
+
 *X509*
 
+
 ### 方法
+
 |方法|返回类型|Accessor|是否静态|参数|
 |---|---|---|---|---|
 |[GenerateSerialNumber()](./SharpDevLib.Cryptography.X509.GenerateSerialNumber.md "GenerateSerialNumber()")|[Byte\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.byte[] "Byte\[\]")|`public`|`是`|-|
@@ -34,4 +44,5 @@ public static class X509 : Object
 |ToString()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")|`public`|`否`|-|
 |Equals(Object obj)&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean "Boolean")|`public`|`否`|-|
 |GetHashCode()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 "Int32")|`public`|`否`|-|
+
 

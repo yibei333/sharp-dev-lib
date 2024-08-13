@@ -1,22 +1,35 @@
 ###### [主页](./Index.md "主页")
+
 ## HttpResponse\<T\> 类
+
 ### 定义
+
 **程序集** : [SharpDevLib.Transport.dll](./SharpDevLib.Transport.assembly.md "SharpDevLib.Transport.dll")
+
 **命名空间** : [SharpDevLib.Transport](./SharpDevLib.Transport.namespace.md "SharpDevLib.Transport")
+
 **继承** : [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object") ↣ [HttpResponse](./SharpDevLib.Transport.HttpResponse.md "HttpResponse")
+
 ``` csharp
 public class HttpResponse<T> : HttpResponse
 ```
+
 **注释**
+
 *http响应*
 
+
 **泛型参数**
+
 |名称|注释|约束|
 |---|---|---|
 |T|响应数据类型|-|
 
 
+
+
 ### 属性
+
 |名称|类型|是否静态|注释|
 |---|---|---|---|
 |[Data](./SharpDevLib.Transport.HttpResponse.1.Data.md "Data")|T|`否`|数据|
@@ -31,7 +44,9 @@ public class HttpResponse<T> : HttpResponse
 |[LastTimeConsuming](./SharpDevLib.Transport.HttpResponse.LastTimeConsuming.md "LastTimeConsuming")&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[HttpResponse](./SharpDevLib.Transport.HttpResponse.md "HttpResponse"))*|[TimeSpan](https://learn.microsoft.com/en-us/dotnet/api/system.timespan "TimeSpan")|`否`|最后一次耗时|
 |[TotalTimeConsuming](./SharpDevLib.Transport.HttpResponse.TotalTimeConsuming.md "TotalTimeConsuming")&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[HttpResponse](./SharpDevLib.Transport.HttpResponse.md "HttpResponse"))*|[TimeSpan](https://learn.microsoft.com/en-us/dotnet/api/system.timespan "TimeSpan")|`否`|总耗时|
 
+
 ### 方法
+
 |方法|返回类型|Accessor|是否静态|参数|
 |---|---|---|---|---|
 |[ToString()](./SharpDevLib.Transport.HttpResponse.1.ToString.md "ToString()")|[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")|`public`|`否`|-|
@@ -42,4 +57,5 @@ public class HttpResponse<T> : HttpResponse
 |Finalize()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Void](https://learn.microsoft.com/en-us/dotnet/api/system.void "Void")|`protected`|`否`|-|
 |Equals(Object obj)&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean "Boolean")|`public`|`否`|-|
 |GetHashCode()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 "Int32")|`public`|`否`|-|
+
 

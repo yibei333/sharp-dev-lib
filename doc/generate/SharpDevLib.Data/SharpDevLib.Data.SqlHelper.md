@@ -1,17 +1,28 @@
 ###### [主页](./Index.md "主页")
+
 ## SqlHelper 类
+
 ### 定义
+
 **程序集** : [SharpDevLib.Data.dll](./SharpDevLib.Data.assembly.md "SharpDevLib.Data.dll")
+
 **命名空间** : [SharpDevLib.Data](./SharpDevLib.Data.namespace.md "SharpDevLib.Data")
+
 **继承** : [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object")
+
 **实现** : [IDisposable](https://learn.microsoft.com/en-us/dotnet/api/system.idisposable "IDisposable")
+
 ``` csharp
 public sealed class SqlHelper : Object, IDisposable
 ```
+
 **注释**
+
 *Sql帮助类*
 
+
 ### 构造函数
+
 |方法|注释|参数|
 |---|---|---|
 |[SqlHelper(DbProviderFactory dbProviderFactory, String connectionString)](./SharpDevLib.Data.SqlHelper.ctor.DbProviderFactory.String.md "SqlHelper(DbProviderFactory dbProviderFactory, String connectionString)")|实例化Sql帮助类|dbProviderFactory:数据库提供商工厂,例如
@@ -20,13 +31,17 @@ public sealed class SqlHelper : Object, IDisposable
 |[SqlHelper()](./SharpDevLib.Data.SqlHelper.ctor.md "SqlHelper()")|实例化Sql帮助类|-|
 |[SqlHelper(DbContext dbContext)](./SharpDevLib.Data.SqlHelper.ctor.DbContext.md "SqlHelper(DbContext dbContext)")|实例化Sql帮助类|dbContext:DbContext|
 
+
 ### 属性
+
 |名称|类型|是否静态|注释|
 |---|---|---|---|
 |[Connection](./SharpDevLib.Data.SqlHelper.Connection.md "Connection")|[DbConnection](https://learn.microsoft.com/en-us/dotnet/api/system.data.common.dbconnection "DbConnection")|`否`|连接|
 |[DbProviderFactory](./SharpDevLib.Data.SqlHelper.DbProviderFactory.md "DbProviderFactory")|[DbProviderFactory](https://learn.microsoft.com/en-us/dotnet/api/system.data.common.dbproviderfactory "DbProviderFactory")|`否`|数据库提供商工厂|
 
+
 ### 方法
+
 |方法|返回类型|Accessor|是否静态|参数|
 |---|---|---|---|---|
 |[Config(DbProviderFactory dbProviderFactory, String connectionString)](./SharpDevLib.Data.SqlHelper.Config.DbProviderFactory.String.md "Config(DbProviderFactory dbProviderFactory, String connectionString)")|[Void](https://learn.microsoft.com/en-us/dotnet/api/system.void "Void")|`public`|`是`|dbProviderFactory:数据库提供商工厂<br>connectionString:连接字符串|
@@ -49,4 +64,5 @@ public sealed class SqlHelper : Object, IDisposable
 |ToString()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")|`public`|`否`|-|
 |Equals(Object obj)&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean "Boolean")|`public`|`否`|-|
 |GetHashCode()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 "Int32")|`public`|`否`|-|
+
 

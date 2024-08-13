@@ -1,16 +1,26 @@
 ###### [主页](./Index.md "主页")
+
 ## Excel 类
+
 ### 定义
+
 **程序集** : [SharpDevLib.OpenXML.dll](./SharpDevLib.OpenXML.assembly.md "SharpDevLib.OpenXML.dll")
+
 **命名空间** : [SharpDevLib.OpenXML](./SharpDevLib.OpenXML.namespace.md "SharpDevLib.OpenXML")
+
 **继承** : [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object")
+
 ``` csharp
 public static class Excel : Object
 ```
+
 **注释**
+
 *excel扩展*
 
+
 ### 方法
+
 |方法|返回类型|Accessor|是否静态|参数|
 |---|---|---|---|---|
 |[Encrypt(Stream inputStream, Stream outputStream, String password)](./SharpDevLib.OpenXML.Excel.Encrypt.Stream.Stream.String.md "Encrypt(Stream inputStream, Stream outputStream, String password)")|[Void](https://learn.microsoft.com/en-us/dotnet/api/system.void "Void")|`public`|`是`|inputStream:excel文件流<br>outputStream:密码保护的excel文件流<br>password:密码|
@@ -24,4 +34,5 @@ public static class Excel : Object
 |ToString()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")|`public`|`否`|-|
 |Equals(Object obj)&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean "Boolean")|`public`|`否`|-|
 |GetHashCode()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 "Int32")|`public`|`否`|-|
+
 

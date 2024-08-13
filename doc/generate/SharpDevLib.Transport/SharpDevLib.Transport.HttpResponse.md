@@ -1,17 +1,28 @@
 ###### [主页](./Index.md "主页")
+
 ## HttpResponse 类
+
 ### 定义
+
 **程序集** : [SharpDevLib.Transport.dll](./SharpDevLib.Transport.assembly.md "SharpDevLib.Transport.dll")
+
 **命名空间** : [SharpDevLib.Transport](./SharpDevLib.Transport.namespace.md "SharpDevLib.Transport")
+
 **继承** : [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object")
+
 **派生** : [HttpResponse](./SharpDevLib.Transport.HttpResponse.1.md "HttpResponse")\<T\>
+
 ``` csharp
 public class HttpResponse : Object
 ```
+
 **注释**
+
 *http响应*
 
+
 ### 属性
+
 |名称|类型|是否静态|注释|
 |---|---|---|---|
 |[Url](./SharpDevLib.Transport.HttpResponse.Url.md "Url")|[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")|`否`|请求地址|
@@ -25,7 +36,9 @@ public class HttpResponse : Object
 |[LastTimeConsuming](./SharpDevLib.Transport.HttpResponse.LastTimeConsuming.md "LastTimeConsuming")|[TimeSpan](https://learn.microsoft.com/en-us/dotnet/api/system.timespan "TimeSpan")|`否`|最后一次耗时|
 |[TotalTimeConsuming](./SharpDevLib.Transport.HttpResponse.TotalTimeConsuming.md "TotalTimeConsuming")|[TimeSpan](https://learn.microsoft.com/en-us/dotnet/api/system.timespan "TimeSpan")|`否`|总耗时|
 
+
 ### 方法
+
 |方法|返回类型|Accessor|是否静态|参数|
 |---|---|---|---|---|
 |[Failed(String url, HttpStatusCode code, String message)](./SharpDevLib.Transport.HttpResponse.Failed.String.HttpStatusCode.String.md "Failed(String url, HttpStatusCode code, String message)")|[HttpResponse](./SharpDevLib.Transport.HttpResponse.md "HttpResponse")|`public`|`是`|url:请求地址<br>code:http状态码<br>message:消息|
@@ -36,4 +49,5 @@ public class HttpResponse : Object
 |Finalize()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Void](https://learn.microsoft.com/en-us/dotnet/api/system.void "Void")|`protected`|`否`|-|
 |Equals(Object obj)&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean "Boolean")|`public`|`否`|-|
 |GetHashCode()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 "Int32")|`public`|`否`|-|
+
 

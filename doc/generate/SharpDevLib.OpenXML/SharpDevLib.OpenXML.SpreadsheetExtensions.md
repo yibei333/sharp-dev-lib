@@ -1,16 +1,26 @@
 ###### [主页](./Index.md "主页")
+
 ## SpreadsheetExtensions 类
+
 ### 定义
+
 **程序集** : [SharpDevLib.OpenXML.dll](./SharpDevLib.OpenXML.assembly.md "SharpDevLib.OpenXML.dll")
+
 **命名空间** : [SharpDevLib.OpenXML](./SharpDevLib.OpenXML.namespace.md "SharpDevLib.OpenXML")
+
 **继承** : [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object")
+
 ``` csharp
 public static class SpreadsheetExtensions : Object
 ```
+
 **注释**
+
 *电子表格扩展*
 
+
 ### 方法
+
 |方法|返回类型|Accessor|是否静态|参数|
 |---|---|---|---|---|
 |[GetWorksheet(this WorkbookPart workbookPart, String tableName)](./SharpDevLib.OpenXML.SpreadsheetExtensions.GetWorksheet.thisWorkbookPart.String.md "GetWorksheet(this WorkbookPart workbookPart, String tableName)")|[Worksheet](https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.spreadsheet.worksheet "Worksheet")|`public`|`是`|workbookPart:工作簿部件<br>tableName:表明,如sheet1|
@@ -40,4 +50,5 @@ public static class SpreadsheetExtensions : Object
 |ToString()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")|`public`|`否`|-|
 |Equals(Object obj)&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean "Boolean")|`public`|`否`|-|
 |GetHashCode()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 "Int32")|`public`|`否`|-|
+
 

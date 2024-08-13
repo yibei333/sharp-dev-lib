@@ -1,21 +1,33 @@
 ###### [主页](./Index.md "主页")
+
 ## EmailContent 类
+
 ### 定义
+
 **程序集** : [SharpDevLib.Transport.dll](./SharpDevLib.Transport.assembly.md "SharpDevLib.Transport.dll")
+
 **命名空间** : [SharpDevLib.Transport](./SharpDevLib.Transport.namespace.md "SharpDevLib.Transport")
+
 **继承** : [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object")
+
 ``` csharp
 public class EmailContent : Object
 ```
+
 **注释**
+
 *邮箱内容*
 
+
 ### 构造函数
+
 |方法|注释|参数|
 |---|---|---|
 |[EmailContent(IEnumerable\<String\> receivers, String subject, String body)](./SharpDevLib.Transport.EmailContent.ctor.IEnumerable.String.String.String.md "EmailContent(IEnumerable<String> receivers, String subject, String body)")|实例化邮箱内容|receivers:收件人<br>subject:标题<br>body:主体|
 
+
 ### 属性
+
 |名称|类型|是否静态|注释|
 |---|---|---|---|
 |[Receivers](./SharpDevLib.Transport.EmailContent.Receivers.md "Receivers")|[IEnumerable](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1 "IEnumerable")\<[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")\>|`否`|收件人|
@@ -30,7 +42,9 @@ public class EmailContent : Object
 |[HeaderEncoding](./SharpDevLib.Transport.EmailContent.HeaderEncoding.md "HeaderEncoding")|[Encoding](https://learn.microsoft.com/en-us/dotnet/api/system.text.encoding "Encoding")|`否`|头部编码|
 |[IsHtml](./SharpDevLib.Transport.EmailContent.IsHtml.md "IsHtml")|[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean "Boolean")|`否`|是否是Html内容|
 
+
 ### 方法
+
 |方法|返回类型|Accessor|是否静态|参数|
 |---|---|---|---|---|
 |GetType()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Type](https://learn.microsoft.com/en-us/dotnet/api/system.type "Type")|`public`|`否`|-|
@@ -39,4 +53,5 @@ public class EmailContent : Object
 |ToString()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")|`public`|`否`|-|
 |Equals(Object obj)&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean "Boolean")|`public`|`否`|-|
 |GetHashCode()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 "Int32")|`public`|`否`|-|
+
 

@@ -1,16 +1,26 @@
 ###### [主页](./Index.md "主页")
+
 ## HttpMultiPartFormDataRequest 类
+
 ### 定义
+
 **程序集** : [SharpDevLib.Transport.dll](./SharpDevLib.Transport.assembly.md "SharpDevLib.Transport.dll")
+
 **命名空间** : [SharpDevLib.Transport](./SharpDevLib.Transport.namespace.md "SharpDevLib.Transport")
+
 **继承** : [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object") ↣ [HttpRequest](./SharpDevLib.Transport.HttpRequest.md "HttpRequest") ↣ [HttpRequest](./SharpDevLib.Transport.HttpRequest.1.md "HttpRequest")\<[Dictionary](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2 "Dictionary")\<[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String"), [String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")\>\>
+
 ``` csharp
 public class HttpMultiPartFormDataRequest : HttpRequest<Dictionary<String, String>>
 ```
+
 **注释**
+
 *multipart/form-data表单请求*
 
+
 ### 构造函数
+
 |方法|注释|参数|
 |---|---|---|
 |[HttpMultiPartFormDataRequest(String url)](./SharpDevLib.Transport.HttpMultiPartFormDataRequest.ctor.String.md "HttpMultiPartFormDataRequest(String url)")|实例化表单请求|url:请求地址|
@@ -18,7 +28,9 @@ public class HttpMultiPartFormDataRequest : HttpRequest<Dictionary<String, Strin
 |[HttpMultiPartFormDataRequest(String url, HttpFormFile[] files)](./SharpDevLib.Transport.HttpMultiPartFormDataRequest.ctor.String.HttpFormFile.md "HttpMultiPartFormDataRequest(String url, HttpFormFile[] files)")|实例化表单请求|url:请求地址<br>files:文件集合|
 |[HttpMultiPartFormDataRequest(String url, Dictionary\<String, String\> parameters, HttpFormFile[] files)](./SharpDevLib.Transport.HttpMultiPartFormDataRequest.ctor.String.Dictionary.String.String.HttpFormFile.md "HttpMultiPartFormDataRequest(String url, Dictionary<String, String> parameters, HttpFormFile[] files)")|实例化表单请求|url:请求地址<br>parameters:请求表单参数<br>files:文件集合|
 
+
 ### 属性
+
 |名称|类型|是否静态|注释|
 |---|---|---|---|
 |[Files](./SharpDevLib.Transport.HttpMultiPartFormDataRequest.Files.md "Files")|[HttpFormFile\[\]](https://learn.microsoft.com/en-us/dotnet/api/sharpdevlib.transport.httpformfile[] "HttpFormFile\[\]")|`否`|文件集合|
@@ -32,7 +44,9 @@ public class HttpMultiPartFormDataRequest : HttpRequest<Dictionary<String, Strin
 |[OnSendProgress](./SharpDevLib.Transport.HttpRequest.OnSendProgress.md "OnSendProgress")&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[HttpRequest](./SharpDevLib.Transport.HttpRequest.md "HttpRequest"))*|[Action](https://learn.microsoft.com/en-us/dotnet/api/system.action-1 "Action")\<[HttpProgress](./SharpDevLib.Transport.HttpProgress.md "HttpProgress")\>|`否`|传入数据回调|
 |[UseEdgeUserAgent](./SharpDevLib.Transport.HttpRequest.UseEdgeUserAgent.md "UseEdgeUserAgent")&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[HttpRequest](./SharpDevLib.Transport.HttpRequest.md "HttpRequest"))*|[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean "Boolean")|`否`|使用edge的ua(默认为true)|
 
+
 ### 方法
+
 |方法|返回类型|Accessor|是否静态|参数|
 |---|---|---|---|---|
 |[ToString()](./SharpDevLib.Transport.HttpMultiPartFormDataRequest.ToString.md "ToString()")|[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")|`public`|`否`|-|
@@ -41,4 +55,5 @@ public class HttpMultiPartFormDataRequest : HttpRequest<Dictionary<String, Strin
 |Finalize()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Void](https://learn.microsoft.com/en-us/dotnet/api/system.void "Void")|`protected`|`否`|-|
 |Equals(Object obj)&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean "Boolean")|`public`|`否`|-|
 |GetHashCode()&nbsp;&nbsp;&nbsp;&nbsp;*(继承自[Object](https://learn.microsoft.com/en-us/dotnet/api/system.object "Object"))*|[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 "Int32")|`public`|`否`|-|
+
 
