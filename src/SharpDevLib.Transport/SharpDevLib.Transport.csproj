@@ -5,20 +5,19 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>12.0</LangVersion>
 		<Authors>developer333</Authors>
-		<Description>传输协议库</Description>
+		<Description>数据传输相关</Description>
 		<Copyright>developer333</Copyright>
 		<PackageId>SharpDevLib.Transport</PackageId>
 		<PackageProjectUrl>https://github.com/yibei333/sharp-dev-lib</PackageProjectUrl>
 		<PackageIcon>c-sharp.png</PackageIcon>
 		<RepositoryUrl>https://github.com/yibei333/sharp-dev-lib</RepositoryUrl>
 		<PackageTags>transport tcp udp smtp http</PackageTags>
-		<!--<PackageLicenseFile>LICENSE</PackageLicenseFile>-->
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>2.0.0.7-alpha</Version>
+		<Version>2.0.0</Version>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReadmeFile>SharpDevLib.Transport.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -30,7 +29,7 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-		<None Include="../../README.md" Link="Assets\README.md">
+		<None Include="../../doc/nuget/SharpDevLib.Transport.md" Link="Assets\SharpDevLib.Transport.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>

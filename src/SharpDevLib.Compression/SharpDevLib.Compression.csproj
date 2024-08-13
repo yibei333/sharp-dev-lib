@@ -5,20 +5,19 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>12.0</LangVersion>
 		<Authors>developer333</Authors>
-		<Description>文件压缩/解压库</Description>
+		<Description>文件压缩/解压相关</Description>
 		<Copyright>developer333</Copyright>
 		<PackageId>SharpDevLib.Compression</PackageId>
 		<PackageProjectUrl>https://github.com/yibei333/sharp-dev-lib</PackageProjectUrl>
 		<PackageIcon>c-sharp.png</PackageIcon>
 		<RepositoryUrl>https://github.com/yibei333/sharp-dev-lib</RepositoryUrl>
 		<PackageTags>compress decompress compression</PackageTags>
-		<!--<PackageLicenseFile>LICENSE</PackageLicenseFile>-->
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>2.0.0.5-alpha</Version>
+		<Version>2.0.0</Version>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReadmeFile>SharpDevLib.Compression.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -30,7 +29,7 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-		<None Include="../../README.md" Link="Assets\README.md">
+		<None Include="../../doc/nuget/SharpDevLib.Compression.md" Link="Assets\SharpDevLib.Compression.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
