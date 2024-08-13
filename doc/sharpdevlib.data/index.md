@@ -1,1 +1,0 @@
-﻿# sharp-dev-lib

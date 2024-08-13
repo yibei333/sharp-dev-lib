@@ -16,7 +16,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>2.0.0.7-alpha</Version>
+		<Version>2.0.0.9-alpha</Version>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -30,7 +30,7 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-		<None Include="../../README.md" Link="Assets\README.md">
+		<None Include="../../doc/generate/SharpDevLib/Index.md" Link="Assets\README.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>

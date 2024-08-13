@@ -1,0 +1,17 @@
+###### [主页](./Index.md "主页")
+#### HttpMultiPartFormDataRequest(String url, HttpFormFile[] files) 构造函数
+**程序集** : [SharpDevLib.Transport.dll](./SharpDevLib.Transport.assembly.md "SharpDevLib.Transport.dll")
+**命名空间** : [SharpDevLib.Transport](./SharpDevLib.Transport.namespace.md "SharpDevLib.Transport")
+**所属类型** : [HttpMultiPartFormDataRequest](./SharpDevLib.Transport.HttpMultiPartFormDataRequest.md "HttpMultiPartFormDataRequest")
+``` csharp
+public HttpMultiPartFormDataRequest(String url, HttpFormFile[] files)
+```
+**注释**
+*实例化表单请求*
+
+**参数**
+|名称|类型|注释|
+|---|---|---|
+|url|[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")|请求地址|
+|files|[HttpFormFile\[\]](https://learn.microsoft.com/en-us/dotnet/api/sharpdevlib.transport.httpformfile[] "HttpFormFile\[\]")|文件集合|
+
