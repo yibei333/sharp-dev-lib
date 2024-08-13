@@ -12,13 +12,12 @@
 		<PackageIcon>c-sharp.png</PackageIcon>
 		<RepositoryUrl>https://github.com/yibei333/sharp-dev-lib</RepositoryUrl>
 		<PackageTags>libarary service</PackageTags>
-		<!--<PackageLicenseFile>LICENSE</PackageLicenseFile>-->
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>2.0.0.9-alpha</Version>
+		<Version>2.0.0.8-alpha</Version>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReadmeFile>Index.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -30,7 +29,7 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-		<None Include="../../doc/generate/SharpDevLib/Index.md" Link="Assets\README.md">
+		<None Include="../../doc/generate/SharpDevLib/Index.md" Link="Assets\Index.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
