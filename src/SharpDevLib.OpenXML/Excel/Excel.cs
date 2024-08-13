@@ -124,6 +124,8 @@ public static class Excel
 
         //write table
         uint sheetIndex = 1;
+        var sharedStringTable = workbookPart.GetSharedStringTable();
+        var sharedStringDictionary = new Dictionary<string, int>();
         foreach (DataTable table in dataSet.Tables)
         {
             var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
@@ -136,7 +138,7 @@ public static class Excel
             sheets.AppendChild(sheet);
             sheetIndex++;
 
-            SetTableData(workbookPart, sheetData, table);
+            SetTableData(sheetData, table, sharedStringTable, sharedStringDictionary);
             SetColumns(worksheetPart.Worksheet, table.Columns.Count);
         }
 
@@ -144,7 +146,7 @@ public static class Excel
     }
 
     #region Private
-    static void SetTableData(WorkbookPart workbookPart, SheetData sheetData, DataTable table)
+    static void SetTableData(SheetData sheetData, DataTable table, SharedStringTable sharedStringTable, Dictionary<string, int> sharedStringDictionary)
     {
         //header
         var headerRow = new Row { RowIndex = 1 };
@@ -156,9 +158,9 @@ public static class Excel
             var cell = new Cell
             {
                 DataType = CellValues.SharedString,
-                CellValue = new CellValue(workbookPart.SetSharedStringItem(item.ColumnName)),
                 CellReference = new CellReference(1, headerColumnIndex++).Reference
             };
+            cell.SetValue(item.ColumnName, sharedStringTable, sharedStringDictionary);
             headerRow.AppendChild(cell);
         }
 
@@ -176,7 +178,7 @@ public static class Excel
                 {
                     CellReference = new CellReference(rowIndex, contentColumnIndex++).Reference
                 };
-                cell.SetValue(workbookPart, dataRow[item.ColumnName]);
+                cell.SetValue(dataRow[item.ColumnName], sharedStringTable, sharedStringDictionary);
                 contentRow.AppendChild(cell);
             }
             rowIndex++;

@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using System.Collections.Concurrent;
 using System.Text;
 
 namespace SharpDevLib.OpenXML;
@@ -75,27 +76,33 @@ public static class SpreadsheetExtensions
     }
 
     /// <summary>
-    /// 设置SharedString
+    /// 获取SharedStringTable
     /// </summary>
     /// <param name="workbookPart">工作簿部件</param>
-    /// <param name="text">字符串</param>
-    /// <returns>SharedStringItem索引</returns>
-    public static int SetSharedStringItem(this WorkbookPart workbookPart, string text)
+    /// <returns>SharedStringTable</returns>
+    public static SharedStringTable GetSharedStringTable(this WorkbookPart workbookPart)
     {
         var sharedStringTablePart = workbookPart.GetPartsOfType<SharedStringTablePart>().FirstOrDefault() ?? workbookPart.AddNewPart<SharedStringTablePart>();
         sharedStringTablePart.SharedStringTable ??= new SharedStringTable();
-        var sharedStringTable = sharedStringTablePart.SharedStringTable;
+        return sharedStringTablePart.SharedStringTable;
+    }
 
-        int i = 0;
-        foreach (SharedStringItem item in sharedStringTable.Elements<SharedStringItem>())
-        {
-            if (item.InnerText == text) return i;
-            i++;
-        }
+    /// <summary>
+    /// 设置SharedString
+    /// </summary>
+    /// <param name="sharedStringTable">SharedStringTable</param>
+    /// <param name="text">字符串</param>
+    /// <returns>SharedStringItem索引</returns>
+    public static int SetSharedStringItem(this SharedStringTable sharedStringTable, string text)
+    {
+        var items = sharedStringTable.Elements<SharedStringItem>().ToArray();
+        var item = items.FirstOrDefault(x => x.InnerText == text);
+        var index = Array.IndexOf(items, item);
+        if (index >= 0) return index;
 
         sharedStringTable.AppendChild(new SharedStringItem(new Text(text)));
         sharedStringTable.Save();
-        return i;
+        return items.Count();
     }
     #endregion
 
@@ -309,7 +316,7 @@ public static class SpreadsheetExtensions
         if (dataType is null) return text;
         else if (dataType == CellValues.SharedString)
         {
-            var sharedStringItems = workbookPart.GetPartsOfType<SharedStringTablePart>()?.FirstOrDefault()?.SharedStringTable?.Elements<SharedStringItem>()?.ToList() ?? new List<SharedStringItem>();
+            var sharedStringItems = workbookPart.GetPartsOfType<SharedStringTablePart>()?.FirstOrDefault()?.SharedStringTable?.Elements<SharedStringItem>()?.ToList() ?? [];
             var sharedItem = sharedStringItems.ElementAt(int.Parse(text));
             return sharedItem.Text?.Text ?? string.Empty;
         }
@@ -323,9 +330,9 @@ public static class SpreadsheetExtensions
     /// 根据值类型设置值
     /// </summary>
     /// <param name="cell">单元格</param>
-    /// <param name="workbookPart">工作簿部件</param>
     /// <param name="value">值</param>
-    public static void SetValue(this Cell cell, WorkbookPart workbookPart, object? value)
+    /// <param name="sharedStringTable">SharedStringTable</param>
+    public static void SetValue(this Cell cell, object? value, SharedStringTable? sharedStringTable)
     {
         if (value is null)
         {
@@ -347,8 +354,59 @@ public static class SpreadsheetExtensions
         }
         else
         {
-            cell.CellValue = new CellValue(workbookPart.SetSharedStringItem(value.ToString()));
-            cell.DataType = CellValues.SharedString;
+            if (sharedStringTable is null)
+            {
+                cell.CellValue = new CellValue(value.ToString());
+                cell.DataType = CellValues.String;
+            }
+            else
+            {
+                var index = sharedStringTable.SetSharedStringItem(value.ToString());
+                cell.CellValue = new CellValue(index);
+                cell.DataType = CellValues.SharedString;
+            }
+        }
+    }
+
+    internal static void SetValue(this Cell cell, object? value, SharedStringTable sharedStringTable, Dictionary<string, int>? sharedStringCache)
+    {
+        if (value is null)
+        {
+            cell.CellValue = null;
+            cell.DataType = CellValues.String;
+            return;
+        }
+
+        var type = value.GetType();
+        if (type.IsNumericDatatype())
+        {
+            cell.DataType = CellValues.Number;
+            cell.CellValue = new CellValue(value.ToString());
+        }
+        else if (type == typeof(bool))
+        {
+            cell.CellValue = new CellValue(bool.Parse(value.ToString()));
+            cell.DataType = CellValues.Boolean;
+        }
+        else
+        {
+            if (sharedStringCache is null)
+            {
+                cell.CellValue = new CellValue(value.ToString());
+                cell.DataType = CellValues.String;
+            }
+            else
+            {
+                var text = value.ToString();
+                if (!sharedStringCache.TryGetValue(text, out var index))
+                {
+                    index = sharedStringCache.Count;
+                    sharedStringCache[text] = index;
+                    sharedStringTable.AppendChild(new SharedStringItem(new Text(text)));
+                }
+                cell.CellValue = new CellValue(index);
+                cell.DataType = CellValues.SharedString;
+            }
         }
     }
 
@@ -474,13 +532,16 @@ public static class SpreadsheetExtensions
         return cell;
     }
 
+    static readonly ConcurrentDictionary<Type, bool> _numericDataTypesCache = [];
+    static readonly List<TypeCode> _numericDataTypeCodes = [TypeCode.Byte, TypeCode.SByte, TypeCode.UInt16, TypeCode.UInt32, TypeCode.UInt64, TypeCode.Int16, TypeCode.Int32, TypeCode.Int64, TypeCode.Decimal, TypeCode.Double, TypeCode.Single];
     static bool IsNumericDatatype(this Type type)
     {
-        return Type.GetTypeCode(type) switch
+        if (!_numericDataTypesCache.TryGetValue(type, out var result))
         {
-            TypeCode.Byte or TypeCode.SByte or TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64 or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64 or TypeCode.Decimal or TypeCode.Double or TypeCode.Single => true,
-            _ => false,
-        };
+            result = _numericDataTypeCodes.Contains(Type.GetTypeCode(type));
+            _numericDataTypesCache.TryAdd(type, result);
+        }
+        return result;
     }
     #endregion
 
@@ -522,7 +583,7 @@ public static class SpreadsheetExtensions
             }
             wordLength.Length = Math.Max(wordLength.Length, cellValue?.Length ?? 0);
         }
-        columnWordLength = columnWordLength.OrderBy(x => x.ColumnIndex).ToList();
+        columnWordLength = [.. columnWordLength.OrderBy(x => x.ColumnIndex)];
 
         var columns = worksheet.Elements<Columns>().FirstOrDefault();
         if (columns is null)
@@ -551,16 +612,10 @@ public static class SpreadsheetExtensions
         worksheet.Save();
     }
 
-    class ColumnWordLength
+    class ColumnWordLength(uint columnIndex, string columnName)
     {
-        public ColumnWordLength(uint columnIndex, string columnName)
-        {
-            ColumnIndex = columnIndex;
-            ColumnName = columnName;
-        }
-
-        public uint ColumnIndex { get; set; }
-        public string ColumnName { get; set; }
+        public uint ColumnIndex { get; set; } = columnIndex;
+        public string ColumnName { get; set; } = columnName;
         public int Length { get; set; }
     }
 

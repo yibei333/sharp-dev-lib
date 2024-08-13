@@ -208,13 +208,14 @@ public class ExcelTests
         using var targetStream = CopySourceStream(sourceStream, "InsertRow", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
+        var sharedStringTable = doc.WorkbookPart!.GetSharedStringTable();
         var row = doc.WorkbookPart?.GetWorksheet("T2").InsertRow(3);
         var cell = new Cell
         {
             DataType = CellValues.SharedString,
             CellReference = "A3"
         };
-        cell.SetValue(doc.WorkbookPart!, "ok");
+        cell.SetValue("ok", sharedStringTable);
         row?.AppendChild(cell);
         doc.Save();
         targetStream.Flush();
@@ -275,8 +276,9 @@ public class ExcelTests
         using var targetStream = CopySourceStream(sourceStream, "UpdateCellValue", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
+        var sharedStringTable = doc.WorkbookPart!.GetSharedStringTable();
         var cell = doc.WorkbookPart?.GetWorksheet("T2").GetCells(x => x.CellReference == "A3").FirstOrDefault();
-        cell?.SetValue(doc.WorkbookPart!, 2);
+        cell?.SetValue(2, sharedStringTable);
 
         doc.Save();
         targetStream.Flush();

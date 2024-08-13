@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
 
 namespace SharpDevLib.OpenXML;
 
@@ -9,6 +10,7 @@ public class CellReference
 {
     const string _columnExpression = "[A-Za-z]+";
     const string _rowExpression = "[0-9]+";
+    static readonly ConcurrentDictionary<uint, string> _columnNameCache = [];
 
     /// <summary>
     /// 实例化单元格引用
@@ -34,12 +36,18 @@ public class CellReference
         RowIndex = rowIndex;
         ColumnIndex = columnIndex;
 
-        var prefixCount = columnIndex / 26;
-        if (prefixCount >= 26) throw new NotSupportedException($"max cellreference is ZZ");
-        var prefix = prefixCount > 0 ? ((char)(prefixCount + 65 - 1)).ToString() : "";
-        var nameCount = columnIndex % 26;
-        var name = ((char)(nameCount + 65 - 1)).ToString();
-        ColumnName = prefix + name;
+        if (!_columnNameCache.TryGetValue(columnIndex, out var columnName))
+        {
+            var prefixCount = columnIndex / 26;
+            if (prefixCount >= 26) throw new NotSupportedException($"max cellreference is ZZ");
+            var prefix = prefixCount > 0 ? ((char)(prefixCount + 65 - 1)).ToString() : "";
+            var nameCount = columnIndex % 26;
+            var name = ((char)(nameCount + 65 - 1)).ToString();
+            columnName = prefix + name;
+            _columnNameCache.TryAdd(columnIndex, columnName);
+        }
+
+        ColumnName = columnName;
         Reference = ColumnName + rowIndex;
     }
 
