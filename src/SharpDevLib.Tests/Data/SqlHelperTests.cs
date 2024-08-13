@@ -7,6 +7,7 @@ using SharpDevLib.Tests.TestData;
 using SharpDevLib.Tests.TestData.Data;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -109,6 +110,23 @@ public class SqlHelperTests
         Assert.AreEqual(3, dataSet.Tables.Count);
         Assert.AreEqual(Users.Serialize(), dataSet.Tables[0].ToList<User>().Serialize());
         Assert.AreEqual(UserFavorites.Serialize(), dataSet.Tables[1].ToList<UserFavorite>().Serialize());
+    }
+
+    [TestMethod]
+    public async Task ExecuteDataTableAsyncTest()
+    {
+        SqlHelper.Config(SqliteFactory.Instance, SourceConnectionString);
+        using var sqlHelper = new SqlHelper();
+
+        var sql = $@"
+            SELECT [Name],Age FROM [User];
+            SELECT [Name],Favorite FROM [UserFavorite];
+            SELECT a.[Name],a.Age,b.Favorite FROM [User] a INNER JOIN [UserFavorite] b ON a.Name=b.Name;
+        ";
+        var table = await sqlHelper.ExecuteDataTableAsync(sql);
+        table.TableName = "xx";
+        var set = new DataSet();
+        set.Tables.Add(table);
     }
 
     [TestMethod]

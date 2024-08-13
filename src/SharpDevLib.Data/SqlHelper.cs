@@ -218,6 +218,43 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
+    /// 检索数据表格
+    /// </summary>
+    /// <param name="sql">sql语句</param>
+    /// <param name="parameters">sql参数</param>
+    /// <returns>数据表格</returns>
+    public DataTable ExecuteDataTable(string sql, params DbParameter[] parameters)
+    {
+        var set = ExecuteDataSet(sql, parameters);
+        var table = set.Tables[0];
+        set.Tables.Remove(table);
+        return table;
+    }
+
+    /// <summary>
+    /// 检索数据表格
+    /// </summary>
+    /// <param name="sql">sql语句</param>
+    /// <param name="parameters">sql参数</param>
+    /// <returns>数据表格</returns>
+    public async Task<DataTable> ExecuteDataTableAsync(string sql, params DbParameter[] parameters)
+    {
+        return await Task.Run(() => ExecuteDataTable(sql, parameters));
+    }
+
+    /// <summary>
+    /// 检索数据表格
+    /// </summary>
+    /// <param name="sql">sql语句</param>
+    /// <param name="parameters">sql参数</param>
+    /// <param name="cancellationToken">CancellationToken</param>
+    /// <returns>数据表格</returns>
+    public async Task<DataTable> ExecuteDataTableAsync(string sql, DbParameter[] parameters, CancellationToken cancellationToken)
+    {
+        return await Task.Run(() => ExecuteDataTable(sql, parameters), cancellationToken);
+    }
+
+    /// <summary>
     /// 执行非查询sql语句
     /// </summary>
     /// <param name="sql">sql语句</param>
