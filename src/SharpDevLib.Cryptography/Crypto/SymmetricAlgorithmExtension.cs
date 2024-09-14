@@ -104,9 +104,9 @@ public static class SymmetricAlgorithmExtension
 
     static int[] GetAllowedKeySize(this SymmetricAlgorithm algorithm)
     {
-        if (algorithm is Aes) return new int[] { 16, 24, 32 };
-        if (algorithm is DES) return new int[] { 8 };
-        if (algorithm is TripleDES) return new int[] { 16, 24 };
+        if (algorithm is Aes) return [16, 24, 32];
+        if (algorithm is DES) return [8];
+        if (algorithm is TripleDES) return [16, 24];
         else throw new NotImplementedException($"algorithm '{algorithm.GetType().FullName}' not supported yet");
     }
 
@@ -139,7 +139,7 @@ public static class SymmetricAlgorithmExtension
         if (bytes.Length > length) return bytes.Take(length).ToArray();
 
         var paddingBytes = new byte[length - bytes.Length];
-        return bytes.Concat(paddingBytes).ToArray();
+        return [.. bytes, .. paddingBytes];
     }
 
     static byte[] PaddingBytes(this byte[] bytes, int[] allowedLength, out int usedLength)

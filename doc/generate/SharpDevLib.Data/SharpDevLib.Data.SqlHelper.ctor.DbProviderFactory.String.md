@@ -20,9 +20,7 @@ public SqlHelper(DbProviderFactory dbProviderFactory, String connectionString)
 
 |名称|类型|注释|
 |---|---|---|
-|dbProviderFactory|[DbProviderFactory](https://learn.microsoft.com/en-us/dotnet/api/system.data.common.dbproviderfactory "DbProviderFactory")|数据库提供商工厂,例如
-            1.引用Microsoft.Data.Sqlite,则用SqliteFactory.Instance2.引用Microsoft.Data.SqlClient,则用SqlClientFactory.Instance3.引用Pomelo.EntityFrameworkCore.MySql,则用MySqlConnectorFactory.Instance|
-|connectionString|[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")|连接字符串
-            1.Sqlite,"data source=dbFilePath"2.SqlServer,"Server=server;Database=database;User Id=user;Password=password;"3.MySql,"server=server;user=user;password=password;database=database"|
+|dbProviderFactory|[DbProviderFactory](https://learn.microsoft.com/en-us/dotnet/api/system.data.common.dbproviderfactory "DbProviderFactory")|数据库提供商工厂,例如<br>1.引用Microsoft.Data.Sqlite,则用SqliteFactory.Instance<br>2.引用Microsoft.Data.SqlClient,则用SqlClientFactory.Instance<br>3.引用Pomelo.EntityFrameworkCore.MySql,则用MySqlConnectorFactory.Instance|
+|connectionString|[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")|连接字符串<br>1.Sqlite,"data source=dbFilePath"<br>2.SqlServer,"Server=server;Database=database;User Id=user;Password=password;"<br>3.MySql,"server=server;user=user;password=password;database=database"|
 
 

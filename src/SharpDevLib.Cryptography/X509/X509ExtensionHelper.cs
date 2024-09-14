@@ -13,7 +13,7 @@ internal static class X509ExtensionHelper
         {
             new X509BasicConstraintsExtension(true, false, 0, false),
             new X509KeyUsageExtension(X509KeyUsageFlags.KeyCertSign | X509KeyUsageFlags.CrlSign, false),
-            new X509EnhancedKeyUsageExtension(new OidCollection {
+            new X509EnhancedKeyUsageExtension([
                 Oid.FromOidValue("1.3.6.1.5.5.7.3.2", OidGroup.All),//Client Authentication
                 Oid.FromOidValue("1.3.6.1.5.5.7.3.1", OidGroup.All),//Server Authentication
                 Oid.FromOidValue("1.3.6.1.5.5.7.3.3", OidGroup.All),//Code Signing
@@ -22,7 +22,7 @@ internal static class X509ExtensionHelper
                 Oid.FromOidValue("1.3.6.1.5.5.7.3.7", OidGroup.All),//IP security user
                 Oid.FromOidValue("1.3.6.1.5.5.7.3.6", OidGroup.All),//IP security tunnel termination
                 Oid.FromOidValue("1.3.6.1.5.5.7.3.8", OidGroup.All),//Time Stamping
-            }, false),
+            ], false),
         };
         extensions.AddRange(GetKeyIdentifierExtension(publicKey, caCert));
         return extensions;
@@ -34,7 +34,7 @@ internal static class X509ExtensionHelper
         {
             new X509BasicConstraintsExtension(false, false, 0, false),
             new X509KeyUsageExtension(X509KeyUsageFlags.KeyEncipherment | X509KeyUsageFlags.DigitalSignature, false),
-            new X509EnhancedKeyUsageExtension(new OidCollection { Oid.FromOidValue("1.3.6.1.5.5.7.3.1", OidGroup.All) }, false),
+            new X509EnhancedKeyUsageExtension([Oid.FromOidValue("1.3.6.1.5.5.7.3.1", OidGroup.All)], false),
         };
         extensions.AddRange(GetKeyIdentifierExtension(publicKey, caCert));
         extensions.Add(GetSubjectAlternativeNameExtension(alternativeNames));
@@ -47,7 +47,7 @@ internal static class X509ExtensionHelper
         {
             new X509BasicConstraintsExtension(false, false, 0, false),
             new X509KeyUsageExtension(X509KeyUsageFlags.KeyEncipherment | X509KeyUsageFlags.DigitalSignature, false),
-            new X509EnhancedKeyUsageExtension(new OidCollection { Oid.FromOidValue("1.3.6.1.5.5.7.3.2", OidGroup.All) }, false),
+            new X509EnhancedKeyUsageExtension([Oid.FromOidValue("1.3.6.1.5.5.7.3.2", OidGroup.All)], false),
         };
         extensions.AddRange(GetKeyIdentifierExtension(publicKey, caCert));
         return extensions;
@@ -59,7 +59,7 @@ internal static class X509ExtensionHelper
         {
             new X509BasicConstraintsExtension(false, false, 0, false),
             new X509KeyUsageExtension(X509KeyUsageFlags.KeyEncipherment | X509KeyUsageFlags.DigitalSignature, false),
-            new X509EnhancedKeyUsageExtension(new OidCollection { Oid.FromOidValue("1.3.6.1.5.5.7.3.3", OidGroup.All) }, false),
+            new X509EnhancedKeyUsageExtension([Oid.FromOidValue("1.3.6.1.5.5.7.3.3", OidGroup.All)], false),
         };
         extensions.AddRange(GetKeyIdentifierExtension(publicKey, caCert));
         return extensions;
@@ -75,18 +75,18 @@ internal static class X509ExtensionHelper
     {
         //使用者密钥标识
         var subjectKeyIdentifierExtension = CreateSubjectKeyIdentifierExtension(publicKey);
-        if (caCert is null) return new List<X509Extension> { subjectKeyIdentifierExtension };
+        if (caCert is null) return [subjectKeyIdentifierExtension];
 
         var subjectKeyIdentifierRawData = caCert.Extensions.OfType<X509SubjectKeyIdentifierExtension>().FirstOrDefault()?.RawData ?? throw new Exception("unable to find ca X509SubjectKeyIdentifierExtension");
         //授权密钥标识符
         var authorityKeyIdentifierExtension = new X509AuthorityKeyIdentifierExtension(subjectKeyIdentifierRawData, false);
-        return new List<X509Extension> { subjectKeyIdentifierExtension, authorityKeyIdentifierExtension };
+        return [subjectKeyIdentifierExtension, authorityKeyIdentifierExtension];
     }
 
     static X509SubjectKeyIdentifierExtension CreateSubjectKeyIdentifierExtension(byte[] publicKey)
     {
         var keyValue = new AsnEncodedData(publicKey);
-        var keyParam = new AsnEncodedData(new byte[] { 05, 00 });
+        var keyParam = new AsnEncodedData([05, 00]);
         var key = new PublicKey(new Oid(Oids.Rsa), keyParam, keyValue);
         return new X509SubjectKeyIdentifierExtension(key, false);
     }

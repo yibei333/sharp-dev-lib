@@ -25,9 +25,7 @@ public sealed class SqlHelper : Object, IDisposable
 
 |方法|注释|参数|
 |---|---|---|
-|[SqlHelper(DbProviderFactory dbProviderFactory, String connectionString)](./SharpDevLib.Data.SqlHelper.ctor.DbProviderFactory.String.md "SqlHelper(DbProviderFactory dbProviderFactory, String connectionString)")|实例化Sql帮助类|dbProviderFactory:数据库提供商工厂,例如
-            1.引用Microsoft.Data.Sqlite,则用SqliteFactory.Instance2.引用Microsoft.Data.SqlClient,则用SqlClientFactory.Instance3.引用Pomelo.EntityFrameworkCore.MySql,则用MySqlConnectorFactory.Instance<br>connectionString:连接字符串
-            1.Sqlite,"data source=dbFilePath"2.SqlServer,"Server=server;Database=database;User Id=user;Password=password;"3.MySql,"server=server;user=user;password=password;database=database"|
+|[SqlHelper(DbProviderFactory dbProviderFactory, String connectionString)](./SharpDevLib.Data.SqlHelper.ctor.DbProviderFactory.String.md "SqlHelper(DbProviderFactory dbProviderFactory, String connectionString)")|实例化Sql帮助类|dbProviderFactory:数据库提供商工厂,例如<br>1.引用Microsoft.Data.Sqlite,则用SqliteFactory.Instance<br>2.引用Microsoft.Data.SqlClient,则用SqlClientFactory.Instance<br>3.引用Pomelo.EntityFrameworkCore.MySql,则用MySqlConnectorFactory.Instance<br>connectionString:连接字符串<br>1.Sqlite,"data source=dbFilePath"<br>2.SqlServer,"Server=server;Database=database;User Id=user;Password=password;"<br>3.MySql,"server=server;user=user;password=password;database=database"|
 |[SqlHelper()](./SharpDevLib.Data.SqlHelper.ctor.md "SqlHelper()")|实例化Sql帮助类|-|
 |[SqlHelper(DbContext dbContext)](./SharpDevLib.Data.SqlHelper.ctor.DbContext.md "SqlHelper(DbContext dbContext)")|实例化Sql帮助类|dbContext:DbContext|
 

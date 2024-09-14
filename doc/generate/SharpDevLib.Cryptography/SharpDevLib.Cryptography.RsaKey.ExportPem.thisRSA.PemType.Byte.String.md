@@ -28,7 +28,6 @@ public static String ExportPem(this RSA rsa, PemType pemType, Byte[] password, S
 |rsa|[RSA](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.rsa "RSA")|rsa algorithm|
 |pemType|[PemType](./SharpDevLib.Cryptography.PemType.md "PemType")|PEM格式类型|
 |password|[Byte\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.byte[] "Byte\[\]")|密码(仅当PEM格式为受密码保护的私钥时适用)|
-|encryptPkcs1PrivateKeyAlogorithm|[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")|加密算法(仅当PEM格式为受密码保护的PKCS#1私钥时适用),受支持的算法如下:
-            (1)AES-256-CBC(2)DES-EDE3-CBC|
+|encryptPkcs1PrivateKeyAlogorithm|[String](https://learn.microsoft.com/en-us/dotnet/api/system.string "String")|加密算法(仅当PEM格式为受密码保护的PKCS#1私钥时适用),受支持的算法如下:<br>(1)AES-256-CBC<br>(2)DES-EDE3-CBC|
 
 
