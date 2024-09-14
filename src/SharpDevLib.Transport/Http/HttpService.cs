@@ -120,7 +120,7 @@ internal class HttpService : IHttpService
         var url = BuildUrl(request);
         var responseMonitor = await Retry(client, () =>
         {
-            var content = new FormUrlEncodedContent(request.Parameters ?? new());
+            var content = new FormUrlEncodedContent(request.Parameters ?? []);
             var message = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
             return message;
         }, request, cancellationToken);
@@ -205,8 +205,8 @@ internal class HttpService : IHttpService
 
         if (request.UseEdgeUserAgent && !(request.Headers?.ContainsKey("User-Agent") ?? false))
         {
-            request.Headers ??= new Dictionary<string, string[]>();
-            request.Headers.Add("User-Agent", new string[] { _edgeUA });
+            request.Headers ??= [];
+            request.Headers.Add("User-Agent", [_edgeUA]);
         }
 
         if (request.Headers.NotNullOrEmpty())
@@ -295,7 +295,7 @@ internal class HttpService : IHttpService
         Dictionary<string, IEnumerable<string>>? headers = null;
         foreach (var header in responseMonitor.ResponseMessage.Headers)
         {
-            headers ??= new();
+            headers ??= [];
             headers.Add(header.Key, header.Value);
         }
 
@@ -306,7 +306,7 @@ internal class HttpService : IHttpService
             var host = new Uri(responseMonitor.Url).Host;
             foreach (var item in cookieValues)
             {
-                cookies ??= new();
+                cookies ??= [];
                 var cookie = item.ParseCookie(host);
                 if (cookie is not null) cookies.Add(cookie);
             }
@@ -368,32 +368,21 @@ internal class HttpService : IHttpService
         else Debug.WriteLine(message);
     }
 
-    class ResponseMonitor
+    class ResponseMonitor(string url, HttpRequest request, Exception? exception, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming, HttpResponseMessage? responseMessage)
     {
-        public ResponseMonitor(string url, HttpRequest request, Exception? exception, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming, HttpResponseMessage? responseMessage)
-        {
-            Url = url;
-            Request = request;
-            Exception = exception;
-            RetryCount = retryCount;
-            LastTimeConsuming = lastTimeConsuming;
-            TotalTimeConsuming = totalTimeConsuming;
-            ResponseMessage = responseMessage;
-        }
+        public string Url { get; } = url;
 
-        public string Url { get; }
+        public Exception? Exception { get; } = exception;
 
-        public Exception? Exception { get; }
+        public int RetryCount { get; } = retryCount;
 
-        public int RetryCount { get; }
+        public TimeSpan LastTimeConsuming { get; } = lastTimeConsuming;
 
-        public TimeSpan LastTimeConsuming { get; }
+        public TimeSpan TotalTimeConsuming { get; } = totalTimeConsuming;
 
-        public TimeSpan TotalTimeConsuming { get; }
+        public HttpResponseMessage? ResponseMessage { get; } = responseMessage;
 
-        public HttpResponseMessage? ResponseMessage { get; }
-
-        public HttpRequest Request { get; }
+        public HttpRequest Request { get; } = request;
     }
     #endregion
 }

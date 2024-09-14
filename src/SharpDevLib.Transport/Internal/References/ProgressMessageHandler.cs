@@ -179,14 +179,9 @@ internal class ProgressStream : DelegatingStream
     }
 }
 
-internal abstract class DelegatingStream : Stream
+internal abstract class DelegatingStream(Stream innerStream) : Stream
 {
-    private readonly Stream _innerStream;
-
-    protected DelegatingStream(Stream innerStream)
-    {
-        _innerStream = innerStream ?? throw new NullReferenceException("innerStream");
-    }
+    private readonly Stream _innerStream = innerStream ?? throw new NullReferenceException("innerStream");
 
     protected Stream InnerStream => _innerStream;
 
@@ -245,17 +240,11 @@ internal abstract class DelegatingStream : Stream
     public override void WriteByte(byte value) => _innerStream.WriteByte(value);
 }
 
-internal class HttpProgressEventArgs : ProgressChangedEventArgs
+internal class HttpProgressEventArgs(int progressPercentage, object userToken, long bytesTransferred, long? totalBytes) : ProgressChangedEventArgs(progressPercentage, userToken)
 {
-    public HttpProgressEventArgs(int progressPercentage, object userToken, long bytesTransferred, long? totalBytes) : base(progressPercentage, userToken)
-    {
-        BytesTransferred = bytesTransferred;
-        TotalBytes = totalBytes;
-    }
+    public long BytesTransferred { get; private set; } = bytesTransferred;
 
-    public long BytesTransferred { get; private set; }
-
-    public long? TotalBytes { get; private set; }
+    public long? TotalBytes { get; private set; } = totalBytes;
 }
 
 internal static class HttpHeaderExtensions
