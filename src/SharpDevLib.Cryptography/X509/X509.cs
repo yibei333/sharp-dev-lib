@@ -144,6 +144,35 @@ public static class X509
     }
 
     /// <summary>
+    /// 生成代码签名证书
+    /// </summary>
+    /// <param name="issuerPrivateKey">PEM格式的颁发者私钥</param>
+    /// <param name="issuerCert">颁发者证书</param>
+    /// <param name="csr">证书签名请求</param>
+    /// <param name="serialNumber">序列号</param>
+    /// <param name="days">过期天数</param>
+    /// <param name="friendlyName">友好名称</param>
+    /// <returns>X509Certificate2</returns>
+    public static X509Certificate2 GenerateCodeSigningCert(string issuerPrivateKey, X509Certificate2 issuerCert, X509CertificateSigningRequest csr, byte[] serialNumber, int days, string? friendlyName = null)
+    {
+        return GenerateCert(issuerPrivateKey, issuerCert, csr, serialNumber, days, X509ExtensionHelper.CreateCodeSigningExtensions(csr.PublicKey, issuerCert), friendlyName);
+    }
+
+    /// <summary>
+    /// 生成代码签名证书
+    /// </summary>
+    /// <param name="privateKey">PEM格式的私钥</param>
+    /// <param name="csr">证书签名请求</param>
+    /// <param name="serialNumber">序列号</param>
+    /// <param name="days">过期天数</param>
+    /// <param name="friendlyName">友好名称</param>
+    /// <returns>X509Certificate2</returns>
+    public static X509Certificate2 GenerateCodeSigningCert(string privateKey, X509CertificateSigningRequest csr, byte[] serialNumber, int days, string? friendlyName = null)
+    {
+        return GenerateSelfSignedCert(privateKey, csr, serialNumber, days, X509ExtensionHelper.CreateCodeSigningExtensions(csr.PublicKey, null), friendlyName);
+    }
+
+    /// <summary>
     /// 保存为der格式到文件流
     /// </summary>
     /// <param name="certificate">证书</param>

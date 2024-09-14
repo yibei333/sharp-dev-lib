@@ -251,4 +251,71 @@ public class CertificateTests
         Assert.IsTrue(new FileInfo(certPath).Exists);
         Assert.IsTrue(new FileInfo(certPath).Length > 0);
     }
+
+    [TestMethod]
+    public void GenerateSelfSignedCodeSigningCertTest()
+    {
+        var name = "TestCodeSigningSelfSigned";
+        var keyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{name}.key");
+        var certPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{name}.crt");
+        var csrPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests{name}.csr");
+        keyPath.RemoveFileIfExist();
+        certPath.RemoveFileIfExist();
+        csrPath.RemoveFileIfExist();
+
+        using var rsa = RSA.Create();
+        rsa.KeySize = 2048;
+        var privateKey = rsa.ExportPem(PemType.Pkcs1PrivateKey);
+        privateKey.Utf8Decode().SaveToFile(keyPath);
+
+        var subject = new X509Subject(name) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
+        var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
+        csr.Export().Utf8Decode().SaveToFile(csrPath);
+        var serialNumber = X509.GenerateSerialNumber();
+        var cert = X509.GenerateCodeSigningCert(privateKey, csr, serialNumber, 360, subject.CommonName);
+        cert.SaveCrt(certPath);
+
+        Assert.IsTrue(new FileInfo(keyPath).Exists);
+        Assert.IsTrue(new FileInfo(keyPath).Length > 0);
+        Assert.IsTrue(new FileInfo(certPath).Exists);
+        Assert.IsTrue(new FileInfo(certPath).Length > 0);
+    }
+
+    [TestMethod]
+    public void GenerateCodeSigningCertTest()
+    {
+        var rootCaName = "TestRootCA";
+        var caKeyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Cryptography/Certificate/{rootCaName}.key");
+        var caCertPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Cryptography/Certificate/{rootCaName}.crt");
+        var caKey = File.ReadAllText(caKeyPath);
+        var caCert = new X509Certificate2(caCertPath);
+
+        var name = "TestCodeSigning";
+        var keyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{name}.key");
+        var certPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{name}.crt");
+        var csrPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{name}.csr");
+        var pfxPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{name}.pfx");
+        keyPath.RemoveFileIfExist();
+        certPath.RemoveFileIfExist();
+        csrPath.RemoveFileIfExist();
+
+        using var rsa = RSA.Create();
+        rsa.KeySize = 2048;
+        var privateKey = rsa.ExportPem(PemType.Pkcs1PrivateKey);
+        var publicKey = rsa.ExportPem(PemType.X509SubjectPublicKey);
+        privateKey.Utf8Decode().SaveToFile(keyPath);
+
+        var subject = new X509Subject(name) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
+        var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
+        csr.Export().Utf8Decode().SaveToFile(csrPath);
+        var serialNumber = X509.GenerateSerialNumber();
+        var cert = X509.GenerateCodeSigningCert(caKey, caCert, csr, serialNumber, 360, subject.CommonName);
+        cert.SaveCrt(certPath);
+        SavePfxTest(cert, keyPath, pfxPath);
+
+        Assert.IsTrue(new FileInfo(keyPath).Exists);
+        Assert.IsTrue(new FileInfo(keyPath).Length > 0);
+        Assert.IsTrue(new FileInfo(certPath).Exists);
+        Assert.IsTrue(new FileInfo(certPath).Length > 0);
+    }
 }

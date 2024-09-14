@@ -53,6 +53,18 @@ internal static class X509ExtensionHelper
         return extensions;
     }
 
+    public static List<X509Extension> CreateCodeSigningExtensions(byte[] publicKey, X509Certificate2? caCert)
+    {
+        var extensions = new List<X509Extension>
+        {
+            new X509BasicConstraintsExtension(false, false, 0, false),
+            new X509KeyUsageExtension(X509KeyUsageFlags.KeyEncipherment | X509KeyUsageFlags.DigitalSignature, false),
+            new X509EnhancedKeyUsageExtension(new OidCollection { Oid.FromOidValue("1.3.6.1.5.5.7.3.3", OidGroup.All) }, false),
+        };
+        extensions.AddRange(GetKeyIdentifierExtension(publicKey, caCert));
+        return extensions;
+    }
+
     /// <summary>
     /// 获取使用者密钥标识符和授权密钥标识符扩展
     /// </summary>
