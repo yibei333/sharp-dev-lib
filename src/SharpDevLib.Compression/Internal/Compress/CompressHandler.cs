@@ -37,7 +37,7 @@ internal abstract class CompressHandler
             else
             {
                 var fileInfo = new FileInfo(path);
-                rootPath = fileInfo.Directory.FullName;
+                rootPath = Option.IncludeSourceDiretory ? fileInfo.Directory.Parent.FullName ?? string.Empty : fileInfo.Directory.FullName;
             }
             return GetPathList(path, rootPath);
         }).ToList();
