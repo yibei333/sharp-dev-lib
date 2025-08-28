@@ -54,9 +54,14 @@ internal abstract class CompressHandler
         {
             var fileInfo = new FileInfo(path);
             if (!fileInfo.Exists) throw new FileNotFoundException("file not found", path);
-            var pathInfo = new FilePathInfo(path, path.TrimStart(rootPath).TrimStart("\\"), fileInfo.Name, fileInfo.Length);
+            var pathInfo = new FilePathInfo(path, FormatPath(path).TrimStart(FormatPath(rootPath)).TrimStart("/").TrimEnd("/"), fileInfo.Name, fileInfo.Length);
             return new List<FilePathInfo> { pathInfo };
         }
+    }
+
+    string FormatPath(string path)
+    {
+        return path.Replace("\\", "/").Replace("//", "/").TrimEnd("/");
     }
 }
 
