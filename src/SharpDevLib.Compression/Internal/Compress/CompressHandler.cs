@@ -1,15 +1,9 @@
 ﻿namespace SharpDevLib.Compression.Internal.Compress;
 
-internal abstract class CompressHandler
+internal abstract class CompressHandler(CompressOption option, CancellationToken? cancellationToken)
 {
-    protected CompressHandler(CompressOption option, CancellationToken? cancellationToken)
-    {
-        Option = option;
-        CancellationToken = cancellationToken;
-    }
-
-    public CompressOption Option { get; }
-    public CancellationToken? CancellationToken { get; }
+    public CompressOption Option { get; } = option;
+    public CancellationToken? CancellationToken { get; } = cancellationToken;
     public virtual bool SupportPassword { get; } = false;
 
     public abstract Task HandleAsync();
@@ -26,7 +20,7 @@ internal abstract class CompressHandler
 
     protected List<FilePathInfo> GetPathList()
     {
-        return Option.SourcePaths.SelectMany(path =>
+        return [.. Option.SourcePaths.SelectMany(path =>
         {
             string rootPath = string.Empty;
             var directoryInfo = new DirectoryInfo(path);
@@ -40,7 +34,7 @@ internal abstract class CompressHandler
                 rootPath = Option.IncludeSourceDiretory ? fileInfo.Directory.Parent.FullName ?? string.Empty : fileInfo.Directory.FullName;
             }
             return GetPathList(path, rootPath);
-        }).ToList();
+        })];
     }
 
     List<FilePathInfo> GetPathList(string path, string rootPath)
@@ -48,14 +42,14 @@ internal abstract class CompressHandler
         var directoryInfo = new DirectoryInfo(path);
         if (directoryInfo.Exists)
         {
-            return directoryInfo.GetDirectories().Select(y => y.FullName).Concat(directoryInfo.GetFiles().Select(y => y.FullName)).SelectMany(x => GetPathList(x, rootPath)).ToList();
+            return [.. directoryInfo.GetDirectories().Select(y => y.FullName).Concat(directoryInfo.GetFiles().Select(y => y.FullName)).SelectMany(x => GetPathList(x, rootPath))];
         }
         else
         {
             var fileInfo = new FileInfo(path);
             if (!fileInfo.Exists) throw new FileNotFoundException("file not found", path);
             var pathInfo = new FilePathInfo(path, FormatPath(path).TrimStart(FormatPath(rootPath)).TrimStart("/").TrimEnd("/"), fileInfo.Name, fileInfo.Length);
-            return new List<FilePathInfo> { pathInfo };
+            return [pathInfo];
         }
     }
 
@@ -65,11 +59,8 @@ internal abstract class CompressHandler
     }
 }
 
-internal abstract class CompressHandler<TOutputStream, TEntry> : CompressHandler where TOutputStream : Stream where TEntry : class
+internal abstract class CompressHandler<TOutputStream, TEntry>(CompressOption option, CancellationToken? cancellationToken) : CompressHandler(option, cancellationToken) where TOutputStream : Stream where TEntry : class
 {
-    protected CompressHandler(CompressOption option, CancellationToken? cancellationToken) : base(option, cancellationToken)
-    { }
-
     public abstract TOutputStream CreateStream(Stream targetStream);
 
     public abstract Task WriteNextEntryAsync(TOutputStream outputStream, FilePathInfo pathInfo);
@@ -96,20 +87,12 @@ internal abstract class CompressHandler<TOutputStream, TEntry> : CompressHandler
     }
 }
 
-internal class FilePathInfo
+internal class FilePathInfo(string path, string name, string selfName, long size)
 {
-    public FilePathInfo(string path, string name, string selfName, long size)
-    {
-        Path = path;
-        Name = name;
-        Size = size;
-        SelfName = selfName;
-    }
-
-    public string Path { get; }
-    public string Name { get; }
-    public string SelfName { get; }
-    public long Size { get; }
+    public string Path { get; } = path;
+    public string Name { get; } = name;
+    public string SelfName { get; } = selfName;
+    public long Size { get; } = size;
 }
 
 

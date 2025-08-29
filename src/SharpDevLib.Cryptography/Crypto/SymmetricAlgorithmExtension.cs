@@ -136,7 +136,7 @@ public static class SymmetricAlgorithmExtension
     static byte[] PaddingBytes(this byte[] bytes, int length)
     {
         if (bytes.Length == length) return bytes;
-        if (bytes.Length > length) return bytes.Take(length).ToArray();
+        if (bytes.Length > length) return [.. bytes.Take(length)];
 
         var paddingBytes = new byte[length - bytes.Length];
         return [.. bytes, .. paddingBytes];
@@ -152,7 +152,7 @@ public static class SymmetricAlgorithmExtension
             if (bytes.Length == allowedLength[i]) return bytes;
             if (bytes.Length < allowedLength[i]) return bytes.PaddingBytes(allowedLength[i]);
 
-            if (i == allowedLength.Length - 1) return bytes.Take(allowedLength[i]).ToArray();
+            if (i == allowedLength.Length - 1) return [.. bytes.Take(allowedLength[i])];
         }
         return bytes;
     }

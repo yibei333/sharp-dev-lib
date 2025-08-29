@@ -307,16 +307,15 @@ public static class SpreadsheetExtensions
     /// 获取单元格值
     /// </summary>
     /// <param name="cell">单元格</param>
-    /// <param name="workbookPart">工作簿部件</param>
+    /// <param name="sharedStringItems">共享字符串集合</param>
     /// <returns>值</returns>
-    public static string? GetValue(this Cell cell, WorkbookPart workbookPart)
+    public static string? GetValue(this Cell cell, IEnumerable<SharedStringItem> sharedStringItems)
     {
         var text = cell.CellValue?.Text;
         var dataType = cell.DataType;
         if (dataType is null) return text;
         else if (dataType == CellValues.SharedString)
         {
-            var sharedStringItems = workbookPart.GetPartsOfType<SharedStringTablePart>()?.FirstOrDefault()?.SharedStringTable?.Elements<SharedStringItem>()?.ToList() ?? [];
             var sharedItem = sharedStringItems.ElementAt(int.Parse(text));
             return sharedItem.Text?.Text ?? string.Empty;
         }
@@ -420,6 +419,7 @@ public static class SpreadsheetExtensions
     public static MergeCell MergeCells(this Worksheet worksheet, string cellReference1, string cellReference2)
     {
         var workbookPart = worksheet.GetParent<WorkbookPart>() ?? throw new Exception("WorkbookPart not found");
+        var sharedStringItems = workbookPart.GetPartsOfType<SharedStringTablePart>()?.FirstOrDefault()?.SharedStringTable?.Elements<SharedStringItem>()?.ToList() ?? [];
         CreateCellIfNotExist(worksheet, cellReference1);
         CreateCellIfNotExist(worksheet, cellReference2);
 
@@ -490,7 +490,7 @@ public static class SpreadsheetExtensions
             leftTopCell = new Cell { CellReference = leftTopCellReference.Reference };
             row.AppendCell(leftTopCell);
         }
-        var mainValueCell = cells.Where(x => x.GetValue(workbookPart).NotNullOrWhiteSpace()).OrderBy(x => new CellReference(x.CellReference).RowIndex).ThenBy(x => new CellReference(x.CellReference).ColumnIndex).FirstOrDefault();
+        var mainValueCell = cells.Where(x => x.GetValue(sharedStringItems).NotNullOrWhiteSpace()).OrderBy(x => new CellReference(x.CellReference).RowIndex).ThenBy(x => new CellReference(x.CellReference).ColumnIndex).FirstOrDefault();
         if (mainValueCell is not null)
         {
             //copy value to leftTopCell
@@ -563,6 +563,7 @@ public static class SpreadsheetExtensions
     public static void AutoColumnWidth(this WorksheetPart worksheetPart)
     {
         var workbookPart = worksheetPart.GetParent<WorkbookPart>() ?? throw new Exception($"unable to find WorkbookPart");
+        var sharedStringItems = workbookPart.GetPartsOfType<SharedStringTablePart>()?.FirstOrDefault()?.SharedStringTable?.Elements<SharedStringItem>()?.ToList() ?? [];
         var worksheet = worksheetPart.Worksheet;
 
         //analysis word length
@@ -576,7 +577,7 @@ public static class SpreadsheetExtensions
                 wordLength = new ColumnWordLength(cellReference.ColumnIndex, cellReference.ColumnName);
                 columnWordLength.Add(wordLength);
             }
-            var cellValue = cell.GetValue(workbookPart);
+            var cellValue = cell.GetValue(sharedStringItems);
             if (double.TryParse(cellValue, out var doubleValue))
             {
                 if ((cellValue?.Split('.')?.LastOrDefault()?.Length ?? 0) > 10) cellValue = doubleValue.ToString("0.0000");//float number

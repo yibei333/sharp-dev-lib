@@ -3,12 +3,8 @@ using SharpDevLib.Compression.Internal.References;
 
 namespace SharpDevLib.Compression.Internal.Compress;
 
-internal class ZipCompressHandler : CompressHandler<ZipOutputStream, ZipEntry>
+internal class ZipCompressHandler(CompressOption option, CancellationToken? cancellationToken) : CompressHandler<ZipOutputStream, ZipEntry>(option, cancellationToken)
 {
-    public ZipCompressHandler(CompressOption option, CancellationToken? cancellationToken) : base(option, cancellationToken)
-    {
-    }
-
     public override bool SupportPassword => true;
 
     public override ZipOutputStream CreateStream(Stream targetStream)

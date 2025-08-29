@@ -15,7 +15,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>2.0.2</Version>
+		<Version>2.0.3</Version>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 		<PackageReadmeFile>SharpDevLib.Cryptography.md</PackageReadmeFile>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -41,8 +41,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
+		<PackageReference Include="System.Formats.Asn1" Version="9.0.8" />
 		<PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
-		<PackageReference Include="System.Text.Json" Version="8.0.5" />
+		<PackageReference Include="System.Text.Json" Version="9.0.8" />
 	</ItemGroup>
 </Project>

@@ -22,9 +22,8 @@ public class Base64UrlEncodeTests : EncodeTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidDataException))]
     public void DecodeExceptionTest()
     {
-        (_base64UrlEncode + "__").Base64UrlDecode();
+        Assert.ThrowsExactly<InvalidDataException>(() => (_base64UrlEncode + "__").Base64UrlDecode());
     }
 }

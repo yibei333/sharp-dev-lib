@@ -38,9 +38,9 @@ public class CertificateTests
         SavePfxTest(cert, keyPath, pfxPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
-        Assert.IsTrue(new FileInfo(keyPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(keyPath).Length);
         Assert.IsTrue(new FileInfo(certPath).Exists);
-        Assert.IsTrue(new FileInfo(certPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(certPath).Length);
     }
 
     [TestMethod]
@@ -77,9 +77,9 @@ public class CertificateTests
         SavePfxTest(cert, keyPath, pfxPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
-        Assert.IsTrue(new FileInfo(keyPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(keyPath).Length);
         Assert.IsTrue(new FileInfo(certPath).Exists);
-        Assert.IsTrue(new FileInfo(certPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(certPath).Length);
 
         GenerateServerCertByCATest(keyPath, certPath, "TestServerThirdLevel");
     }
@@ -117,9 +117,9 @@ public class CertificateTests
         SavePfxTest(cert, keyPath, pfxCertPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
-        Assert.IsTrue(new FileInfo(keyPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(keyPath).Length);
         Assert.IsTrue(new FileInfo(certPath).Exists);
-        Assert.IsTrue(new FileInfo(certPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(certPath).Length);
     }
 
     [TestMethod]
@@ -169,13 +169,13 @@ public class CertificateTests
         SavePfxTest(cert, keyPath, pfxCertPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
-        Assert.IsTrue(new FileInfo(keyPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(keyPath).Length);
         Assert.IsTrue(new FileInfo(certPath).Exists);
-        Assert.IsTrue(new FileInfo(certPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(certPath).Length);
         Assert.IsTrue(new FileInfo(derCertPath).Exists);
-        Assert.IsTrue(new FileInfo(derCertPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(derCertPath).Length);
         Assert.IsTrue(new FileInfo(pfxCertPath).Exists);
-        Assert.IsTrue(new FileInfo(pfxCertPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(pfxCertPath).Length);
     }
 
     static void SavePfxTest(X509Certificate2 certificate, string keyPath, string pfxPath)
@@ -183,7 +183,7 @@ public class CertificateTests
         certificate.SavePfx(pfxPath, File.ReadAllText(keyPath), "foo");
 
         Assert.IsTrue(File.Exists(pfxPath));
-        Assert.IsTrue(new FileInfo(pfxPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(pfxPath).Length);
         Assert.IsTrue(new X509Certificate2(pfxPath, "foo").Subject.NotNullOrEmpty());
     }
 
@@ -211,9 +211,9 @@ public class CertificateTests
         cert.SaveCrt(certPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
-        Assert.IsTrue(new FileInfo(keyPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(keyPath).Length);
         Assert.IsTrue(new FileInfo(certPath).Exists);
-        Assert.IsTrue(new FileInfo(certPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(certPath).Length);
     }
 
     [TestMethod]
@@ -247,9 +247,9 @@ public class CertificateTests
         cert.SaveCrt(certPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
-        Assert.IsTrue(new FileInfo(keyPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(keyPath).Length);
         Assert.IsTrue(new FileInfo(certPath).Exists);
-        Assert.IsTrue(new FileInfo(certPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(certPath).Length);
     }
 
     [TestMethod]
@@ -276,9 +276,9 @@ public class CertificateTests
         cert.SaveCrt(certPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
-        Assert.IsTrue(new FileInfo(keyPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(keyPath).Length);
         Assert.IsTrue(new FileInfo(certPath).Exists);
-        Assert.IsTrue(new FileInfo(certPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(certPath).Length);
     }
 
     [TestMethod]
@@ -314,8 +314,8 @@ public class CertificateTests
         SavePfxTest(cert, keyPath, pfxPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
-        Assert.IsTrue(new FileInfo(keyPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(keyPath).Length);
         Assert.IsTrue(new FileInfo(certPath).Exists);
-        Assert.IsTrue(new FileInfo(certPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(certPath).Length);
     }
 }

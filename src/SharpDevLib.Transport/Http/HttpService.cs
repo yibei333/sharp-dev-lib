@@ -277,7 +277,8 @@ internal class HttpService : IHttpService
                 total += last;
                 exception = ex;
             }
-        };
+        }
+        ;
         return new ResponseMonitor(url, request, exception, retryIndex, last, total, response);
     }
 

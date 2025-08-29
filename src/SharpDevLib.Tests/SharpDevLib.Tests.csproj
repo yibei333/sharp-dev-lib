@@ -7,23 +7,23 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Azure.Identity" Version="1.12.0" />
+		<PackageReference Include="Azure.Identity" Version="1.15.0" />
 		<PackageReference Include="EmailReplyParser" Version="1.0.0" />
 		<PackageReference Include="EmbedIO" Version="3.5.2" />
-		<PackageReference Include="HttpMultipartParser" Version="8.4.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
-		<PackageReference Include="MSTest.TestAdapter" Version="3.4.3" />
-		<PackageReference Include="MSTest.TestFramework" Version="3.4.3" />
-		<PackageReference Include="coverlet.collector" Version="6.0.2">
+		<PackageReference Include="HttpMultipartParser" Version="9.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.8" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+		<PackageReference Include="MSTest.TestAdapter" Version="3.10.3" />
+		<PackageReference Include="MSTest.TestFramework" Version="3.10.3" />
+		<PackageReference Include="coverlet.collector" Version="6.0.4">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="OpenPop.Core" Version="1.0.0" />
-		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
-		<PackageReference Include="SmtpServer" Version="10.0.1" />
-		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0" />
+		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+		<PackageReference Include="SmtpServer" Version="11.0.0" />
+		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.8" />
 	</ItemGroup>
 
 	<ItemGroup>

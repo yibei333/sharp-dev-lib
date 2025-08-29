@@ -4,6 +4,7 @@ using EmbedIO.WebApi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Transport;
 using System;
+using System.Threading;
 
 namespace SharpDevLib.Tests.Transport.Http.Base;
 
@@ -26,7 +27,7 @@ public class HttpBaseTests
                             .WithController<HttpDeleteController>()
                         )
                         .WithStaticFolder("/statics", AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData"), true, m => m.WithContentCaching(true));
-        _server.Start();
+        _server.Start(CancellationToken.None);
         HttpGlobalOptions.BaseUrl = BaseUrl;
     }
 

@@ -31,7 +31,7 @@ public class HttpDeleteTests : HttpBaseTests
             }
         };
         var response = request.DeleteAsync<int>().GetAwaiter().GetResult();
-        Assert.IsTrue(count > 0);
+        Assert.IsGreaterThan(0, count);
         Assert.IsTrue(response.IsSuccess);
         Assert.AreEqual(10, response.Data);
     }

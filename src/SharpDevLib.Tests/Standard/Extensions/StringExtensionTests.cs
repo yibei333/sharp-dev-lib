@@ -59,10 +59,9 @@ public class StringExtensionTests
     [DataRow("")]
     [DataRow(" ")]
     [DataRow("a")]
-    [ExpectedException(typeof(InvalidCastException))]
     public void ToGuidExceptionTest(string? str)
     {
-        str.ToGuid(true);
+        Assert.ThrowsExactly<InvalidCastException>(() => str.ToGuid(true));
     }
 
     [TestMethod]
@@ -93,18 +92,16 @@ public class StringExtensionTests
     [DataRow("1,2,", ',', true, true)]
     [DataRow("1,2,", ',', false, true)]
     [DataRow("1,b7fe8157-1d89-4e11-8ac1-460ef4ab0cf5,", ',', false, true)]
-    [ExpectedException(typeof(InvalidCastException))]
     public void SplitToGuidListExceptionTest(string? str, char separator, bool removeEmptyEntries, bool distinct)
     {
-        str.SplitToGuidList(separator, removeEmptyEntries, true, distinct);
+        Assert.ThrowsExactly<InvalidCastException>(() => str.SplitToGuidList(separator, removeEmptyEntries, true, distinct));
     }
 
     [TestMethod]
     [DataRow("1", '-', true, true)]
-    [ExpectedException(typeof(ArgumentException))]
     public void SplitToGuidListSeperatorExceptionTest(string? str, char separator, bool removeEmptyEntries, bool distinct)
     {
-        str.SplitToGuidList(separator, removeEmptyEntries, true, distinct);
+        Assert.ThrowsExactly<ArgumentException>(() => str.SplitToGuidList(separator, removeEmptyEntries, true, distinct));
     }
 
     [TestMethod]
@@ -131,10 +128,9 @@ public class StringExtensionTests
 
     [TestMethod]
     [DataRow("1", '-', true, true)]
-    [ExpectedException(typeof(ArgumentException))]
     public void SplitToListSeperatorExceptionTest(string? str, char separator, bool removeEmptyEntries, bool distinct)
     {
-        str.SplitToList(separator, removeEmptyEntries, distinct);
+        Assert.ThrowsExactly<ArgumentException>(() => str.SplitToList(separator, removeEmptyEntries, distinct));
     }
 
     [TestMethod]

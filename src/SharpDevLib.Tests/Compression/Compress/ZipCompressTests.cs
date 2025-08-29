@@ -18,7 +18,7 @@ public class ZipCompressTests
         };
         option.CompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
@@ -34,7 +34,7 @@ public class ZipCompressTests
         };
         option.CompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
@@ -47,7 +47,7 @@ public class ZipCompressTests
         };
         option.Compress();
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
@@ -63,6 +63,6 @@ public class ZipCompressTests
         };
         option.Compress();
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 }

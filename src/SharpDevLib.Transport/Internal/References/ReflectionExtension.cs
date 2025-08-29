@@ -19,7 +19,8 @@ internal static class ReflectionExtension
         foreach (var item in type.GetGenericArguments())
         {
             names.Add(GetTypeDefinitionName(item, isFullName));
-        };
+        }
+        ;
         var typeName = isFullName ? type.FullName ?? type.Name : type.Name;
         return $"{typeName.Split('`')[0]}<{string.Join(",", names)}>";
     }

@@ -24,10 +24,9 @@ public class FileExtensionTests
     [DataRow(null)]
     [DataRow("")]
     [DataRow(" ")]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void GetFileExtensionTest(string path)
     {
-        path.GetFileExtension();
+        Assert.ThrowsExactly<ArgumentNullException>(() => path.GetFileExtension());
     }
 
     [TestMethod]
@@ -48,10 +47,9 @@ public class FileExtensionTests
     [DataRow(null)]
     [DataRow("")]
     [DataRow(" ")]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void GetFileNameTest(string path)
     {
-        path.GetFileName();
+        Assert.ThrowsExactly<ArgumentNullException>(() => path.GetFileName());
     }
 
     [TestMethod]
@@ -66,12 +64,11 @@ public class FileExtensionTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
     public void SaveBytesToFileExistedExceptionTest()
     {
         var bytes = "foo.bar".Utf8Decode();
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt");
-        bytes.SaveToFile(path, true);
+        Assert.ThrowsExactly<InvalidOperationException>(() => bytes.SaveToFile(path, true));
     }
 
     [TestMethod]
@@ -87,23 +84,21 @@ public class FileExtensionTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void SaveStreamToFilePathExceptionTest()
     {
         var bytes = "foo.bar".Utf8Decode();
         using var stream = new MemoryStream(bytes);
         var path = string.Empty;
-        stream.SaveToFile(path);
+        Assert.ThrowsExactly<ArgumentNullException>(() => stream.SaveToFile(path));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
     public void SaveStreamToFileExistedExceptionTest()
     {
         var bytes = "foo.bar".Utf8Decode();
         using var stream = new MemoryStream(bytes);
         var path = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt");
-        stream.SaveToFile(path, true);
+        Assert.ThrowsExactly<InvalidOperationException>(() => stream.SaveToFile(path, true));
     }
 
     [TestMethod]
@@ -141,10 +136,9 @@ public class FileExtensionTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
     public void ToFileSizeStringExceptionTest()
     {
-        (-1L).ToFileSizeString();
+        Assert.ThrowsExactly<ArgumentException>(() => (-1L).ToFileSizeString());
     }
 
     [TestMethod]
@@ -161,10 +155,9 @@ public class FileExtensionTests
     [DataRow(null)]
     [DataRow("")]
     [DataRow(" ")]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void GetMimeTypeTest(string filePathOrName)
     {
-        filePathOrName.GetMimeType();
+        Assert.ThrowsExactly<ArgumentNullException>(() => filePathOrName.GetMimeType());
     }
 
     [TestMethod]

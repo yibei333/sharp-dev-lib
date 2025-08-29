@@ -23,9 +23,8 @@ public class HexStringEncodeTests : EncodeTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidDataException))]
     public void DecodeExceptionTest()
     {
-        (_hex + "a").HexStringDecode();
+        Assert.ThrowsExactly<InvalidDataException>(() => (_hex + "a").HexStringDecode());
     }
 }

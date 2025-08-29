@@ -19,7 +19,7 @@ public class Bz2CompressTests
         };
         option.CompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
@@ -33,11 +33,10 @@ public class Bz2CompressTests
         };
         option.CompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidDataException))]
     public void CompressWithPasswordTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/bz2-password-create.bz2");
@@ -48,6 +47,6 @@ public class Bz2CompressTests
             IncludeSourceDiretory = true,
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
         };
-        option.CompressAsync().GetAwaiter().GetResult();
+        Assert.ThrowsExactly<InvalidDataException>(() => option.CompressAsync().GetAwaiter().GetResult());
     }
 }

@@ -22,10 +22,9 @@ public class EnumExtensionTests
     [TestMethod]
     [DataRow(0)]
     [DataRow(5)]
-    [ExpectedException(typeof(InvalidDataException))]
     public void IntToEnumExceptionTest(int intValue)
     {
-        intValue.ToEnum<Gender>();
+        Assert.ThrowsExactly<InvalidDataException>(() => intValue.ToEnum<Gender>());
     }
 
     [TestMethod]
@@ -42,10 +41,9 @@ public class EnumExtensionTests
     [DataRow(" ")]
     [DataRow("male")]
     [DataRow("Male1")]
-    [ExpectedException(typeof(InvalidDataException))]
     public void StringToEnumExceptionTest(string stringValue)
     {
-        stringValue.ToEnum<Gender>(false);
+        Assert.ThrowsExactly<InvalidDataException>(() => stringValue.ToEnum<Gender>(false));
     }
 
     [TestMethod]

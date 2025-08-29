@@ -105,7 +105,7 @@ public class ExcelTests
         writeSet.Tables.Add(writeTable2);
         Excel.Write(writeSet, stream);
         Assert.IsTrue(File.Exists(path));
-        Assert.IsTrue(new FileInfo(path).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(path).Length);
 
         var readSet = Excel.Read(stream);
         Assert.AreEqual(2, readSet.Tables.Count);
@@ -154,7 +154,7 @@ public class ExcelTests
         targetStream.Flush();
 
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
@@ -165,7 +165,7 @@ public class ExcelTests
 
         Excel.Encrypt(sourceStream, targetStream, "foo");
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
@@ -176,7 +176,7 @@ public class ExcelTests
 
         Excel.Decrypt(sourceStream, targetStream, "foo");
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
@@ -191,14 +191,14 @@ public class ExcelTests
         targetStream.Flush();
 
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
 
         var readSet = Excel.Read(targetStream);
         Assert.AreEqual(2, readSet.Tables.Count);
         var readTable2 = readSet.Tables["T2"];
         Assert.IsNotNull(readTable2);
         var readList2 = readTable2.ToList<Foo>();
-        Assert.AreEqual(3, readList2.Count);
+        Assert.HasCount(3, readList2);
     }
 
     [TestMethod]
@@ -221,14 +221,14 @@ public class ExcelTests
         targetStream.Flush();
 
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
 
         var readSet = Excel.Read(targetStream);
         Assert.AreEqual(2, readSet.Tables.Count);
         var readTable2 = readSet.Tables["T2"];
         Assert.IsNotNull(readTable2);
         var readList2 = readTable2.ToList<Foo>();
-        Assert.AreEqual(5, readList2.Count);
+        Assert.HasCount(5, readList2);
     }
 
     [TestMethod]
@@ -247,7 +247,7 @@ public class ExcelTests
         targetStream.Flush();
 
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
@@ -266,7 +266,7 @@ public class ExcelTests
         targetStream.Flush();
 
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
@@ -284,7 +284,7 @@ public class ExcelTests
         targetStream.Flush();
 
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
@@ -301,7 +301,7 @@ public class ExcelTests
         targetStream.Flush();
 
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
@@ -325,7 +325,7 @@ public class ExcelTests
         targetStream.Flush();
 
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
@@ -343,7 +343,7 @@ public class ExcelTests
         targetStream.Flush();
 
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
@@ -361,7 +361,7 @@ public class ExcelTests
         targetStream.Flush();
 
         Assert.IsTrue(File.Exists(targetPath));
-        Assert.IsTrue(new FileInfo(targetPath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
@@ -375,7 +375,7 @@ public class ExcelTests
         worksheetPart.AddBackground(imageStream);
         targetStream.Flush();
         Assert.IsTrue(File.Exists(path));
-        Assert.IsTrue(new FileInfo(path).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(path).Length);
 
         using var removeBackgorundStream = CopySourceStream(targetStream, "RemoveBackground", out var removePath);
         using var removeDoc = SpreadsheetDocument.Open(removeBackgorundStream, true);
@@ -384,6 +384,6 @@ public class ExcelTests
         removeBackgorundStream.Flush();
 
         Assert.IsTrue(File.Exists(removePath));
-        Assert.IsTrue(new FileInfo(removePath).Length > 0);
+        Assert.IsGreaterThan(0, new FileInfo(removePath).Length);
     }
 }

@@ -43,11 +43,11 @@ public class TreeTests
 
         var metaList = deserialized.ToMetaDataList();
         Console.WriteLine(metaList.Serialize(JsonOption.DefaultWithFormat));
-        Assert.AreEqual(9, metaList.Count);
+        Assert.HasCount(9, metaList);
 
         var flatList = deserialized.ToFlatList();
         Console.WriteLine(flatList.Serialize(JsonOption.DefaultWithFormat));
-        Assert.AreEqual(9, flatList.Count);
+        Assert.HasCount(9, flatList);
     }
 
     [TestMethod]
@@ -87,11 +87,11 @@ public class TreeTests
 
         var metaList = deserialized.ToMetaDataList();
         Console.WriteLine(metaList.Serialize(JsonOption.DefaultWithFormat));
-        Assert.AreEqual(9, metaList.Count);
+        Assert.HasCount(9, metaList);
 
         var flatList = deserialized.ToFlatList();
         Console.WriteLine(flatList.Serialize(JsonOption.DefaultWithFormat));
-        Assert.AreEqual(9, flatList.Count);
+        Assert.HasCount(9, flatList);
     }
 
     [TestMethod]
@@ -129,15 +129,14 @@ public class TreeTests
 
         var metaList = deserialized.ToMetaDataList();
         Console.WriteLine(metaList.Serialize(JsonOption.DefaultWithFormat));
-        Assert.AreEqual(9, metaList.Count);
+        Assert.HasCount(9, metaList);
 
         var flatList = deserialized.ToFlatList();
         Console.WriteLine(flatList.Serialize(JsonOption.DefaultWithFormat));
-        Assert.AreEqual(9, flatList.Count);
+        Assert.HasCount(9, flatList);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(NullReferenceException))]
     public void NullReferenceExceptionTest()
     {
         var departments = new List<Department<string>>
@@ -151,11 +150,10 @@ public class TreeTests
             SortPropertyName = "Identity",
             Descending = true
         };
-        departments.BuildTree(option);
+        Assert.ThrowsExactly<NullReferenceException>(() => departments.BuildTree(option));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
     public void CycleExceptionTest()
     {
         var departments = new List<Department<string>>
@@ -171,11 +169,10 @@ public class TreeTests
             SortPropertyName = "Identity",
             Descending = true
         };
-        departments.BuildTree(option);
+        Assert.ThrowsExactly<InvalidOperationException>(() => departments.BuildTree(option));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
     public void SelfCycleExceptionTest()
     {
         var departments = new List<Department<string>>
@@ -189,15 +186,13 @@ public class TreeTests
             SortPropertyName = "Identity",
             Descending = true
         };
-        departments.BuildTree(option);
+        Assert.ThrowsExactly<InvalidOperationException>(() => departments.BuildTree(option));
     }
 
     [TestMethod]
     [DataRow("XX", "PId", "Identity")]
     [DataRow("Identity", "XX", "Identity")]
-    [DataRow("Identity", "PId", "XX")]
-    [ExpectedException(typeof(ArgumentException))]
-    public void PropertyNotFoundExceptionTest(string idPropertyName, string parentIdPropertyName, string sortPropertyName)
+    public void PropertyNotFoundExceptionTest1(string idPropertyName, string parentIdPropertyName, string sortPropertyName)
     {
         var departments = new List<Department<string>>
         {
@@ -210,14 +205,30 @@ public class TreeTests
             SortPropertyName = sortPropertyName,
             Descending = true
         };
-        departments.BuildTree(option);
+        Assert.ThrowsExactly<ArgumentException>(() => departments.BuildTree(option));
+    }
+
+    [TestMethod]
+    [DataRow("Identity", "PId", "XX")]
+    public void PropertyNotFoundExceptionTest2(string idPropertyName, string parentIdPropertyName, string sortPropertyName)
+    {
+        var departments = new List<Department<string>>
+        {
+            new ("1","foo","3"),
+        };
+        Assert.ThrowsExactly<ArgumentException>(() => new TreeBuildOption<Department<string>>
+        {
+            IdPropertyName = idPropertyName,
+            ParentIdPropertyName = parentIdPropertyName,
+            SortPropertyName = sortPropertyName,
+            Descending = true
+        });
     }
 
     [TestMethod]
     [DataRow("", "", "")]
     [DataRow("Identity", "", "")]
     [DataRow("", "PId", "")]
-    [ExpectedException(typeof(NullReferenceException))]
     public void EmptyPropertyExceptionTest(string idPropertyName, string parentIdPropertyName, string sortPropertyName)
     {
         var departments = new List<Department<string>>
@@ -231,11 +242,10 @@ public class TreeTests
             SortPropertyName = sortPropertyName,
             Descending = true
         };
-        departments.BuildTree(option);
+        Assert.ThrowsExactly<NullReferenceException>(() => departments.BuildTree(option));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidDataException))]
     public void RepeatExceptionTest()
     {
         var departments = new List<Department<string>>
@@ -250,6 +260,6 @@ public class TreeTests
             SortPropertyName = "Identity",
             Descending = true
         };
-        departments.BuildTree(option);
+        Assert.ThrowsExactly<InvalidDataException>(() => departments.BuildTree(option));
     }
 }

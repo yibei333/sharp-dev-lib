@@ -43,10 +43,9 @@ public class Md5ExtensionTests : HashTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
     public void HMACMD5HashExceptionTest()
     {
-        _bytes.HmacMd5("01234567890123456789012345678901234567890123456789012345678901234".Utf8Decode());
+        Assert.ThrowsExactly<InvalidOperationException>(() => _bytes.HmacMd5("01234567890123456789012345678901234567890123456789012345678901234".Utf8Decode()));
     }
     #endregion
 }

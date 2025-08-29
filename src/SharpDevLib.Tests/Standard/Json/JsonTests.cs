@@ -37,10 +37,9 @@ public class JsonTests
     [DataRow(null)]
     [DataRow("")]
     [DataRow(" ")]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void DeSerializeExceptionTest(string json)
     {
-        json.DeSerialize<User>();
+        Assert.ThrowsExactly<ArgumentNullException>(() => json.DeSerialize<User>());
     }
 
     [TestMethod]

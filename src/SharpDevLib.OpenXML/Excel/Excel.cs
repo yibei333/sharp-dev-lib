@@ -65,13 +65,16 @@ public static class Excel
             var table = new DataTable(tableName);
             dataSet.Tables.Add(table);
 
+            var rows = worksheetPart.Worksheet.Descendants<Row>();
+            var sharedStringItems = workbookPart.GetPartsOfType<SharedStringTablePart>()?.FirstOrDefault()?.SharedStringTable?.Elements<SharedStringItem>()?.ToList() ?? [];
+
             //header
             var headerNameMap = new Dictionary<string, string>();
-            var headerRow = worksheetPart.Worksheet.Descendants<Row>().FirstOrDefault(x => x.RowIndex is not null && x.RowIndex == 1);
+            var headerRow = rows.ElementAt(0);
             if (headerRow is null) break;
             foreach (Cell headerCell in headerRow.Elements<Cell>())
             {
-                var tableColumnName = headerCell.GetValue(workbookPart);
+                var tableColumnName = headerCell.GetValue(sharedStringItems);
                 if (tableColumnName.IsNullOrWhiteSpace()) throw new Exception($"unable to get cell value with reference '{headerCell.CellReference}'");
                 var excelColumnName = new CellReference(headerCell.CellReference).ColumnName;
                 headerNameMap.Add(excelColumnName, tableColumnName);
@@ -79,16 +82,16 @@ public static class Excel
             }
 
             //contents
-            foreach (var excelRow in worksheetPart.Worksheet.Descendants<Row>().Where(x => x.RowIndex is not null && x.RowIndex > 1))
+            foreach (var row in rows.Skip(1))
             {
                 var dataRow = table.NewRow();
                 table.Rows.Add(dataRow);
 
-                foreach (var excelCell in excelRow.Elements<Cell>())
+                foreach (var excelCell in row.Elements<Cell>())
                 {
                     var excelColumnName = new CellReference(excelCell.CellReference).ColumnName;
                     var tableColumnName = headerNameMap[excelColumnName];
-                    var value = excelCell.GetValue(workbookPart);
+                    var value = excelCell.GetValue(sharedStringItems);
                     dataRow[tableColumnName] = value;
                 }
             }
