@@ -93,6 +93,23 @@ public class ExcelTests
     }
 
     [TestMethod]
+    public void ReadExceptionTest()
+    {
+        using var stream = GetSourceStream("Normal", out _);
+        Assert.ThrowsExactly<ArgumentException>(() => Excel.Read(stream, [["foo"]]));
+        Assert.ThrowsExactly<ArgumentException>(() => Excel.Read(stream, [["foo"], ["bar"]]));
+    }
+
+    [TestMethod]
+    public void ReadTest1()
+    {
+        using var stream = GetSourceStream("Normal", out _);
+
+        var set = Excel.Read(stream, [["字符串值", "整型值", "双精度浮点数值", "十进制值", "布尔值", "枚举值"], ["字符串值", "整型值", "双精度浮点数值", "十进制值", "布尔值", "枚举值"]]);
+        Assert.AreEqual(2, set.Tables.Count);
+    }
+
+    [TestMethod]
     public void WriteSetTest()
     {
         using var stream = GetTargetStream("WriteSet", out var path);
@@ -122,6 +139,36 @@ public class ExcelTests
         var readListJson2 = readList2.Serialize();
         Console.WriteLine(readListJson2);
         Assert.AreEqual(TestJson2, readListJson2);
+    }
+
+    [TestMethod]
+    public void WriteSetExceptionTest()
+    {
+        using var stream = GetTargetStream("WriteSetException", out var path);
+
+        var writeSet = new DataSet();
+        var writeTable1 = TestData1.ToDataTable();
+        writeSet.Tables.Add(writeTable1);
+
+        var writeTable2 = TestData2.ToDataTable();
+        writeSet.Tables.Add(writeTable2);
+        Assert.ThrowsExactly<ArgumentException>(() => Excel.Write(writeSet, stream, [["foo"]]));
+        Assert.ThrowsExactly<ArgumentException>(() => Excel.Write(writeSet, stream, [["foo", "bar"]]));
+    }
+
+    [TestMethod]
+    public void WriteSetTest1()
+    {
+        using var stream = GetTargetStream("WriteSet1", out var path);
+
+        var writeSet = new DataSet();
+        var writeTable1 = TestData1.ToDataTable();
+        writeSet.Tables.Add(writeTable1);
+
+        var writeTable2 = TestData2.ToDataTable();
+        writeSet.Tables.Add(writeTable2);
+        Excel.Write(writeSet, stream, [["字符串值", "整型值", "双精度浮点数值", "十进制值", "布尔值", "枚举值"], ["字符串值", "整型值", "双精度浮点数值", "十进制值", "布尔值", "枚举值"]]);
+        Assert.IsTrue(File.Exists(path));
     }
 
     [TestMethod]

@@ -52,14 +52,29 @@ public static class Excel
     /// <param name="stream">标准的Excel流</param>
     /// <returns>DataSet</returns>
     /// <exception cref="Exception">读取失败时引发异常</exception>
-    public static DataSet Read(Stream stream)
+    public static DataSet Read(Stream stream) => Read(stream, null);
+
+    /// <summary>
+    /// 读取标准的Excel流,标准的定义为
+    /// <para>1.第一行为表头</para>
+    /// <para>2.每行的列不能超出表头的长度范围</para>
+    /// <para>3.读取的结果中所有列的类型都为string类型</para>
+    /// </summary>
+    /// <param name="stream">标准的Excel流</param>
+    /// <param name="columnNames">自定义列名</param>
+    /// <returns>DataSet</returns>
+    /// <exception cref="Exception">读取失败时引发异常</exception>
+    public static DataSet Read(Stream stream, string[][]? columnNames)
     {
         using var doc = SpreadsheetDocument.Open(stream, false);
         var workbookPart = doc.WorkbookPart ?? throw new Exception($"WorkbookPart not found");
         var dataSet = new DataSet();
 
+        var sheetIndex = -1;
+        if (columnNames.NotNullOrEmpty() && columnNames.Count() != workbookPart.GetPartsOfType<WorksheetPart>().Count()) throw new ArgumentException($"parameter '{nameof(columnNames)}' count not match sheet count");
         foreach (var worksheetPart in workbookPart.GetPartsOfType<WorksheetPart>())
         {
+            sheetIndex++;
             var rid = workbookPart.GetIdOfPart(worksheetPart);
             var tableName = workbookPart.Workbook.Descendants<Sheet>().FirstOrDefault(x => x.Id == rid)?.Name ?? throw new Exception($"Get Sheet by rid('{rid}') failed");
             var table = new DataTable(tableName);
@@ -72,9 +87,20 @@ public static class Excel
             var headerNameMap = new Dictionary<string, string>();
             var headerRow = rows.ElementAt(0);
             if (headerRow is null) break;
+            var sheetColumnNames = columnNames.NotNullOrEmpty() ? columnNames[sheetIndex] : null;
+            if (sheetColumnNames.NotNullOrEmpty() && headerRow.Elements<Cell>().Count() != sheetColumnNames.Count()) throw new ArgumentException($"sheet '{tableName}' column count not match");
+            var index = 0;
             foreach (Cell headerCell in headerRow.Elements<Cell>())
             {
-                var tableColumnName = headerCell.GetValue(sharedStringItems);
+                var tableColumnName = string.Empty;
+                if (sheetColumnNames.NotNullOrEmpty())
+                {
+                    tableColumnName = sheetColumnNames[index++];
+                }
+                else
+                {
+                    tableColumnName = headerCell.GetValue(sharedStringItems);
+                }
                 if (tableColumnName.IsNullOrWhiteSpace()) throw new Exception($"unable to get cell value with reference '{headerCell.CellReference}'");
                 var excelColumnName = new CellReference(headerCell.CellReference).ColumnName;
                 headerNameMap.Add(excelColumnName, tableColumnName);
@@ -104,11 +130,20 @@ public static class Excel
     /// </summary>
     /// <param name="dataTable">DataTable</param>
     /// <param name="stream">一般为Excel的文件流</param>
-    public static void Write(DataTable dataTable, Stream stream)
+    public static void Write(DataTable dataTable, Stream stream) => Write(dataTable, stream, null);
+
+    /// <summary>
+    /// 将DataTable写入Excel
+    /// </summary>
+    /// <param name="dataTable">DataTable</param>
+    /// <param name="stream">一般为Excel的文件流</param>
+    /// <param name="columnNames">自定义列名</param>
+    public static void Write(DataTable dataTable, Stream stream, string[]? columnNames)
     {
         var set = new DataSet();
         set.Tables.Add(dataTable);
-        Write(set, stream);
+        if (columnNames.NotNullOrEmpty()) Write(set, stream, [columnNames]);
+        else Write(set, stream, null);
     }
 
     /// <summary>
@@ -116,7 +151,15 @@ public static class Excel
     /// </summary>
     /// <param name="dataSet">DataSet</param>
     /// <param name="stream">一般为Excel的文件流</param>
-    public static void Write(DataSet dataSet, Stream stream)
+    public static void Write(DataSet dataSet, Stream stream) => Write(dataSet, stream, null);
+
+    /// <summary>
+    /// 将DataSet写入Excel
+    /// </summary>
+    /// <param name="dataSet">DataSet</param>
+    /// <param name="stream">一般为Excel的文件流</param>
+    /// <param name="columnNames">自定义列名</param>
+    public static void Write(DataSet dataSet, Stream stream, string[][]? columnNames)
     {
         //structure
         using var doc = SpreadsheetDocument.Create(stream, SpreadsheetDocumentType.Workbook);
@@ -129,6 +172,8 @@ public static class Excel
         uint sheetIndex = 1;
         var sharedStringTable = workbookPart.GetSharedStringTable();
         var sharedStringDictionary = new Dictionary<string, int>();
+        if (columnNames.NotNullOrEmpty() && columnNames.Length != dataSet.Tables.Count) throw new ArgumentException($"argument '{nameof(columnNames)}' not match table's count");
+        var columnNameIndex = 0;
         foreach (DataTable table in dataSet.Tables)
         {
             var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
@@ -141,7 +186,8 @@ public static class Excel
             sheets.AppendChild(sheet);
             sheetIndex++;
 
-            SetTableData(sheetData, table, sharedStringTable, sharedStringDictionary);
+            var customColumnNames = columnNames.NotNullOrEmpty() ? columnNames[columnNameIndex++] : null;
+            SetTableData(sheetData, table, sharedStringTable, sharedStringDictionary, customColumnNames);
             SetColumns(worksheetPart.Worksheet, table.Columns.Count);
         }
 
@@ -149,21 +195,25 @@ public static class Excel
     }
 
     #region Private
-    static void SetTableData(SheetData sheetData, DataTable table, SharedStringTable sharedStringTable, Dictionary<string, int> sharedStringDictionary)
+    static void SetTableData(SheetData sheetData, DataTable table, SharedStringTable sharedStringTable, Dictionary<string, int> sharedStringDictionary, string[]? columnNames)
     {
         //header
         var headerRow = new Row { RowIndex = 1 };
         sheetData.AppendChild(headerRow);
         uint headerColumnIndex = 1;
+        if (columnNames.NotNullOrEmpty() && columnNames.Count() != table.Columns.Count) throw new ArgumentException($"column count not match");
+        var columnNameIndex = -1;
 
         foreach (DataColumn item in table.Columns)
         {
+            columnNameIndex++;
             var cell = new Cell
             {
                 DataType = CellValues.SharedString,
                 CellReference = new CellReference(1, headerColumnIndex++).Reference
             };
-            cell.SetValue(item.ColumnName, sharedStringTable, sharedStringDictionary);
+            var columnName = columnNames.NotNullOrEmpty() ? columnNames[columnNameIndex] : item.ColumnName;
+            cell.SetValue(columnName, sharedStringTable, sharedStringDictionary);
             headerRow.AppendChild(cell);
         }
 
