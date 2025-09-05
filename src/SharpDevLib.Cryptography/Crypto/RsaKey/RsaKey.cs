@@ -12,6 +12,20 @@ namespace SharpDevLib.Cryptography;
 public static class RsaKey
 {
     /// <summary>
+    /// 64个字符换行
+    /// </summary>
+    /// <param name="keyBody">不带头尾的key</param>
+    /// <returns>格式化的key</returns>
+    public static string WrapLineWith64Char(this string keyBody) => PemObject.WrapLineWith64Char(keyBody);
+
+    /// <summary>
+    /// 删除64个字符的换行
+    /// </summary>
+    /// <param name="keyBody">不带头尾的key</param>
+    /// <returns>格式化的key</returns>
+    public static string RemoveWrapLineAndTrim(this string keyBody) => PemObject.RemoveWrapLineAndTrim(keyBody);
+
+    /// <summary>
     /// 导入Pem格式的密钥
     /// </summary>
     /// <param name="rsa">rsa algorithm</param>

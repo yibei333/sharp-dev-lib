@@ -1,4 +1,5 @@
 ﻿using SharpDevLib.Cryptography.Internal.References;
+using System.Reflection;
 using System.Text;
 
 namespace SharpDevLib.Cryptography.Pem;
@@ -46,19 +47,25 @@ internal class PemObject
             }
         }
 
-        var count = Math.Ceiling(Body.Length / 64.0);
+        builder.AppendLineWithLFTerminator(WrapLineWith64Char(Body));
+        builder.Append(Footer);
+        return builder.ToString();
+    }
+
+    public static string WrapLineWith64Char(string line)
+    {
+        var builder = new StringBuilder();
+        var count = Math.Ceiling(line.Length / 64.0);
         for (int i = 0; i < count; i++)
         {
             if (i == count - 1)
             {
-                var length = Body.Length % 64;
+                var length = line.Length % 64;
                 if (length == 0) length = 64;
-                builder.AppendLineWithLFTerminator(Body.Substring(i * 64, length));
+                builder.Append(line.Substring(i * 64, length));
             }
-            else builder.AppendLineWithLFTerminator(Body.Substring(i * 64, 64));
+            else builder.AppendLineWithLFTerminator(line.Substring(i * 64, 64));
         }
-
-        builder.Append(Footer);
         return builder.ToString();
     }
 
@@ -129,7 +136,7 @@ internal class PemObject
         }
     }
 
-    static string RemoveWrapLineAndTrim(string source)
+    public static string RemoveWrapLineAndTrim(string source)
     {
         return source.Replace("\r\n", "").Replace("\r", "").Replace("\n", "").Trim();
     }
