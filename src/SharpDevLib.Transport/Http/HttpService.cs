@@ -190,6 +190,17 @@ internal class HttpService : IHttpService
                 request.OnSendProgress(progress);
             };
         }
+        else if (HttpGlobalOptions.OnSendProgress is not null)
+        {
+            var progress = new HttpProgress();
+            progressHanlder.HttpStartSend += (_, _) => progress.Reset();
+            progressHanlder.HttpSendProgress += (_, e) =>
+            {
+                progress.Total = e.TotalBytes ?? 0;
+                progress.Transfered = e.BytesTransferred;
+                HttpGlobalOptions.OnSendProgress(progress);
+            };
+        }
 
         if (request.OnReceiveProgress is not null)
         {
@@ -200,6 +211,17 @@ internal class HttpService : IHttpService
                 progress.Total = e.TotalBytes ?? 0;
                 progress.Transfered = e.BytesTransferred;
                 request.OnReceiveProgress(progress);
+            };
+        }
+        else if (HttpGlobalOptions.OnReceiveProgress is not null)
+        {
+            var progress = new HttpProgress();
+            progressHanlder.HttpStartSend += (_, _) => progress.Reset();
+            progressHanlder.HttpReceiveProgress += (_, e) =>
+            {
+                progress.Total = e.TotalBytes ?? 0;
+                progress.Transfered = e.BytesTransferred;
+                HttpGlobalOptions.OnReceiveProgress(progress);
             };
         }
 
@@ -327,7 +349,23 @@ internal class HttpService : IHttpService
                 var responseText = await content.ReadAsStringAsync();
                 if (responseText.NotNullOrWhiteSpace())
                 {
-                    if (isGenericMethod && responseMonitor.ResponseMessage.IsSuccessStatusCode)
+                    if (isGenericMethod)
+                    {
+                        if (type.IsClass)
+                        {
+                            if (type == typeof(string)) data = (T)Convert.ChangeType(responseText, type);
+                            else
+                            {
+                                var obj = responseText.DeSerialize(type);
+                                if (obj is not null) data = (T)obj;
+                            }
+                        }
+                        else
+                        {
+                            data = (T)Convert.ChangeType(responseText, type);
+                        }
+                    }
+                    else
                     {
                         if (type.IsClass)
                         {

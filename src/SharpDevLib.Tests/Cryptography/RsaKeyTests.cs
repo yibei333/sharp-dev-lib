@@ -213,7 +213,7 @@ kY2vMCcCgYBzIDl+8N1A723Zs68zoztsnyNIkdEPrPeYozYf08Mo2wINYsAfEHIp
 rBfB2SdDIUDTMgZPszqvkArTmvqkvaWdCaAr12/xmCft7W3yZp1tArIz0K/pP+ZK
 C3H8zlXUDecx4Iq2CG8OGgA8NbdIPnmSGr8vf0sUllV7FlnQc10+gA==";
         var result = source.WrapLineWith64Char();
-        Assert.AreEqual(expected.Replace("\r\n","\n"), result);
+        Assert.AreEqual(expected.Replace("\r\n", "\n"), result);
         Assert.AreEqual(expected.RemoveWrapLineAndTrim(), source);
     }
 

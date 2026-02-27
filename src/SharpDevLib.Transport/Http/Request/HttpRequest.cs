@@ -7,17 +7,12 @@ namespace SharpDevLib.Transport;
 /// <summary>
 /// http请求
 /// </summary>
-public abstract class HttpRequest
+/// <remarks>
+/// 实例化http请求
+/// </remarks>
+/// <param name="url">请求地址</param>
+public abstract class HttpRequest(string url)
 {
-    /// <summary>
-    /// 实例化http请求
-    /// </summary>
-    /// <param name="url">请求地址</param>
-    public HttpRequest(string url)
-    {
-        Url = Encoding.UTF8.GetString(HttpUtility.UrlDecodeToBytes(url));
-    }
-
     /// <summary>
     /// 超时时间
     /// </summary>
@@ -31,7 +26,7 @@ public abstract class HttpRequest
     /// <summary>
     /// 请求地址
     /// </summary>
-    public string Url { get; }
+    public string Url { get; } = Encoding.UTF8.GetString(HttpUtility.UrlDecodeToBytes(url));
 
     /// <summary>
     /// 请求头
@@ -82,16 +77,12 @@ public abstract class HttpRequest
 /// http请求
 /// </summary>
 /// <typeparam name="TParameters">请求参数类型</typeparam>
-public abstract class HttpRequest<TParameters> : HttpRequest
+/// <remarks>
+/// 实例化http请求
+/// </remarks>
+/// <param name="url">请求地址</param>
+public abstract class HttpRequest<TParameters>(string url) : HttpRequest(url)
 {
-    /// <summary>
-    /// 实例化http请求
-    /// </summary>
-    /// <param name="url">请求地址</param>
-    public HttpRequest(string url) : base(url)
-    {
-    }
-
     /// <summary>
     /// 实例化http请求
     /// </summary>

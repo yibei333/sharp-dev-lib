@@ -19,6 +19,16 @@ public static class HttpGlobalOptions
     /// 重试次数
     /// </summary>
     public static int? RetryCount { get; set; }
+
+    /// <summary>
+    /// 接收数据回调
+    /// </summary>
+    public static Action<HttpProgress>? OnReceiveProgress { get; set; }
+
+    /// <summary>
+    /// 传入数据回调
+    /// </summary>
+    public static Action<HttpProgress>? OnSendProgress { get; set; }
 }
 
 internal class HttpGlobalSettingsOptions

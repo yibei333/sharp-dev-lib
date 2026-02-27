@@ -30,7 +30,13 @@ public class PageReply<TData> : BaseReply
     /// 分页数据
     /// </summary>
     public List<TData>? Data { get; set; }
+}
 
+/// <summary>
+/// 分页响应
+/// </summary>
+public static class PageReply
+{
     /// <summary>
     /// 构建成功的分页响应
     /// </summary>
@@ -40,7 +46,7 @@ public class PageReply<TData> : BaseReply
     /// <param name="size">每页数据条数</param>
     /// <param name="description">描述</param>
     /// <returns>成功的分页响应</returns>
-    public static PageReply<TData> Succeed(List<TData> data, long total, int index, int size, string? description = null) => new() { Success = true, Description = description, Data = data, TotalCount = total, Index = index, Size = size };
+    public static PageReply<TData> Succeed<TData>(List<TData> data, long total, int index, int size, string? description = null) => new() { Success = true, Description = description, Data = data, TotalCount = total, Index = index, Size = size };
 
     /// <summary>
     /// 构建成功的分页响应
@@ -50,12 +56,12 @@ public class PageReply<TData> : BaseReply
     /// <param name="request">请求</param>
     /// <param name="description">描述</param>
     /// <returns>成功的分页响应</returns>
-    public static PageReply<TData> Succeed(List<TData> data, long total, PageRequest request, string? description = null) => new() { Success = true, Description = description, Data = data, TotalCount = total, Index = request.Index, Size = request.Size };
+    public static PageReply<TData> Succeed<TData>(List<TData> data, long total, PageRequest request, string? description = null) => Succeed(data, total, request.Index, request.Size, description);
 
     /// <summary>
     /// 构建失败的分页响应
     /// </summary>
     /// <param name="description">描述</param>
     /// <returns>失败的分页响应</returns>
-    public static PageReply<TData> Failed(string? description = null) => new() { Success = false, Description = description };
+    public static PageReply<TData> Failed<TData>(string? description = null) => new() { Success = false, Description = description };
 }
