@@ -17,14 +17,15 @@ public static class TreeHelper
     /// <exception cref="InvalidDataException">当出现循环引用时引发异常</exception>
     public static List<TreeItem<TMetaData>> BuildTree<TMetaData>(this IEnumerable<TMetaData> items, TreeOption? option = null) where TMetaData : class
     {
-        var list = items.Select(x => new TreeItem<TMetaData>(x, option)).ToList();
+        var list = items.Where(x => x is not null).Select(x => new TreeItem<TMetaData>(x, option)).ToList();
         var repeated = list.GroupBy(x => x.Id).Where(x => x.Count() > 1).Select(x => x.Key).ToList();
         if (repeated.Any()) throw new InvalidDataException($"repeat id detected:'{string.Join(",", repeated)}'");
         foreach (var item in list)
         {
-            if (item.ParentId is not null) item.SetParent(list.FirstOrDefault(x => x.Id == item.ParentId), false);
+            if (item.ParentId is not null) item.SetParent(list.FirstOrDefault(x => x.Id == item.ParentId));
         }
-        return list.Where(x => x.Parent is null).ToList().SortTree(option);
+        var treeOption = option ?? TreeOption.Default;
+        return list.Where(x => x.Parent is null).ToList().SortTree(treeOption?.Descending ?? false);
     }
 
     /// <summary>
@@ -62,12 +63,13 @@ public static class TreeHelper
         return [.. tree.SelectMany(x => x.ToFlatList())];
     }
 
-    internal static List<TreeItem<TMetaData>> SortTree<TMetaData>(this List<TreeItem<TMetaData>> items, TreeOption? option = null) where TMetaData : class
+    internal static List<TreeItem<TMetaData>> SortTree<TMetaData>(this List<TreeItem<TMetaData>> items, bool descending) where TMetaData : class
     {
-        items.ForEach(child => child.Children = child.Children.SortTree(option));
+        var sortProperty = items.FirstOrDefault()?.SortProperty;
+        if (sortProperty is null) return items;
+        items.ForEach(child => child.Children = child.Children.SortTree(descending));
         if (items.Count <= 1) return items;
         var firstItem = items.FirstOrDefault();
-        if (option is null || option.SortPropertyName.IsNullOrWhiteSpace()) return items;
-        return [.. items.OrderByDynamic(option.SortPropertyName, option.Descending)];
+        return [.. items.OrderByDynamic(sortProperty, descending)];
     }
 }

@@ -1,5 +1,4 @@
-﻿using SharpDevLib;
-using SharpDevLib.Compression.Internal.Compress;
+﻿using SharpDevLib.Compression.Internal.Compress;
 using SharpDevLib.Compression.Internal.DeCompress;
 
 namespace SharpDevLib.Compression.Internal;

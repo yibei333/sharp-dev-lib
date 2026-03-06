@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using SharpDevLib.Transport;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
 
 namespace SharpDevLib;

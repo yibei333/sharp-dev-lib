@@ -1,6 +1,5 @@
 
 using System;
-using System.Net.Sockets;
 
 namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib;
 

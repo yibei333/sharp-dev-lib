@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using SharpDevLib.Transport.Internal;
-using System;
+﻿using SharpDevLib.Transport.Internal;
 using System.Net;
 using System.Text;
 
@@ -13,7 +9,7 @@ namespace SharpDevLib;
 /// </summary>
 public static class HttpHelper
 {
-    public static string ToQueryString(this IEnumerable<KeyValuePair<string, string?>>? parameters) => string.Join("&", parameters?.Select(x => $"{x.Key}={x.Value}"));
+    public static string ToQueryString(this IEnumerable<KeyValuePair<string, string?>>? parameters) => parameters.IsNullOrEmpty() ? string.Empty : string.Join("&", parameters.Select(x => $"{x.Key}={x.Value}"));
 
     public static async Task<HttpResponse> GetAsync(this HttpRequest request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Get, cancellationToken);
 
@@ -25,31 +21,35 @@ public static class HttpHelper
     }
 
     public static async Task<HttpResponse> PostAsync(this HttpRequest request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Post, cancellationToken);
-    
+
     public static async Task<HttpResponse> PutAsync(this HttpRequest request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Put, cancellationToken);
-    
+
     public static async Task<HttpResponse> DeleteAsync(this HttpRequest request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Delete, cancellationToken);
 
     #region Private
     static async Task<HttpResponse> SendAsync(this HttpRequest request, HttpMethod method, CancellationToken? cancellationToken = null)
     {
         if (request.Url.IsNullOrWhiteSpace()) throw new InvalidOperationException("url requried");
-        using var client = CreateClient(request);
         if (method == HttpMethod.Get || method == HttpMethod.Delete)
         {
-            var url = request.Url.TrimEnd("?");
-            var prefix = url.Contains("?") ? "&" : "?";
-            request.RequestUrl = $"{url}{prefix}{request.Parameters.ToQueryString()}".Utf8Decode().UrlEncode();
-            request.HttpRequestMessage = new HttpRequestMessage(method, request.RequestUrl);
-        }
-        else
-        {
-            HttpContent? content = null;
-            if (request.Json.NotNullOrEmpty())
+            if (request.Parameters.NotNullOrEmpty())
             {
-                content = new StringContent(request.Json, Encoding.UTF8, "application/json");
+                var url = request.Url.TrimEnd("?");
+                var prefix = url.Contains("?") ? "&" : "?";
+                request.RequestUrl = $"{url}{prefix}{request.Parameters.ToQueryString()}";
             }
-            else if (request.Files.NotNullOrEmpty())
+        }
+        using var client = CreateClient(request);
+        HttpRequestMessage CreateRequestMessage()
+        {
+            //query string
+            if (method == HttpMethod.Get || method == HttpMethod.Delete) return new HttpRequestMessage(method, request.RequestUrl);
+
+            //json
+            if (request.Json.NotNullOrEmpty()) return new HttpRequestMessage(method, request.RequestUrl) { Content = new StringContent(request.Json, Encoding.UTF8, "application/json") };
+
+            //multi part form data
+            if (request.Files.NotNullOrEmpty())
             {
                 var multipartFormDataContent = new MultipartFormDataContent();
                 if (request.Parameters.NotNullOrEmpty())
@@ -69,16 +69,16 @@ public static class HttpHelper
                     }
                     multipartFormDataContent.Add(new StreamContent(stream), file.ParameterName, file.FileName);
                 }
-                content = multipartFormDataContent;
+                return new HttpRequestMessage(method, request.RequestUrl) { Content = multipartFormDataContent };
             }
-            else if (request.Parameters.NotNullOrEmpty())
-            {
-                content = new FormUrlEncodedContent(request.Parameters ?? []);
-            }
-            request.HttpRequestMessage = new HttpRequestMessage(method, request.Url);
-            if (content is not null) request.HttpRequestMessage.Content = content;
+
+            //form url encoded
+            if (request.Parameters.NotNullOrEmpty()) return new HttpRequestMessage(method, request.RequestUrl) { Content = new FormUrlEncodedContent(request.Parameters ?? []) };
+
+            //default
+            return new HttpRequestMessage(method, request.Url);
         }
-        var responseMonitor = await RetryAsync(client, request, cancellationToken);
+        var responseMonitor = await RetryAsync(client, request, CreateRequestMessage, cancellationToken);
         return responseMonitor.BuildResponse();
     }
 
@@ -139,7 +139,7 @@ public static class HttpHelper
         return client;
     }
 
-    static async Task<ResponseMonitor> RetryAsync(HttpClient client, HttpRequest request, CancellationToken? cancellationToken = null)
+    static async Task<ResponseMonitor> RetryAsync(HttpClient client, HttpRequest request, Func<HttpRequestMessage> createRequestMessage, CancellationToken? cancellationToken = null)
     {
         var retryCount = request.Config?.RetryCount ?? HttpConfig.Default?.RetryCount ?? 0;
         var retryIndex = -1;
@@ -158,6 +158,7 @@ public static class HttpHelper
             retryIndex++;
             try
             {
+                request.HttpRequestMessage = createRequestMessage();
                 response = await client.SendAsync(request.HttpRequestMessage, HttpCompletionOption.ResponseContentRead, cancellationToken ?? CancellationToken.None);
                 var endTime = DateTime.Now;
                 last = endTime - startTime;
@@ -197,7 +198,8 @@ public static class HttpHelper
 
         public HttpResponse BuildResponse()
         {
-            return new HttpResponse(Request, ResponseMessage, Exception?.Message, RetryCount, LastTimeConsuming, TotalTimeConsuming);
+            var message = (ResponseMessage?.IsSuccessStatusCode ?? false) ? null : Exception?.Message ?? ResponseMessage?.ReasonPhrase;
+            return new HttpResponse(Request, ResponseMessage, message, RetryCount, LastTimeConsuming, TotalTimeConsuming);
         }
     }
     #endregion

@@ -1,5 +1,4 @@
-﻿using SharpDevLib.Cryptography;
-using SharpDevLib.Cryptography.Internal.OpenSSL;
+﻿using SharpDevLib.Cryptography.Internal.OpenSSL;
 using SharpDevLib.Cryptography.Internal.Pkcs;
 using SharpDevLib.Cryptography.Pem;
 using System.Diagnostics;
@@ -17,14 +16,14 @@ public static class RsaKeyHelper
     /// </summary>
     /// <param name="keyBody">不带头尾的key</param>
     /// <returns>格式化的key</returns>
-    public static string WrapLineWith64Char(this string keyBody) => PemObject.WrapLineWith64Char(keyBody);
+    public static string WrapLineWith64Char(string keyBody) => PemObject.WrapLineWith64Char(keyBody);
 
     /// <summary>
     /// 删除64个字符的换行
     /// </summary>
     /// <param name="keyBody">不带头尾的key</param>
     /// <returns>格式化的key</returns>
-    public static string RemoveWrapLineAndTrim(this string keyBody) => PemObject.RemoveWrapLineAndTrim(keyBody);
+    public static string RemoveWrapLineAndTrim(string keyBody) => PemObject.RemoveWrapLineAndTrim(keyBody);
 
     /// <summary>
     /// 导入Pem格式的密钥

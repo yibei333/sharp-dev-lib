@@ -23,10 +23,17 @@ public class TreeItem<TMetaData> where TMetaData : class
         var type = typeof(TMetaData);
         Id = ToStringValue(option.GetIdProperty(type), metaData, true);
         ParentId = ToStringValue(option.GetParentIdProperty(type), metaData);
+        if (option.SortPropertyName.NotNullOrWhiteSpace())
+        {
+            SortProperty = this.GetType().GetProperty(nameof(SortValue));
+            SortValue = option.GetSortProperty(type)?.GetValue(metaData);
+        }
     }
 
     internal string? Id { get; }
     internal string? ParentId { get; }
+    internal object? SortValue { get; }
+    internal PropertyInfo? SortProperty { get; }
 
     /// <summary>
     /// 元数据
@@ -78,7 +85,25 @@ public class TreeItem<TMetaData> where TMetaData : class
     /// 设置父项
     /// </summary>
     /// <param name="parent">父项</param>
-    public void SetParent(TreeItem<TMetaData> parent) => SetParent(parent, true);
+    public void SetParent(TreeItem<TMetaData> parent)
+    {
+        Parent?.Children?.Remove(this);
+        Parent = parent;
+        if (Parent is not null)
+        {
+            EnsureNotCycle(Parent);
+            Parent.Children.Add(this);
+        }
+    }
+
+    /// <summary>
+    /// 添加子项
+    /// </summary>
+    /// <param name="child">子项</param>
+    public void AddChild(TreeItem<TMetaData> child)
+    {
+        child.SetParent(this);
+    }
 
     string? ToStringValue(PropertyInfo propertyInfo, TMetaData metaData, bool required = false)
     {
@@ -95,18 +120,6 @@ public class TreeItem<TMetaData> where TMetaData : class
         }
         if (result.IsNullOrWhiteSpace() && required) throw new NullReferenceException($"property '{propertyInfo.Name}' should not be null or empty");
         return result;
-    }
-
-    internal void SetParent(TreeItem<TMetaData> parent, bool sort)
-    {
-        Parent?.Children?.Remove(this);
-        Parent = parent;
-        if (Parent is not null)
-        {
-            EnsureNotCycle(Parent);
-            Parent.Children.Add(this);
-            if (sort) Parent.Children = Parent.Children.SortTree();
-        }
     }
 
     void EnsureNotCycle(TreeItem<TMetaData> parent)

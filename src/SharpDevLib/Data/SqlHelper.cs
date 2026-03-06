@@ -147,6 +147,46 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
+    /// 检索列表
+    /// </summary>
+    /// <typeparam name="T">单个返回值的类型</typeparam>
+    /// <param name="sql">sql语句</param>
+    /// <param name="parameters">sql参数</param>
+    /// <returns>类型为IEnumerable<T></T>的值</returns>
+    public IEnumerable<T> Query<T>(string sql, params DbParameter[] parameters) where T : class
+    {
+        var table = ExecuteDataTable(sql, parameters);
+        return table.ToList<T>();
+    }
+
+    /// <summary>
+    /// 检索列表
+    /// </summary>
+    /// <typeparam name="T">单个返回值的类型</typeparam>
+    /// <param name="sql">sql语句</param>
+    /// <param name="parameters">sql参数</param>
+    /// <returns>类型为IEnumerable<T></T>的值</returns>
+    public async Task<IEnumerable<T>> QueryAsync<T>(string sql, params DbParameter[] parameters) where T : class
+    {
+        var table = await ExecuteDataTableAsync(sql, parameters);
+        return table.ToList<T>();
+    }
+
+    /// <summary>
+    /// 检索列表
+    /// </summary>
+    /// <typeparam name="T">单个返回值的类型</typeparam>
+    /// <param name="cancellationToken">CancellationToken</param>
+    /// <param name="sql">sql语句</param>
+    /// <param name="parameters">sql参数</param>
+    /// <returns>类型为IEnumerable<T></T>的值</returns>
+    public async Task<IEnumerable<T>> QueryAsync<T>(CancellationToken cancellationToken, string sql, params DbParameter[] parameters) where T : class
+    {
+        var table = await ExecuteDataTableAsync(cancellationToken, sql, parameters);
+        return table.ToList<T>();
+    }
+
+    /// <summary>
     /// 检索数据集
     /// </summary>
     /// <param name="sql">sql语句</param>

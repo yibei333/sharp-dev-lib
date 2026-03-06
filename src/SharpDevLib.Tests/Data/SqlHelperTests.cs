@@ -276,4 +276,15 @@ public class SqlHelperTests
         var users = dbContext.Database.SqlQuery<User>(FormattableStringFactory.Create("SELECT * FROM TempTable")).ToList();
         Console.WriteLine(users.Serialize());
     }
+
+    [TestMethod]
+    public void QueryTest()
+    {
+        var path = GetFileConnectionString("query");
+        SqlHelper.Config(SqliteFactory.Instance, path);
+        using var sqlHelper = new SqlHelper();
+        var users = sqlHelper.Query<User>("SELECT * FROM [User]");
+        Assert.HasCount(2, users);
+        Console.WriteLine(users.Serialize(new JsonOption { FormatJson = true }));
+    }
 }

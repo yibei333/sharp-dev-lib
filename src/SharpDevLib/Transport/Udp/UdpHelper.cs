@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.Net;
+﻿using System.Net;
 using System.Net.NetworkInformation;
 
 namespace SharpDevLib;

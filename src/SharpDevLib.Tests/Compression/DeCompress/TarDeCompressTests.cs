@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib.Compression;
-using SharpDevLib.Tests.Standard.Json;
+using SharpDevLib.Tests.Json;
 using System;
 using System.IO;
 

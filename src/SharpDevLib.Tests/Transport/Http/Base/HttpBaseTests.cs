@@ -2,7 +2,6 @@
 using EmbedIO.Files;
 using EmbedIO.WebApi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib.Transport;
 using System;
 using System.Threading;
 

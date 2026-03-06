@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Tests.TestData;
 using SharpDevLib.Tests.Transport.Http.Base;
-using SharpDevLib.Transport;
 
 namespace SharpDevLib.Tests.Transport.Http;
 
@@ -13,22 +12,20 @@ public class HttpPutTests : HttpBaseTests
     [TestMethod]
     public void PutTest()
     {
-        var request = new HttpRequest(BaseUrl.CombinePath("/api/put"), _userJson)
-        {
-            Config = new HttpConfig
-            {
-                UserAgent = null
-            }
-        };
-        var response = request.PutAsync().GetAwaiter().GetResult();
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/put"), _userJson) { Config = new HttpConfig { UserAgent = null } }
+            .PutAsync()
+            .GetAwaiter()
+            .GetResult();
         Assert.IsTrue(response.IsSuccess);
     }
 
     [TestMethod]
     public void PutIntTest()
     {
-        var request = new HttpRequest(BaseUrl.CombinePath("/api/put/int"), _userJson);
-        var response = request.PutAsync().GetAwaiter().GetResult();
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/put/int"), _userJson)
+            .PutAsync()
+            .GetAwaiter()
+            .GetResult();
         Assert.IsTrue(response.IsSuccess);
         Assert.AreEqual(10, response.GetResponseDataAsync<int>().GetAwaiter().GetResult());
     }
@@ -36,8 +33,10 @@ public class HttpPutTests : HttpBaseTests
     [TestMethod]
     public void PutStringTest()
     {
-        var request = new HttpRequest(BaseUrl.CombinePath("/api/put/string"), _userJson);
-        var response = request.PutAsync().GetAwaiter().GetResult();
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/put/string"), _userJson)
+            .PutAsync()
+            .GetAwaiter()
+            .GetResult();
         Assert.IsTrue(response.IsSuccess);
         Assert.AreEqual("foo", response.GetResponseDataAsync<string>().GetAwaiter().GetResult());
     }
@@ -45,8 +44,10 @@ public class HttpPutTests : HttpBaseTests
     [TestMethod]
     public void PutObjectTest()
     {
-        var request = new HttpRequest(BaseUrl.CombinePath("/api/put/object"), _userJson);
-        var response = request.PutAsync().GetAwaiter().GetResult();
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/put/object"), _userJson)
+            .PutAsync()
+            .GetAwaiter()
+            .GetResult();
         Assert.IsTrue(response.IsSuccess);
         var data = response.GetResponseDataAsync<User>().GetAwaiter().GetResult();
         Assert.IsNotNull(data);

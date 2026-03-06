@@ -108,7 +108,6 @@ public static class StringHelper
     /// <param name="removeEmptyEntries">是否删除空白</param>
     /// <param name="distinct">是否去重</param>
     /// <returns>字符串集合</returns>
-    /// <exception cref="ArgumentException">当separator参数为'-'时引发异常</exception>
     public static List<string> SplitToList(this string? str, char[] separators, bool removeEmptyEntries = true, bool distinct = true)
     {
         if (str.IsNullOrWhiteSpace()) return [];

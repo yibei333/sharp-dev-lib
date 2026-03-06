@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib.Cryptography;
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -34,8 +33,8 @@ public class SymmetricAlgorithmExtensionTests
         using var algorithm = GetSymmetricAlgorithm(algorithmName);
         algorithm.Mode = CipherMode.CBC;
         algorithm.Padding = PaddingMode.PKCS7;
-        algorithm.SetKey(key);
-        algorithm.SetIV(iv);
+        algorithm.SetKeyAutoPad(key);
+        algorithm.SetIVAutoPad(iv);
         var encrypted = algorithm.Encrypt(plainText.Utf8Decode());
         Assert.AreEqual(expected, encrypted.Base64Encode());
     }
@@ -47,8 +46,8 @@ public class SymmetricAlgorithmExtensionTests
     public void DecryptTest(string algorithmName, string encrypted)
     {
         using var algorithm = GetSymmetricAlgorithm(algorithmName);
-        algorithm.SetKey(key);
-        algorithm.SetIV(iv);
+        algorithm.SetKeyAutoPad(key);
+        algorithm.SetIVAutoPad(iv);
         var decrypted = algorithm.Decrypt(encrypted.Base64Decode());
         Assert.AreEqual(plainText, decrypted.Utf8Encode());
     }
@@ -70,8 +69,8 @@ public class SymmetricAlgorithmExtensionTests
         using var algorithm = GetSymmetricAlgorithm(algorithmName);
         algorithm.Mode = CipherMode.CBC;
         algorithm.Padding = PaddingMode.PKCS7;
-        algorithm.SetKey(key);
-        algorithm.SetIV(iv);
+        algorithm.SetKeyAutoPad(key);
+        algorithm.SetIVAutoPad(iv);
         algorithm.Encrypt(sourceStream, targetStream);
 
         Assert.IsTrue(File.Exists(targetPath));
@@ -96,8 +95,8 @@ public class SymmetricAlgorithmExtensionTests
         using var algorithm = GetSymmetricAlgorithm(algorithmName);
         algorithm.Mode = CipherMode.CBC;
         algorithm.Padding = PaddingMode.PKCS7;
-        algorithm.SetKey(key);
-        algorithm.SetIV(iv);
+        algorithm.SetKeyAutoPad(key);
+        algorithm.SetIVAutoPad(iv);
         algorithm.Decrypt(sourceStream, targetStream);
 
         Assert.IsTrue(File.Exists(targetPath));

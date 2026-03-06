@@ -12,7 +12,7 @@ public static class ProcessHelper
     /// <summary>
     /// 日志记录器
     /// </summary>
-    public static ILogger? Logger { get; set; } = new ConsoleLogger(nameof(ProcessHelper));
+    public static ILogger? Logger { get; set; } = new SimpleConsoleLogger(nameof(ProcessHelper));
 
     /// <summary>
     /// 启动进程并等待退出

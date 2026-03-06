@@ -1,7 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib.OpenXML;
 using SharpDevLib.Tests.TestData;
 using System;
 using System.Collections.Generic;

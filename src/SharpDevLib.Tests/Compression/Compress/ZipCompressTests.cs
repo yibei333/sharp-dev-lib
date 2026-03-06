@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib.Compression;
 using System;
 using System.IO;
 

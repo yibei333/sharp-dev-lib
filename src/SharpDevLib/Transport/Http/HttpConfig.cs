@@ -12,7 +12,7 @@ public class HttpConfig
     /// </summary>
     public static HttpConfig Default { get; set; } = new()
     {
-        Logger = new ConsoleLogger(nameof(HttpHelper)),
+        Logger = new SimpleConsoleLogger(nameof(HttpHelper)),
         UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0"
     };
 

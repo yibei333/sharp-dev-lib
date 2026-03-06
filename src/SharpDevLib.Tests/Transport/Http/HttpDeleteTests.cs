@@ -1,10 +1,7 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Tests.TestData;
 using SharpDevLib.Tests.Transport.Http.Base;
-using SharpDevLib.Transport;
 using System;
-using System.Collections.Generic;
 
 namespace SharpDevLib.Tests.Transport.Http;
 
@@ -14,8 +11,12 @@ public class HttpDeleteTests : HttpBaseTests
     [TestMethod]
     public void DeleteTest()
     {
-        var request = new HttpRequest(BaseUrl.CombinePath("/api/delete")) { Parameters = new Dictionary<string, string?> { { "name", "foo" }, { "age", "10" } } };
-        var response = request.DeleteAsync().GetAwaiter().GetResult();
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/delete"))
+            .AddParameter("name", "foo")
+            .AddParameter("age", "10")
+            .DeleteAsync()
+            .GetAwaiter()
+            .GetResult();
         Assert.IsTrue(response.IsSuccess);
     }
 
@@ -23,19 +24,20 @@ public class HttpDeleteTests : HttpBaseTests
     public void DeleteIntTest()
     {
         var count = 0;
-        var request = new HttpRequest(BaseUrl.CombinePath("/api/delete/int"))
+        var config = new HttpConfig
         {
-            Parameters = new Dictionary<string, string?> { { "name", "foo" }, { "age", "10" } },
-            Config = new HttpConfig
+            OnReceiveProgress = p =>
             {
-                OnReceiveProgress = p =>
-                {
-                    count++;
-                    Console.WriteLine($"receive->{p}");
-                }
+                count++;
+                Console.WriteLine($"receive->{p}");
             }
         };
-        var response = request.DeleteAsync().GetAwaiter().GetResult();
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/delete/int")) { Config = config }
+            .AddParameter("name", "foo")
+            .AddParameter("age", "10")
+            .DeleteAsync()
+            .GetAwaiter()
+            .GetResult();
         Assert.IsGreaterThan(0, count);
         Assert.IsTrue(response.IsSuccess);
         var actual = response.GetResponseDataAsync<int>().GetAwaiter().GetResult();
@@ -45,8 +47,12 @@ public class HttpDeleteTests : HttpBaseTests
     [TestMethod]
     public void DeleteStringTest()
     {
-        var request = new HttpRequest(BaseUrl.CombinePath("/api/delete/string")) { Parameters = new Dictionary<string, string?> { { "name", "foo" }, { "age", "10" } } };
-        var response = request.DeleteAsync().GetAwaiter().GetResult();
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/delete/string"))
+            .AddParameter("name", "foo")
+            .AddParameter("age", "10")
+            .DeleteAsync()
+            .GetAwaiter()
+            .GetResult();
         Assert.IsTrue(response.IsSuccess);
         var actual = response.GetResponseDataAsync<string>().GetAwaiter().GetResult();
         Assert.AreEqual("foo", actual);
@@ -55,8 +61,12 @@ public class HttpDeleteTests : HttpBaseTests
     [TestMethod]
     public void DeleteObjectTest()
     {
-        var request = new HttpRequest(BaseUrl.CombinePath("/api/delete/object")) { Parameters = new Dictionary<string, string?> { { "name", "foo" }, { "age", "10" } } };
-        var response = request.DeleteAsync().GetAwaiter().GetResult();
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/delete/object"))
+            .AddParameter("name", "foo")
+            .AddParameter("age", "10")
+            .DeleteAsync()
+            .GetAwaiter()
+            .GetResult();
         Assert.IsTrue(response.IsSuccess);
         var data = response.GetResponseDataAsync<User>().GetAwaiter().GetResult();
         Assert.IsNotNull(data);

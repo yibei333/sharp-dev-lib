@@ -3,7 +3,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenPop.Mime;
 using SharpDevLib.Tests.Transport.Email.EmailHost;
 using SharpDevLib.Tests.Transport.Email.EmailHost.Service;
-using SharpDevLib.Transport;
 using System;
 using System.IO;
 using System.Linq;

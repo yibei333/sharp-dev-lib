@@ -2,7 +2,7 @@
 
 namespace SharpDevLib;
 
-internal class ConsoleLogger(string categoryName, LogLevel minLevel = LogLevel.Information) : ILogger
+public class SimpleConsoleLogger(string categoryName, LogLevel minLevel = LogLevel.Information) : ILogger
 {
     private readonly string _categoryName = categoryName;
     private readonly LogLevel _minLevel = minLevel;

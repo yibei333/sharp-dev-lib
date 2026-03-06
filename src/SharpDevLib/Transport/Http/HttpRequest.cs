@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2016.Excel;
-using System.Net;
-using System.Text;
-using System.Web;
+﻿using System.Net;
 
 namespace SharpDevLib;
 
@@ -10,7 +7,13 @@ namespace SharpDevLib;
 /// </summary>
 public class HttpRequest
 {
-    internal HttpRequestMessage HttpRequestMessage { get; set; } = null!;
+    HttpRequestMessage? _httpRequestMessage;
+
+    internal HttpRequestMessage HttpRequestMessage
+    {
+        get => _httpRequestMessage ?? throw new Exception("can not get request message,may be task cancled before request");
+        set => _httpRequestMessage = value;
+    }
 
     /// <summary>
     /// 实例化http请求

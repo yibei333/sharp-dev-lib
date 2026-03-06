@@ -84,4 +84,11 @@ internal class HttpGetController : WebApiController
         Console.WriteLine(HttpContext.Id);
         Thread.Sleep(1500);
     }
+
+    [Route(HttpVerbs.Get, "/get/error")]
+    public void Error()
+    {
+        HttpContext.Response.StatusCode = 500;
+        HttpContext.WriteObject(new User("error", 1));
+    }
 }

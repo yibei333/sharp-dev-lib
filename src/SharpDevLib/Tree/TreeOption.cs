@@ -52,4 +52,13 @@ public class TreeOption(string idPropertyName = "Id", string parentIdPropertyNam
         _cache[ParentIdPropertyName] = property;
         return property;
     }
+
+    internal PropertyInfo? GetSortProperty(Type metaDataType)
+    {
+        if (SortPropertyName.IsNullOrWhiteSpace()) return null;
+        if (_cache.ContainsKey(SortPropertyName)) return _cache[SortPropertyName];
+        var property = metaDataType.GetProperty(SortPropertyName) ?? throw new ArgumentException($"unable to find property '{SortPropertyName}' of type '{metaDataType.FullName}'");
+        _cache[SortPropertyName] = property;
+        return property;
+    }
 }

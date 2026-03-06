@@ -1,11 +1,6 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.Extensions.Logging;
-using SharpDevLib;
+﻿using Microsoft.Extensions.Logging;
 using System.Net;
-using System.Reflection;
 using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace SharpDevLib;
 
@@ -172,12 +167,12 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
         var requestContentType = request.HttpRequestMessage.Content?.Headers?.ContentType?.ToString();
         if (requestContentType.IsNullOrWhiteSpace()) return;
         builder.AppendLine($"content-type:{requestContentType}");
-        if (requestContentType == "application/json")
+        if (requestContentType.Contains("application/json"))
         {
             builder.AppendLine($"json:");
             builder.AppendLine(request.Json);
         }
-        else if (requestContentType == "multipart/form-data")
+        else if (requestContentType.Contains("multipart/form-data"))
         {
             builder.AppendLine($"form:");
             if (request.Parameters.NotNullOrEmpty())
@@ -195,7 +190,7 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
                 }
             }
         }
-        else if (requestContentType == "application/x-www-form-urlencoded")
+        else if (requestContentType.Contains("application/x-www-form-urlencoded"))
         {
             builder.AppendLine($"form:");
             if (request.Parameters.NotNullOrEmpty())
@@ -213,13 +208,14 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
     {
         builder.AppendLine($"****response****");
         builder.AppendLine($"code:{response.Code}");
-        builder.AppendLine($"error message:{response.ErrorMessage}");
+        if (response.ErrorMessage.NotNullOrWhiteSpace()) builder.AppendLine($"error message:{response.ErrorMessage}");
         if (response.HttpResponseMessage.Content is null) builder.AppendLine("no response");
         else
         {
-            if (response.HttpResponseMessage.Content.Headers?.ContentType?.ToString() == "application/json")
+            if (response.HttpResponseMessage.Content.Headers?.ContentType?.ToString().Contains("application/json") ?? false)
             {
-                builder.AppendLine($"reply:{response.HttpResponseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult()}");
+                builder.AppendLine("reply:");
+                builder.AppendLine(response.HttpResponseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult());
             }
         }
     }

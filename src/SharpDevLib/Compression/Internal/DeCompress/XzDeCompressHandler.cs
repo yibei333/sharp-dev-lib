@@ -19,7 +19,7 @@ internal class XzDeCompressHandler(DeCompressRequest request) : DeCompressHandle
             using var sourceStream = new FileInfo(Request.SourceFile).OpenOrCreate();
             using var inputStream = new XZStream(sourceStream);
             using var outputStream = new FileInfo(Request.TargetPath.CombinePath(fileName)).OpenOrCreate();
-            await inputStream.CopyToAsync(outputStream,Request.CancellationToken ?? CancellationToken.None, transfered => Request.Transfered += transfered);
+            await inputStream.CopyToAsync(outputStream, Request.CancellationToken ?? CancellationToken.None, transfered => Request.Transfered += transfered);
         }
     }
 
