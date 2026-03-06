@@ -6,9 +6,9 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib;
 
 public static class TcpListenerHelper
 {
-    public delegate void OnNewConnectionDelegate(TcpClient tcp);
+    public delegate void OnNewConnectionDelegate(System.Net.Sockets.TcpClient tcp);
 
-    public static void StartListen(this TcpListener listen, OnNewConnectionDelegate onNew)
+    public static void StartListen(this System.Net.Sockets.TcpListener listen, OnNewConnectionDelegate onNew)
     {
         listen.Start();
 
@@ -27,7 +27,7 @@ public static class TcpListenerHelper
             if (listen.Server == null || listen.Server.IsBound == false) return;
             BeginListen();
 
-            TcpClient? tcp = null;
+            System.Net.Sockets.TcpClient? tcp = null;
             Helpers.TryCallCatch(EndListenInternal);
             void EndListenInternal()
             {

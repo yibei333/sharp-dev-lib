@@ -8,7 +8,7 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib
 {
     internal class POP3ServerSession
     {
-        private readonly TcpClient tcp;
+        private readonly System.Net.Sockets.TcpClient tcp;
         private readonly bool immediateTls;
         private readonly POP3Listener service;
         private readonly long connectionID;
@@ -21,7 +21,7 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib
         private Stream CurrStream => tls as Stream ?? tcpstr;
         private PopResponse currResp;
 
-        internal POP3ServerSession(TcpClient tcp, bool immediateTls, POP3Listener service, long connectionID)
+        internal POP3ServerSession(System.Net.Sockets.TcpClient tcp, bool immediateTls, POP3Listener service, long connectionID)
         {
             this.tcp = tcp;
             this.immediateTls = immediateTls;

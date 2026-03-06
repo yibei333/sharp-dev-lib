@@ -16,7 +16,7 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public void PostJsonTest()
     {
-        var request = new HttpJsonRequest("/api/post", _userJson);
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/post"), _userJson);
         var response = request.PostAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
     }
@@ -24,40 +24,44 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public void PostJsonIntTest()
     {
-        var request = new HttpJsonRequest("/api/post/int", _userJson);
-        var response = request.PostAsync<int>().GetAwaiter().GetResult();
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/post/int"), _userJson);
+        var response = request.PostAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
-        Assert.AreEqual(10, response.Data);
+        Assert.AreEqual(10, response.GetResponseDataAsync<int>().GetAwaiter().GetResult());
     }
 
     [TestMethod]
     public void PostJsonStringTest()
     {
-        var request = new HttpJsonRequest("/api/post/string", _userJson);
-        var response = request.PostAsync<string>().GetAwaiter().GetResult();
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/post/string"), _userJson);
+        var response = request.PostAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
-        Assert.AreEqual("foo", response.Data);
+        Assert.AreEqual("foo", response.GetResponseDataAsync<string>().GetAwaiter().GetResult());
     }
 
     [TestMethod]
     public void PostJsonObjectTest()
     {
-        var request = new HttpJsonRequest("/api/post/object", _userJson);
-        var response = request.PostAsync<User>().GetAwaiter().GetResult();
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/post/object"), _userJson);
+        var response = request.PostAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
-        Assert.IsNotNull(response.Data);
-        Assert.AreEqual(10, response.Data.Age);
-        Assert.AreEqual("foo", response.Data.Name);
+        var data = response.GetResponseDataAsync<User>().GetAwaiter().GetResult();
+        Assert.IsNotNull(data);
+        Assert.AreEqual(10, data.Age);
+        Assert.AreEqual("foo", data.Name);
     }
 
     [TestMethod]
     public void PostUrlEncodedFormTest()
     {
-        var request = new HttpUrlEncodedFormRequest("/api/post/form", new Dictionary<string, string>
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/post/form"))
         {
-            { "Name","foo" },
-            { "Age","10" },
-        });
+            Parameters = new Dictionary<string, string?>
+            {
+                { "Name","foo" },
+                { "Age","10" },
+            }
+        };
         var response = request.PostAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
     }
@@ -65,30 +69,37 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public void PostUrlEncodedFormObjectTest()
     {
-        var request = new HttpUrlEncodedFormRequest("/api/post/form/object", new Dictionary<string, string>
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/post/form/object"))
         {
-            { "Name","foo" },
-            { "Age","10" },
-        });
-        var response = request.PostAsync<User>().GetAwaiter().GetResult();
+            Parameters = new Dictionary<string, string?>
+            {
+                { "Name","foo" },
+                { "Age","10" },
+            }
+        };
+        var response = request.PostAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
-        Assert.IsNotNull(response.Data);
-        Assert.AreEqual(10, response.Data.Age);
-        Assert.AreEqual("foo", response.Data.Name);
+        var data = response.GetResponseDataAsync<User>().GetAwaiter().GetResult();
+        Assert.IsNotNull(data);
+        Assert.AreEqual(10, data.Age);
+        Assert.AreEqual("foo", data.Name);
     }
 
     [TestMethod]
     public void PostMultiPartFormTest()
     {
-        var request = new HttpMultiPartFormDataRequest("/api/post/form/multi", new Dictionary<string, string>
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/post/form/multi"))
         {
-            { "Name","foo" },
-            { "Age","10" },
-        },
-        [
-            new HttpFormFile("file","TestFile.txt",File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))),
-            new HttpFormFile("file","Foo.txt",File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Foo.txt"))),
-        ]);
+            Parameters = new Dictionary<string, string?>
+            {
+                { "Name","foo" },
+                { "Age","10" },
+            },
+            Files = [
+                new HttpFormFile("file","TestFile.txt",File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))),
+                new HttpFormFile("file","Foo.txt",File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Foo.txt"))),
+            ]
+        };
         var response = request.PostAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
     }
@@ -98,34 +109,39 @@ public class HttpPostTests : HttpBaseTests
     {
         var sendCount = 0;
         var receiveCount = 0;
-        var request = new HttpMultiPartFormDataRequest("/api/post/form/multi/object", new Dictionary<string, string>
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/post/form/multi"))
         {
-            { "Name","foo" },
-            { "Age","10" },
-        },
-        [
-            new HttpFormFile("file","TestFile.txt",File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))),
-            new HttpFormFile("file","Foo.txt",File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Foo.txt"))),
-        ])
-        {
-            OnReceiveProgress = p =>
+            Parameters = new Dictionary<string, string?>
             {
-                receiveCount++;
-                Console.WriteLine($"receive->{p}");
+                { "Name","foo" },
+                { "Age","10" },
             },
-            OnSendProgress = p =>
+            Files = [
+                new HttpFormFile("file","TestFile.txt",File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))),
+                new HttpFormFile("file","Foo.txt",File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Foo.txt"))),
+            ],
+            Config=new HttpConfig
             {
-                sendCount++;
-                Console.WriteLine($"send->{p}");
+                OnReceiveProgress = p =>
+                {
+                    receiveCount++;
+                    Console.WriteLine($"receive->{p}");
+                },
+                OnSendProgress = p =>
+                {
+                    sendCount++;
+                    Console.WriteLine($"send->{p}");
+                }
             }
         };
-        var response = request.PostAsync<User>().GetAwaiter().GetResult();
+        var response = request.PostAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
-        Assert.IsTrue(sendCount > 0);
-        Assert.IsTrue(receiveCount > 0);
-        Assert.IsNotNull(response.Data);
-        Assert.AreEqual(10, response.Data.Age);
-        Assert.AreEqual("foo", response.Data.Name);
+        Assert.IsGreaterThan(0, sendCount);
+        Assert.IsGreaterThan(0, receiveCount);
+        var data = response.GetResponseDataAsync<User>().GetAwaiter().GetResult();
+        Assert.IsNotNull(data);
+        Assert.AreEqual(10, data.Age);
+        Assert.AreEqual("foo", data.Name);
         Assert.IsTrue(File.Exists(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/PostTestFile.txt")));
         Assert.AreEqual("Hello,World!", File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/PostTestFile.txt")));
         Assert.IsTrue(File.Exists(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/PostFoo.txt")));

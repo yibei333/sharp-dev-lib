@@ -220,11 +220,11 @@ C3H8zlXUDecx4Iq2CG8OGgA8NbdIPnmSGr8vf0sUllV7FlnQc10+gA==";
     [TestMethod]
     public void IsKeyPairMatchTest()
     {
-        Assert.IsTrue(RsaKey.IsKeyPairMatch(Pkcs1PrivateKey, PublicKey));
-        Assert.IsTrue(RsaKey.IsKeyPairMatch(Pkcs8PrivateKey, PublicKey));
-        Assert.IsTrue(RsaKey.IsKeyPairMatch(Pkcs1PrivateKey, X509PublicKey));
-        Assert.IsTrue(RsaKey.IsKeyPairMatch(Pkcs8PrivateKey, X509PublicKey));
-        Assert.IsFalse(RsaKey.IsKeyPairMatch(Pkcs1PrivateKey, Pkcs8PrivateKey));
+        Assert.IsTrue(RsaKeyHelper.IsKeyPairMatch(Pkcs1PrivateKey, PublicKey));
+        Assert.IsTrue(RsaKeyHelper.IsKeyPairMatch(Pkcs8PrivateKey, PublicKey));
+        Assert.IsTrue(RsaKeyHelper.IsKeyPairMatch(Pkcs1PrivateKey, X509PublicKey));
+        Assert.IsTrue(RsaKeyHelper.IsKeyPairMatch(Pkcs8PrivateKey, X509PublicKey));
+        Assert.IsFalse(RsaKeyHelper.IsKeyPairMatch(Pkcs1PrivateKey, Pkcs8PrivateKey));
     }
 
     [TestMethod]
@@ -239,7 +239,7 @@ C3H8zlXUDecx4Iq2CG8OGgA8NbdIPnmSGr8vf0sUllV7FlnQc10+gA==";
     public void GetKeyInfoTest(string keyName, bool requirePassword, PemType type, bool isPrivate, bool isEncrypted, int keySize)
     {
         var key = GetKey(keyName);
-        var info = RsaKey.GetKeyInfo(key, requirePassword ? passwordBytes : null);
+        var info = RsaKeyHelper.GetKeyInfo(key, requirePassword ? passwordBytes : null);
         Assert.AreEqual(type, info.Type);
         Assert.AreEqual(isPrivate, info.IsPrivate);
         Assert.AreEqual(isEncrypted, info.IsEncrypted);

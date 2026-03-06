@@ -75,7 +75,7 @@ public class ExcelTests
     {
         using var stream = GetSourceStream("Normal", out _);
 
-        var set = Excel.Read(stream);
+        var set = ExcelHelper.ReadSet(stream);
         Assert.AreEqual(2, set.Tables.Count);
         var table1 = set.Tables["T1"];
         Assert.IsNotNull(table1);
@@ -96,8 +96,8 @@ public class ExcelTests
     public void ReadExceptionTest()
     {
         using var stream = GetSourceStream("Normal", out _);
-        Assert.ThrowsExactly<ArgumentException>(() => Excel.Read(stream, [["foo"]]));
-        Assert.ThrowsExactly<ArgumentException>(() => Excel.Read(stream, [["foo"], ["bar"]]));
+        Assert.ThrowsExactly<ArgumentException>(() => ExcelHelper.ReadSet(stream, [["foo"]]));
+        Assert.ThrowsExactly<ArgumentException>(() => ExcelHelper.ReadSet(stream, [["foo"], ["bar"]]));
     }
 
     [TestMethod]
@@ -105,7 +105,7 @@ public class ExcelTests
     {
         using var stream = GetSourceStream("Normal", out _);
 
-        var set = Excel.Read(stream, [["字符串值", "整型值", "双精度浮点数值", "十进制值", "布尔值", "枚举值"], ["字符串值", "整型值", "双精度浮点数值", "十进制值", "布尔值", "枚举值"]]);
+        var set = ExcelHelper.ReadSet(stream, [["字符串值", "整型值", "双精度浮点数值", "十进制值", "布尔值", "枚举值"], ["字符串值", "整型值", "双精度浮点数值", "十进制值", "布尔值", "枚举值"]]);
         Assert.AreEqual(2, set.Tables.Count);
     }
 
@@ -120,11 +120,11 @@ public class ExcelTests
 
         var writeTable2 = TestData2.ToDataTable();
         writeSet.Tables.Add(writeTable2);
-        Excel.Write(writeSet, stream);
+        ExcelHelper.Write(writeSet, stream);
         Assert.IsTrue(File.Exists(path));
         Assert.IsGreaterThan(0, new FileInfo(path).Length);
 
-        var readSet = Excel.Read(stream);
+        var readSet = ExcelHelper.ReadSet(stream);
         Assert.AreEqual(2, readSet.Tables.Count);
         var readTable1 = readSet.Tables["Table1"];
         Assert.IsNotNull(readTable1);
@@ -152,8 +152,8 @@ public class ExcelTests
 
         var writeTable2 = TestData2.ToDataTable();
         writeSet.Tables.Add(writeTable2);
-        Assert.ThrowsExactly<ArgumentException>(() => Excel.Write(writeSet, stream, [["foo"]]));
-        Assert.ThrowsExactly<ArgumentException>(() => Excel.Write(writeSet, stream, [["foo", "bar"]]));
+        Assert.ThrowsExactly<ArgumentException>(() => ExcelHelper.Write(writeSet, stream, [["foo"]]));
+        Assert.ThrowsExactly<ArgumentException>(() => ExcelHelper.Write(writeSet, stream, [["foo", "bar"]]));
     }
 
     [TestMethod]
@@ -167,7 +167,7 @@ public class ExcelTests
 
         var writeTable2 = TestData2.ToDataTable();
         writeSet.Tables.Add(writeTable2);
-        Excel.Write(writeSet, stream, [["字符串值", "整型值", "双精度浮点数值", "十进制值", "布尔值", "枚举值"], ["字符串值", "整型值", "双精度浮点数值", "十进制值", "布尔值", "枚举值"]]);
+        ExcelHelper.Write(writeSet, stream, [["字符串值", "整型值", "双精度浮点数值", "十进制值", "布尔值", "枚举值"], ["字符串值", "整型值", "双精度浮点数值", "十进制值", "布尔值", "枚举值"]]);
         Assert.IsTrue(File.Exists(path));
     }
 
@@ -177,9 +177,9 @@ public class ExcelTests
         using var stream = GetTargetStream("WriteTable", out _);
 
         var writeTable1 = TestData1.ToDataTable();
-        Excel.Write(writeTable1, stream);
+        ExcelHelper.Write(writeTable1, stream);
 
-        var readSet = Excel.Read(stream);
+        var readSet = ExcelHelper.ReadSet(stream);
         Assert.AreEqual(1, readSet.Tables.Count);
         var readTable1 = readSet.Tables["Table1"];
         Assert.IsNotNull(readTable1);
@@ -210,7 +210,7 @@ public class ExcelTests
         using var sourceStream = GetSourceStream("Normal", out _);
         using var targetStream = GetTargetStream("Encrypt", out var targetPath);
 
-        Excel.Encrypt(sourceStream, targetStream, "foo");
+        ExcelHelper.Encrypt(sourceStream, targetStream, "foo");
         Assert.IsTrue(File.Exists(targetPath));
         Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
@@ -221,7 +221,7 @@ public class ExcelTests
         using var sourceStream = GetSourceStream("Encrypted", out _);
         using var targetStream = GetTargetStream("Decrypt", out var targetPath);
 
-        Excel.Decrypt(sourceStream, targetStream, "foo");
+        ExcelHelper.Decrypt(sourceStream, targetStream, "foo");
         Assert.IsTrue(File.Exists(targetPath));
         Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
@@ -240,7 +240,7 @@ public class ExcelTests
         Assert.IsTrue(File.Exists(targetPath));
         Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
 
-        var readSet = Excel.Read(targetStream);
+        var readSet = ExcelHelper.ReadSet(targetStream);
         Assert.AreEqual(2, readSet.Tables.Count);
         var readTable2 = readSet.Tables["T2"];
         Assert.IsNotNull(readTable2);
@@ -270,7 +270,7 @@ public class ExcelTests
         Assert.IsTrue(File.Exists(targetPath));
         Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
 
-        var readSet = Excel.Read(targetStream);
+        var readSet = ExcelHelper.ReadSet(targetStream);
         Assert.AreEqual(2, readSet.Tables.Count);
         var readTable2 = readSet.Tables["T2"];
         Assert.IsNotNull(readTable2);
@@ -358,7 +358,7 @@ public class ExcelTests
         using var targetStream = CopySourceStream(sourceStream, "UpdateCellStyle", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
-        var styleIndex = doc.WorkbookPart!.CreateStyle(new SharpDevLib.OpenXML.CellStyle
+        var styleIndex = doc.WorkbookPart!.CreateStyle(new SharpDevLib.CellStyle
         {
             BackgroundColor = "#0000FF",
             FontColor = "#FFFFFF",
@@ -384,7 +384,7 @@ public class ExcelTests
         using var doc = SpreadsheetDocument.Open(targetStream, true);
         var mergeCell = doc.WorkbookPart?.GetWorksheet("T2").MergeCells("h8", "d3");
         Assert.IsNotNull(mergeCell);
-        mergeCell.UseStyle(new SharpDevLib.OpenXML.CellStyle { HorizontalAlignment = HorizontalAlignmentValues.Center, VerticalAlignment = VerticalAlignmentValues.Center, BackgroundColor = "#bcd" });
+        mergeCell.UseStyle(new SharpDevLib.CellStyle { HorizontalAlignment = HorizontalAlignmentValues.Center, VerticalAlignment = VerticalAlignmentValues.Center, BackgroundColor = "#bcd" });
 
         doc.Save();
         targetStream.Flush();

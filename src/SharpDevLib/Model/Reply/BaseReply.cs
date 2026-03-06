@@ -3,7 +3,6 @@
 /// <summary>
 /// 响应基类,或许可以在反射或者泛型中用
 /// </summary>
-[BelongDirectory("Model/Reply")]
 public abstract class BaseReply
 {
     /// <summary>

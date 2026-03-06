@@ -5,7 +5,6 @@ namespace SharpDevLib;
 /// <summary>
 /// Guid空断言扩展
 /// </summary>
-[BelongDirectory("NullCheck")]
 public static class GuidNullCheck
 {
     /// <summary>

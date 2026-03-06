@@ -32,8 +32,8 @@ public class CertificateTests
         var subject = new X509Subject(name) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
         csr.Export().Utf8Decode().SaveToFile(csrPath);
-        var serialNumber = X509.GenerateSerialNumber();
-        var cert = X509.GenerateSelfSignedCACert(privateKey, csr, serialNumber, 360000, subject.CommonName);
+        var serialNumber = X509Helper.GenerateSerialNumber();
+        var cert = X509Helper.GenerateSelfSignedCACert(privateKey, csr, serialNumber, 360000, subject.CommonName);
         cert.SaveCrt(certPath);
         SavePfxTest(cert, keyPath, pfxPath);
 
@@ -71,8 +71,8 @@ public class CertificateTests
         var subject = new X509Subject(name) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
         csr.Export().Utf8Decode().SaveToFile(csrPath);
-        var serialNumber = X509.GenerateSerialNumber();
-        var cert = X509.GenerateCACert(caKey, caCert, csr, serialNumber, 360, subject.CommonName);
+        var serialNumber = X509Helper.GenerateSerialNumber();
+        var cert = X509Helper.GenerateCACert(caKey, caCert, csr, serialNumber, 360, subject.CommonName);
         cert.SaveCrt(certPath);
         SavePfxTest(cert, keyPath, pfxPath);
 
@@ -105,14 +105,14 @@ public class CertificateTests
         var subject = new X509Subject(name) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
         csr.Export().Utf8Decode().SaveToFile(csrPath);
-        var serialNumber = X509.GenerateSerialNumber();
+        var serialNumber = X509Helper.GenerateSerialNumber();
         var altNames = new List<SubjectAlternativeName>
         {
             new(SubjectAlternativeNameType.Dns,"localhost"),
             new(SubjectAlternativeNameType.Dns,"*.localhost"),
             new(SubjectAlternativeNameType.IP,"127.0.0.1"),
         };
-        var cert = X509.GenerateSelfSignedServerCert(privateKey, csr, serialNumber, 360, altNames, subject.CommonName);
+        var cert = X509Helper.GenerateSelfSignedServerCert(privateKey, csr, serialNumber, 360, altNames, subject.CommonName);
         cert.SaveCrt(certPath);
         SavePfxTest(cert, keyPath, pfxCertPath);
 
@@ -156,14 +156,14 @@ public class CertificateTests
         var subject = new X509Subject(keyName) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
         csr.Export().Utf8Decode().SaveToFile(csrPath);
-        var serialNumber = X509.GenerateSerialNumber();
+        var serialNumber = X509Helper.GenerateSerialNumber();
         var altNames = new List<SubjectAlternativeName>
         {
             new(SubjectAlternativeNameType.Dns,"localhost"),
             new(SubjectAlternativeNameType.Dns,"*.localhost"),
             new(SubjectAlternativeNameType.IP,"127.0.0.1"),
         };
-        var cert = X509.GenerateServerCert(caKey, caCert, csr, serialNumber, 360, altNames, subject.CommonName);
+        var cert = X509Helper.GenerateServerCert(caKey, caCert, csr, serialNumber, 360, altNames, subject.CommonName);
         cert.SaveCrt(certPath);
         cert.SaveDer(derCertPath);
         SavePfxTest(cert, keyPath, pfxCertPath);
@@ -206,8 +206,8 @@ public class CertificateTests
         var subject = new X509Subject(name) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
         csr.Export().Utf8Decode().SaveToFile(csrPath);
-        var serialNumber = X509.GenerateSerialNumber();
-        var cert = X509.GenerateSelfSignedClientCert(privateKey, csr, serialNumber, 360, subject.CommonName);
+        var serialNumber = X509Helper.GenerateSerialNumber();
+        var cert = X509Helper.GenerateSelfSignedClientCert(privateKey, csr, serialNumber, 360, subject.CommonName);
         cert.SaveCrt(certPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
@@ -242,8 +242,8 @@ public class CertificateTests
         var subject = new X509Subject(name) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
         csr.Export().Utf8Decode().SaveToFile(csrPath);
-        var serialNumber = X509.GenerateSerialNumber();
-        var cert = X509.GenerateClientCert(caKey, caCert, csr, serialNumber, 360, subject.CommonName);
+        var serialNumber = X509Helper.GenerateSerialNumber();
+        var cert = X509Helper.GenerateClientCert(caKey, caCert, csr, serialNumber, 360, subject.CommonName);
         cert.SaveCrt(certPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
@@ -271,8 +271,8 @@ public class CertificateTests
         var subject = new X509Subject(name) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
         csr.Export().Utf8Decode().SaveToFile(csrPath);
-        var serialNumber = X509.GenerateSerialNumber();
-        var cert = X509.GenerateCodeSigningCert(privateKey, csr, serialNumber, 360, subject.CommonName);
+        var serialNumber = X509Helper.GenerateSerialNumber();
+        var cert = X509Helper.GenerateCodeSigningCert(privateKey, csr, serialNumber, 360, subject.CommonName);
         cert.SaveCrt(certPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
@@ -308,8 +308,8 @@ public class CertificateTests
         var subject = new X509Subject(name) { Country = "CN", City = "Random City", Province = "Random Province", Organization = "Random Organization", OrganizationalUnit = "Random Organization Unit" };
         var csr = new X509CertificateSigningRequest(subject.Text(), privateKey);
         csr.Export().Utf8Decode().SaveToFile(csrPath);
-        var serialNumber = X509.GenerateSerialNumber();
-        var cert = X509.GenerateCodeSigningCert(caKey, caCert, csr, serialNumber, 360, subject.CommonName);
+        var serialNumber = X509Helper.GenerateSerialNumber();
+        var cert = X509Helper.GenerateCodeSigningCert(caKey, caCert, csr, serialNumber, 360, subject.CommonName);
         cert.SaveCrt(certPath);
         SavePfxTest(cert, keyPath, pfxPath);
 

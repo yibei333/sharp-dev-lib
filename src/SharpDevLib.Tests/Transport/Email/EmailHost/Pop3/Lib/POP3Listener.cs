@@ -10,7 +10,7 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib;
 public class POP3Listener : IDisposable
 {
     private readonly object mutex;
-    private readonly List<TcpListener> listeners;
+    private readonly List<System.Net.Sockets.TcpListener> listeners;
     private readonly List<POP3ServerSession> connections;
     public IIPBanEngine IPBanEngine { get; set; } = new ThreeStrikesBanEngine();
     public bool RequireSecureLogin { get; set; }
@@ -46,7 +46,7 @@ public class POP3Listener : IDisposable
 
     public int ListenOnRandom(IPAddress addr, bool immediateTls)
     {
-        var listen = new TcpListener(addr, 0);
+        var listen = new System.Net.Sockets.TcpListener(addr, 0);
         listen.StartListen(OnNewConnection(immediateTls));
         StoreNewListener(listen);
         return ((IPEndPoint)listen.LocalEndpoint).Port;
@@ -54,12 +54,12 @@ public class POP3Listener : IDisposable
 
     public void ListenOn(IPAddress addr, int port, bool immediateTls)
     {
-        var listen = new TcpListener(addr, port);
+        var listen = new System.Net.Sockets.TcpListener(addr, port);
         listen.StartListen(OnNewConnection(immediateTls));
         StoreNewListener(listen);
     }
 
-    private void StoreNewListener(TcpListener listen)
+    private void StoreNewListener(System.Net.Sockets.TcpListener listen)
     {
         lock (mutex) listeners.Add(listen);
     }
@@ -67,7 +67,7 @@ public class POP3Listener : IDisposable
     private TcpListenerHelper.OnNewConnectionDelegate OnNewConnection(bool immediateTls)
     {
         return Internal;
-        void Internal(TcpClient tcp)
+        void Internal(System.Net.Sockets.TcpClient tcp)
         {
             lock (mutex)
             {

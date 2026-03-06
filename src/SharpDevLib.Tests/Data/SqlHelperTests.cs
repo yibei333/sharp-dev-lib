@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib.Data;
 using SharpDevLib.Tests.TestData;
 using SharpDevLib.Tests.TestData.Data;
 using System;

@@ -9,16 +9,16 @@ public class TransportExtensionsTests
     [TestMethod]
     public void GetAvailbelTcpTest()
     {
-        var port = TransportExtensions.GetAvailableTcpPort(50, 100);
-        Assert.IsTrue(port >= 50);
-        Assert.IsTrue(port <= 100);
+        var port = TcpHelper.GetAvailableTcpPort(50, 100);
+        Assert.IsGreaterThanOrEqualTo(50, port);
+        Assert.IsLessThanOrEqualTo(100, port);
     }
 
     [TestMethod]
     public void GetAvailbelUdpTest()
     {
-        var port = TransportExtensions.GetAvailableUdpPort(50, 100);
-        Assert.IsTrue(port >= 50);
-        Assert.IsTrue(port <= 100);
+        var port = UdpHelper.GetAvailableUdpPort(50, 100);
+        Assert.IsGreaterThanOrEqualTo(50, port);
+        Assert.IsLessThanOrEqualTo(100, port);
     }
 }

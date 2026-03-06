@@ -8,6 +8,7 @@ namespace SharpDevLib.Tests.Standard.Json;
 [TestClass]
 public class JsonTests
 {
+    internal static readonly JsonOption FormatJsonOption = new() { FormatJson = true };
     static readonly User _user = new("foo", 10);
     static readonly string _userString = _user.ToString();
     const string _json = "{\"Age\":10,\"Name\":\"foo\"}";
@@ -22,7 +23,7 @@ public class JsonTests
         var json = _user.Serialize();
         Assert.AreEqual(_json, json);
 
-        var formatedJson = _user.Serialize(JsonOption.DefaultWithFormat);
+        var formatedJson = _user.Serialize(FormatJsonOption);
         Assert.AreEqual(_formatedJson, formatedJson);
     }
 

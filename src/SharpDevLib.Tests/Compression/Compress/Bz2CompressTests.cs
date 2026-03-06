@@ -12,9 +12,9 @@ public class Bz2CompressTests
     public void TarCompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/bz2-create.tar.bz2");
-        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
+        var option = new CompressRequest([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.Default)),
             IncludeSourceDiretory = true
         };
         option.CompressAsync().GetAwaiter().GetResult();
@@ -26,9 +26,9 @@ public class Bz2CompressTests
     public void CompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/bz2-create.bz2");
-        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root/foo.txt")], targetPath)
+        var option = new CompressRequest([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root/foo.txt")], targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.Default)),
             IncludeSourceDiretory = true
         };
         option.CompressAsync().GetAwaiter().GetResult();
@@ -40,12 +40,12 @@ public class Bz2CompressTests
     public void CompressWithPasswordTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/bz2-password-create.bz2");
-        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
+        var option = new CompressRequest([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
         {
             Password = "foobar",
             Level = CompressionLevel.MinimumSize,
             IncludeSourceDiretory = true,
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.Default)),
         };
         Assert.ThrowsExactly<InvalidDataException>(() => option.CompressAsync().GetAwaiter().GetResult());
     }

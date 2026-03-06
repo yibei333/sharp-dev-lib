@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Compression;
+using SharpDevLib.Tests.Standard.Json;
 using System;
 using System.IO;
 
@@ -12,9 +13,9 @@ public class SevenZipDeCompressTests
     public void DeCompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/sevenzip-decompress");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/sevenzip.7z"), targetPath)
+        var option = new DeCompressRequest(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/sevenzip.7z"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat))
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonTests.FormatJsonOption))
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
@@ -25,10 +26,10 @@ public class SevenZipDeCompressTests
     public void DeCompressWithPasswordTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/sevenzip-decompress-password");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/sevenzip-password.7z"), targetPath)
+        var option = new DeCompressRequest(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/sevenzip-password.7z"), targetPath)
         {
             Password = "foobar",
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonTests.FormatJsonOption)),
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));

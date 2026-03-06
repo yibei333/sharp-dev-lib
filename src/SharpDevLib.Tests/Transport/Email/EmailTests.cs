@@ -43,7 +43,7 @@ public class EmailTests
         _pop3Host.StartAsync();
     }
 
-    [ClassCleanup(InheritanceBehavior.BeforeEachDerivedClass)]
+    [ClassCleanup(InheritanceBehavior.BeforeEachDerivedClass, ClassCleanupBehavior.EndOfClass)]
     public static void Cleanup()
     {
         _smtpHost?.Stop();
@@ -53,7 +53,7 @@ public class EmailTests
     [TestMethod]
     public void SendTest()
     {
-        var options = new EmailOptions
+        var options = new EmailConfig
         {
             Host = "localhost",
             Port = 25,
@@ -61,6 +61,7 @@ public class EmailTests
             SenderDisplayName = "foo",
             SenderPassword = "foo_password"
         };
+        EmailHelper.SetConfig(options);
         var content = new EmailContent(["bar@localhost"], "send test", "testbody")
         {
             Attachments = [
@@ -69,7 +70,7 @@ public class EmailTests
             CC = ["baz@localhost"],
             BCC = ["qux@localhost"]
         };
-        options.Send(content);
+        EmailHelper.SendAsync(content).GetAwaiter().GetResult();
 
         Assert.IsNotNull(_emailUserService);
         Assert.IsNotNull(_emailService);
@@ -88,67 +89,12 @@ public class EmailTests
         Assert.IsTrue(message.FindAllTextVersions().Any(x => x.Body.Utf8Encode().Contains(content.Body!)));
         Assert.AreEqual(content.Receivers?.First(), message.Headers.To.First().ToString());
         Assert.AreEqual(content.CC?.First(), message.Headers.Cc.First().ToString());
-        Assert.AreEqual(true, message.Headers.Bcc.IsNullOrEmpty());
+        Assert.IsTrue(message.Headers.Bcc.IsNullOrEmpty());
         var bccEmail = (from a in _emailService.All join b in _emailDetailService.All on a.Id equals b.EmailId join c in _emailUserService.All on b.UserId equals c.Id where b.Type == 2 && c.Name == "qux" && a.Subject == content.Subject select a).FirstOrDefault();
         Assert.IsNotNull(bccEmail);
 
         var attachments = message.FindAllAttachments();
-        Assert.AreEqual(1, attachments.Count);
-        var attachment = attachments.First();
-        Assert.IsNotNull(attachment);
-        using var attachStream = new MemoryStream();
-        attachment.Save(attachStream);
-        var attachmentText = attachStream.ToArray().Utf8Encode();
-        Assert.AreEqual("Hello,World!", attachmentText);
-    }
-
-    [TestMethod]
-    public void SendFromServiceTest()
-    {
-        EmailGlobalOptions.Host = "localhost";
-        EmailGlobalOptions.Port = 25;
-        EmailGlobalOptions.Sender = "baz@localhost";
-        EmailGlobalOptions.SenderDisplayName = "baz";
-        EmailGlobalOptions.SenderPassword = "baz_password";
-
-        IServiceCollection services = new ServiceCollection();
-        services.AddEmailService();
-        var serviceProvider = services.BuildServiceProvider().CreateScope().ServiceProvider;
-        var service = serviceProvider.GetRequiredService<IEmailService>();
-
-        var content = new EmailContent(["qux@localhost"], "send test", "testbody")
-        {
-            Attachments = [
-                new EmailAttachment(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))
-            ],
-            CC = ["foo@localhost"],
-            BCC = ["bar@localhost"]
-        };
-        service.Send(content);
-
-        Assert.IsNotNull(_emailUserService);
-        Assert.IsNotNull(_emailService);
-        Assert.IsNotNull(_emailDetailService);
-
-        var email = (from a in _emailService.All join b in _emailDetailService.All on a.Id equals b.EmailId join c in _emailUserService.All on b.UserId equals c.Id where b.Type == 1 && c.Name == EmailGlobalOptions.SenderDisplayName && a.Subject == content.Subject select a).FirstOrDefault();
-        Assert.IsNotNull(email);
-        Assert.IsTrue(File.Exists(email.FilePath));
-
-        using var stream = File.OpenRead(email.FilePath);
-        var message = Message.Load(stream);
-        Assert.IsNotNull(message);
-
-        Console.WriteLine(message.ToString());
-
-        Assert.IsTrue(message.FindAllTextVersions().Any(x => x.Body.Utf8Encode().Contains(content.Body!)));
-        Assert.AreEqual(content.Receivers?.First(), message.Headers.To.First().ToString());
-        Assert.AreEqual(content.CC?.First(), message.Headers.Cc.First().ToString());
-        Assert.AreEqual(true, message.Headers.Bcc.IsNullOrEmpty());
-        var bccEmail = (from a in _emailService.All join b in _emailDetailService.All on a.Id equals b.EmailId join c in _emailUserService.All on b.UserId equals c.Id where b.Type == 2 && c.Name == "qux" && a.Subject == content.Subject select a).FirstOrDefault();
-        Assert.IsNotNull(bccEmail);
-
-        var attachments = message.FindAllAttachments();
-        Assert.AreEqual(1, attachments.Count);
+        Assert.HasCount(1, attachments);
         var attachment = attachments.First();
         Assert.IsNotNull(attachment);
         using var attachStream = new MemoryStream();

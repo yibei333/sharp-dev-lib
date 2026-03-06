@@ -11,7 +11,7 @@ namespace SharpDevLib.Tests.Transport.Http.Base;
 public class HttpBaseTests
 {
     static WebServer? _server;
-    protected const string BaseUrl = "http://localhost:23456";
+    public const string BaseUrl = "http://localhost:23456";
 
     [ClassInitialize(InheritanceBehavior.BeforeEachDerivedClass)]
     public static void Initialize(TestContext context)
@@ -28,7 +28,6 @@ public class HttpBaseTests
                         )
                         .WithStaticFolder("/statics", AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData"), true, m => m.WithContentCaching(true));
         _server.Start(CancellationToken.None);
-        HttpGlobalOptions.BaseUrl = BaseUrl;
     }
 
     [ClassCleanup(InheritanceBehavior.BeforeEachDerivedClass)]

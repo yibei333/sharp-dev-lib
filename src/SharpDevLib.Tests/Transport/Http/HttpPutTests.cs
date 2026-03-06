@@ -13,9 +13,12 @@ public class HttpPutTests : HttpBaseTests
     [TestMethod]
     public void PutTest()
     {
-        var request = new HttpJsonRequest("/api/put", _userJson)
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/put"), _userJson)
         {
-            UseEdgeUserAgent = false
+            Config = new HttpConfig
+            {
+                UserAgent = null
+            }
         };
         var response = request.PutAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
@@ -24,29 +27,30 @@ public class HttpPutTests : HttpBaseTests
     [TestMethod]
     public void PutIntTest()
     {
-        var request = new HttpJsonRequest("/api/put/int", _userJson);
-        var response = request.PutAsync<int>().GetAwaiter().GetResult();
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/put/int"), _userJson);
+        var response = request.PutAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
-        Assert.AreEqual(10, response.Data);
+        Assert.AreEqual(10, response.GetResponseDataAsync<int>().GetAwaiter().GetResult());
     }
 
     [TestMethod]
     public void PutStringTest()
     {
-        var request = new HttpJsonRequest("/api/put/string", _userJson);
-        var response = request.PutAsync<string>().GetAwaiter().GetResult();
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/put/string"), _userJson);
+        var response = request.PutAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
-        Assert.AreEqual("foo", response.Data);
+        Assert.AreEqual("foo", response.GetResponseDataAsync<string>().GetAwaiter().GetResult());
     }
 
     [TestMethod]
     public void PutObjectTest()
     {
-        var request = new HttpJsonRequest("/api/put/object", _userJson);
-        var response = request.PutAsync<User>().GetAwaiter().GetResult();
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/put/object"), _userJson);
+        var response = request.PutAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
-        Assert.IsNotNull(response.Data);
-        Assert.AreEqual(10, response.Data.Age);
-        Assert.AreEqual("foo", response.Data.Name);
+        var data = response.GetResponseDataAsync<User>().GetAwaiter().GetResult();
+        Assert.IsNotNull(data);
+        Assert.AreEqual(10, data.Age);
+        Assert.AreEqual("foo", data.Name);
     }
 }

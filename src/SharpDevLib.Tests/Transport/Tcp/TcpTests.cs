@@ -13,40 +13,15 @@ public class TcpTests
     [TestMethod]
     public async Task Test()
     {
-        var listenerFactory = new TcpListenerFactory();
-        var listener = listenerFactory.Create(IPAddress.Any, 4098);
+        var listener = TcpHelper.CreateListener(IPAddress.Any, 4098);
         StartListener(listener);
 
-        var clientFactory = new TcpClientFactory();
-        var client = clientFactory.Create(IPAddress.Loopback, 4098);
+        var client = TcpHelper.CreateClient(IPAddress.Loopback, 4098);
         ClientStartConnectAndReceive(client);
-        await Task.Delay(500);
+        await Task.Delay(500, TestContext.CancellationTokenSource.Token);
 
         client.Send("hello,world".Utf8Decode());
-        await Task.Delay(500);
-
-        listener.Dispose();
-        client.Dispose();
-    }
-
-    [TestMethod]
-    public async Task ServiceTest()
-    {
-        IServiceCollection services = new ServiceCollection();
-        services.AddTcpService();
-        var serviceProvider = services.BuildServiceProvider();
-        var listenerFactory = serviceProvider.GetRequiredService<ITcpListenerFactory>();
-        var clientFactory = serviceProvider.GetRequiredService<ITcpClientFactory>();
-
-        var listener = listenerFactory.Create(IPAddress.Any, 4099);
-        StartListener(listener);
-
-        var client = clientFactory.Create(IPAddress.Loopback, 4099);
-        ClientStartConnectAndReceive(client);
-        await Task.Delay(500);
-
-        client.Send("hello,world".Utf8Decode());
-        await Task.Delay(500);
+        await Task.Delay(500, TestContext.CancellationTokenSource.Token);
 
         listener.Dispose();
         client.Dispose();
@@ -94,6 +69,8 @@ public class TcpTests
         };
         await client.ConnectAndReceiveAsync();
     }
+
+    public TestContext TestContext { get; set; }
 }
 
 

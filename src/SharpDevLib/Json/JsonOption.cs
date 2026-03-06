@@ -8,7 +8,6 @@ namespace SharpDevLib;
 /// <summary>
 /// json选项
 /// </summary>
-[BelongDirectory("Json")]
 public class JsonOption
 {
     readonly ConcurrentDictionary<string, JsonSerializerOptions> _cache = new();
@@ -21,17 +20,7 @@ public class JsonOption
     /// <summary>
     /// 默认选项
     /// </summary>
-    public static JsonOption Default = new();
-
-    /// <summary>
-    /// 默认格式化选项
-    /// </summary>
-    public static JsonOption DefaultWithFormat = new() { FormatJson = true };
-
-    /// <summary>
-    /// 默认小驼峰选项
-    /// </summary>
-    public static JsonOption DefaultWithCamelCaseLower = new() { NameFormat = JsonNameFormat.CamelCaseLower };
+    public static JsonOption Default { get; set; } = new();
 
     /// <summary>
     /// 是否格式华Json,默认为false

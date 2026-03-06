@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Tests.TestData;
 using SharpDevLib.Tests.Transport.Http.Base;
 using SharpDevLib.Transport;
@@ -13,7 +14,7 @@ public class HttpDeleteTests : HttpBaseTests
     [TestMethod]
     public void DeleteTest()
     {
-        var request = new HttpKeyValueRequest("/api/delete", new Dictionary<string, string> { { "name", "foo" }, { "age", "10" } });
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/delete")) { Parameters = new Dictionary<string, string?> { { "name", "foo" }, { "age", "10" } } };
         var response = request.DeleteAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
     }
@@ -22,37 +23,44 @@ public class HttpDeleteTests : HttpBaseTests
     public void DeleteIntTest()
     {
         var count = 0;
-        var request = new HttpKeyValueRequest("/api/delete/int", new Dictionary<string, string> { { "name", "foo" }, { "age", "10" } })
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/delete/int"))
         {
-            OnReceiveProgress = p =>
+            Parameters = new Dictionary<string, string?> { { "name", "foo" }, { "age", "10" } },
+            Config = new HttpConfig
             {
-                count++;
-                Console.WriteLine($"receive->{p}");
+                OnReceiveProgress = p =>
+                {
+                    count++;
+                    Console.WriteLine($"receive->{p}");
+                }
             }
         };
-        var response = request.DeleteAsync<int>().GetAwaiter().GetResult();
+        var response = request.DeleteAsync().GetAwaiter().GetResult();
         Assert.IsGreaterThan(0, count);
         Assert.IsTrue(response.IsSuccess);
-        Assert.AreEqual(10, response.Data);
+        var actual = response.GetResponseDataAsync<int>().GetAwaiter().GetResult();
+        Assert.AreEqual(10, actual);
     }
 
     [TestMethod]
     public void DeleteStringTest()
     {
-        var request = new HttpKeyValueRequest("/api/delete/string", new Dictionary<string, string> { { "name", "foo" }, { "age", "10" } });
-        var response = request.DeleteAsync<string>().GetAwaiter().GetResult();
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/delete/string")) { Parameters = new Dictionary<string, string?> { { "name", "foo" }, { "age", "10" } } };
+        var response = request.DeleteAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
-        Assert.AreEqual("foo", response.Data);
+        var actual = response.GetResponseDataAsync<string>().GetAwaiter().GetResult();
+        Assert.AreEqual("foo", actual);
     }
 
     [TestMethod]
     public void DeleteObjectTest()
     {
-        var request = new HttpKeyValueRequest("/api/delete/object", new Dictionary<string, string> { { "name", "foo" }, { "age", "10" } });
-        var response = request.DeleteAsync<User>().GetAwaiter().GetResult();
+        var request = new HttpRequest(BaseUrl.CombinePath("/api/delete/object")) { Parameters = new Dictionary<string, string?> { { "name", "foo" }, { "age", "10" } } };
+        var response = request.DeleteAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
-        Assert.IsNotNull(response.Data);
-        Assert.AreEqual("foo", response.Data.Name);
-        Assert.AreEqual(10, response.Data.Age);
+        var data = response.GetResponseDataAsync<User>().GetAwaiter().GetResult();
+        Assert.IsNotNull(data);
+        Assert.AreEqual("foo", data.Name);
+        Assert.AreEqual(10, data.Age);
     }
 }

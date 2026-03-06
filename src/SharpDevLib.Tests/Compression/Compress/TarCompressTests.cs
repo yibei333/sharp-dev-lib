@@ -12,9 +12,9 @@ public class TarCompressTests
     public void CompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/tar-create.tar");
-        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
+        var option = new CompressRequest([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize()),
         };
         option.CompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath));
@@ -25,12 +25,12 @@ public class TarCompressTests
     public void CompressWithPasswordTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/tar-password-create.tar");
-        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
+        var option = new CompressRequest([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
         {
             Password = "foobar",
             Level = CompressionLevel.MinimumSize,
             IncludeSourceDiretory = true,
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize()),
         };
         Assert.ThrowsExactly<InvalidDataException>(() => option.CompressAsync().GetAwaiter().GetResult());
     }

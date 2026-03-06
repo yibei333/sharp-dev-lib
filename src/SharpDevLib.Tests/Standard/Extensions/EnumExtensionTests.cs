@@ -49,7 +49,7 @@ public class EnumExtensionTests
     [TestMethod]
     public void GetDictionaryTest()
     {
-        var actual = EnumExtension.GetDictionary<Gender>().Serialize();
+        var actual = EnumHelper.GetDictionary<Gender>().Serialize();
         Console.WriteLine(actual);
         Assert.AreEqual(_dicJson, actual);
     }
@@ -57,7 +57,7 @@ public class EnumExtensionTests
     [TestMethod]
     public void GetKeyValuesTest()
     {
-        var actual = EnumExtension.GetKeyValues<Gender>().Serialize();
+        var actual = EnumHelper.GetKeyValues<Gender>().Serialize();
         Assert.AreEqual(_json, actual);
     }
 }

@@ -3,7 +3,6 @@
 /// <summary>
 /// json命名格式
 /// </summary>
-[BelongDirectory("Json")]
 public enum JsonNameFormat
 {
     /// <summary>

@@ -7,7 +7,6 @@ namespace SharpDevLib;
 /// 树形结构项
 /// </summary>
 /// <typeparam name="TMetaData">元数据类型</typeparam>
-[BelongDirectory("Tree")]
 public class TreeItem<TMetaData> where TMetaData : class
 {
     [JsonConstructor]
@@ -17,20 +16,17 @@ public class TreeItem<TMetaData> where TMetaData : class
         Children = children;
     }
 
-    internal TreeItem(TMetaData metaData, TreeBuildOption<TMetaData>? option)
+    internal TreeItem(TMetaData metaData, TreeOption? option = null)
     {
+        option ??= TreeOption.Default ?? new TreeOption();
         MetaData = metaData;
-        if (option is not null) Option = option;
-
-        Id = ToStringValue(Option.IdProperty, metaData, true);
-        ParentId = ToStringValue(Option.ParentIdProperty, metaData);
-        if (Option.TreeItemSortProperty is not null) SortValue = Option.MetaDataSortProperty?.GetValue(metaData);
+        var type = typeof(TMetaData);
+        Id = ToStringValue(option.GetIdProperty(type), metaData, true);
+        ParentId = ToStringValue(option.GetParentIdProperty(type), metaData);
     }
 
     internal string? Id { get; }
     internal string? ParentId { get; }
-    internal object? SortValue { get; }
-    internal TreeBuildOption<TMetaData> Option { get; } = new TreeBuildOption<TMetaData>();
 
     /// <summary>
     /// 元数据

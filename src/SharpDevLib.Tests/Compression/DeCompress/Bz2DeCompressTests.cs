@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Compression;
+using SharpDevLib.Tests.Standard.Json;
 using System;
 using System.IO;
 
@@ -12,9 +13,9 @@ public class Bz2DeCompressTests
     public void TarDeCompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/bz2-tar-decompress");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/bz2.tar.bz2"), targetPath)
+        var option = new DeCompressRequest(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/bz2.tar.bz2"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat))
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonTests.FormatJsonOption))
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
@@ -25,9 +26,9 @@ public class Bz2DeCompressTests
     public void DeCompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/bz2-decompress");
-        var option = new DeCompressOption(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/bz2.bz2"), targetPath)
+        var option = new DeCompressRequest(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/bz2.bz2"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat))
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonTests.FormatJsonOption))
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("bz2")));

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SharpDevLib.Tests.Standard.Json;
 using SharpDevLib.Tests.TestData;
 using System;
 using System.Collections.Generic;
@@ -24,10 +25,8 @@ public class TreeTests
             new ("2","bar"),
             new ("3","baz","0"),
         };
-        var option = new TreeBuildOption<Department<string>>
+        var option = new TreeOption("Identity", "PId")
         {
-            IdPropertyName = "Identity",
-            ParentIdPropertyName = "PId",
             SortPropertyName = "Identity",
             Descending = true
         };
@@ -36,17 +35,17 @@ public class TreeTests
         var tree = departments.BuildTree(option);
         var json = tree.Serialize(jsonOption);
 
-        var deserialized = json.DeSerializeTree(option);
+        var deserialized = json.DeSerializeTree<Department<string>>(option);
         var deserializedJson = deserialized.Serialize(jsonOption);
         Console.WriteLine(deserializedJson);
         Assert.AreEqual(json, deserializedJson);
 
         var metaList = deserialized.ToMetaDataList();
-        Console.WriteLine(metaList.Serialize(JsonOption.DefaultWithFormat));
+        Console.WriteLine(metaList.Serialize(JsonTests.FormatJsonOption));
         Assert.HasCount(9, metaList);
 
         var flatList = deserialized.ToFlatList();
-        Console.WriteLine(flatList.Serialize(JsonOption.DefaultWithFormat));
+        Console.WriteLine(flatList.Serialize(JsonTests.FormatJsonOption));
         Assert.HasCount(9, flatList);
     }
 
@@ -68,10 +67,8 @@ public class TreeTests
             new (Guid.NewGuid(),"bar"),
             new (Guid.NewGuid(),"baz",Guid.NewGuid()),
         };
-        var option = new TreeBuildOption<Department<Guid>>
+        var option = new TreeOption("Identity","PId")
         {
-            IdPropertyName = "Identity",
-            ParentIdPropertyName = "PId",
             SortPropertyName = "Identity",
             Descending = true
         };
@@ -80,17 +77,17 @@ public class TreeTests
         var tree = departments.BuildTree(option);
         var json = tree.Serialize(jsonOption);
 
-        var deserialized = json.DeSerializeTree(option);
+        var deserialized = json.DeSerializeTree<Department<Guid>>(option);
         var deserializedJson = deserialized.Serialize(jsonOption);
         Console.WriteLine(deserializedJson);
         Assert.AreEqual(json, deserializedJson);
 
         var metaList = deserialized.ToMetaDataList();
-        Console.WriteLine(metaList.Serialize(JsonOption.DefaultWithFormat));
+        Console.WriteLine(metaList.Serialize(JsonTests.FormatJsonOption));
         Assert.HasCount(9, metaList);
 
         var flatList = deserialized.ToFlatList();
-        Console.WriteLine(flatList.Serialize(JsonOption.DefaultWithFormat));
+        Console.WriteLine(flatList.Serialize(JsonTests.FormatJsonOption));
         Assert.HasCount(9, flatList);
     }
 
@@ -110,10 +107,8 @@ public class TreeTests
             new (2,"bar"),
             new (3,"baz",0),
         };
-        var option = new TreeBuildOption<Department<int>>
+        var option = new TreeOption("Identity","PId")
         {
-            IdPropertyName = "Identity",
-            ParentIdPropertyName = "PId",
             SortPropertyName = "Identity",
             Descending = true
         };
@@ -122,17 +117,17 @@ public class TreeTests
         var jsonOption = new JsonOption { FormatJson = true, OrderByNameProperty = false };
         var json = tree.Serialize(jsonOption);
 
-        var deserialized = json.DeSerializeTree(option);
+        var deserialized = json.DeSerializeTree<Department<int>>(option);
         var deserializedJson = deserialized.Serialize(jsonOption);
         Console.WriteLine(deserializedJson);
         Assert.AreEqual(json, deserializedJson);
 
         var metaList = deserialized.ToMetaDataList();
-        Console.WriteLine(metaList.Serialize(JsonOption.DefaultWithFormat));
+        Console.WriteLine(metaList.Serialize(JsonTests.FormatJsonOption));
         Assert.HasCount(9, metaList);
 
         var flatList = deserialized.ToFlatList();
-        Console.WriteLine(flatList.Serialize(JsonOption.DefaultWithFormat));
+        Console.WriteLine(flatList.Serialize(JsonTests.FormatJsonOption));
         Assert.HasCount(9, flatList);
     }
 
@@ -143,10 +138,8 @@ public class TreeTests
         {
             new ("","foo"),
         };
-        var option = new TreeBuildOption<Department<string>>
+        var option = new TreeOption("Identity","PId")
         {
-            IdPropertyName = "Identity",
-            ParentIdPropertyName = "PId",
             SortPropertyName = "Identity",
             Descending = true
         };
@@ -162,10 +155,8 @@ public class TreeTests
             new ("2","foo","1"),
             new ("3","foo","2"),
         };
-        var option = new TreeBuildOption<Department<string>>
+        var option = new TreeOption("Identity", "PId")
         {
-            IdPropertyName = "Identity",
-            ParentIdPropertyName = "PId",
             SortPropertyName = "Identity",
             Descending = true
         };
@@ -179,10 +170,8 @@ public class TreeTests
         {
             new ("1","foo","1"),
         };
-        var option = new TreeBuildOption<Department<string>>
+        var option = new TreeOption("Identity", "PId")
         {
-            IdPropertyName = "Identity",
-            ParentIdPropertyName = "PId",
             SortPropertyName = "Identity",
             Descending = true
         };
@@ -198,10 +187,8 @@ public class TreeTests
         {
             new ("1","foo","3"),
         };
-        var option = new TreeBuildOption<Department<string>>
+        var option = new TreeOption(idPropertyName,parentIdPropertyName)
         {
-            IdPropertyName = idPropertyName,
-            ParentIdPropertyName = parentIdPropertyName,
             SortPropertyName = sortPropertyName,
             Descending = true
         };
@@ -216,10 +203,8 @@ public class TreeTests
         {
             new ("1","foo","3"),
         };
-        Assert.ThrowsExactly<ArgumentException>(() => new TreeBuildOption<Department<string>>
+        Assert.ThrowsExactly<ArgumentException>(() => new TreeOption(idPropertyName,parentIdPropertyName)
         {
-            IdPropertyName = idPropertyName,
-            ParentIdPropertyName = parentIdPropertyName,
             SortPropertyName = sortPropertyName,
             Descending = true
         });
@@ -235,10 +220,8 @@ public class TreeTests
         {
             new ("1","foo","3"),
         };
-        var option = new TreeBuildOption<Department<string>>
+        var option = new TreeOption(idPropertyName,parentIdPropertyName)
         {
-            IdPropertyName = idPropertyName,
-            ParentIdPropertyName = parentIdPropertyName,
             SortPropertyName = sortPropertyName,
             Descending = true
         };
@@ -253,10 +236,8 @@ public class TreeTests
             new ("1","foo","3"),
             new ("1","bar","0"),
         };
-        var option = new TreeBuildOption<Department<string>>
+        var option = new TreeOption("Identity", "PId")
         {
-            IdPropertyName = "Identity",
-            ParentIdPropertyName = "PId",
             SortPropertyName = "Identity",
             Descending = true
         };

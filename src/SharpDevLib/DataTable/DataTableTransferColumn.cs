@@ -6,7 +6,6 @@ namespace SharpDevLib;
 /// 实例化DataTable转换列
 /// </summary>
 /// <param name="name">源DataTable中的列名,完全匹配,注意空格和*号</param>
-[BelongDirectory("DataTable")]
 public class DataTableTransferColumn(string name)
 {
     /// <summary>

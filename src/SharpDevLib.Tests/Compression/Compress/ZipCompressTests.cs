@@ -12,9 +12,9 @@ public class ZipCompressTests
     public void CompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/zip-create.zip");
-        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
+        var option = new CompressRequest([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize()),
         };
         option.CompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath));
@@ -25,12 +25,12 @@ public class ZipCompressTests
     public void CompressWithPasswordTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/zip-password-create.zip");
-        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
+        var option = new CompressRequest([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
         {
             Password = "foobar",
             Level = CompressionLevel.MinimumSize,
             IncludeSourceDiretory = true,
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize()),
         };
         option.CompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath));
@@ -41,11 +41,11 @@ public class ZipCompressTests
     public void SyncCompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/zip-create-sync.zip");
-        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
+        var option = new CompressRequest([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize()),
         };
-        option.Compress();
+        option.CompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath));
         Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
@@ -54,14 +54,14 @@ public class ZipCompressTests
     public void SyncCompressWithPasswordTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/zip-password-create-sync.zip");
-        var option = new CompressOption([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
+        var option = new CompressRequest([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
         {
             Password = "foobar",
             Level = CompressionLevel.MinimumSize,
             IncludeSourceDiretory = true,
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonOption.DefaultWithFormat)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize()),
         };
-        option.Compress();
+        option.CompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath));
         Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
