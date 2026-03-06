@@ -2,6 +2,7 @@
 
 namespace SharpDevLib.Tests.NullCheck;
 
+[TestClass]
 public class StringNullCheckTests
 {
     [TestMethod]

@@ -3,33 +3,36 @@
 namespace SharpDevLib;
 
 /// <summary>
-/// 树形结构构建选项
+/// 树形结构构建选项，用于自定义树形结构的构建行为
 /// </summary>
-/// <param name="idPropertyName">Id属性名称</param>
-/// <param name="parentIdPropertyName">父Id属性名称</param>
+/// <param name="idPropertyName">标识节点的属性名称，默认为"Id"</param>
+/// <param name="parentIdPropertyName">标识父节点的属性名称，默认为"ParentId"</param>
 public class TreeOption(string idPropertyName = "Id", string parentIdPropertyName = "ParentId")
 {
     readonly Dictionary<string, PropertyInfo> _cache = [];
 
+    /// <summary>
+    /// 获取或设置默认的树形结构构建选项
+    /// </summary>
     public static TreeOption? Default { get; set; } = new TreeOption();
 
     /// <summary>
-    /// Id属性名称
+    /// 获取标识节点的属性名称
     /// </summary>
     public string IdPropertyName { get; } = idPropertyName;
 
     /// <summary>
-    /// 父Id属性名称
+    /// 获取标识父节点的属性名称
     /// </summary>
     public string ParentIdPropertyName { get; } = parentIdPropertyName;
 
     /// <summary>
-    /// 排序属性名称
+    /// 获取或设置用于排序的属性名称，如果为null则不进行排序
     /// </summary>
     public string? SortPropertyName { get; set; }
 
     /// <summary>
-    /// 是否降序
+    /// 获取或设置是否按降序排序，默认为false
     /// </summary>
     public bool Descending { get; set; }
 

@@ -3,7 +3,7 @@
 namespace SharpDevLib;
 
 /// <summary>
-/// http请求
+/// HTTP请求
 /// </summary>
 public class HttpRequest
 {
@@ -16,9 +16,9 @@ public class HttpRequest
     }
 
     /// <summary>
-    /// 实例化http请求
+    /// 实例化HTTP请求
     /// </summary>
-    /// <param name="url">请求地址</param>
+    /// <param name="url">请求URL地址</param>
     public HttpRequest(string url)
     {
         Url = url;
@@ -26,10 +26,10 @@ public class HttpRequest
     }
 
     /// <summary>
-    /// 实例化http请求
+    /// 实例化HTTP请求（JSON格式）
     /// </summary>
-    /// <param name="url">请求地址</param>
-    /// <param name="json">json</param>
+    /// <param name="url">请求URL地址</param>
+    /// <param name="json">JSON格式的请求体</param>
     public HttpRequest(string url, string json)
     {
         Url = url;
@@ -38,48 +38,49 @@ public class HttpRequest
     }
 
     /// <summary>
-    /// 配置
+    /// HTTP配置
     /// </summary>
     public HttpConfig? Config { get; set; }
 
     /// <summary>
-    /// 请求地址
+    /// 请求URL地址
     /// </summary>
     public string Url { get; }
 
     internal string RequestUrl { get; set; }
 
     /// <summary>
-    /// 参数
+    /// 请求参数字典
     /// </summary>
+    /// <remarks>用于GET/DELETE请求的查询参数，或POST/PUT请求的表单参数</remarks>
     public Dictionary<string, string?>? Parameters { get; set; }
 
     /// <summary>
-    /// json参数
+    /// JSON格式的请求体
     /// </summary>
     public string? Json { get; }
 
     /// <summary>
-    /// 文件
+    /// 表单文件列表
     /// </summary>
     public List<HttpFormFile>? Files { get; set; }
 
     /// <summary>
-    /// 请求头
+    /// HTTP请求头字典
     /// </summary>
     public Dictionary<string, string[]>? Headers { get; set; }
 
     /// <summary>
-    /// 请求Cookie
+    /// HTTP请求Cookie列表
     /// </summary>
     public List<Cookie>? Cookies { get; set; }
 
     /// <summary>
-    /// 添加参数
+    /// 添加请求参数
     /// </summary>
-    /// <param name="key">key</param>
-    /// <param name="value">value</param>
-    /// <returns>Request</returns>
+    /// <param name="key">参数键</param>
+    /// <param name="value">参数值</param>
+    /// <returns>当前请求对象，支持链式调用</returns>
     public HttpRequest AddParameter(string key, string? value)
     {
         Parameters ??= [];
@@ -88,11 +89,11 @@ public class HttpRequest
     }
 
     /// <summary>
-    /// 添加头
+    /// 添加HTTP请求头
     /// </summary>
-    /// <param name="key">key</param>
-    /// <param name="value">value</param>
-    /// <returns>Request</returns>
+    /// <param name="key">请求头名称</param>
+    /// <param name="value">请求头值数组</param>
+    /// <returns>当前请求对象，支持链式调用</returns>
     public HttpRequest AddHeader(string key, string[] value)
     {
         Headers ??= [];
@@ -101,10 +102,10 @@ public class HttpRequest
     }
 
     /// <summary>
-    /// 添加cookie
+    /// 添加Cookie
     /// </summary>
-    /// <param name="cookie">cookie</param>
-    /// <returns>Request</returns>
+    /// <param name="cookie">Cookie对象</param>
+    /// <returns>当前请求对象，支持链式调用</returns>
     public HttpRequest AddCookie(Cookie cookie)
     {
         Cookies ??= [];
@@ -113,10 +114,10 @@ public class HttpRequest
     }
 
     /// <summary>
-    /// 添加file
+    /// 添加表单文件
     /// </summary>
-    /// <param name="file">file</param>
-    /// <returns>Request</returns>
+    /// <param name="file">表单文件对象</param>
+    /// <returns>当前请求对象，支持链式调用</returns>
     public HttpRequest AddFile(HttpFormFile file)
     {
         Files ??= [];

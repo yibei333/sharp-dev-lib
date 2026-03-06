@@ -4,7 +4,7 @@ using System.Net.Sockets;
 namespace SharpDevLib;
 
 /// <summary>
-/// Udp客户端
+/// UDP客户端
 /// </summary>
 public class UdpClient : IDisposable
 {
@@ -33,7 +33,7 @@ public class UdpClient : IDisposable
     public Socket Socket { get; private set; }
 
     /// <summary>
-    /// 本地地址
+    /// 本地绑定IP地址
     /// </summary>
     public IPAddress? LocalAdress { get; }
 
@@ -58,25 +58,24 @@ public class UdpClient : IDisposable
     public ITransportSendAdapter? SendAdapter { get; set; }
 
     /// <summary>
-    /// 接收事件
+    /// 接收到数据事件
     /// </summary>
     public event EventHandler<UdpClientDataEventArgs>? Received;
 
     /// <summary>
-    /// 发送事件
+    /// 数据发送完成事件
     /// </summary>
     public event EventHandler<UdpClientDataEventArgs>? Sended;
 
     /// <summary>
-    /// 异常事件
+    /// 发生异常事件
     /// </summary>
     public event EventHandler<UdpClientExceptionEventArgs>? Error;
 
     /// <summary>
-    /// 开始接收
+    /// 开始异步接收数据
     /// </summary>
-    /// <param name="cancellationToken">cancellationToken</param>
-    /// <returns>task</returns>
+    /// <param name="cancellationToken">取消令牌</param>
     public async Task ReceiveAsync(CancellationToken? cancellationToken = null)
     {
         await Task.Run(() =>
@@ -103,12 +102,12 @@ public class UdpClient : IDisposable
     }
 
     /// <summary>
-    /// 发送
+    /// 发送数据到指定远程端点
     /// </summary>
-    /// <param name="remoteAdress">远程地址</param>
+    /// <param name="remoteAdress">远程IP地址</param>
     /// <param name="remotePort">远程端口</param>
-    /// <param name="bytes">字节数组</param>
-    /// <param name="throwIfException">发送失败是否抛出异常,默认false,可以订阅Error事件</param>
+    /// <param name="bytes">要发送的字节数组</param>
+    /// <param name="throwIfException">发送失败是否抛出异常，默认false，可订阅Error事件</param>
     public void Send(IPAddress remoteAdress, int remotePort, byte[] bytes, bool throwIfException = false)
     {
         try
@@ -125,7 +124,7 @@ public class UdpClient : IDisposable
     }
 
     /// <summary>
-    /// dispose
+    /// 释放资源
     /// </summary>
     public void Dispose()
     {

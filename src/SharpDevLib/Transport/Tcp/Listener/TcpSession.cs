@@ -3,9 +3,9 @@
 namespace SharpDevLib;
 
 /// <summary>
-/// Tcp会话
+/// TCP会话
 /// </summary>
-/// <typeparam name="TMetadata">元数据</typeparam>
+/// <typeparam name="TMetadata">会话元数据类型</typeparam>
 public class TcpSession<TMetadata> : IDisposable
 {
     TcpSessionStates _state = 0;
@@ -25,22 +25,22 @@ public class TcpSession<TMetadata> : IDisposable
     ITransportSendAdapter SendAdapter { get; }
 
     /// <summary>
-    /// 套接字
+    /// 底层套接字
     /// </summary>
     public Socket Socket { get; }
 
     /// <summary>
-    /// 所属监听器
+    /// 所属的TCP监听器
     /// </summary>
     public TcpListener<TMetadata> Listener { get; }
 
     /// <summary>
-    /// 元数据
+    /// 会话元数据
     /// </summary>
     public TMetadata Metadata { get; }
 
     /// <summary>
-    /// 状态
+    /// 会话状态
     /// </summary>
     public TcpSessionStates State
     {
@@ -55,30 +55,30 @@ public class TcpSession<TMetadata> : IDisposable
     }
 
     /// <summary>
-    /// 状态变更回调事件
+    /// 状态变更事件
     /// </summary>
     public event EventHandler<TcpSessionStateChangedEventArgs<TMetadata>>? StateChanged;
 
     /// <summary>
-    /// 接收事件
+    /// 接收到数据事件
     /// </summary>
     public event EventHandler<TcpSessionDataEventArgs<TMetadata>>? Received;
 
     /// <summary>
-    /// 发送事件
+    /// 数据发送完成事件
     /// </summary>
     public event EventHandler<TcpSessionDataEventArgs<TMetadata>>? Sended;
 
     /// <summary>
-    /// 异常事件
+    /// 发生异常事件
     /// </summary>
     public event EventHandler<TcpSessionExceptionEventArgs<TMetadata>>? Error;
 
     /// <summary>
-    /// 发送
+    /// 发送数据
     /// </summary>
-    /// <param name="bytes">字节数组</param>
-    /// <param name="throwIfException">发送失败是否抛出异常,默认false,可以订阅Error事件</param>
+    /// <param name="bytes">要发送的字节数组</param>
+    /// <param name="throwIfException">发送失败是否抛出异常，默认false，可订阅Error事件</param>
     public void Send(byte[] bytes, bool throwIfException = false)
     {
         try
@@ -132,7 +132,7 @@ public class TcpSession<TMetadata> : IDisposable
     }
 
     /// <summary>
-    /// 关闭并释放连接
+    /// 关闭连接并从监听器中移除
     /// </summary>
     public void Close()
     {
@@ -144,7 +144,7 @@ public class TcpSession<TMetadata> : IDisposable
     }
 
     /// <summary>
-    /// dispose
+    /// 释放资源
     /// </summary>
     public void Dispose()
     {

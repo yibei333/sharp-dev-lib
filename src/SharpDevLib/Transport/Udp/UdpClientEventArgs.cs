@@ -3,21 +3,18 @@
 namespace SharpDevLib;
 
 /// <summary>
-/// Udp客户端事件参数
+/// UDP客户端事件参数
 /// </summary>
-/// <remarks>
-/// 实例化Udp会话事件
-/// </remarks>
-/// <param name="client">客户端</param>
+/// <param name="client">UDP客户端实例</param>
 public class UdpClientEventArgs(UdpClient client)
 {
     /// <summary>
-    /// 客户端
+    /// UDP客户端实例
     /// </summary>
     public UdpClient Client { get; } = client;
 
     /// <summary>
-    /// 远程终结点
+    /// 远程端点
     /// </summary>
     public EndPoint? RemoteEndPoint { get; internal set; }
 }

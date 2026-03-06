@@ -5,20 +5,20 @@ using System.Text;
 namespace SharpDevLib;
 
 /// <summary>
-/// 进程帮助类
+/// 进程帮助类，提供进程启动、执行和管理功能
 /// </summary>
 public static class ProcessHelper
 {
     /// <summary>
-    /// 日志记录器
+    /// 获取或设置日志记录器，用于记录进程执行信息
     /// </summary>
     public static ILogger? Logger { get; set; } = new SimpleConsoleLogger(nameof(ProcessHelper));
 
     /// <summary>
-    /// 启动进程并等待退出
+    /// 启动进程并等待其退出
     /// </summary>
-    /// <param name="process">进程实例</param>
-    /// <param name="request">进程启动请求</param>
+    /// <param name="process">要启动的进程实例</param>
+    /// <param name="request">进程启动请求配置</param>
     /// <returns>进程执行结果</returns>
     public static async Task<ProcessResult> StartAndWaitForExitAsync(this Process process, ProcessStartRequest request)
     {

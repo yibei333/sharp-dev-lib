@@ -3,7 +3,7 @@
 namespace SharpDevLib;
 
 /// <summary>
-/// RSA密钥参数
+/// RSA密钥参数类，存储RSA密钥的详细参数信息（16进制字符串表示）
 /// </summary>
 public class RsaKeyParameters
 {
@@ -19,37 +19,37 @@ public class RsaKeyParameters
     }
 
     /// <summary>
-    /// Modulus参数
+    /// 模数（Modulus），RSA公钥和私钥共有的参数
     /// </summary>
     public string Modulus { get; }
 
     /// <summary>
-    /// Exponent参数
+    /// 公钥指数（Exponent），通常为65537（0x010001）
     /// </summary>
     public string Exponent { get; }
 
     /// <summary>
-    /// D参数
+    /// 私钥指数（D），仅私钥包含此参数
     /// </summary>
     public string? D { get; }
 
     /// <summary>
-    /// P参数
+    /// 质数因子P，仅私钥包含此参数
     /// </summary>
     public string? P { get; }
 
     /// <summary>
-    /// DP参数
+    /// CRT参数DP，仅私钥包含此参数，用于中国剩余定理优化
     /// </summary>
     public string? DP { get; }
 
     /// <summary>
-    /// DQ参数
+    /// CRT参数DQ，仅私钥包含此参数，用于中国剩余定理优化
     /// </summary>
     public string? DQ { get; }
 
     /// <summary>
-    /// InverseQ参数
+    /// CRT参数InverseQ，仅私钥包含此参数，用于中国剩余定理优化
     /// </summary>
     public string? InverseQ { get; }
 }

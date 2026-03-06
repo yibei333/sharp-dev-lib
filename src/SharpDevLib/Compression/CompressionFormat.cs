@@ -1,40 +1,40 @@
 ﻿namespace SharpDevLib;
 
 /// <summary>
-/// 压缩文件格式
+/// 压缩文件格式枚举
 /// </summary>
 public enum CompressionFormat
 {
     /// <summary>
-    /// 未知
+    /// 未知格式
     /// </summary>
     UnKnown,
     /// <summary>
-    /// .zip
+    /// ZIP格式，扩展名为.zip
     /// </summary>
     Zip,
     /// <summary>
-    /// .rar
+    /// RAR格式，扩展名为.rar
     /// </summary>
     Rar,
     /// <summary>
-    /// .7z
+    /// 7-Zip格式，扩展名为.7z
     /// </summary>
     SevenZip,
     /// <summary>
-    /// .tar
+    /// TAR格式，扩展名为.tar
     /// </summary>
     Tar,
     /// <summary>
-    /// .tgz或.tar.gz
+    /// GZIP格式，扩展名为.tgz或.tar.gz
     /// </summary>
     Gz,
     /// <summary>
-    /// .tar.xz
+    /// XZ格式，扩展名为.tar.xz
     /// </summary>
     Xz,
     /// <summary>
-    /// .bz2
+    /// BZIP2格式，扩展名为.bz2
     /// </summary>
     Bz2,
 }

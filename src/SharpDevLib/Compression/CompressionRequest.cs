@@ -1,12 +1,12 @@
 ﻿namespace SharpDevLib;
 
 /// <summary>
-/// 压缩/解压选项
+/// 压缩/解压请求基类，定义压缩和解压操作的通用配置
 /// </summary>
 /// <remarks>
-/// 实例化压缩/解压选项
+/// 使用指定目标路径实例化压缩/解压请求
 /// </remarks>
-/// <param name="targetPath">目标路径</param>
+/// <param name="targetPath">保存压缩文件或解压文件的目标路径</param>
 public abstract class CompressionRequest(string targetPath)
 {
     long _transfered;
@@ -33,22 +33,22 @@ public abstract class CompressionRequest(string targetPath)
     }
 
     /// <summary>
-    /// 保存目标路径
+    /// 获取保存压缩文件或解压文件的目标路径
     /// </summary>
     public string TargetPath { get; } = targetPath;
 
     /// <summary>
-    /// 密码
+    /// 获取或设置压缩文件的密码（如果需要加密）
     /// </summary>
     public string? Password { get; set; }
 
     /// <summary>
-    /// 取消令牌
+    /// 获取或设置取消令牌，用于取消长时间运行的压缩或解压操作
     /// </summary>
     public CancellationToken? CancellationToken { get; set; }
 
     /// <summary>
-    /// 进度变化回调
+    /// 获取或设置进度变化回调函数，用于接收压缩/解压进度更新
     /// </summary>
     public Action<CompressionProgressArgs>? OnProgress { get; set; }
 }

@@ -1,16 +1,13 @@
 ﻿namespace SharpDevLib;
 
 /// <summary>
-/// Tcp客户端事件参数
+/// TCP客户端事件参数
 /// </summary>
-/// <remarks>
-/// 实例化Tcp会话事件
-/// </remarks>
-/// <param name="client">客户端</param>
+/// <param name="client">TCP客户端实例</param>
 public class TcpClientEventArgs(TcpClient client)
 {
     /// <summary>
-    /// 客户端
+    /// TCP客户端实例
     /// </summary>
     public TcpClient Client { get; } = client;
 }

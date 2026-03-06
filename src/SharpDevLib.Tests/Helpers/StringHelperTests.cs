@@ -83,7 +83,7 @@ public class StringHelperTests
     {
         var actual = str.SplitToGuidList(separator, removeEmptyEntries, false, distinct);
         Console.WriteLine(actual.Serialize());
-        Assert.AreEqual(expected, actual.Count);
+        Assert.HasCount(expected, actual);
     }
 
     [TestMethod]

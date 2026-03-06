@@ -1,7 +1,7 @@
 ﻿namespace SharpDevLib;
 
 /// <summary>
-/// jwt验签结果
+/// JWT验证结果类，包含验证状态和JWT各部分信息
 /// </summary>
 public class JwtVerifyResult
 {
@@ -20,27 +20,27 @@ public class JwtVerifyResult
     }
 
     /// <summary>
-    /// 验证是否通过
+    /// 验证是否通过，true表示验证成功，false表示验证失败
     /// </summary>
     public bool IsVerified { get; }
 
     /// <summary>
-    /// 算法
+    /// JWT使用的签名算法类型
     /// </summary>
     public JwtAlgorithm Algorithm { get; }
 
     /// <summary>
-    /// jwt头
+    /// JWT头部部分的Base64Url解码字符串
     /// </summary>
     public string? Header { get; }
 
     /// <summary>
-    /// jwt载荷
+    /// JWT载荷部分的Base64Url解码字符串
     /// </summary>
     public string? Payload { get; }
 
     /// <summary>
-    /// 签名
+    /// JWT签名部分的Base64Url解码字符串
     /// </summary>
     public string? Signature { get; }
 }

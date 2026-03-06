@@ -3,7 +3,7 @@
 namespace SharpDevLib;
 
 /// <summary>
-/// http进度
+/// HTTP传输进度
 /// </summary>
 public class HttpProgress
 {
@@ -13,6 +13,7 @@ public class HttpProgress
     /// <summary>
     /// 总字节数
     /// </summary>
+    /// <remarks>某些情况下可能为0，表示未知总大小</remarks>
     public long Total { get; internal set; }
 
     /// <summary>
@@ -36,18 +37,20 @@ public class HttpProgress
     }
 
     /// <summary>
-    /// 进度(0-100)
+    /// 传输进度百分比
     /// </summary>
+    /// <value>范围0-100</value>
     public double Progress => Total <= 0 ? 0 : Math.Round(Transfered * 100.0 / Total, 2);
 
     /// <summary>
-    /// 进度字符串(带%)
+    /// 进度字符串（带百分号）
     /// </summary>
     public string ProgressString => $"{Progress}%";
 
     /// <summary>
-    /// 传输速度
+    /// 当前传输速度
     /// </summary>
+    /// <value>格式为"XX/s"，XX为带单位的大小字符串</value>
     public string Speed { get; private set; } = string.Empty;
 
     internal void Reset()
@@ -58,9 +61,9 @@ public class HttpProgress
     }
 
     /// <summary>
-    /// 将请求转换为字符串,用于记录日志
+    /// 将进度信息转换为字符串
     /// </summary>
-    /// <returns>字符串</returns>
+    /// <returns>包含总字节数、已传输字节数、进度、速度等信息的字符串</returns>
     public override string ToString()
     {
         var builder = new StringBuilder();

@@ -4,7 +4,8 @@ using System.Text.RegularExpressions;
 namespace SharpDevLib;
 
 /// <summary>
-/// 单元格引用
+/// Excel 单元格引用类
+/// 用于表示 Excel 中的单元格位置,支持通过行号、列号或单元格引用字符串创建
 /// </summary>
 public class CellReference
 {
@@ -13,10 +14,10 @@ public class CellReference
     static readonly ConcurrentDictionary<uint, string> _columnNameCache = [];
 
     /// <summary>
-    /// 实例化单元格引用
+    /// 实例化单元格引用对象
     /// </summary>
-    /// <param name="rowIndex">行号,以1开始</param>
-    /// <param name="columnName">列明,如A,B,C</param>
+    /// <param name="rowIndex">行号,从 1 开始</param>
+    /// <param name="columnName">列名,如 A、B、C</param>
     public CellReference(uint rowIndex, string columnName)
     {
         RowIndex = rowIndex;
@@ -26,11 +27,11 @@ public class CellReference
     }
 
     /// <summary>
-    /// 实例化单元格引用
+    /// 实例化单元格引用对象
     /// </summary>
-    /// <param name="rowIndex">行号,以1开始</param>
-    /// <param name="columnIndex">列号,以1开始</param>
-    /// <exception cref="NotSupportedException">当列号超过ZZ时引发异常</exception>
+    /// <param name="rowIndex">行号,从 1 开始</param>
+    /// <param name="columnIndex">列号,从 1 开始</param>
+    /// <exception cref="NotSupportedException">当列号超过 ZZ (最大支持到 702) 时引发异常</exception>
     public CellReference(uint rowIndex, uint columnIndex)
     {
         RowIndex = rowIndex;
@@ -52,11 +53,11 @@ public class CellReference
     }
 
     /// <summary>
-    /// 实例化单元格引用
+    /// 实例化单元格引用对象
     /// </summary>
-    /// <param name="reference">引用,如A1,B2</param>
-    /// <exception cref="ArgumentNullException">当参数reference为空时引发异常</exception>
-    /// <exception cref="Exception">当参数reference不合法时时引发异常</exception>
+    /// <param name="reference">单元格引用字符串,如 A1、B2</param>
+    /// <exception cref="ArgumentNullException">当参数 reference 为 null 或空白字符时引发异常</exception>
+    /// <exception cref="Exception">当参数 reference 不合法时引发异常</exception>
     public CellReference(string? reference)
     {
         if (reference.IsNullOrWhiteSpace()) throw new ArgumentNullException("reference could not be null or whitespace");
@@ -77,22 +78,22 @@ public class CellReference
     }
 
     /// <summary>
-    /// 行号,以1开始
+    /// 行号,从 1 开始
     /// </summary>
     public uint RowIndex { get; }
 
     /// <summary>
-    /// 列号,以1开始
+    /// 列号,从 1 开始
     /// </summary>
     public uint ColumnIndex { get; }
 
     /// <summary>
-    /// 列明,如A,B,C
+    /// 列名,如 A、B、C
     /// </summary>
     public string ColumnName { get; }
 
     /// <summary>
-    /// 引用,如A1,B2
+    /// 单元格引用,如 A1、B2
     /// </summary>
     public string Reference { get; }
 }

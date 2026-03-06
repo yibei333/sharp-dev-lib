@@ -5,53 +5,72 @@ using System.Text;
 namespace SharpDevLib;
 
 /// <summary>
-/// http响应
+/// HTTP响应，封装HTTP请求的响应信息
 /// </summary>
 public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponseMessage, string? errorMessage, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming)
 {
+    /// <summary>
+    /// 获取对应的HTTP请求
+    /// </summary>
     HttpRequest Request { get; } = request;
 
     readonly HttpResponseMessage? _httpResponseMessage = httpResponseMessage;
 
+    /// <summary>
+    /// 获取HTTP响应消息
+    /// </summary>
+    /// <exception cref="Exception">当无法获取响应消息时抛出异常</exception>
     public HttpResponseMessage HttpResponseMessage => _httpResponseMessage ?? throw new Exception("can not get response message,may be task cancled before request");
 
     /// <summary>
-    /// 请求是否成功
+    /// 获取请求是否成功
     /// </summary>
+    /// <value>当HTTP状态码为2xx时返回true，否则返回false</value>
     public bool IsSuccess { get; } = httpResponseMessage?.IsSuccessStatusCode ?? false;
 
     /// <summary>
-    /// http状态码
+    /// 获取HTTP状态码
     /// </summary>
     public HttpStatusCode Code { get; } = httpResponseMessage?.StatusCode ?? HttpStatusCode.Unused;
 
     /// <summary>
-    /// 错误消息
+    /// 获取错误消息
     /// </summary>
+    /// <value>当请求失败时包含错误描述信息</value>
     public string? ErrorMessage { get; } = errorMessage;
 
     /// <summary>
-    /// 重试次数
+    /// 获取重试次数
     /// </summary>
+    /// <value>请求失败后的重试次数</value>
     public int RetryCount { get; } = retryCount;
 
     /// <summary>
-    /// 处理次数
+    /// 获取处理次数（重试次数+1）
     /// </summary>
     public int ProcessCount => RetryCount + 1;
 
     /// <summary>
-    /// 最后一次耗时
+    /// 获取最后一次请求的耗时
     /// </summary>
     public TimeSpan LastTimeConsuming { get; } = lastTimeConsuming;
 
     /// <summary>
-    /// 总耗时
+    /// 获取总耗时
     /// </summary>
+    /// <value>包含所有重试在内的总耗时</value>
     public TimeSpan TotalTimeConsuming { get; } = totalTimeConsuming;
 
+    /// <summary>
+    /// 获取响应头信息
+    /// </summary>
+    /// <returns>响应头字典，键为头名称，值为头值数组</returns>
     public Dictionary<string, string[]>? GetResponseHeaders() => HttpResponseMessage.Headers?.Select(x => new KeyValuePair<string, string[]>(x.Key, [.. x.Value])).ToDictionary();
 
+    /// <summary>
+    /// 获取响应Cookie集合
+    /// </summary>
+    /// <returns>Cookie列表，如果不存在Set-Cookie头则返回null</returns>
     public List<Cookie?>? GetResponseCookies()
     {
         var headers = GetResponseHeaders();
@@ -60,6 +79,11 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
         return [.. headers["Set-Cookie"].Select(x => ParseCookie(x, host))];
     }
 
+    /// <summary>
+    /// 确保响应状态码表示成功，否则抛出异常
+    /// </summary>
+    /// <returns>当前响应对象</returns>
+    /// <exception cref="Exception">当响应不成功时抛出异常</exception>
     public HttpResponse EnsureSuccessStatusCode()
     {
         if (!IsSuccess)
@@ -70,6 +94,10 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
         return this;
     }
 
+    /// <summary>
+    /// 返回响应的字符串表示，包含请求和响应的详细信息
+    /// </summary>
+    /// <returns>请求和响应的详细信息字符串，用于日志记录</returns>
     public override string ToString()
     {
         var builder = new StringBuilder();
@@ -78,6 +106,11 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
         return builder.ToString();
     }
 
+    /// <summary>
+    /// 异步获取响应数据并反序列化为指定类型
+    /// </summary>
+    /// <typeparam name="T">目标数据类型</typeparam>
+    /// <returns>反序列化后的响应数据</returns>
     public async Task<T> GetResponseDataAsync<T>()
     {
         var content = HttpResponseMessage.Content;

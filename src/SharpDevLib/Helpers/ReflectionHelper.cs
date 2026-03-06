@@ -5,16 +5,16 @@ using System.Text;
 namespace SharpDevLib;
 
 /// <summary>
-/// 反射扩展
+/// 反射扩展，提供类型、方法和构造函数的反射信息获取功能
 /// </summary>
 public static class ReflectionHelper
 {
     /// <summary>
-    /// 获取类型定义名称(支持泛型,不支持嵌套类型)
+    /// 获取类型定义名称，支持泛型类型但不支持嵌套类型
     /// </summary>
-    /// <param name="type">类型</param>
-    /// <param name="isFullName">是否全名</param>
-    /// <returns>名称</returns>
+    /// <param name="type">要获取名称的类型</param>
+    /// <param name="isFullName">是否返回类型的完全限定名，默认为false</param>
+    /// <returns>类型定义名称字符串，泛型类型格式如"TypeName&lt;T1, T2&gt;"</returns>
     public static string GetTypeDefinitionName(this Type type, bool isFullName = false)
     {
         if (!type.IsGenericType) return type.GetTypeName(isFullName);
@@ -42,20 +42,20 @@ public static class ReflectionHelper
     }
 
     /// <summary>
-    /// 获取对象类型定义名称(支持泛型)
+    /// 获取对象的类型定义名称，支持泛型类型
     /// </summary>
-    /// <param name="obj">对象</param>
-    /// <param name="isFullName">是否全名</param>
-    /// <returns>名称</returns>
+    /// <param name="obj">要获取类型名称的对象</param>
+    /// <param name="isFullName">是否返回类型的完全限定名，默认为false</param>
+    /// <returns>类型定义名称字符串，如果对象为null则返回空字符串</returns>
     public static string GetTypeDefinitionName(this object obj, bool isFullName = false) => obj?.GetType()?.GetTypeDefinitionName(isFullName) ?? string.Empty;
 
     /// <summary>
     /// 获取方法定义名称
     /// </summary>
-    /// <param name="methodInfo">methodInfo</param>
-    /// <param name="containParameterName">是否包含参数名称</param>
-    /// <param name="isFullName">是否全名</param>
-    /// <returns>方法定义名称</returns>
+    /// <param name="methodInfo">方法信息对象</param>
+    /// <param name="containParameterName">是否包含参数名称，默认为false</param>
+    /// <param name="isFullName">是否使用类型的完全限定名，默认为false</param>
+    /// <returns>方法定义名称字符串，格式如"MethodName&lt;T&gt;(ParamType1 paramName1, ParamType2 paramName2)"</returns>
     public static string GetMethodDefinitionName(this MethodInfo methodInfo, bool containParameterName, bool isFullName = false)
     {
         var builder = new StringBuilder();
@@ -83,12 +83,12 @@ public static class ReflectionHelper
     }
 
     /// <summary>
-    /// 获取构造方法定义名称
+    /// 获取构造函数定义名称
     /// </summary>
-    /// <param name="constructorInfo">constructorInfo</param>
-    /// <param name="containParameterName">是否包含参数名称</param>
-    /// <param name="isFullName">是否全名</param>
-    /// <returns>构造方法定义名称</returns>
+    /// <param name="constructorInfo">构造函数信息对象</param>
+    /// <param name="containParameterName">是否包含参数名称，默认为false</param>
+    /// <param name="isFullName">是否使用类型的完全限定名，默认为false</param>
+    /// <returns>构造函数定义名称字符串，格式如"TypeName(ParamType1 paramName1, ParamType2 paramName2)"</returns>
     public static string GetConstructorDefinitionName(this ConstructorInfo constructorInfo, bool containParameterName, bool isFullName = false)
     {
         var builder = new StringBuilder();

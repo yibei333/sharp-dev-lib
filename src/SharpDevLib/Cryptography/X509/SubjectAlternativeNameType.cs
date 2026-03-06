@@ -1,28 +1,28 @@
 ﻿namespace SharpDevLib;
 
 /// <summary>
-/// subject alternative name type
+/// 主体备用名称类型枚举
 /// </summary>
 public enum SubjectAlternativeNameType
 {
     /// <summary>
-    /// dns
+    /// DNS名称
     /// </summary>
     Dns,
     /// <summary>
-    /// ip address
+    /// IP地址
     /// </summary>
     IP,
     /// <summary>
-    /// uri
+    /// URI地址
     /// </summary>
     Uri,
     /// <summary>
-    /// email
+    /// 电子邮件地址
     /// </summary>
     Email,
     /// <summary>
-    /// user pricipal name
+    /// 用户主体名称（User Principal Name）
     /// </summary>
     UPN
 }

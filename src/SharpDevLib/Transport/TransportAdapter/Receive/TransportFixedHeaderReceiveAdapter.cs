@@ -4,15 +4,16 @@ using System.Net.Sockets;
 namespace SharpDevLib;
 
 /// <summary>
-/// 传输固定头接收适配器(每次接收前四个字节作为数据长度,没有粘包问题)
+/// 传输固定头接收适配器
 /// </summary>
+/// <remarks>每次接收前四个字节作为数据长度，没有粘包问题</remarks>
 public class TransportFixedHeaderReceiveAdapter : ITransportReceiveAdapter
 {
     /// <summary>
-    /// 接收
+    /// 接收数据（TCP使用）
     /// </summary>
     /// <param name="socket">套接字</param>
-    /// <returns>字节数组</returns>
+    /// <returns>接收到的字节数组</returns>
     /// <exception cref="InvalidDataException">获取头部字节长度失败时引发异常</exception>
     public byte[] Receive(Socket socket)
     {
@@ -28,11 +29,11 @@ public class TransportFixedHeaderReceiveAdapter : ITransportReceiveAdapter
     }
 
     /// <summary>
-    /// 接收
+    /// 接收数据（UDP使用）
     /// </summary>
     /// <param name="socket">套接字</param>
-    /// <param name="remoteEndPoint">远程终结点</param>
-    /// <returns>字节数组</returns>
+    /// <param name="remoteEndPoint">远程端点</param>
+    /// <returns>接收到的字节数组</returns>
     /// <exception cref="InvalidDataException">获取头部字节长度失败时引发异常</exception>
     public byte[] ReceiveFrom(Socket socket, ref EndPoint remoteEndPoint)
     {

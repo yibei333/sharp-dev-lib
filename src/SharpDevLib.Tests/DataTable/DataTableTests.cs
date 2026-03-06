@@ -46,8 +46,8 @@ public class DataTableExtensionTests
     public void ListToDataTableTest()
     {
         var table = TestData.ToDataTable();
-        Assert.AreEqual(10, table.Columns.Count);
-        Assert.AreEqual(2, table.Rows.Count);
+        Assert.HasCount(10, table.Columns);
+        Assert.HasCount(2, table.Rows);
     }
 
     [TestMethod]
@@ -116,8 +116,8 @@ public class DataTableExtensionTests
             new("TimestampValue") {NameConverter=key=>"创建时间戳",ValueConverter=(v,row)=>long.Parse(v.ToString()!).ToUtcTime().ToTimeString(),IsRequired=true,TargetType=typeof(string)},
         };
         var targetTable = sourceTable.Transfer(columns);
-        Assert.AreEqual(4, targetTable.Columns.Count);
-        Assert.AreEqual(2, targetTable.Rows.Count);
+        Assert.HasCount(4, targetTable.Columns);
+        Assert.HasCount(2, targetTable.Rows);
 
         var backColumns = new DataTableTransferColumn[]
         {
@@ -127,7 +127,7 @@ public class DataTableExtensionTests
             new("* 创建时间戳") {NameConverter=key=>"TimestampValue",ValueConverter=(v,row)=>Convert.ToDateTime(v.ToString()!).ToUtcTimestamp(),TargetType=typeof(long)},
         };
         var tarnsferBackTable = targetTable.Transfer(backColumns);
-        Assert.AreEqual(4, tarnsferBackTable.Columns.Count);
-        Assert.AreEqual(2, tarnsferBackTable.Rows.Count);
+        Assert.HasCount(4, tarnsferBackTable.Columns);
+        Assert.HasCount(2, tarnsferBackTable.Rows);
     }
 }

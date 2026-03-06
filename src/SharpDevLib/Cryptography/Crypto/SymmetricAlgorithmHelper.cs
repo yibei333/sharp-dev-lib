@@ -10,12 +10,12 @@ public static class SymmetricAlgorithmHelper
     const int bufferSize = 4096;
 
     /// <summary>
-    /// 解密
+    /// 将加密的字节数组解密为原始数据
     /// </summary>
-    /// <param name="algorithm">对称算法</param>
+    /// <param name="algorithm">对称加密算法实例</param>
     /// <param name="data">已加密的字节数组</param>
-    /// <returns>解密的字节数组</returns>
-    /// <exception cref="ArgumentNullException">当data参数为空时引发异常</exception>
+    /// <returns>解密后的原始字节数组</returns>
+    /// <exception cref="ArgumentNullException">当data参数为null或空数组时抛出</exception>
     public static byte[] Decrypt(this SymmetricAlgorithm algorithm, byte[] data)
     {
         if (data.IsNullOrEmpty()) throw new ArgumentNullException(nameof(data));
@@ -27,11 +27,11 @@ public static class SymmetricAlgorithmHelper
     }
 
     /// <summary>
-    /// 解密
+    /// 将加密的流解密到目标流
     /// </summary>
-    /// <param name="algorithm">对称算法</param>
-    /// <param name="inputStream">已加密的流</param>
-    /// <param name="outputStream">解密的流</param>
+    /// <param name="algorithm">对称加密算法实例</param>
+    /// <param name="inputStream">已加密的输入流</param>
+    /// <param name="outputStream">解密后的输出流</param>
     public static void Decrypt(this SymmetricAlgorithm algorithm, Stream inputStream, Stream outputStream)
     {
         using var transform = algorithm.CreateDecryptor();
@@ -48,12 +48,12 @@ public static class SymmetricAlgorithmHelper
     }
 
     /// <summary>
-    /// 加密
+    /// 将原始字节数组加密为密文
     /// </summary>
-    /// <param name="algorithm">对称算法</param>
-    /// <param name="data">需要加密的字节数组</param>
-    /// <returns>加密的字节数组</returns>
-    /// <exception cref="ArgumentNullException">当data参数为空时引发异常</exception>
+    /// <param name="algorithm">对称加密算法实例</param>
+    /// <param name="data">需要加密的原始字节数组</param>
+    /// <returns>加密后的密文字节数组</returns>
+    /// <exception cref="ArgumentNullException">当data参数为null或空数组时抛出</exception>
     public static byte[] Encrypt(this SymmetricAlgorithm algorithm, byte[] data)
     {
         if (data.IsNullOrEmpty()) throw new ArgumentNullException(nameof(data));
@@ -65,11 +65,11 @@ public static class SymmetricAlgorithmHelper
     }
 
     /// <summary>
-    /// 加密
+    /// 将原始流加密到目标流
     /// </summary>
-    /// <param name="algorithm">对称算法</param>
-    /// <param name="inputStream">需要加密的流</param>
-    /// <param name="outputStream">加密的流</param>
+    /// <param name="algorithm">对称加密算法实例</param>
+    /// <param name="inputStream">需要加密的原始输入流</param>
+    /// <param name="outputStream">加密后的输出流</param>
     public static void Encrypt(this SymmetricAlgorithm algorithm, Stream inputStream, Stream outputStream)
     {
         using var transform = algorithm.CreateEncryptor();
@@ -86,14 +86,17 @@ public static class SymmetricAlgorithmHelper
     }
 
     /// <summary>
-    /// 设置对称算法的密钥和密钥长度,自动截取或补全密钥长度,步骤如下
-    /// <para>1.循环允许的密钥长度[L1,L2,...,Ln]</para>
-    /// <para>2.如果密钥长度等于Ln,直接返回密钥</para>
-    /// <para>3.如果密钥长度小于Ln,返回[key,(补上足够的0字节)]</para>
-    /// <para>4.如果不是最后一次循环,则进入下个循环,否则返回key[...Ln]</para>
+    /// 设置对称算法的密钥，自动截取或补全密钥长度以符合算法要求
+    /// <para>处理步骤：</para>
+    /// <para>1.循环检查允许的密钥长度[L1, L2, ..., Ln]</para>
+    /// <para>2.如果密钥长度等于Li，直接使用该密钥</para>
+    /// <para>3.如果密钥长度小于Li，返回[key + 补零字节]</para>
+    /// <para>4.如果不是最后一次循环，则进入下一轮，否则返回key的前Li个字节</para>
+    /// <para>支持算法：AES(16/24/32字节)、DES(8字节)、TripleDES(16/24字节)</para>
     /// </summary>
-    /// <param name="algorithm">对称算法</param>
-    /// <param name="key">密钥</param>
+    /// <param name="algorithm">对称加密算法实例</param>
+    /// <param name="key">要设置的密钥字节数组</param>
+    /// <exception cref="NotImplementedException">当算法不支持时抛出</exception>
     public static void SetKeyAutoPad(this SymmetricAlgorithm algorithm, byte[] key)
     {
         var allowedSize = algorithm.GetAllowedKeySize();
@@ -111,14 +114,17 @@ public static class SymmetricAlgorithmHelper
     }
 
     /// <summary>
-    /// 设置对称算法的初始化向量,自动截取或补全密钥长度,步骤如下
-    /// <para>1.设对称算法需要的初始化向量的长度为L</para>
-    /// <para>2.如果密钥长度等于L,直接返回</para>
-    /// <para>3.如果密钥长度小于L,返回[iv,(补上(L-iv.Length)个0字节)]</para>
-    /// <para>4.返回iv[...L]</para>
+    /// 设置对称算法的初始化向量(IV)，自动截取或补全长度以符合算法要求
+    /// <para>处理步骤：</para>
+    /// <para>1.设对称算法需要的初始化向量长度为L</para>
+    /// <para>2.如果IV长度等于L，直接使用该IV</para>
+    /// <para>3.如果IV长度小于L，返回[iv + 补零字节]</para>
+    /// <para>4.如果IV长度大于L，返回iv的前L个字节</para>
+    /// <para>支持算法：AES(16字节)、DES(8字节)、TripleDES(8字节)</para>
     /// </summary>
-    /// <param name="algorithm">对称算法</param>
-    /// <param name="iv">初始化向量</param>
+    /// <param name="algorithm">对称加密算法实例</param>
+    /// <param name="iv">要设置的初始化向量字节数组</param>
+    /// <exception cref="NotImplementedException">当算法不支持时抛出</exception>
     public static void SetIVAutoPad(this SymmetricAlgorithm algorithm, byte[] iv)
     {
         var size = algorithm.GetIVSize();

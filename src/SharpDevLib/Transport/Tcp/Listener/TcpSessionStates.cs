@@ -1,7 +1,7 @@
 ﻿namespace SharpDevLib;
 
 /// <summary>
-/// Tcp会话状态
+/// TCP会话状态
 /// </summary>
 public enum TcpSessionStates
 {

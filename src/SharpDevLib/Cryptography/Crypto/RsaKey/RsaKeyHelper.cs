@@ -7,40 +7,40 @@ using System.Security.Cryptography;
 namespace SharpDevLib;
 
 /// <summary>
-/// RSA密钥对扩展
+/// RSA密钥对扩展，提供RSA密钥的导入、导出、匹配验证和密钥信息获取功能
 /// </summary>
 public static class RsaKeyHelper
 {
     /// <summary>
-    /// 64个字符换行
+    /// 将密钥体内容按64个字符换行
     /// </summary>
-    /// <param name="keyBody">不带头尾的key</param>
-    /// <returns>格式化的key</returns>
+    /// <param name="keyBody">不带头尾标记的密钥体</param>
+    /// <returns>格式化后的密钥字符串</returns>
     public static string WrapLineWith64Char(string keyBody) => PemObject.WrapLineWith64Char(keyBody);
 
     /// <summary>
-    /// 删除64个字符的换行
+    /// 删除密钥体中的换行符并去除首尾空白
     /// </summary>
-    /// <param name="keyBody">不带头尾的key</param>
-    /// <returns>格式化的key</returns>
+    /// <param name="keyBody">不带头尾标记的密钥体</param>
+    /// <returns>去除换行和空白后的密钥字符串</returns>
     public static string RemoveWrapLineAndTrim(string keyBody) => PemObject.RemoveWrapLineAndTrim(keyBody);
 
     /// <summary>
-    /// 导入Pem格式的密钥
+    /// 导入PEM格式的RSA密钥
     /// </summary>
-    /// <param name="rsa">rsa algorithm</param>
-    /// <param name="pem">Pem格式的密钥,支持的格式如下:
+    /// <param name="rsa">RSA算法实例</param>
+    /// <param name="pem">PEM格式的密钥，支持的格式如下：
     /// <para>(1)PKCS#1私钥</para> 
     /// <para>(2)受密码保护的PKCS#1私钥</para> 
     /// <para>(3)PKCS#1公钥</para> 
     /// <para>(4)PKCS#8私钥</para> 
     /// <para>(5)受密码保护的PKCS#8私钥</para> 
-    /// <para>(6)X.509SubjectPublicKey</para> 
+    /// <para>(6)X.509 SubjectPublicKey</para> 
     /// </param>
     /// <param name="password">密码（仅当PEM格式为受密码保护的私钥时适用）</param>
     /// <exception cref="NotSupportedException">当解析出的PemType为UnKnown时引发异常</exception>
-    /// <exception cref="ArgumentNullException">当pem为受密码保密且password参数为空时引发异常</exception>
-    /// <exception cref="NotImplementedException">X509Certificate,X509CertificateSigningRequest未实现</exception>
+    /// <exception cref="ArgumentNullException">当pem为受密码保护且password参数为空时引发异常</exception>
+    /// <exception cref="NotImplementedException">X509Certificate和X509CertificateSigningRequest格式未实现</exception>
     public static void ImportPem(this RSA rsa, string pem, byte[]? password = null)
     {
         var pemObject = PemObject.Read(pem);
@@ -75,19 +75,19 @@ public static class RsaKeyHelper
     }
 
     /// <summary>
-    /// 导出PEM格式的密钥
+    /// 导出PEM格式的RSA密钥
     /// </summary>
-    /// <param name="rsa">rsa algorithm</param>
+    /// <param name="rsa">RSA算法实例</param>
     /// <param name="pemType">PEM格式类型</param>
-    /// <param name="password">密码(仅当PEM格式为受密码保护的私钥时适用)</param>
-    /// <param name="encryptPkcs1PrivateKeyAlogorithm">加密算法(仅当PEM格式为受密码保护的PKCS#1私钥时适用),受支持的算法如下:
+    /// <param name="password">密码（仅当PEM格式为受密码保护的私钥时适用）</param>
+    /// <param name="encryptPkcs1PrivateKeyAlogorithm">加密算法（仅当PEM格式为受密码保护的PKCS#1私钥时适用），受支持的算法如下：
     /// <para>(1)AES-256-CBC</para> 
     /// <para>(2)DES-EDE3-CBC</para> 
     /// </param>
-    /// <returns>PEM格式的密钥</returns>
-    /// <exception cref="NotSupportedException">当解析出的PemType为UnKnown时引发异常</exception>
-    /// <exception cref="ArgumentNullException">当pem为受密码保密且password参数为空时引发异常</exception>
-    /// <exception cref="NotImplementedException">X509Certificate,X509CertificateSigningRequest未实现</exception>
+    /// <returns>PEM格式的密钥字符串</returns>
+    /// <exception cref="NotSupportedException">当pemType为UnKnown时引发异常</exception>
+    /// <exception cref="ArgumentNullException">当pemType为受密码保护且password参数为空时引发异常</exception>
+    /// <exception cref="NotImplementedException">X509Certificate和X509CertificateSigningRequest格式未实现</exception>
     public static string ExportPem(this RSA rsa, PemType pemType, byte[]? password = null, string encryptPkcs1PrivateKeyAlogorithm = "AES-256-CBC")
     {
         if (pemType == PemType.UnKnown) throw new NotSupportedException("not supported pem format");
@@ -122,11 +122,11 @@ public static class RsaKeyHelper
     }
 
     /// <summary>
-    /// 密钥对是否匹配
+    /// 验证私钥和公钥是否匹配
     /// </summary>
     /// <param name="privatePem">PEM格式的私钥</param>
     /// <param name="publicPem">PEM格式的公钥</param>
-    /// <returns>是否匹配</returns>
+    /// <returns>如果密钥对匹配返回true，否则返回false</returns>
     public static bool IsKeyPairMatch(string privatePem, string publicPem)
     {
         try
@@ -148,11 +148,11 @@ public static class RsaKeyHelper
     }
 
     /// <summary>
-    /// 获取密钥信息
+    /// 获取RSA密钥的详细信息
     /// </summary>
     /// <param name="key">PEM格式的密钥</param>
     /// <param name="password">密码（仅当PEM格式为受密码保护的私钥时适用）</param>
-    /// <returns>密钥信息</returns>
+    /// <returns>RSA密钥信息对象</returns>
     public static RsaKeyInfo GetKeyInfo(string key, byte[]? password = null)
     {
         var pemObject = PemObject.Read(key);

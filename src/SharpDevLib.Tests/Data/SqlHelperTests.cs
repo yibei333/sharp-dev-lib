@@ -89,7 +89,7 @@ public class SqlHelperTests
             SELECT a.[Name],a.Age,b.Favorite FROM [User] a INNER JOIN [UserFavorite] b ON a.Name=b.Name;
         ";
         var dataSet = sqlHelper.ExecuteDataSet(sql);
-        Assert.AreEqual(3, dataSet.Tables.Count);
+        Assert.HasCount(3, dataSet.Tables);
         Assert.AreEqual(Users.Serialize(), dataSet.Tables[0].ToList<User>().Serialize());
         Assert.AreEqual(UserFavorites.Serialize(), dataSet.Tables[1].ToList<UserFavorite>().Serialize());
     }
@@ -106,7 +106,7 @@ public class SqlHelperTests
             SELECT a.[Name],a.Age,b.Favorite FROM [User] a INNER JOIN [UserFavorite] b ON a.Name=b.Name;
         ";
         var dataSet = await sqlHelper.ExecuteDataSetAsync(sql);
-        Assert.AreEqual(3, dataSet.Tables.Count);
+        Assert.HasCount(3, dataSet.Tables);
         Assert.AreEqual(Users.Serialize(), dataSet.Tables[0].ToList<User>().Serialize());
         Assert.AreEqual(UserFavorites.Serialize(), dataSet.Tables[1].ToList<UserFavorite>().Serialize());
     }

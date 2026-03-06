@@ -4,9 +4,9 @@ using System.Text.Json.Serialization;
 namespace SharpDevLib;
 
 /// <summary>
-/// 树形结构项
+/// 树形结构项，表示树形结构中的单个节点
 /// </summary>
-/// <typeparam name="TMetaData">元数据类型</typeparam>
+/// <typeparam name="TMetaData">元数据类型，存储节点的自定义数据</typeparam>
 public class TreeItem<TMetaData> where TMetaData : class
 {
     [JsonConstructor]
@@ -36,33 +36,33 @@ public class TreeItem<TMetaData> where TMetaData : class
     internal PropertyInfo? SortProperty { get; }
 
     /// <summary>
-    /// 元数据
+    /// 获取节点的元数据，存储节点的自定义信息
     /// </summary>
     [JsonPropertyOrder(0)]
     public TMetaData MetaData { get; }
 
     /// <summary>
-    /// 父项
+    /// 获取父节点，如果没有父节点则为null
     /// </summary>
     [JsonIgnore]
     public TreeItem<TMetaData>? Parent { get; private set; }
 
     /// <summary>
-    /// 层级
+    /// 获取节点在树形结构中的层级，根节点层级为1
     /// </summary>
     [JsonPropertyOrder(1)]
     public int Level => (Parent?.Level ?? 0) + 1;
 
     /// <summary>
-    /// 子项
+    /// 获取或设置子节点集合
     /// </summary>
     [JsonPropertyOrder(2)]
     public List<TreeItem<TMetaData>> Children { get; internal set; } = [];
 
     /// <summary>
-    /// 转换为元数据集合
+    /// 将当前节点及其所有子节点转换为元数据平级集合
     /// </summary>
-    /// <returns>元数据集合</returns>
+    /// <returns>包含当前节点及其所有子孙节点的元数据集合</returns>
     public List<TMetaData> ToMetaDataList()
     {
         var list = new List<TMetaData> { MetaData };
@@ -71,9 +71,9 @@ public class TreeItem<TMetaData> where TMetaData : class
     }
 
     /// <summary>
-    /// 转换为平级集合
+    /// 将当前节点及其所有子节点转换为树项平级集合
     /// </summary>
-    /// <returns>平级集合</returns>
+    /// <returns>包含当前节点及其所有子孙节点的树项集合</returns>
     public List<TreeItem<TMetaData>> ToFlatList()
     {
         var list = new List<TreeItem<TMetaData>> { this };
@@ -82,10 +82,11 @@ public class TreeItem<TMetaData> where TMetaData : class
     }
 
     /// <summary>
-    /// 设置父项
+    /// 设置当前节点的父节点
     /// </summary>
-    /// <param name="parent">父项</param>
-    public void SetParent(TreeItem<TMetaData> parent)
+    /// <param name="parent">要设置的父节点，为null时将当前节点设置为根节点</param>
+    /// <exception cref="InvalidOperationException">当设置父节点会导致循环引用时引发异常</exception>
+    public void SetParent(TreeItem<TMetaData>? parent)
     {
         Parent?.Children?.Remove(this);
         Parent = parent;
@@ -97,9 +98,10 @@ public class TreeItem<TMetaData> where TMetaData : class
     }
 
     /// <summary>
-    /// 添加子项
+    /// 向当前节点添加子节点
     /// </summary>
-    /// <param name="child">子项</param>
+    /// <param name="child">要添加的子节点</param>
+    /// <exception cref="InvalidOperationException">当添加子节点会导致循环引用时引发异常</exception>
     public void AddChild(TreeItem<TMetaData> child)
     {
         child.SetParent(this);

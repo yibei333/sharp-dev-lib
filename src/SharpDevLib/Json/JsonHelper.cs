@@ -3,31 +3,31 @@
 namespace SharpDevLib;
 
 /// <summary>
-/// json扩展
+/// JSON序列化和反序列化扩展，提供对象的JSON序列化与反序列化功能
 /// </summary>
 public static class JsonHelper
 {
     /// <summary>
-    /// 序列化对象
+    /// 使用默认配置将对象序列化为JSON字符串
     /// </summary>
     /// <param name="obj">需要序列化的对象</param>
-    /// <returns>json结果</returns>
+    /// <returns>JSON字符串</returns>
     public static string Serialize(this object obj) => JsonSerializer.Serialize(obj, JsonOption.Default.Create());
 
     /// <summary>
-    /// 序列化对象
+    /// 使用指定配置将对象序列化为JSON字符串
     /// </summary>
     /// <param name="obj">需要序列化的对象</param>
-    /// <param name="option">选项</param>
-    /// <returns>json结果</returns>
+    /// <param name="option">JSON序列化选项</param>
+    /// <returns>JSON字符串</returns>
     public static string Serialize(this object obj, JsonOption option) => JsonSerializer.Serialize(obj, (option ?? JsonOption.Default).Create());
 
     /// <summary>
-    /// 尝试序列化对象,失败返回false,成功返回true且结果放在jsonResult参数中
+    /// 尝试使用默认配置将对象序列化为JSON字符串
     /// </summary>
     /// <param name="obj">需要序列化的对象</param>
-    /// <param name="jsonResult">json结果</param>
-    /// <returns>是否成功</returns>
+    /// <param name="jsonResult">输出的JSON字符串，失败时为空字符串</param>
+    /// <returns>序列化是否成功</returns>
     public static bool TrySerialize(this object obj, out string jsonResult)
     {
         try
@@ -43,12 +43,12 @@ public static class JsonHelper
     }
 
     /// <summary>
-    /// 尝试序列化对象,失败返回false,成功返回true且结果放在jsonResult参数中
+    /// 尝试使用指定配置将对象序列化为JSON字符串
     /// </summary>
     /// <param name="obj">需要序列化的对象</param>
-    /// <param name="option">选项</param>
-    /// <param name="jsonResult">json结果</param>
-    /// <returns>是否成功</returns>
+    /// <param name="option">JSON序列化选项</param>
+    /// <param name="jsonResult">输出的JSON字符串，失败时为空字符串</param>
+    /// <returns>序列化是否成功</returns>
     public static bool TrySerialize(this object obj, JsonOption option, out string jsonResult)
     {
         try
@@ -64,12 +64,12 @@ public static class JsonHelper
     }
 
     /// <summary>
-    /// Json反序列化
+    /// 使用默认配置将JSON字符串反序列化为指定类型的对象
     /// </summary>
-    /// <typeparam name="T">要反序列化的类型</typeparam>
-    /// <param name="json">json</param>
-    /// <returns>反序列化对象结果</returns>
-    /// <exception cref="ArgumentNullException">当json参数为空时引发异常</exception>
+    /// <typeparam name="T">目标类型</typeparam>
+    /// <param name="json">JSON字符串</param>
+    /// <returns>反序列化后的对象</returns>
+    /// <exception cref="ArgumentNullException">当json参数为空或仅包含空白字符时引发异常</exception>
     /// <exception cref="JsonException">当反序列化失败时引发异常</exception>
     public static T DeSerialize<T>(this string json) where T : class
     {
@@ -78,12 +78,12 @@ public static class JsonHelper
     }
 
     /// <summary>
-    /// Json反序列化
+    /// 使用默认配置将JSON字符串反序列化为指定类型的对象
     /// </summary>
-    /// <param name="json">json</param>
-    /// <param name="type">type</param>
-    /// <returns>反序列化对象结果</returns>
-    /// <exception cref="ArgumentNullException">当json参数为空时引发异常</exception>
+    /// <param name="json">JSON字符串</param>
+    /// <param name="type">目标类型</param>
+    /// <returns>反序列化后的对象</returns>
+    /// <exception cref="ArgumentNullException">当json参数为空或仅包含空白字符时引发异常</exception>
     /// <exception cref="JsonException">当反序列化失败时引发异常</exception>
     public static object DeSerialize(this string json, Type type)
     {
@@ -92,13 +92,13 @@ public static class JsonHelper
     }
 
     /// <summary>
-    /// Json反序列化
+    /// 使用指定配置将JSON字符串反序列化为指定类型的对象
     /// </summary>
-    /// <typeparam name="T">要反序列化的类型</typeparam>
-    /// <param name="json">json</param>
-    /// <param name="option">选项</param>
-    /// <returns>反序列化对象结果</returns>
-    /// <exception cref="ArgumentNullException">当json参数为空时引发异常</exception>
+    /// <typeparam name="T">目标类型</typeparam>
+    /// <param name="json">JSON字符串</param>
+    /// <param name="option">JSON反序列化选项</param>
+    /// <returns>反序列化后的对象</returns>
+    /// <exception cref="ArgumentNullException">当json参数为空或仅包含空白字符时引发异常</exception>
     /// <exception cref="JsonException">当反序列化失败时引发异常</exception>
     public static T DeSerialize<T>(this string json, JsonOption option) where T : class
     {
@@ -107,12 +107,12 @@ public static class JsonHelper
     }
 
     /// <summary>
-    /// 尝试反序列化,失败返回false,成功返回true且结果放在result参数中
+    /// 尝试使用默认配置将JSON字符串反序列化为指定类型的对象
     /// </summary>
-    /// <typeparam name="T">要反序列化的类型</typeparam>
-    /// <param name="json">json</param>
-    /// <param name="result">反序列化对象结果</param>
-    /// <returns>是否成功</returns>
+    /// <typeparam name="T">目标类型</typeparam>
+    /// <param name="json">JSON字符串</param>
+    /// <param name="result">输出的反序列化对象，失败时为默认值</param>
+    /// <returns>反序列化是否成功</returns>
     public static bool TryDeSerialize<T>(this string json, out T result) where T : class
     {
         try
@@ -129,13 +129,13 @@ public static class JsonHelper
     }
 
     /// <summary>
-    /// 尝试反序列化,失败返回false,成功返回true且结果放在result参数中
+    /// 尝试使用指定配置将JSON字符串反序列化为指定类型的对象
     /// </summary>
-    /// <typeparam name="T">要反序列化的类型</typeparam>
-    /// <param name="json">json</param>
-    /// <param name="option">选项</param>
-    /// <param name="result">反序列化对象结果</param>
-    /// <returns>是否成功</returns>
+    /// <typeparam name="T">目标类型</typeparam>
+    /// <param name="json">JSON字符串</param>
+    /// <param name="option">JSON反序列化选项</param>
+    /// <param name="result">输出的反序列化对象，失败时为默认值</param>
+    /// <returns>反序列化是否成功</returns>
     public static bool TryDeSerialize<T>(this string json, JsonOption option, out T result) where T : class
     {
         try
@@ -152,11 +152,11 @@ public static class JsonHelper
     }
 
     /// <summary>
-    /// Json格式化
+    /// 格式化JSON字符串，使其更易读
     /// </summary>
-    /// <param name="json">需要格式化的json</param>
-    /// <param name="orderByNameProperty">是否根据属性名称排序,默认为true</param>
-    /// <returns>格式化的json</returns>
+    /// <param name="json">需要格式化的JSON字符串</param>
+    /// <param name="orderByNameProperty">是否根据属性名称排序，默认为true</param>
+    /// <returns>格式化后的JSON字符串，格式化失败时返回原字符串</returns>
     public static string FormatJson(this string json, bool orderByNameProperty = true)
     {
         try
@@ -172,11 +172,11 @@ public static class JsonHelper
     }
 
     /// <summary>
-    /// Json压缩
+    /// 压缩JSON字符串，移除空白字符
     /// </summary>
-    /// <param name="json">需要压缩的json</param>
-    /// <param name="orderByNameProperty">是否根据属性名称排序,默认为true</param>
-    /// <returns>压缩的json</returns>
+    /// <param name="json">需要压缩的JSON字符串</param>
+    /// <param name="orderByNameProperty">是否根据属性名称排序，默认为true</param>
+    /// <returns>压缩后的JSON字符串，压缩失败时返回原字符串</returns>
     public static string CompressJson(this string json, bool orderByNameProperty = true)
     {
         try

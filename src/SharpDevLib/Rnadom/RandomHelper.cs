@@ -3,17 +3,18 @@
 namespace SharpDevLib;
 
 /// <summary>
-/// 随机扩展
+/// 随机数扩展，提供随机码生成功能
 /// </summary>
 public static class RandomHelper
 {
     /// <summary>
-    /// 生成随机码
+    /// 生成指定长度和字符集的随机码
     /// </summary>
-    /// <param name="random">random</param>
-    /// <param name="option">选项</param>
-    /// <returns>随机码</returns>
-    /// <exception cref="ArgumentException">当输出长度小于等于0或者种子数据为空时引发异常</exception>
+    /// <param name="random">随机数生成器实例</param>
+    /// <param name="option">随机码生成选项，包含长度和字符种子。若为null则使用默认选项</param>
+    /// <returns>生成的随机码字符串</returns>
+    /// <exception cref="ArgumentException">当输出长度小于等于0时引发异常</exception>
+    /// <exception cref="ArgumentException">当种子数据为空或长度小于等于0时引发异常</exception>
     public static string GenerateCode(this Random random, GenerateRandomCodeOption? option = null)
     {
         var generateOption = option ?? GenerateRandomCodeOption.Default;

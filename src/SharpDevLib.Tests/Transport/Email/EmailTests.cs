@@ -42,7 +42,7 @@ public class EmailTests
         _pop3Host.StartAsync();
     }
 
-    [ClassCleanup(InheritanceBehavior.BeforeEachDerivedClass, ClassCleanupBehavior.EndOfClass)]
+    [ClassCleanup(InheritanceBehavior.BeforeEachDerivedClass)]
     public static void Cleanup()
     {
         _smtpHost?.Stop();
@@ -85,7 +85,7 @@ public class EmailTests
 
         Console.WriteLine(message.ToString());
 
-        Assert.IsTrue(message.FindAllTextVersions().Any(x => x.Body.Utf8Encode().Contains(content.Body!)));
+        Assert.Contains(x => x.Body.Utf8Encode().Contains(content.Body!), message.FindAllTextVersions());
         Assert.AreEqual(content.Receivers?.First(), message.Headers.To.First().ToString());
         Assert.AreEqual(content.CC?.First(), message.Headers.Cc.First().ToString());
         Assert.IsTrue(message.Headers.Bcc.IsNullOrEmpty());

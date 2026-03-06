@@ -49,7 +49,7 @@ public class CertificateTests
         var caKeyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Cryptography/Certificate/{rootCaName}.key");
         var caCertPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Cryptography/Certificate/{rootCaName}.crt");
         var caKey = File.ReadAllText(caKeyPath);
-        var caCert = new X509Certificate2(caCertPath);
+        var caCert = X509CertificateLoader.LoadCertificateFromFile(caCertPath);
 
         var name = "TestCASecondLevel";
         var keyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{name}.key");
@@ -133,7 +133,7 @@ public class CertificateTests
     static void GenerateServerCertByCATest(string caKeyPath, string caCertPath, string keyName)
     {
         var caKey = File.ReadAllText(caKeyPath);
-        var caCert = new X509Certificate2(caCertPath);
+        var caCert = X509CertificateLoader.LoadCertificateFromFile(caCertPath);
 
         var keyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{keyName}.key");
         var certPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{keyName}.crt");
@@ -183,7 +183,7 @@ public class CertificateTests
 
         Assert.IsTrue(File.Exists(pfxPath));
         Assert.IsGreaterThan(0, new FileInfo(pfxPath).Length);
-        Assert.IsTrue(new X509Certificate2(pfxPath, "foo").Subject.NotNullOrEmpty());
+        Assert.IsTrue(X509CertificateLoader.LoadPkcs12FromFile(pfxPath, "foo").Subject.NotNullOrEmpty());
     }
 
     [TestMethod]
@@ -222,7 +222,7 @@ public class CertificateTests
         var caKeyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Cryptography/Certificate/{rootCaName}.key");
         var caCertPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Cryptography/Certificate/{rootCaName}.crt");
         var caKey = File.ReadAllText(caKeyPath);
-        var caCert = new X509Certificate2(caCertPath);
+        var caCert = X509CertificateLoader.LoadCertificateFromFile(caCertPath);
 
         var name = "TestClient";
         var keyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{name}.key");
@@ -287,7 +287,7 @@ public class CertificateTests
         var caKeyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Cryptography/Certificate/{rootCaName}.key");
         var caCertPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Cryptography/Certificate/{rootCaName}.crt");
         var caKey = File.ReadAllText(caKeyPath);
-        var caCert = new X509Certificate2(caCertPath);
+        var caCert = X509CertificateLoader.LoadCertificateFromFile(caCertPath);
 
         var name = "TestCodeSigning";
         var keyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{name}.key");

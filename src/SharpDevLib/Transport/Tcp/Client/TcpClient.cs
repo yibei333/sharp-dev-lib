@@ -4,7 +4,7 @@ using System.Net.Sockets;
 namespace SharpDevLib;
 
 /// <summary>
-/// Tcp客户端
+/// TCP客户端
 /// </summary>
 public class TcpClient : IDisposable
 {
@@ -33,12 +33,12 @@ public class TcpClient : IDisposable
     }
 
     /// <summary>
-    /// 套接字
+    /// 底层套接字
     /// </summary>
     public Socket Socket { get; private set; }
 
     /// <summary>
-    /// 状态
+    /// 客户端状态
     /// </summary>
     public TcpClientStates State
     {
@@ -53,27 +53,27 @@ public class TcpClient : IDisposable
     }
 
     /// <summary>
-    /// 状态变更回调事件
+    /// 状态变更事件
     /// </summary>
     public event EventHandler<TcpClientStateChangedEventArgs>? StateChanged;
 
     /// <summary>
-    /// 本地地址
+    /// 本地绑定IP地址
     /// </summary>
     public IPAddress? LocalAdress { get; }
 
     /// <summary>
-    /// 本地端口
+    /// 本地绑定端口
     /// </summary>
     public int? LocalPort { get; }
 
     /// <summary>
-    /// 远程地址
+    /// 远程服务器IP地址
     /// </summary>
     public IPAddress RemoteAdress { get; }
 
     /// <summary>
-    /// 远程端口
+    /// 远程服务器端口
     /// </summary>
     public int RemotePort { get; }
 
@@ -93,25 +93,24 @@ public class TcpClient : IDisposable
     public ITransportSendAdapter? SendAdapter { get; set; }
 
     /// <summary>
-    /// 接收事件
+    /// 接收到数据事件
     /// </summary>
     public event EventHandler<TcpClientDataEventArgs>? Received;
 
     /// <summary>
-    /// 发送事件
+    /// 数据发送完成事件
     /// </summary>
     public event EventHandler<TcpClientDataEventArgs>? Sended;
 
     /// <summary>
-    /// 异常事件
+    /// 发生异常事件
     /// </summary>
     public event EventHandler<TcpClientExceptionEventArgs>? Error;
 
     /// <summary>
-    /// 开始连接和接收
+    /// 连接到服务器并开始接收数据
     /// </summary>
-    /// <param name="cancellationToken">cancellationToken</param>
-    /// <returns>task</returns>
+    /// <param name="cancellationToken">取消令牌</param>
     public async Task ConnectAndReceiveAsync(CancellationToken? cancellationToken = null)
     {
         await Task.Run(() =>
@@ -167,10 +166,10 @@ public class TcpClient : IDisposable
     }
 
     /// <summary>
-    /// 发送
+    /// 发送数据
     /// </summary>
-    /// <param name="bytes">字节数组</param>
-    /// <param name="throwIfException">发送失败是否抛出异常,默认false,可以订阅Error事件</param>
+    /// <param name="bytes">要发送的字节数组</param>
+    /// <param name="throwIfException">发送失败是否抛出异常，默认false，可订阅Error事件</param>
     public void Send(byte[] bytes, bool throwIfException = false)
     {
         try
@@ -193,7 +192,7 @@ public class TcpClient : IDisposable
     }
 
     /// <summary>
-    /// 关闭并释放连接
+    /// 关闭连接
     /// </summary>
     public void Close()
     {
@@ -202,7 +201,7 @@ public class TcpClient : IDisposable
     }
 
     /// <summary>
-    /// dispose
+    /// 释放资源
     /// </summary>
     public void Dispose()
     {

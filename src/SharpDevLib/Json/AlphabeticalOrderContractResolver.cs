@@ -3,6 +3,9 @@ using System.Text.Json.Serialization.Metadata;
 
 namespace SharpDevLib;
 
+/// <summary>
+/// 按字母顺序解析JSON属性名称的解析器
+/// </summary>
 class AlphabeticalOrderContractResolver : DefaultJsonTypeInfoResolver
 {
     public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)

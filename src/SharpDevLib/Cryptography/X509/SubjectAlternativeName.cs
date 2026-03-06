@@ -1,23 +1,19 @@
 ﻿namespace SharpDevLib;
 
 /// <summary>
-/// subject alternative name option
+/// 主体备用名称选项，用于X.509证书扩展
 /// </summary>
-/// <remarks>
-/// create instance of type SubjectAlternativeName
-/// </remarks>
-/// <param name="type">subject alternative name type</param>
-/// <param name="value">subject alternative value</param>
+/// <param name="type">主体备用名称类型</param>
+/// <param name="value">主体备用名称的值</param>
 public class SubjectAlternativeName(SubjectAlternativeNameType type, string value)
 {
-
     /// <summary>
-    /// subject alternative name type
+    /// 获取主体备用名称类型
     /// </summary>
     public SubjectAlternativeNameType Type { get; } = type;
 
     /// <summary>
-    /// subject alternative value
+    /// 获取主体备用名称的值
     /// </summary>
     public string Value { get; } = value;
 }

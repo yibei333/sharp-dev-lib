@@ -8,7 +8,7 @@ namespace SharpDevLib;
 public class HttpConfig
 {
     /// <summary>
-    /// 默认
+    /// 获取或设置默认的HTTP配置
     /// </summary>
     public static HttpConfig Default { get; set; } = new()
     {
@@ -17,32 +17,32 @@ public class HttpConfig
     };
 
     /// <summary>
-    /// 日志
+    /// 日志记录器
     /// </summary>
     public ILogger? Logger { get; set; }
 
     /// <summary>
-    /// 超时时间
+    /// 请求超时时间
     /// </summary>
     public TimeSpan? TimeOut { get; set; }
 
     /// <summary>
-    /// 重试次数
+    /// 请求失败时的重试次数
     /// </summary>
     public int RetryCount { get; set; }
 
     /// <summary>
-    /// UA
+    /// User-Agent请求头
     /// </summary>
     public string? UserAgent { get; set; }
 
     /// <summary>
-    /// 接收数据回调
+    /// 接收数据进度回调事件
     /// </summary>
     public Action<HttpProgress>? OnReceiveProgress { get; set; }
 
     /// <summary>
-    /// 传入数据回调
+    /// 发送数据进度回调事件
     /// </summary>
     public Action<HttpProgress>? OnSendProgress { get; set; }
 }

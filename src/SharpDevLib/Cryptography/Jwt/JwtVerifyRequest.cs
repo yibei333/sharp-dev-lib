@@ -3,7 +3,7 @@
 namespace SharpDevLib;
 
 /// <summary>
-/// 验证jwt请求模型
+/// JWT验证请求基类，用于构建JWT验证请求
 /// </summary>
 public abstract class JwtVerifyRequest
 {
@@ -17,12 +17,12 @@ public abstract class JwtVerifyRequest
 
 
     /// <summary>
-    /// 算法
+    /// JWT签名算法类型
     /// </summary>
     public JwtAlgorithm Algorithm { get; }
 
     /// <summary>
-    /// token
+    /// 要验证的JWT令牌字符串
     /// </summary>
     public string Token { get; }
 

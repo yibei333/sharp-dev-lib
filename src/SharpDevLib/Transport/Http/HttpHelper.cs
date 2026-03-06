@@ -5,14 +5,34 @@ using System.Text;
 namespace SharpDevLib;
 
 /// <summary>
-/// http扩展
+/// HTTP扩展，提供HTTP请求、响应处理的扩展方法
 /// </summary>
 public static class HttpHelper
 {
+    /// <summary>
+    /// 将键值对集合转换为查询字符串格式
+    /// </summary>
+    /// <param name="parameters">键值对集合</param>
+    /// <returns>查询字符串，格式为key1=value1&amp;key2=value2。如果集合为空或null则返回空字符串</returns>
     public static string ToQueryString(this IEnumerable<KeyValuePair<string, string?>>? parameters) => parameters.IsNullOrEmpty() ? string.Empty : string.Join("&", parameters.Select(x => $"{x.Key}={x.Value}"));
 
+    /// <summary>
+    /// 异步发送GET请求
+    /// </summary>
+    /// <param name="request">HTTP请求对象</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>HTTP响应对象</returns>
+    /// <exception cref="InvalidOperationException">当URL为空时引发异常</exception>
     public static async Task<HttpResponse> GetAsync(this HttpRequest request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Get, cancellationToken);
 
+    /// <summary>
+    /// 异步发送GET请求并获取响应流
+    /// </summary>
+    /// <param name="request">HTTP请求对象</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>响应流</returns>
+    /// <exception cref="InvalidOperationException">当URL为空时引发异常</exception>
+    /// <exception cref="Exception">当HTTP响应状态码不成功时抛出</exception>
     public static async Task<Stream> GetStreamAsync(this HttpRequest request, CancellationToken? cancellationToken = null)
     {
         var response = await request.GetAsync(cancellationToken);
@@ -20,10 +40,31 @@ public static class HttpHelper
         return await response.HttpResponseMessage.Content.ReadAsStreamAsync();
     }
 
+    /// <summary>
+    /// 异步发送POST请求
+    /// </summary>
+    /// <param name="request">HTTP请求对象</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>HTTP响应对象</returns>
+    /// <exception cref="InvalidOperationException">当URL为空时引发异常</exception>
     public static async Task<HttpResponse> PostAsync(this HttpRequest request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Post, cancellationToken);
 
+    /// <summary>
+    /// 异步发送PUT请求
+    /// </summary>
+    /// <param name="request">HTTP请求对象</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>HTTP响应对象</returns>
+    /// <exception cref="InvalidOperationException">当URL为空时引发异常</exception>
     public static async Task<HttpResponse> PutAsync(this HttpRequest request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Put, cancellationToken);
 
+    /// <summary>
+    /// 异步发送DELETE请求
+    /// </summary>
+    /// <param name="request">HTTP请求对象</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>HTTP响应对象</returns>
+    /// <exception cref="InvalidOperationException">当URL为空时引发异常</exception>
     public static async Task<HttpResponse> DeleteAsync(this HttpRequest request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Delete, cancellationToken);
 
     #region Private

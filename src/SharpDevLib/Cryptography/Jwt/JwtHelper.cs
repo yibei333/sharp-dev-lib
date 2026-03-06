@@ -5,36 +5,36 @@ using System.Text.Json;
 namespace SharpDevLib;
 
 /// <summary>
-/// jwt扩展
+/// JWT（JSON Web Token）扩展，提供JWT的创建和验证功能
 /// </summary>
 public static class JwtHelper
 {
     /// <summary>
-    /// 创建jwt
+    /// 使用HMACSHA256算法创建JWT
     /// </summary>
-    /// <param name="request">使用HMACSHA256算法创建JWT请求模型</param>
-    /// <returns>jwt</returns>
+    /// <param name="request">使用HMACSHA256算法创建JWT的请求配置</param>
+    /// <returns>JWT令牌字符串</returns>
     public static string Create(this JwtCreateWithHMACSHA256Request request) => InternalCreate(request);
 
     /// <summary>
-    /// 创建jwt
+    /// 使用RSA SHA256算法创建JWT
     /// </summary>
-    /// <param name="request">使用RSA SHA256算法创建JWT请求模型</param>
-    /// <returns>jwt</returns>
+    /// <param name="request">使用RSA SHA256算法创建JWT的请求配置</param>
+    /// <returns>JWT令牌字符串</returns>
     public static string Create(this JwtCreateWithRS256Request request) => InternalCreate(request);
 
     /// <summary>
-    /// 验证jwt
+    /// 使用HMACSHA256算法验证JWT
     /// </summary>
-    /// <param name="request">使用HMACSHA256算法验证JWT请求模型</param>
-    /// <returns>jwt验签结果</returns>
+    /// <param name="request">使用HMACSHA256算法验证JWT的请求配置</param>
+    /// <returns>JWT验证结果，包含验证状态和相关信息</returns>
     public static JwtVerifyResult Verify(this JwtVerifyWithHMACSHA256Request request) => InternalVerify(request);
 
     /// <summary>
-    /// 验证jwt
+    /// 使用RSA SHA256算法验证JWT
     /// </summary>
-    /// <param name="request">使用RSA SHA256算法验证JWT请求模型</param>
-    /// <returns>jwt验签结果</returns>
+    /// <param name="request">使用RSA SHA256算法验证JWT的请求配置</param>
+    /// <returns>JWT验证结果，包含验证状态和相关信息</returns>
     public static JwtVerifyResult Verify(this JwtVerifyWithRS256Request request) => InternalVerify(request);
 
     static string InternalCreate(JwtCreateRequest request)

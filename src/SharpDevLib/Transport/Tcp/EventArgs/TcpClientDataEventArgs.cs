@@ -1,13 +1,10 @@
 ﻿namespace SharpDevLib;
 
 /// <summary>
-/// Tcp客户端数据事件参数
+/// TCP客户端数据事件参数
 /// </summary>
-/// <remarks>
-/// 实例化Tcp客户端数据事件参数
-/// </remarks>
-/// <param name="client">客户端</param>
-/// <param name="bytes">字节数组</param>
+/// <param name="client">TCP客户端实例</param>
+/// <param name="bytes">接收到的字节数组</param>
 public class TcpClientDataEventArgs(TcpClient client, byte[] bytes) : TcpClientEventArgs(client)
 {
     /// <summary>

@@ -6,12 +6,12 @@
 public static class TransportSendAdapters
 {
     /// <summary>
-    /// 传输固定头发送适配器(每次发送消息在前四个字节中放入字节的长度总和,没有粘包问题)
+    /// 固定头发送适配器（前四个字节为数据长度，无粘包问题）
     /// </summary>
     public static ITransportSendAdapter FixedHeader = new TransportFixedHeaderSendAdapter();
 
     /// <summary>
-    /// 传输默认发送适配器
+    /// 默认发送适配器（直接发送数据，有粘包问题）
     /// </summary>
     public static ITransportSendAdapter Default = new TransportDefaultSendAdapter();
 }

@@ -3,7 +3,7 @@
 namespace SharpDevLib;
 
 /// <summary>
-/// 文件扩展
+/// 文件操作扩展，提供文件路径处理、文件读写、MIME类型识别等功能
 /// </summary>
 public static class FileHelper
 {
@@ -1004,10 +1004,10 @@ public static class FileHelper
     /// <summary>
     /// 获取文件的扩展名
     /// </summary>
-    /// <param name="filePath">文件路径,文件名也可以</param>
-    /// <param name="includePoint">是否包含"."</param>
-    /// <returns>扩展名</returns>
-    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
+    /// <param name="filePath">文件路径，可以是完整路径或仅文件名</param>
+    /// <param name="includePoint">是否包含点号(.)，默认为true</param>
+    /// <returns>文件扩展名，如".txt"或"txt"</returns>
+    /// <exception cref="ArgumentNullException">当filePath参数为null或空字符串时抛出</exception>
     public static string GetFileExtension(this string filePath, bool includePoint = true)
     {
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
@@ -1016,12 +1016,12 @@ public static class FileHelper
     }
 
     /// <summary>
-    /// 获取文件名
+    /// 获取文件名（不包含路径）
     /// </summary>
     /// <param name="filePath">文件路径</param>
-    /// <param name="includeExtension">是否包含扩展名</param>
+    /// <param name="includeExtension">是否包含扩展名，默认为true</param>
     /// <returns>文件名</returns>
-    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
+    /// <exception cref="ArgumentNullException">当filePath参数为null或空字符串时抛出</exception>
     public static string GetFileName(this string filePath, bool includeExtension = true)
     {
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
@@ -1032,11 +1032,11 @@ public static class FileHelper
     /// <summary>
     /// 将字节数组保存到文件中
     /// </summary>
-    /// <param name="bytes">字节数组</param>
-    /// <param name="filePath">文件路径</param>
-    /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
-    /// <exception cref="ArgumentNullException">当bytes或filePath参数为空时引发异常</exception>
-    /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时引发异常</exception>
+    /// <param name="bytes">要保存的字节数组</param>
+    /// <param name="filePath">目标文件路径</param>
+    /// <param name="throwIfFileExist">当文件已存在时是否抛出异常，true表示抛出异常，false表示覆盖文件</param>
+    /// <exception cref="ArgumentNullException">当bytes或filePath参数为null或空时抛出</exception>
+    /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时抛出</exception>
     public static void SaveToFile(this byte[] bytes, string filePath, bool throwIfFileExist = false)
     {
         if (bytes.IsNullOrEmpty()) throw new ArgumentNullException(nameof(bytes));
@@ -1054,14 +1054,14 @@ public static class FileHelper
     }
 
     /// <summary>
-    /// 将字节数组保存到文件中
+    /// 异步将字节数组保存到文件中
     /// </summary>
-    /// <param name="bytes">字节数组</param>
-    /// <param name="filePath">文件路径</param>
-    /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
-    /// <exception cref="ArgumentNullException">当bytes或filePath参数为空时引发异常</exception>
-    /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时引发异常</exception>
+    /// <param name="bytes">要保存的字节数组</param>
+    /// <param name="filePath">目标文件路径</param>
+    /// <param name="cancellationToken">取消令牌，用于取消异步操作</param>
+    /// <param name="throwIfFileExist">当文件已存在时是否抛出异常，true表示抛出异常，false表示覆盖文件</param>
+    /// <exception cref="ArgumentNullException">当bytes或filePath参数为null或空时抛出</exception>
+    /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时抛出</exception>
     public static async Task SaveToFileAsync(this byte[] bytes, string filePath, CancellationToken? cancellationToken, bool throwIfFileExist = false)
     {
         if (bytes.IsNullOrEmpty()) throw new ArgumentNullException(nameof(bytes));
@@ -1081,11 +1081,11 @@ public static class FileHelper
     /// <summary>
     /// 将流保存到文件中
     /// </summary>
-    /// <param name="stream">流</param>
-    /// <param name="filePath">文件路径</param>
-    /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
-    /// <exception cref="ArgumentNullException">当stream或filePath参数为空时引发异常</exception>
-    /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时引发异常</exception>
+    /// <param name="stream">要保存的流</param>
+    /// <param name="filePath">目标文件路径</param>
+    /// <param name="throwIfFileExist">当文件已存在时是否抛出异常，true表示抛出异常，false表示覆盖文件</param>
+    /// <exception cref="ArgumentNullException">当stream或filePath参数为null或空时抛出</exception>
+    /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时抛出</exception>
     public static void SaveToFile(this Stream stream, string filePath, bool throwIfFileExist = false)
     {
         if (stream is null) throw new ArgumentNullException(nameof(stream));
@@ -1102,14 +1102,14 @@ public static class FileHelper
     }
 
     /// <summary>
-    /// 将流保存到文件中
+    /// 异步将流保存到文件中
     /// </summary>
-    /// <param name="stream">流</param>
-    /// <param name="filePath">文件路径</param>
-    /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="throwIfFileExist">当文件已存在时是否抛出异常,true-抛出异常,false-覆盖</param>
-    /// <exception cref="ArgumentNullException">当stream或filePath参数为空时引发异常</exception>
-    /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时引发异常</exception>
+    /// <param name="stream">要保存的流</param>
+    /// <param name="filePath">目标文件路径</param>
+    /// <param name="cancellationToken">取消令牌，用于取消异步操作</param>
+    /// <param name="throwIfFileExist">当文件已存在时是否抛出异常，true表示抛出异常，false表示覆盖文件</param>
+    /// <exception cref="ArgumentNullException">当stream或filePath参数为null或空时抛出</exception>
+    /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时抛出</exception>
     public static async Task SaveToFileAsync(this Stream stream, string filePath, CancellationToken? cancellationToken, bool throwIfFileExist = false)
     {
         if (stream is null) throw new ArgumentNullException(nameof(stream));
@@ -1126,11 +1126,11 @@ public static class FileHelper
     }
 
     /// <summary>
-    /// 如果文件夹不存在抛出异常
+    /// 如果文件夹不存在则抛出异常
     /// </summary>
     /// <param name="directory">文件夹路径</param>
-    /// <exception cref="ArgumentNullException">当directory参数为空时引发异常</exception>
-    /// <exception cref="Exception">当文件夹不存在时引发异常</exception>
+    /// <exception cref="ArgumentNullException">当directory参数为null或空时抛出</exception>
+    /// <exception cref="Exception">当文件夹不存在时抛出异常</exception>
     public static void ThrowIfDirectoryNotExist([NotNull] this string? directory)
     {
         if (directory.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(directory));
@@ -1138,11 +1138,11 @@ public static class FileHelper
     }
 
     /// <summary>
-    /// 如果文件夹不存在抛出异常
+    /// 如果文件夹不存在则抛出异常
     /// </summary>
-    /// <param name="directory">文件夹路径</param>
-    /// <exception cref="ArgumentNullException">当directory参数为空时引发异常</exception>
-    /// <exception cref="Exception">当文件夹不存在时引发异常</exception>
+    /// <param name="directory">文件夹信息对象</param>
+    /// <exception cref="ArgumentNullException">当directory参数为null时抛出</exception>
+    /// <exception cref="Exception">当文件夹不存在时抛出异常</exception>
     public static void ThrowIfDirectoryNotExist([NotNull] this DirectoryInfo? directory)
     {
         if (directory is null) throw new ArgumentNullException(nameof(directory));
@@ -1150,11 +1150,11 @@ public static class FileHelper
     }
 
     /// <summary>
-    /// 如果文件不存在抛出异常
+    /// 如果文件不存在则抛出异常
     /// </summary>
     /// <param name="filePath">文件路径</param>
-    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
-    /// <exception cref="FileNotFoundException">当文件不存在时引发异常</exception>
+    /// <exception cref="ArgumentNullException">当filePath参数为null或空时抛出</exception>
+    /// <exception cref="FileNotFoundException">当文件不存在时抛出异常</exception>
     public static void ThrowIfFileNotExist([NotNull] this string? filePath)
     {
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
@@ -1162,11 +1162,11 @@ public static class FileHelper
     }
 
     /// <summary>
-    /// 如果文件不存在抛出异常
+    /// 如果文件不存在则抛出异常
     /// </summary>
-    /// <param name="fileInfo">文件信息</param>
-    /// <exception cref="ArgumentNullException">当fileInfo参数为空时引发异常</exception>
-    /// <exception cref="FileNotFoundException">当文件不存在时引发异常</exception>
+    /// <param name="fileInfo">文件信息对象</param>
+    /// <exception cref="ArgumentNullException">当fileInfo参数为null时抛出</exception>
+    /// <exception cref="FileNotFoundException">当文件不存在时抛出异常</exception>
     public static void ThrowIfFileNotExist([NotNull] this FileInfo? fileInfo)
     {
         if (fileInfo is null) throw new ArgumentNullException(nameof(fileInfo));
@@ -1177,7 +1177,7 @@ public static class FileHelper
     /// 如果文件夹不存在则创建
     /// </summary>
     /// <param name="directory">文件夹路径</param>
-    /// <exception cref="ArgumentNullException">当directory参数为空时引发异常</exception>
+    /// <exception cref="ArgumentNullException">当directory参数为null或空时抛出</exception>
     public static void CreateDirectoryIfNotExist([NotNull] this string? directory)
     {
         if (directory.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(directory));
@@ -1199,7 +1199,7 @@ public static class FileHelper
     /// 如果文件不存在则创建
     /// </summary>
     /// <param name="filePath">文件路径</param>
-    /// <exception cref="ArgumentNullException">当filePath参数为空时引发异常</exception>
+    /// <exception cref="ArgumentNullException">当filePath参数为null或空时抛出</exception>
     public static void CreateFileIfNotExist([NotNull] this string? filePath)
     {
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
@@ -1209,8 +1209,8 @@ public static class FileHelper
     /// <summary>
     /// 如果文件不存在则创建
     /// </summary>
-    /// <param name="fileInfo">文件信息</param>
-    /// <exception cref="ArgumentNullException">当fileInfo参数为空时引发异常</exception>
+    /// <param name="fileInfo">文件信息对象</param>
+    /// <exception cref="ArgumentNullException">当fileInfo参数为null时抛出</exception>
     public static void CreateFileIfNotExist([NotNull] this FileInfo? fileInfo)
     {
         if (fileInfo is null) throw new ArgumentNullException(nameof(fileInfo));
@@ -1222,11 +1222,11 @@ public static class FileHelper
     }
 
     /// <summary>
-    /// 转换为文件大小字符串
+    /// 将文件字节大小转换为人类可读的字符串格式
     /// </summary>
     /// <param name="size">文件字节长度</param>
-    /// <returns>文件大小</returns>
-    /// <exception cref="ArgumentException">当size参数小于0时引发异常</exception>
+    /// <returns>人类可读的文件大小字符串，如"1.5KB"、"2.3MB"、"4.56GB"等</returns>
+    /// <exception cref="ArgumentException">当size参数小于0时抛出</exception>
     public static string ToFileSizeString(this long size)
     {
         if (size < 0) throw new ArgumentException("file size should greater than equal 0", nameof(size));
@@ -1239,33 +1239,33 @@ public static class FileHelper
     }
 
     /// <summary>
-    /// 通过文件名或路径(包含扩展名)获取MimeType
+    /// 根据文件扩展名获取MIME类型
     /// </summary>
-    /// <param name="filePathOrName">文件名或路径</param>
-    /// <returns>MimeType</returns>
+    /// <param name="filePathOrName">文件名或路径（包含扩展名）</param>
+    /// <returns>MIME类型字符串，如"image/jpeg"、"application/json"等；未知扩展名返回"application/octet-stream"</returns>
     public static string GetMimeType(this string filePathOrName) => _mimeTypeMap.Value.TryGetValue(filePathOrName.GetFileExtension(false), out var type) ? type : "application/octet-stream";
 
     /// <summary>
-    /// 合并路径
+    /// 合并两个路径部分
     /// </summary>
-    /// <param name="leftPath">左边路径</param>
-    /// <param name="rightPath">右边路径</param>
-    /// <returns>路径</returns>
+    /// <param name="leftPath">左侧路径</param>
+    /// <param name="rightPath">右侧路径</param>
+    /// <returns>合并后的路径，自动处理路径分隔符</returns>
     public static string CombinePath(this string leftPath, string rightPath) => Path.Combine(leftPath.Trim(), rightPath.Trim().TrimStart('/').TrimStart('\\')).FormatPath();
 
     /// <summary>
-    /// 格式化路径
+    /// 格式化路径，统一使用/作为路径分隔符
     /// </summary>
-    /// <param name="path">路径</param>
-    /// <returns>格式化字符串</returns>
-    /// <exception cref="ArgumentNullException">当path参数为空时引发异常</exception>
+    /// <param name="path">路径字符串</param>
+    /// <returns>格式化后的路径，使用/作为分隔符</returns>
+    /// <exception cref="ArgumentNullException">当path参数为null时抛出</exception>
     public static string FormatPath([NotNull] this string? path) => path?.Trim().Replace("\\", "/") ?? throw new ArgumentNullException(nameof(path));
 
     /// <summary>
-    /// 将文件转换base64格式字符串
+    /// 将文件转换为Base64格式字符串
     /// </summary>
     /// <param name="filePath">文件路径</param>
-    /// <returns>base64格式字符串</returns>
+    /// <returns>文件的Base64编码字符串</returns>
     public static string FileBase64Encode(this string filePath)
     {
         filePath.CreateFileIfNotExist();
@@ -1277,10 +1277,10 @@ public static class FileHelper
     /// <summary>
     /// 将base64格式字符串转换为字节数组
     /// </summary>
-    /// <param name="base64FileString">base64格式字符串</param>
-    /// <returns>字节数组</returns>
-    /// <exception cref="ArgumentNullException">当base64FileString参数为空时引发异常</exception>
-    /// <exception cref="FormatException">当解码失败时引发异常</exception>
+    /// <param name="base64FileString">Base64格式文件字符串，格式如"data:image/jpeg;base64,..."</param>
+    /// <returns>解码后的字节数组</returns>
+    /// <exception cref="ArgumentNullException">当base64FileString参数为null或空时抛出</exception>
+    /// <exception cref="FormatException">当字符串格式不符合Base64文件格式时抛出</exception>
     public static byte[] FileBase64Decode(this string base64FileString)
     {
         if (base64FileString.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(base64FileString));
@@ -1303,7 +1303,7 @@ public static class FileHelper
     /// <summary>
     /// 如果文件夹存在则删除
     /// </summary>
-    /// <param name="path">文件路径</param>
+    /// <param name="path">文件夹路径</param>
     public static void RemoveDirectoryIfExist(this string? path)
     {
         if (path.IsNullOrWhiteSpace()) return;
@@ -1313,8 +1313,8 @@ public static class FileHelper
     /// <summary>
     /// 打开或创建文件流
     /// </summary>
-    /// <param name="fileInfo">文件信息</param>
-    /// <returns>文件流</returns>
+    /// <param name="fileInfo">文件信息对象</param>
+    /// <returns>文件流，可读写</returns>
     public static FileStream OpenOrCreate(this FileInfo fileInfo)
     {
         fileInfo.CreateFileIfNotExist();
@@ -1322,13 +1322,13 @@ public static class FileHelper
     }
 
     /// <summary>
-    /// 拷贝流
+    /// 异步拷贝流，并支持传输进度回调
     /// </summary>
-    /// <param name="source">原始流</param>
+    /// <param name="source">源流</param>
     /// <param name="target">目标流</param>
-    /// <param name="cancellationToken">cancellationToken</param>
-    /// <param name="transfered">传输回调(本次传输字节数)</param>
-    /// <returns>task</returns>
+    /// <param name="cancellationToken">取消令牌，用于取消异步操作</param>
+    /// <param name="transfered">传输进度回调，参数为本次传输的字节数</param>
+    /// <returns>异步任务</returns>
     public static async Task CopyToAsync(this Stream source, Stream target, CancellationToken cancellationToken, Action<long>? transfered = null)
     {
         await Task.Yield();

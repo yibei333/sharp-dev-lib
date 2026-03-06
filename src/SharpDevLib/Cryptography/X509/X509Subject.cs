@@ -1,44 +1,46 @@
 ﻿namespace SharpDevLib;
 
 /// <summary>
-/// X509Subject
+/// X.509证书主体信息，包含证书主题的各种属性
 /// </summary>
-/// <remarks>
-/// 实例化X509Subject
-/// </remarks>
-/// <param name="commonName">Common Name(eg, your name or your server's hostname)</param>
+/// <param name="commonName">通用名称（例如：您的姓名或服务器的主机名）</param>
 public class X509Subject(string commonName)
 {
     /// <summary>
-    /// Country Name (2 letter code)
+    /// 获取或设置国家/地区名称（2字母代码）
     /// </summary>
     public string? Country { get; set; }
+
     /// <summary>
-    /// State or Province Name(full name)
+    /// 获取或设置省/州名称（全名）
     /// </summary>
     public string? Province { get; set; }
+
     /// <summary>
-    /// Locality Name(eg, city)
+    /// 获取或设置城市/地区名称
     /// </summary>
     public string? City { get; set; }
+
     /// <summary>
-    /// Organization Name(eg, company)
+    /// 获取或设置组织名称（例如：公司）
     /// </summary>
     public string? Organization { get; set; }
+
     /// <summary>
-    /// Organizational Unit Name(eg, section)
+    /// 获取或设置组织单位名称（例如：部门）
     /// </summary>
     public string? OrganizationalUnit { get; set; }
+
     /// <summary>
-    /// Common Name(eg, your name or your server's hostname)
+    /// 获取或设置通用名称（例如：您的姓名或服务器的主机名）
     /// </summary>
     public string CommonName { get; set; } = commonName;
 
     /// <summary>
-    /// get text
+    /// 将主体信息转换为文本格式
     /// </summary>
-    /// <returns>text</returns>
-    /// <exception cref="Exception">当所有参数都为空时引发异常</exception>
+    /// <returns>主体信息的文本字符串</returns>
+    /// <exception cref="Exception">当所有属性都为空时抛出异常</exception>
     public string Text()
     {
         var collection = new List<string>();

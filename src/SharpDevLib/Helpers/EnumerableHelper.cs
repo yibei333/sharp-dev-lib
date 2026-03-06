@@ -4,26 +4,27 @@ using System.Reflection;
 namespace SharpDevLib;
 
 /// <summary>
-/// 集合扩展
+/// 集合扩展，提供集合操作和动态排序等功能
 /// </summary>
 public static class EnumerableHelper
 {
     /// <summary>
-    /// 添加项,方便链式调用
+    /// 将KeyValuePair集合转换为字典
     /// </summary>
-    /// <typeparam name="TKey">Key泛型类型</typeparam>
-    /// <typeparam name="TValue">Value泛型类型</typeparam>
+    /// <typeparam name="TKey">字典键类型</typeparam>
+    /// <typeparam name="TValue">字典值类型</typeparam>
     /// <param name="source">KeyValuePair集合</param>
-    /// <returns>字典</returns>
+    /// <returns>转换后的字典</returns>
+    /// <exception cref="ArgumentException">当集合中存在重复键时抛出</exception>
     public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source) => source.ToDictionary(x => x.Key, x => x.Value);
 
     /// <summary>
-    /// 添加项,方便链式调用
+    /// 向列表添加项并返回原列表，支持链式调用
     /// </summary>
-    /// <typeparam name="T">泛型类型</typeparam>
-    /// <param name="source">集合</param>
-    /// <param name="item">项</param>
-    /// <returns>原集合</returns>
+    /// <typeparam name="T">列表项类型</typeparam>
+    /// <param name="source">源列表</param>
+    /// <param name="item">要添加的项</param>
+    /// <returns>添加项后的原列表，用于链式调用</returns>
     public static List<T> AddItem<T>(this List<T> source, T item)
     {
         source.Add(item);
@@ -31,12 +32,12 @@ public static class EnumerableHelper
     }
 
     /// <summary>
-    /// 删除项,方便链式调用
+    /// 从列表中删除指定项并返回原列表，支持链式调用
     /// </summary>
-    /// <typeparam name="T">泛型类型</typeparam>
-    /// <param name="source">集合</param>
-    /// <param name="item">项</param>
-    /// <returns>原集合</returns>
+    /// <typeparam name="T">列表项类型</typeparam>
+    /// <param name="source">源列表</param>
+    /// <param name="item">要删除的项</param>
+    /// <returns>删除项后的原列表，用于链式调用</returns>
     public static List<T> RemoveItem<T>(this List<T> source, T item)
     {
         source.Remove(item);
@@ -44,14 +45,15 @@ public static class EnumerableHelper
     }
 
     /// <summary>
-    /// 添加项,方便链式调用
+    /// 向字典添加键值对并返回原字典，支持链式调用
     /// </summary>
-    /// <typeparam name="TKey">Key泛型类型</typeparam>
-    /// <typeparam name="TValue">Value泛型类型</typeparam>
-    /// <param name="source">集合</param>
-    /// <param name="key">key</param>
-    /// <param name="value">value</param>
-    /// <returns>原字典</returns>
+    /// <typeparam name="TKey">字典键类型</typeparam>
+    /// <typeparam name="TValue">字典值类型</typeparam>
+    /// <param name="source">源字典</param>
+    /// <param name="key">要添加的键</param>
+    /// <param name="value">要添加的值</param>
+    /// <returns>添加键值对后的原字典，用于链式调用</returns>
+    /// <exception cref="ArgumentException">当字典中已存在相同键时抛出</exception>
     public static Dictionary<TKey, TValue> AddItem<TKey, TValue>(this Dictionary<TKey, TValue> source, TKey key, TValue value)
 
     {
@@ -60,13 +62,13 @@ public static class EnumerableHelper
     }
 
     /// <summary>
-    /// 删除项,方便链式调用
+    /// 从字典中删除指定键并返回原字典，支持链式调用
     /// </summary>
-    /// <typeparam name="TKey">Key泛型类型</typeparam>
-    /// <typeparam name="TValue">Value泛型类型</typeparam>
-    /// <param name="source">集合</param>
-    /// <param name="key">key</param>
-    /// <returns>原字典</returns>
+    /// <typeparam name="TKey">字典键类型</typeparam>
+    /// <typeparam name="TValue">字典值类型</typeparam>
+    /// <param name="source">源字典</param>
+    /// <param name="key">要删除的键</param>
+    /// <returns>删除键后的原字典，用于链式调用</returns>
     public static Dictionary<TKey, TValue> RemoveItem<TKey, TValue>(this Dictionary<TKey, TValue> source, TKey key)
     {
         source.Remove(key);
@@ -74,11 +76,11 @@ public static class EnumerableHelper
     }
 
     /// <summary>
-    /// 循环
+    /// 对集合中的每个元素执行指定操作
     /// </summary>
-    /// <typeparam name="T">泛型类型</typeparam>
-    /// <param name="source">集合</param>
-    /// <param name="action">action</param>
+    /// <typeparam name="T">集合元素类型</typeparam>
+    /// <param name="source">源集合</param>
+    /// <param name="action">要对每个元素执行的操作</param>
     public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
     {
         if (source.IsNullOrEmpty()) return;
@@ -86,11 +88,11 @@ public static class EnumerableHelper
     }
 
     /// <summary>
-    /// 循环
+    /// 对集合中的每个元素执行指定操作，包含元素索引
     /// </summary>
-    /// <typeparam name="T">泛型类型</typeparam>
-    /// <param name="source">集合</param>
-    /// <param name="action">action</param>
+    /// <typeparam name="T">集合元素类型</typeparam>
+    /// <param name="source">源集合</param>
+    /// <param name="action">要对每个元素执行的操作，第一个参数为元素索引，第二个参数为元素</param>
     public static void ForEach<T>(this IEnumerable<T> source, Action<int, T> action)
     {
         if (source.IsNullOrEmpty()) return;
@@ -99,31 +101,33 @@ public static class EnumerableHelper
     }
 
     /// <summary>
-    /// 根据对象的值（不是引用）去重
+    /// 根据对象的值（而非引用）对集合进行去重
     /// </summary>
-    /// <typeparam name="T">泛型类型</typeparam>
-    /// <param name="source">集合</param>
-    /// <returns>去重的集合</returns>
+    /// <typeparam name="T">集合元素类型</typeparam>
+    /// <param name="source">源集合</param>
+    /// <returns>去重后的集合</returns>
     public static IEnumerable<T?> DistinctByObjectValue<T>(this IEnumerable<T?> source) where T : class => source.Distinct(new ObjectValueComparer<T>());
 
     /// <summary>
-    /// 根据属性名称排序
+    /// 根据属性名称对集合进行动态排序
     /// </summary>
-    /// <typeparam name="T">泛型类型</typeparam>
-    /// <param name="query">query</param>
-    /// <param name="sortPropertyName">排序属性名称</param>
-    /// <param name="descending">是否降序</param>
-    /// <returns>IEnumerable</returns>
+    /// <typeparam name="T">集合元素类型，必须为引用类型</typeparam>
+    /// <param name="query">源集合</param>
+    /// <param name="sortPropertyName">排序属性的名称</param>
+    /// <param name="descending">是否降序排序，默认为false（升序）</param>
+    /// <returns>排序后的集合</returns>
+    /// <exception cref="ArgumentNullException">当属性名称为null或找不到属性时抛出</exception>
     public static IEnumerable<T> OrderByDynamic<T>(this IEnumerable<T> query, string sortPropertyName, bool descending = false) where T : class => query.AsQueryable().OrderByDynamic(typeof(T).GetProperty(sortPropertyName), descending).AsEnumerable();
 
     /// <summary>
-    /// 根据属性名称排序
+    /// 根据属性名称对查询进行动态排序
     /// </summary>
-    /// <typeparam name="T">泛型类型</typeparam>
-    /// <param name="query">query</param>
-    /// <param name="sortPropertyName">排序属性名称</param>
-    /// <param name="descending">是否降序</param>
-    /// <returns>IQueryable</returns>
+    /// <typeparam name="T">集合元素类型，必须为引用类型</typeparam>
+    /// <param name="query">源查询</param>
+    /// <param name="sortPropertyName">排序属性的名称</param>
+    /// <param name="descending">是否降序排序，默认为false（升序）</param>
+    /// <returns>排序后的查询</returns>
+    /// <exception cref="ArgumentNullException">当属性名称为null或找不到属性时抛出</exception>
     public static IQueryable<T> OrderByDynamic<T>(this IQueryable<T> query, string sortPropertyName, bool descending = false) where T : class => query.OrderByDynamic(typeof(T).GetProperty(sortPropertyName), descending);
 
     internal static IEnumerable<T> OrderByDynamic<T>(this IEnumerable<T> query, PropertyInfo sortProperty, bool descending = false) where T : class => query.AsQueryable().OrderByDynamic(sortProperty, descending).AsEnumerable();

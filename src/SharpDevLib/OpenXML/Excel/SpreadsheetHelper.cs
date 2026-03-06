@@ -7,7 +7,8 @@ using System.Text;
 namespace SharpDevLib;
 
 /// <summary>
-/// 电子表格扩展
+/// 电子表格扩展类
+/// 为 OpenXML 的 Workbook、Worksheet、Cell 等对象提供便捷的扩展方法,支持行列操作、样式设置、批注管理等功能
 /// </summary>
 public static class SpreadsheetHelper
 {
@@ -61,25 +62,26 @@ public static class SpreadsheetHelper
 
     #region Workbook
     /// <summary>
-    /// 获取工作表格
+    /// 根据表名获取工作表
     /// </summary>
     /// <param name="workbookPart">工作簿部件</param>
-    /// <param name="tableName">表明,如sheet1</param>
-    /// <returns>工作表格</returns>
+    /// <param name="tableName">表名,如 Sheet1</param>
+    /// <returns>工作表对象</returns>
+    /// <exception cref="Exception">当指定表名不存在时引发异常</exception>
     public static Worksheet GetWorksheet(this WorkbookPart workbookPart, string tableName)
     {
-        Sheet sheet = workbookPart.Workbook.Elements<Sheets>().SelectMany(x => x.Elements<Sheet>().Where(y => y.Name == tableName)).FirstOrDefault() ?? throw new Exception($"table with name '{tableName}' not found");
+        Sheet sheet = workbookPart.Workbook?.Elements<Sheets>().SelectMany(x => x.Elements<Sheet>().Where(y => y.Name == tableName)).FirstOrDefault() ?? throw new Exception($"table with name '{tableName}' not found");
         string worksheetPartId = sheet.Id?.ToString() ?? string.Empty;
         if (worksheetPartId.IsNullOrWhiteSpace()) throw new Exception();
         var worksheetPart = workbookPart.GetPartById(worksheetPartId) as WorksheetPart ?? throw new Exception($"WorksheetPart with id '{worksheetPartId}' not found");
-        return worksheetPart.Worksheet;
+        return worksheetPart.Worksheet ?? throw new Exception("can't get worksheet");
     }
 
     /// <summary>
-    /// 获取SharedStringTable
+    /// 获取或创建共享字符串表
     /// </summary>
     /// <param name="workbookPart">工作簿部件</param>
-    /// <returns>SharedStringTable</returns>
+    /// <returns>共享字符串表对象</returns>
     public static SharedStringTable GetSharedStringTable(this WorkbookPart workbookPart)
     {
         var sharedStringTablePart = workbookPart.GetPartsOfType<SharedStringTablePart>().FirstOrDefault() ?? workbookPart.AddNewPart<SharedStringTablePart>();
@@ -88,11 +90,11 @@ public static class SpreadsheetHelper
     }
 
     /// <summary>
-    /// 设置SharedString
+    /// 向共享字符串表中添加字符串
     /// </summary>
-    /// <param name="sharedStringTable">SharedStringTable</param>
-    /// <param name="text">字符串</param>
-    /// <returns>SharedStringItem索引</returns>
+    /// <param name="sharedStringTable">共享字符串表对象</param>
+    /// <param name="text">要添加的字符串</param>
+    /// <returns>共享字符串项的索引,如果字符串已存在则返回现有索引</returns>
     public static int SetSharedStringItem(this SharedStringTable sharedStringTable, string text)
     {
         var items = sharedStringTable.Elements<SharedStringItem>().ToArray();
@@ -108,18 +110,19 @@ public static class SpreadsheetHelper
 
     #region Worksheet
     /// <summary>
-    /// 获取单元格集合
+    /// 根据条件获取单元格集合
     /// </summary>
-    /// <param name="worksheet">工作表格</param>
-    /// <param name="condition">查询条件</param>
-    /// <returns>单元格集合</returns>
+    /// <param name="worksheet">工作表对象</param>
+    /// <param name="condition">筛选条件函数</param>
+    /// <returns>符合条件的单元格集合</returns>
     public static IEnumerable<Cell> GetCells(this Worksheet worksheet, Func<Cell, bool> condition) => worksheet.Descendants<Cell>().Where(condition);
 
     /// <summary>
-    /// 删除行(如果该行有合并单元格,则会产生不可预期的效果)
+    /// 删除指定行
     /// </summary>
-    /// <param name="worksheet">工作表格</param>
-    /// <param name="rowIndex">行号</param>
+    /// <param name="worksheet">工作表对象</param>
+    /// <param name="rowIndex">要删除的行号</param>
+    /// <exception cref="Exception">如果该行有合并单元格,则会产生不可预期的效果</exception>
     public static void DeleteRow(this Worksheet worksheet, uint rowIndex)
     {
         var currentRow = worksheet.Descendants<Row>().FirstOrDefault(x => x.RowIndex is not null && x.RowIndex == rowIndex);
@@ -140,11 +143,12 @@ public static class SpreadsheetHelper
     }
 
     /// <summary>
-    /// 插入空行(如果该行有合并单元格,则会产生不可预期的效果)
+    /// 在指定位置插入空行
     /// </summary>
-    /// <param name="worksheet">工作表格</param>
-    /// <param name="rowIndex">行号</param>
-    /// <returns>插入的空行</returns>
+    /// <param name="worksheet">工作表对象</param>
+    /// <param name="rowIndex">要插入的行号</param>
+    /// <returns>新插入的空行对象</returns>
+    /// <exception cref="Exception">如果该行有合并单元格,则会产生不可预期的效果</exception>
     public static Row InsertRow(this Worksheet worksheet, uint rowIndex)
     {
         var belowRows = worksheet.Descendants<Row>().Where(x => x.RowIndex is not null && x.RowIndex >= rowIndex);
@@ -165,11 +169,12 @@ public static class SpreadsheetHelper
     }
 
     /// <summary>
-    /// 插入空白列(如果该行有合并单元格,则会产生不可预期的效果)
+    /// 在指定位置插入空白列
     /// </summary>
-    /// <param name="worksheet">工作表格</param>
-    /// <param name="columnName">列明,如A,B,C</param>
-    /// <param name="insertColumnCells">是否要插入单元格</param>
+    /// <param name="worksheet">工作表对象</param>
+    /// <param name="columnName">列名,如 A、B、C</param>
+    /// <param name="insertColumnCells">是否为每行插入对应的单元格</param>
+    /// <exception cref="Exception">如果该列有合并单元格,则会产生不可预期的效果</exception>
     public static void InsertColumn(this Worksheet worksheet, string columnName, bool insertColumnCells)
     {
         var cellReference = new CellReference(columnName + 1);
@@ -251,10 +256,11 @@ public static class SpreadsheetHelper
     }
 
     /// <summary>
-    /// 删除行(如果该行有合并单元格,则会产生不可预期的效果)
+    /// 删除指定列
     /// </summary>
-    /// <param name="worksheet">工作表格</param>
-    /// <param name="columnName">列明,如A,B,C</param>
+    /// <param name="worksheet">工作表对象</param>
+    /// <param name="columnName">要删除的列名,如 A、B、C</param>
+    /// <exception cref="Exception">如果该列有合并单元格,则会产生不可预期的效果</exception>
     public static void DeleteColumn(this Worksheet worksheet, string columnName)
     {
         var cellReference = new CellReference(columnName + 1);
@@ -304,11 +310,11 @@ public static class SpreadsheetHelper
 
     #region Cell
     /// <summary>
-    /// 获取单元格值
+    /// 获取单元格的值
     /// </summary>
-    /// <param name="cell">单元格</param>
+    /// <param name="cell">单元格对象</param>
     /// <param name="sharedStringItems">共享字符串集合</param>
-    /// <returns>值</returns>
+    /// <returns>单元格的值,如果单元格为空则返回 null</returns>
     public static string? GetValue(this Cell cell, IEnumerable<SharedStringItem> sharedStringItems)
     {
         var text = cell.CellValue?.Text;
@@ -326,11 +332,11 @@ public static class SpreadsheetHelper
     }
 
     /// <summary>
-    /// 根据值类型设置值
+    /// 根据值的类型设置单元格值
     /// </summary>
-    /// <param name="cell">单元格</param>
-    /// <param name="value">值</param>
-    /// <param name="sharedStringTable">SharedStringTable</param>
+    /// <param name="cell">单元格对象</param>
+    /// <param name="value">要设置的值</param>
+    /// <param name="sharedStringTable">共享字符串表,可为 null</param>
     public static void SetValue(this Cell cell, object? value, SharedStringTable? sharedStringTable)
     {
         if (value is null)
@@ -410,12 +416,13 @@ public static class SpreadsheetHelper
     }
 
     /// <summary>
-    /// 合并单元格,只保存左上角的单元格(如果值为空,则根据RowIndex,ColumnIndex排序找到一个有值的单元格赋值),其余单元格删除
+    /// 合并单元格范围,只保留左上角的单元格,其余单元格删除
     /// </summary>
-    /// <param name="worksheet">工作表格</param>
-    /// <param name="cellReference1">第一个单元格</param>
-    /// <param name="cellReference2">第二个单元格</param>
-    /// <returns>合并单元格</returns>
+    /// <param name="worksheet">工作表对象</param>
+    /// <param name="cellReference1">第一个单元格引用</param>
+    /// <param name="cellReference2">第二个单元格引用</param>
+    /// <returns>合并单元格对象</returns>
+    /// <exception cref="Exception">当找不到 WorkbookPart 时引发异常</exception>
     public static MergeCell MergeCells(this Worksheet worksheet, string cellReference1, string cellReference2)
     {
         var workbookPart = worksheet.GetParent<WorkbookPart>() ?? throw new Exception("WorkbookPart not found");
@@ -504,11 +511,11 @@ public static class SpreadsheetHelper
     }
 
     /// <summary>
-    /// 如果单元格不存在则创建
+    /// 如果单元格不存在则创建该单元格
     /// </summary>
-    /// <param name="worksheet">工作表格</param>
-    /// <param name="cellReference">单元格地址</param>
-    /// <returns>单元格</returns>
+    /// <param name="worksheet">工作表对象</param>
+    /// <param name="cellReference">单元格引用地址</param>
+    /// <returns>单元格对象</returns>
     public static Cell CreateCellIfNotExist(this Worksheet worksheet, string cellReference)
     {
         var reference = new CellReference(cellReference);
@@ -547,9 +554,9 @@ public static class SpreadsheetHelper
 
     #region Style
     /// <summary>
-    /// 根据单元格内容长度设置列宽
+    /// 根据单元格内容长度自动调整所有工作表的列宽
     /// </summary>
-    /// <param name="doc">文档</param>
+    /// <param name="doc">电子表格文档对象</param>
     public static void AutoColumnWidth(this SpreadsheetDocument doc)
     {
         doc.WorkbookPart?.GetPartsOfType<WorksheetPart>().ToList().ForEach(x => x.AutoColumnWidth());
@@ -557,14 +564,16 @@ public static class SpreadsheetHelper
     }
 
     /// <summary>
-    /// 根据单元格内容长度设置列宽
+    /// 根据单元格内容长度自动调整列宽
     /// </summary>
-    /// <param name="worksheetPart">工作表格配件</param>
+    /// <param name="worksheetPart">工作表部件</param>
+    /// <exception cref="Exception">当找不到 WorkbookPart 时引发异常</exception>
     public static void AutoColumnWidth(this WorksheetPart worksheetPart)
     {
         var workbookPart = worksheetPart.GetParent<WorkbookPart>() ?? throw new Exception($"unable to find WorkbookPart");
         var sharedStringItems = workbookPart.GetPartsOfType<SharedStringTablePart>()?.FirstOrDefault()?.SharedStringTable?.Elements<SharedStringItem>()?.ToList() ?? [];
         var worksheet = worksheetPart.Worksheet;
+        if (worksheet is null) return;
 
         //analysis word length
         var columnWordLength = new List<ColumnWordLength>();
@@ -621,10 +630,10 @@ public static class SpreadsheetHelper
     }
 
     /// <summary>
-    /// 创建样式
+    /// 创建单元格样式
     /// </summary>
     /// <param name="workbookPart">工作簿部件</param>
-    /// <param name="style">样式</param>
+    /// <param name="style">单元格样式对象</param>
     /// <returns>样式索引</returns>
     public static uint CreateStyle(this WorkbookPart workbookPart, CellStyle style)
     {
@@ -689,10 +698,10 @@ public static class SpreadsheetHelper
     }
 
     /// <summary>
-    /// 创建样式
+    /// 创建单元格格式样式
     /// </summary>
     /// <param name="workbookPart">工作簿部件</param>
-    /// <param name="cellFormat">单元格格式,更灵活</param>
+    /// <param name="cellFormat">单元格格式对象,提供更灵活的样式定义</param>
     /// <returns>样式索引</returns>
     public static uint CreateStyle(this WorkbookPart workbookPart, CellFormat cellFormat)
     {
@@ -708,10 +717,11 @@ public static class SpreadsheetHelper
     }
 
     /// <summary>
-    /// 合并单元格样式
+    /// 为合并单元格中的所有单元格应用样式
     /// </summary>
-    /// <param name="mergeCell">合并单元格</param>
-    /// <param name="style">样式</param>
+    /// <param name="mergeCell">合并单元格对象</param>
+    /// <param name="style">单元格样式对象</param>
+    /// <exception cref="Exception">当找不到 WorkbookPart 时引发异常</exception>
     public static void UseStyle(this MergeCell mergeCell, CellStyle style)
     {
         var workbookPart = mergeCell.GetParent<WorkbookPart>() ?? throw new Exception("unable to find WorkbookPart");
@@ -721,9 +731,11 @@ public static class SpreadsheetHelper
     }
 
     /// <summary>
-    /// 获取合并单元格中的所有单元格
+    /// 获取合并单元格范围中的所有单元格
     /// </summary>
-    /// <param name="mergeCell">合并单元格</param>
+    /// <param name="mergeCell">合并单元格对象</param>
+    /// <returns>合并范围内的单元格列表</returns>
+    /// <exception cref="Exception">当找不到 Worksheet 时引发异常</exception>
     public static List<Cell> GetCells(this MergeCell mergeCell)
     {
         var worksheet = mergeCell.GetParent<Worksheet>() ?? throw new Exception("unable to find Worksheet");
@@ -769,11 +781,12 @@ public static class SpreadsheetHelper
 
     #region Comments
     /// <summary>
-    /// 设置单元格批注
+    /// 为单元格设置批注
     /// </summary>
-    /// <param name="cell">单元格</param>
-    /// <param name="author">批注者</param>
-    /// <param name="comment">批注</param>
+    /// <param name="cell">单元格对象</param>
+    /// <param name="author">批注者名称</param>
+    /// <param name="comment">批注内容</param>
+    /// <exception cref="Exception">当找不到 WorkbookPart 或 WorksheetPart 时引发异常</exception>
     public static void SetComment(this Cell cell, string author, string comment)
     {
         var workbookPart = cell.GetParent<WorkbookPart>() ?? throw new Exception("WorkbookPart not found");
@@ -800,18 +813,18 @@ public static class SpreadsheetHelper
         var vmlDrawingPart = worksheetPart.GetPartsOfType<VmlDrawingPart>().FirstOrDefault() ?? worksheetPart.AddNewPart<VmlDrawingPart>();
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(vmlStyleText));
         vmlDrawingPart.FeedData(stream);
-        worksheetPart.Worksheet.AppendChild(new LegacyDrawing() { Id = worksheetPart.GetIdOfPart(vmlDrawingPart) });
-        workbookPart.Workbook.Save();
+        worksheetPart.Worksheet?.AppendChild(new LegacyDrawing() { Id = worksheetPart.GetIdOfPart(vmlDrawingPart) });
+        workbookPart.Workbook?.Save();
     }
     #endregion
 
     #region Image
     /// <summary>
-    /// 添加背景
+    /// 为工作表添加背景图片
     /// </summary>
-    /// <param name="worksheetPart">工作表格部件</param>
-    /// <param name="background">背景图文件流</param>
-    /// <param name="contentType">content type</param>
+    /// <param name="worksheetPart">工作表部件</param>
+    /// <param name="background">背景图片文件流</param>
+    /// <param name="contentType">内容类型,默认为 image/png</param>
     public static void AddBackground(this WorksheetPart worksheetPart, Stream background, string contentType = "image/png")
     {
         var imagePart = worksheetPart.ImageParts.FirstOrDefault();
@@ -819,25 +832,25 @@ public static class SpreadsheetHelper
         var imageId = worksheetPart.GetIdOfPart(imagePart);
         imagePart.FeedData(background);
         var picture = new Picture { Id = imageId };
-        worksheetPart.Worksheet.Append(picture);
-        worksheetPart.Worksheet.Save();
+        worksheetPart.Worksheet?.Append(picture);
+        worksheetPart.Worksheet?.Save();
     }
 
     /// <summary>
-    /// 删除背景
+    /// 删除工作表的背景图片
     /// </summary>
-    /// <param name="worksheetPart">工作表格部件</param>
+    /// <param name="worksheetPart">工作表部件</param>
     public static void RemoveBackground(this WorksheetPart worksheetPart)
     {
         worksheetPart.ImageParts.ToList().ForEach(x =>
         {
             worksheetPart.DeletePart(x);
         });
-        worksheetPart.Worksheet.Elements<Picture>().ToList().ForEach(x =>
+        worksheetPart.Worksheet?.Elements<Picture>().ToList().ForEach(x =>
         {
             x.Remove();
         });
-        worksheetPart.Worksheet.Save();
+        worksheetPart.Worksheet?.Save();
     }
     #endregion
 }

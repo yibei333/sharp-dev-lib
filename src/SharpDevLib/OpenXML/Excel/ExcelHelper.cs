@@ -7,16 +7,17 @@ using System.Data;
 namespace SharpDevLib;
 
 /// <summary>
-/// excel扩展
+/// Excel 文件读写扩展类
+/// 提供 Excel 文件的密码加密解密、DataTable/DataSet 读写等常用功能
 /// </summary>
 public static class ExcelHelper
 {
     /// <summary>
-    /// 密码保护excel
+    /// 为 Excel 文件设置密码保护
     /// </summary>
-    /// <param name="inputStream">excel文件流</param>
-    /// <param name="outputStream">密码保护的excel文件流</param>
-    /// <param name="password">密码</param>
+    /// <param name="inputStream">输入的 Excel 文件流</param>
+    /// <param name="outputStream">输出密码保护的 Excel 文件流</param>
+    /// <param name="password">密码字符串</param>
     public static void Encrypt(Stream inputStream, Stream outputStream, string password)
     {
         using var memoryStream = new MemoryStream(); ;
@@ -29,11 +30,11 @@ public static class ExcelHelper
     }
 
     /// <summary>
-    /// 去除excel密码保护
+    /// 去除 Excel 文件的密码保护
     /// </summary>
-    /// <param name="inputStream">密码保护的excel文件流</param>
-    /// <param name="outputStream">去除密码的excel文件流</param>
-    /// <param name="password">密码</param>
+    /// <param name="inputStream">密码保护的 Excel 文件流</param>
+    /// <param name="outputStream">输出去除密码的 Excel 文件流</param>
+    /// <param name="password">原密码字符串</param>
     public static void Decrypt(Stream inputStream, Stream outputStream, string password)
     {
         using var memoryStream = new MemoryStream();
@@ -44,28 +45,35 @@ public static class ExcelHelper
     }
 
     /// <summary>
-    /// 读取标准的Excel流,标准的定义为
-    /// <para>1.第一行为表头</para>
-    /// <para>2.每行的列不能超出表头的长度范围</para>
-    /// <para>3.读取的结果中所有列的类型都为string类型</para>
+    /// 从 Excel 流读取指定工作表的数据到 DataTable
     /// </summary>
-    /// <param name="stream">标准的Excel流</param>
-    /// <param name="index">第一个表格,从0开始</param>
-    /// <returns>DataTable</returns>
-    /// <exception cref="Exception">读取失败时引发异常</exception>
+    /// <param name="stream">Excel 文件流</param>
+    /// <param name="index">工作表索引,从 0 开始</param>
+    /// <returns>包含工作表数据的 DataTable</returns>
+    /// <exception cref="Exception">读取失败或找不到工作表时引发异常</exception>
+    /// <remarks>
+    /// 标准 Excel 格式要求:
+    /// 1. 第一行为表头
+    /// 2. 每行的列不能超出表头的长度范围
+    /// 3. 读取的结果中所有列的类型都为 string 类型
+    /// </remarks>
     public static DataTable ReadTable(Stream stream, int index = 0) => ReadTable(stream, null, index);
 
     /// <summary>
-    /// 读取标准的Excel流,标准的定义为
-    /// <para>1.第一行为表头</para>
-    /// <para>2.每行的列不能超出表头的长度范围</para>
-    /// <para>3.读取的结果中所有列的类型都为string类型</para>
+    /// 从 Excel 流读取指定工作表的数据到 DataTable,并使用自定义列名
     /// </summary>
-    /// <param name="stream">标准的Excel流</param>
-    /// <param name="columnNames">自定义列名</param>
-    /// <param name="index">第一个表格,从0开始</param>
-    /// <returns>DataTable</returns>
-    /// <exception cref="Exception">读取失败时引发异常</exception>
+    /// <param name="stream">Excel 文件流</param>
+    /// <param name="columnNames">自定义列名数组,如果为 null 则使用 Excel 中的表头</param>
+    /// <param name="index">工作表索引,从 0 开始</param>
+    /// <returns>包含工作表数据的 DataTable</returns>
+    /// <exception cref="Exception">读取失败或找不到工作表时引发异常</exception>
+    /// <exception cref="ArgumentException">当自定义列名数量与 Excel 列数不匹配时引发异常</exception>
+    /// <remarks>
+    /// 标准 Excel 格式要求:
+    /// 1. 第一行为表头
+    /// 2. 每行的列不能超出表头的长度范围
+    /// 3. 读取的结果中所有列的类型都为 string 类型
+    /// </remarks>
     public static DataTable ReadTable(Stream stream, string[]? columnNames, int index = 0)
     {
         using var doc = SpreadsheetDocument.Open(stream, false);
@@ -75,26 +83,33 @@ public static class ExcelHelper
     }
 
     /// <summary>
-    /// 读取标准的Excel流,标准的定义为
-    /// <para>1.第一行为表头</para>
-    /// <para>2.每行的列不能超出表头的长度范围</para>
-    /// <para>3.读取的结果中所有列的类型都为string类型</para>
+    /// 从 Excel 流读取所有工作表的数据到 DataSet
     /// </summary>
-    /// <param name="stream">标准的Excel流</param>
-    /// <returns>DataSet</returns>
+    /// <param name="stream">Excel 文件流</param>
+    /// <returns>包含所有工作表数据的 DataSet</returns>
     /// <exception cref="Exception">读取失败时引发异常</exception>
+    /// <remarks>
+    /// 标准 Excel 格式要求:
+    /// 1. 第一行为表头
+    /// 2. 每行的列不能超出表头的长度范围
+    /// 3. 读取的结果中所有列的类型都为 string 类型
+    /// </remarks>
     public static DataSet ReadSet(Stream stream) => ReadSet(stream, null);
 
     /// <summary>
-    /// 读取标准的Excel流,标准的定义为
-    /// <para>1.第一行为表头</para>
-    /// <para>2.每行的列不能超出表头的长度范围</para>
-    /// <para>3.读取的结果中所有列的类型都为string类型</para>
+    /// 从 Excel 流读取所有工作表的数据到 DataSet,并使用自定义列名
     /// </summary>
-    /// <param name="stream">标准的Excel流</param>
-    /// <param name="columnNames">自定义列名</param>
-    /// <returns>DataSet</returns>
+    /// <param name="stream">Excel 文件流</param>
+    /// <param name="columnNames">二维数组,每个元素对应一个工作表的自定义列名数组</param>
+    /// <returns>包含所有工作表数据的 DataSet</returns>
     /// <exception cref="Exception">读取失败时引发异常</exception>
+    /// <exception cref="ArgumentException">当自定义列名数量与工作表数量不匹配时引发异常</exception>
+    /// <remarks>
+    /// 标准 Excel 格式要求:
+    /// 1. 第一行为表头
+    /// 2. 每行的列不能超出表头的长度范围
+    /// 3. 读取的结果中所有列的类型都为 string 类型
+    /// </remarks>
     public static DataSet ReadSet(Stream stream, params string[][]? columnNames)
     {
         using var doc = SpreadsheetDocument.Open(stream, false);
@@ -113,18 +128,18 @@ public static class ExcelHelper
     }
 
     /// <summary>
-    /// 将DataTable写入Excel
+    /// 将 DataTable 数据写入 Excel 文件
     /// </summary>
-    /// <param name="dataTable">DataTable</param>
-    /// <param name="stream">一般为Excel的文件流</param>
+    /// <param name="dataTable">要写入的数据表</param>
+    /// <param name="stream">Excel 文件流</param>
     public static void Write(DataTable dataTable, Stream stream) => Write(dataTable, stream, null);
 
     /// <summary>
-    /// 将DataTable写入Excel
+    /// 将 DataTable 数据写入 Excel 文件,并使用自定义列名
     /// </summary>
-    /// <param name="dataTable">DataTable</param>
-    /// <param name="stream">一般为Excel的文件流</param>
-    /// <param name="columnNames">自定义列名</param>
+    /// <param name="dataTable">要写入的数据表</param>
+    /// <param name="stream">Excel 文件流</param>
+    /// <param name="columnNames">自定义列名数组,如果为 null 则使用 DataTable 的列名</param>
     public static void Write(DataTable dataTable, Stream stream, string[]? columnNames)
     {
         var set = new DataSet();
@@ -134,18 +149,19 @@ public static class ExcelHelper
     }
 
     /// <summary>
-    /// 将DataSet写入Excel
+    /// 将 DataSet 数据写入 Excel 文件
     /// </summary>
-    /// <param name="dataSet">DataSet</param>
-    /// <param name="stream">一般为Excel的文件流</param>
+    /// <param name="dataSet">要写入的数据集</param>
+    /// <param name="stream">Excel 文件流</param>
     public static void Write(DataSet dataSet, Stream stream) => Write(dataSet, stream, null);
 
     /// <summary>
-    /// 将DataSet写入Excel
+    /// 将 DataSet 数据写入 Excel 文件,并使用自定义列名
     /// </summary>
-    /// <param name="dataSet">DataSet</param>
-    /// <param name="stream">一般为Excel的文件流</param>
-    /// <param name="columnNames">自定义列名</param>
+    /// <param name="dataSet">要写入的数据集</param>
+    /// <param name="stream">Excel 文件流</param>
+    /// <param name="columnNames">二维数组,每个元素对应一个 DataTable 的自定义列名数组</param>
+    /// <exception cref="ArgumentException">当自定义列名数量与 DataTable 数量不匹配时引发异常</exception>
     public static void Write(DataSet dataSet, Stream stream, params string[][]? columnNames)
     {
         //structure
@@ -185,9 +201,9 @@ public static class ExcelHelper
     static DataTable ReadTable(WorkbookPart workbookPart, WorksheetPart worksheetPart, string[]? columnNames)
     {
         var rid = workbookPart.GetIdOfPart(worksheetPart);
-        var tableName = workbookPart.Workbook.Descendants<Sheet>().FirstOrDefault(x => x.Id == rid)?.Name ?? throw new Exception($"Get Sheet by rid('{rid}') failed");
+        var tableName = workbookPart.Workbook?.Descendants<Sheet>().FirstOrDefault(x => x.Id == rid)?.Name ?? throw new Exception($"Get Sheet by rid('{rid}') failed");
         var table = new DataTable(tableName);
-        var rows = worksheetPart.Worksheet.Descendants<Row>();
+        var rows = worksheetPart.Worksheet?.Descendants<Row>();
         var sharedStringItems = workbookPart.GetPartsOfType<SharedStringTablePart>()?.FirstOrDefault()?.SharedStringTable?.Elements<SharedStringItem>()?.ToList() ?? [];
 
         //header

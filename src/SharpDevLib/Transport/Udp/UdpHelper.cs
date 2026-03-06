@@ -9,11 +9,11 @@ namespace SharpDevLib;
 public static class UdpHelper
 {
     /// <summary>
-    /// 获取可用的Udp端口
+    /// 获取可用的UDP端口
     /// </summary>
     /// <param name="min">最小端口</param>
     /// <param name="max">最大端口</param>
-    /// <returns>可用端口,如果为-1则表示获取失败</returns>
+    /// <returns>可用端口，如果为-1则表示范围内无可用端口</returns>
     public static int GetAvailableUdpPort(int min = IPEndPoint.MinPort, int max = IPEndPoint.MaxPort)
     {
         if (min < IPEndPoint.MinPort || min > IPEndPoint.MaxPort) return -1;
@@ -31,18 +31,18 @@ public static class UdpHelper
     }
 
     /// <summary>
-    /// 创建Udp客户端
+    /// 创建UDP客户端
     /// </summary>
     /// <param name="adapterType">收发适配器类型</param>
-    /// <returns>Udp客户端</returns>
+    /// <returns>UDP客户端</returns>
     public static UdpClient CreateClient(TransportAdapterType adapterType = TransportAdapterType.Default) => new(adapterType);
 
     /// <summary>
-    /// 创建Udp客户端
+    /// 创建UDP客户端（指定本地绑定地址）
     /// </summary>
-    /// <param name="localAdress">本地地址</param>
-    /// <param name="localPort">本地端口</param>
+    /// <param name="localAdress">本地绑定IP地址</param>
+    /// <param name="localPort">本地绑定端口</param>
     /// <param name="adapterType">收发适配器类型</param>
-    /// <returns>Udp客户端</returns>
+    /// <returns>UDP客户端</returns>
     public static UdpClient CreateClient(IPAddress localAdress, int localPort, TransportAdapterType adapterType = TransportAdapterType.Default) => new(localAdress, localPort, adapterType);
 }

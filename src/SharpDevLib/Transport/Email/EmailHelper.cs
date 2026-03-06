@@ -11,9 +11,10 @@ public static class EmailHelper
     static EmailConfig? _config;
 
     /// <summary>
-    /// 设置配置
+    /// 设置邮件发送配置
     /// </summary>
-    /// <param name="config">配置</param>
+    /// <param name="config">邮件配置对象</param>
+    /// <exception cref="EmailVerifyException">当配置无效时引发异常</exception>
     public static void SetConfig(EmailConfig config)
     {
         if (config is null) throw new EmailVerifyException("call EmailHelper.SetConfig() to set config first");
@@ -25,10 +26,11 @@ public static class EmailHelper
     }
 
     /// <summary>
-    /// 发送邮件
+    /// 异步发送邮件
     /// </summary>
-    /// <param name="content">内容</param>
-    /// <param name="cancellationToken">cancellationToken</param>
+    /// <param name="content">邮件内容对象</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <exception cref="EmailVerifyException">当邮件内容无效时引发异常</exception>
     public static async Task SendAsync(this EmailContent content, CancellationToken? cancellationToken = null)
     {
         await Task.Yield();
@@ -76,7 +78,7 @@ public static class EmailHelper
         {
             foreach (EmailAttachment attachment in content.Attachments)
             {
-                message.Attachments.Add(new Attachment(new MemoryStream(attachment.Bytes ?? Array.Empty<byte>()), attachment.Name));
+                message.Attachments.Add(new Attachment(new MemoryStream(attachment.Bytes ?? []), attachment.Name));
             }
         }
         return message;

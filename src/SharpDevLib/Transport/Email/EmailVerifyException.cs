@@ -3,10 +3,7 @@
 /// <summary>
 /// 邮件验证异常
 /// </summary>
-/// <remarks>
-/// 实例化邮件验证异常
-/// </remarks>
-/// <param name="errorMessage">error message</param>
+/// <param name="errorMessage">错误消息</param>
 public class EmailVerifyException(string errorMessage) : Exception($"email service verify failed,{errorMessage}")
 {
 }

@@ -6,9 +6,9 @@ using System.Net.Sockets;
 namespace SharpDevLib;
 
 /// <summary>
-/// Tcp监听器
+/// TCP监听器
 /// </summary>
-/// <typeparam name="TSessionMetadata">会话元数据类型(可以用来绑定会话的身份信息)</typeparam>
+/// <typeparam name="TSessionMetadata">会话元数据类型（可以用来绑定会话的身份信息）</typeparam>
 public class TcpListener<TSessionMetadata> : IDisposable
 {
     TcpListnerStates _state = 0;
@@ -31,7 +31,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
     }
 
     /// <summary>
-    /// 套接字
+    /// 底层套接字
     /// </summary>
     public Socket Socket { get; }
 
@@ -51,7 +51,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
     public ITransportSendAdapter? SendAdapter { get; set; }
 
     /// <summary>
-    /// 状态
+    /// 监听器状态
     /// </summary>
     public TcpListnerStates State
     {
@@ -66,46 +66,45 @@ public class TcpListener<TSessionMetadata> : IDisposable
     }
 
     /// <summary>
-    /// 地址
+    /// 监听IP地址
     /// </summary>
     public IPAddress IPAddress { get; }
 
     /// <summary>
-    /// 端口
+    /// 监听端口
     /// </summary>
     public int Port { get; }
 
     /// <summary>
-    /// 初始化会话元数据
+    /// 初始化会话元数据的函数
     /// </summary>
     public Func<TSessionMetadata> InitSessionMetadata { get; }
 
     /// <summary>
-    /// 会话集合
+    /// 当前所有会话的只读集合
     /// </summary>
     public IReadOnlyCollection<TcpSession<TSessionMetadata>> Sessions { get; }
 
     /// <summary>
-    /// 状态变更回调事件
+    /// 状态变更事件
     /// </summary>
     public event EventHandler<TcpListenerStateChangedEventArgs>? StateChanged;
 
     /// <summary>
-    /// 添加了会话回调事件
+    /// 添加新会话事件
     /// </summary>
     public event EventHandler<TcpSessionEventArgs<TSessionMetadata>>? SessionAdded;
 
     /// <summary>
-    /// 删除了会话回调事件
+    /// 移除会话事件
     /// </summary>
     public event EventHandler<TcpSessionEventArgs<TSessionMetadata>>? SessionRemoved;
 
     /// <summary>
-    /// 开始监听
+    /// 开始监听连接
     /// </summary>
-    /// <param name="cancellationToken">cancellationToken</param>
-    /// <returns>task</returns>
-    /// <exception cref="Exception">断开连接时引发异常</exception>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <exception cref="Exception">监听器已关闭时引发异常</exception>
     public async Task ListenAsync(CancellationToken? cancellationToken = null)
     {
         if (State == TcpListnerStates.Listening) return;
@@ -173,7 +172,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
     }
 
     /// <summary>
-    /// 关闭监听
+    /// 关闭监听器并释放所有会话
     /// </summary>
     public void Close()
     {
@@ -184,7 +183,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
     }
 
     /// <summary>
-    /// dispose
+    /// 释放资源
     /// </summary>
     public void Dispose()
     {
@@ -193,7 +192,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
 }
 
 /// <summary>
-/// Tcp监听器
+/// TCP监听器（非泛型版本）
 /// </summary>
 public class TcpListener : TcpListener<int>
 {

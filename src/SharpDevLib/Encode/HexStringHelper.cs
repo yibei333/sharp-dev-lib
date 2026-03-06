@@ -3,15 +3,15 @@
 namespace SharpDevLib;
 
 /// <summary>
-/// 16进制编码扩展
+/// 16进制编码扩展，提供16进制格式的编码与解码功能
 /// </summary>
 public static class HexStringHelper
 {
     /// <summary>
-    /// 将字节数组转换为16进制字符串
+    /// 将字节数组编码为16进制字符串
     /// </summary>
     /// <param name="bytes">字节数组</param>
-    /// <returns>16进制字符串</returns>
+    /// <returns>16进制字符串，每个字节转换为两个16进制字符</returns>
     public static string HexStringEncode(this byte[] bytes)
     {
         var builder = new StringBuilder();
@@ -23,11 +23,11 @@ public static class HexStringHelper
     }
 
     /// <summary>
-    /// 将16进制字符串转换为字节数组
+    /// 将16进制字符串解码为字节数组
     /// </summary>
     /// <param name="hexString">16进制字符串</param>
     /// <returns>原始字节数组</returns>
-    /// <exception cref="InvalidDataException">当解码失败是引发异常</exception>
+    /// <exception cref="InvalidDataException">当16进制字符串长度为奇数时引发异常</exception>
     public static byte[] HexStringDecode(this string hexString)
     {
         if (hexString.IsNullOrWhiteSpace()) return [];

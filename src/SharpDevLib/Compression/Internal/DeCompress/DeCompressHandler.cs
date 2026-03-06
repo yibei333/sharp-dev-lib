@@ -15,7 +15,12 @@ internal abstract class DeCompressHandler(DeCompressRequest request)
         var fileInfo = new FileInfo(Request.SourceFile);
         using var sourceStream = fileInfo.OpenOrCreate();
         SetTotalSize(sourceStream);
-        using var reader = ReaderFactory.Open(sourceStream, new ReaderOptions { Password = Request.Password, LeaveStreamOpen = true });
+        var options = new ReaderOptions
+        {
+            Password = Request.Password,
+            LeaveStreamOpen = true,
+        };
+        using var reader = ReaderFactory.Open(sourceStream, options);
         reader.EntryExtractionProgress += (_, e) =>
         {
             Request.CurrentName = reader.Entry.Key;

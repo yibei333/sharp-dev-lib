@@ -6,7 +6,7 @@ using System.Reflection;
 namespace SharpDevLib;
 
 /// <summary>
-/// Sql帮助类
+/// SQL帮助类，提供数据库连接、查询和执行SQL语句的功能
 /// </summary>
 public sealed class SqlHelper : IDisposable
 {
@@ -16,17 +16,17 @@ public sealed class SqlHelper : IDisposable
     static string? GlobalConnectionString { get; set; }
 
     /// <summary>
-    /// 设置全局配置
+    /// 设置全局数据库配置
     /// </summary>
-    /// <param name="dbProviderFactory">数据库提供商工厂,例如
-    /// <para>1.引用Microsoft.Data.Sqlite,则用SqliteFactory.Instance</para>
-    /// <para>2.引用Microsoft.Data.SqlClient,则用SqlClientFactory.Instance</para>
-    /// <para>3.引用Pomelo.EntityFrameworkCore.MySql,则用MySqlConnectorFactory.Instance</para>
+    /// <param name="dbProviderFactory">数据库提供商工厂，支持的工厂如下：
+    /// <para>1. 引用Microsoft.Data.Sqlite，则用SqliteFactory.Instance</para>
+    /// <para>2. 引用Microsoft.Data.SqlClient，则用SqlClientFactory.Instance</para>
+    /// <para>3. 引用Pomelo.EntityFrameworkCore.MySql，则用MySqlConnectorFactory.Instance</para>
     /// </param>
-    /// <param name="connectionString">连接字符串
-    /// <para>1.Sqlite,"data source=dbFilePath"</para>
-    /// <para>2.SqlServer,"Server=server;Database=database;User Id=user;Password=password;"</para>
-    /// <para>3.MySql,"server=server;user=user;password=password;database=database"</para>
+    /// <param name="connectionString">数据库连接字符串，格式如下：
+    /// <para>1. SQLite："data source=dbFilePath"</para>
+    /// <para>2. SQL Server："Server=server;Database=database;User Id=user;Password=password;"</para>
+    /// <para>3. MySQL："server=server;user=user;password=password;database=database"</para>
     /// </param>
     public static void Config(DbProviderFactory dbProviderFactory, string connectionString)
     {
@@ -36,17 +36,17 @@ public sealed class SqlHelper : IDisposable
     #endregion
 
     /// <summary>
-    /// 实例化Sql帮助类
+    /// 初始化SQL帮助类实例，使用指定的数据库提供商工厂和连接字符串
     /// </summary>
-    /// <param name="dbProviderFactory">数据库提供商工厂,例如
-    /// <para>1.引用Microsoft.Data.Sqlite,则用SqliteFactory.Instance</para>
-    /// <para>2.引用Microsoft.Data.SqlClient,则用SqlClientFactory.Instance</para>
-    /// <para>3.引用Pomelo.EntityFrameworkCore.MySql,则用MySqlConnectorFactory.Instance</para>
+    /// <param name="dbProviderFactory">数据库提供商工厂，支持的工厂如下：
+    /// <para>1. 引用Microsoft.Data.Sqlite，则用SqliteFactory.Instance</para>
+    /// <para>2. 引用Microsoft.Data.SqlClient，则用SqlClientFactory.Instance</para>
+    /// <para>3. 引用Pomelo.EntityFrameworkCore.MySql，则用MySqlConnectorFactory.Instance</para>
     /// </param>
-    /// <param name="connectionString">连接字符串
-    /// <para>1.Sqlite,"data source=dbFilePath"</para>
-    /// <para>2.SqlServer,"Server=server;Database=database;User Id=user;Password=password;"</para>
-    /// <para>3.MySql,"server=server;user=user;password=password;database=database"</para>
+    /// <param name="connectionString">数据库连接字符串，格式如下：
+    /// <para>1. SQLite："data source=dbFilePath"</para>
+    /// <para>2. SQL Server："Server=server;Database=database;User Id=user;Password=password;"</para>
+    /// <para>3. MySQL："server=server;user=user;password=password;database=database"</para>
     /// </param>
     public SqlHelper(DbProviderFactory dbProviderFactory, string connectionString)
     {
@@ -55,10 +55,11 @@ public sealed class SqlHelper : IDisposable
         Connection.ConnectionString = connectionString;
         Connection.Open();
     }
+
     /// <summary>
-    /// 实例化Sql帮助类
+    /// 初始化SQL帮助类实例，使用全局配置的数据库提供商工厂和连接字符串
     /// </summary>
-    /// <exception cref="Exception">在没有全局配置时引发异常</exception>
+    /// <exception cref="Exception">当未调用SqlHelper.Config()方法设置全局配置时抛出异常</exception>
     public SqlHelper()
     {
         if (GlobalDbProviderFactory is null || GlobalConnectionString.IsNullOrWhiteSpace()) throw new Exception($"please call SqlHelper.Config() method first or provide parameters");
@@ -70,10 +71,10 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 实例化Sql帮助类
+    /// 初始化SQL帮助类实例，使用现有的DbContext
     /// </summary>
-    /// <param name="dbContext">DbContext</param>
-    /// <exception cref="Exception">当获取DbProviderFactory失败时引发异常</exception>
+    /// <param name="dbContext">Entity Framework的DbContext实例</param>
+    /// <exception cref="Exception">当无法从DbConnection获取DbProviderFactory时抛出异常</exception>
     public SqlHelper(DbContext dbContext)
     {
         Connection = dbContext.Database.GetDbConnection();
@@ -82,23 +83,23 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 连接
+    /// 获取数据库连接对象
     /// </summary>
     public DbConnection Connection { get; }
 
     /// <summary>
-    /// 数据库提供商工厂
+    /// 获取数据库提供商工厂
     /// </summary>
     public DbProviderFactory DbProviderFactory { get; }
 
     /// <summary>
-    /// 检索单个值
+    /// 执行SQL查询并返回单个值
     /// </summary>
-    /// <typeparam name="T">返回值的类型</typeparam>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
-    /// <returns>类型为T的值</returns>
-    /// <exception cref="Exception">当T的类型为引用类型时(排除string类型)引发异常</exception>
+    /// <typeparam name="T">返回值的类型，必须是值类型或String</typeparam>
+    /// <param name="sql">SQL查询语句</param>
+    /// <param name="parameters">SQL参数数组</param>
+    /// <returns>查询结果的单个值</returns>
+    /// <exception cref="Exception">当T的类型为引用类型（排除string类型）时抛出异常</exception>
     public T ExecuteScalar<T>(string sql, params DbParameter[] parameters)
     {
         var type = typeof(T);
@@ -110,13 +111,13 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 检索单个值
+    /// 异步执行SQL查询并返回单个值
     /// </summary>
-    /// <typeparam name="T">返回值的类型</typeparam>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
-    /// <returns>类型为T的值</returns>
-    /// <exception cref="Exception">当T的类型为引用类型时(排除string类型)引发异常</exception>
+    /// <typeparam name="T">返回值的类型，必须是值类型或String</typeparam>
+    /// <param name="sql">SQL查询语句</param>
+    /// <param name="parameters">SQL参数数组</param>
+    /// <returns>查询结果的单个值</returns>
+    /// <exception cref="Exception">当T的类型为引用类型（排除string类型）时抛出异常</exception>
     public async Task<T> ExecuteScalarAsync<T>(string sql, params DbParameter[] parameters)
     {
         var type = typeof(T);
@@ -128,14 +129,14 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 检索单个值
+    /// 异步执行SQL查询并返回单个值，支持取消操作
     /// </summary>
-    /// <typeparam name="T">返回值的类型</typeparam>
-    /// <param name="cancellationToken">CancellationToken</param>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
-    /// <returns>类型为T的值</returns>
-    /// <exception cref="Exception">当T的类型为引用类型时(排除string类型)引发异常</exception>
+    /// <typeparam name="T">返回值的类型，必须是值类型或String</typeparam>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="sql">SQL查询语句</param>
+    /// <param name="parameters">SQL参数数组</param>
+    /// <returns>查询结果的单个值</returns>
+    /// <exception cref="Exception">当T的类型为引用类型（排除string类型）时抛出异常</exception>
     public async Task<T?> ExecuteScalarAsync<T>(CancellationToken cancellationToken, string sql, params DbParameter[] parameters)
     {
         var type = typeof(T);
@@ -147,12 +148,12 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 检索列表
+    /// 执行SQL查询并返回对象列表
     /// </summary>
-    /// <typeparam name="T">单个返回值的类型</typeparam>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
-    /// <returns>类型为IEnumerable<T></T>的值</returns>
+    /// <typeparam name="T">返回对象的类型，必须是引用类型</typeparam>
+    /// <param name="sql">SQL查询语句</param>
+    /// <param name="parameters">SQL参数数组</param>
+    /// <returns>查询结果的对象集合</returns>
     public IEnumerable<T> Query<T>(string sql, params DbParameter[] parameters) where T : class
     {
         var table = ExecuteDataTable(sql, parameters);
@@ -160,12 +161,12 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 检索列表
+    /// 异步执行SQL查询并返回对象列表
     /// </summary>
-    /// <typeparam name="T">单个返回值的类型</typeparam>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
-    /// <returns>类型为IEnumerable<T></T>的值</returns>
+    /// <typeparam name="T">返回对象的类型，必须是引用类型</typeparam>
+    /// <param name="sql">SQL查询语句</param>
+    /// <param name="parameters">SQL参数数组</param>
+    /// <returns>查询结果的对象集合</returns>
     public async Task<IEnumerable<T>> QueryAsync<T>(string sql, params DbParameter[] parameters) where T : class
     {
         var table = await ExecuteDataTableAsync(sql, parameters);
@@ -173,13 +174,13 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 检索列表
+    /// 异步执行SQL查询并返回对象列表，支持取消操作
     /// </summary>
-    /// <typeparam name="T">单个返回值的类型</typeparam>
-    /// <param name="cancellationToken">CancellationToken</param>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
-    /// <returns>类型为IEnumerable<T></T>的值</returns>
+    /// <typeparam name="T">返回对象的类型，必须是引用类型</typeparam>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="sql">SQL查询语句</param>
+    /// <param name="parameters">SQL参数数组</param>
+    /// <returns>查询结果的对象集合</returns>
     public async Task<IEnumerable<T>> QueryAsync<T>(CancellationToken cancellationToken, string sql, params DbParameter[] parameters) where T : class
     {
         var table = await ExecuteDataTableAsync(cancellationToken, sql, parameters);
@@ -187,11 +188,11 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 检索数据集
+    /// 执行SQL查询并返回数据集
     /// </summary>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
-    /// <returns>数据集</returns>
+    /// <param name="sql">SQL查询语句</param>
+    /// <param name="parameters">SQL参数数组</param>
+    /// <returns>包含查询结果的数据集</returns>
     public DataSet ExecuteDataSet(string sql, params DbParameter[] parameters)
     {
         using var command = CreateCommand(sql, parameters);
@@ -243,34 +244,34 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 检索数据集
+    /// 异步执行SQL查询并返回数据集
     /// </summary>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
-    /// <returns>数据集</returns>
+    /// <param name="sql">SQL查询语句</param>
+    /// <param name="parameters">SQL参数数组</param>
+    /// <returns>包含查询结果的数据集</returns>
     public async Task<DataSet> ExecuteDataSetAsync(string sql, params DbParameter[] parameters)
     {
         return await Task.Run(() => ExecuteDataSet(sql, parameters));
     }
 
     /// <summary>
-    /// 检索数据集
+    /// 异步执行SQL查询并返回数据集，支持取消操作
     /// </summary>
-    /// <param name="cancellationToken">CancellationToken</param>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
-    /// <returns>数据集</returns>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="sql">SQL查询语句</param>
+    /// <param name="parameters">SQL参数数组</param>
+    /// <returns>包含查询结果的数据集</returns>
     public async Task<DataSet> ExecuteDataSetAsync(CancellationToken cancellationToken, string sql, params DbParameter[] parameters)
     {
         return await Task.Run(() => ExecuteDataSet(sql, parameters), cancellationToken);
     }
 
     /// <summary>
-    /// 检索数据表格
+    /// 执行SQL查询并返回数据表
     /// </summary>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
-    /// <returns>数据表格</returns>
+    /// <param name="sql">SQL查询语句</param>
+    /// <param name="parameters">SQL参数数组</param>
+    /// <returns>包含查询结果的数据表</returns>
     public DataTable ExecuteDataTable(string sql, params DbParameter[] parameters)
     {
         var set = ExecuteDataSet(sql, parameters);
@@ -280,33 +281,33 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 检索数据表格
+    /// 异步执行SQL查询并返回数据表
     /// </summary>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
-    /// <returns>数据表格</returns>
+    /// <param name="sql">SQL查询语句</param>
+    /// <param name="parameters">SQL参数数组</param>
+    /// <returns>包含查询结果的数据表</returns>
     public async Task<DataTable> ExecuteDataTableAsync(string sql, params DbParameter[] parameters)
     {
         return await Task.Run(() => ExecuteDataTable(sql, parameters));
     }
 
     /// <summary>
-    /// 检索数据表格
+    /// 异步执行SQL查询并返回数据表，支持取消操作
     /// </summary>
-    /// <param name="cancellationToken">CancellationToken</param>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
-    /// <returns>数据表格</returns>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="sql">SQL查询语句</param>
+    /// <param name="parameters">SQL参数数组</param>
+    /// <returns>包含查询结果的数据表</returns>
     public async Task<DataTable> ExecuteDataTableAsync(CancellationToken cancellationToken, string sql, params DbParameter[] parameters)
     {
         return await Task.Run(() => ExecuteDataTable(sql, parameters), cancellationToken);
     }
 
     /// <summary>
-    /// 执行非查询sql语句
+    /// 执行非查询SQL语句（如INSERT、UPDATE、DELETE）
     /// </summary>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
+    /// <param name="sql">SQL语句</param>
+    /// <param name="parameters">SQL参数数组</param>
     /// <returns>受影响的行数</returns>
     public int ExecuteNonQuery(string sql, params DbParameter[] parameters)
     {
@@ -315,10 +316,10 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 执行非查询sql语句
+    /// 异步执行非查询SQL语句（如INSERT、UPDATE、DELETE）
     /// </summary>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
+    /// <param name="sql">SQL语句</param>
+    /// <param name="parameters">SQL参数数组</param>
     /// <returns>受影响的行数</returns>
     public async Task<int> ExecuteNonQueryAsync(string sql, params DbParameter[] parameters)
     {
@@ -327,11 +328,11 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 执行非查询sql语句
+    /// 异步执行非查询SQL语句（如INSERT、UPDATE、DELETE），支持取消操作
     /// </summary>
-    /// <param name="cancellationToken">CancellationToken</param>
-    /// <param name="sql">sql语句</param>
-    /// <param name="parameters">sql参数</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="sql">SQL语句</param>
+    /// <param name="parameters">SQL参数数组</param>
     /// <returns>受影响的行数</returns>
     public async Task<int> ExecuteNonQueryAsync(CancellationToken cancellationToken, string sql, params DbParameter[] parameters)
     {
@@ -340,7 +341,7 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// dispose the connection
+    /// 释放数据库连接资源
     /// </summary>
     public void Dispose()
     {

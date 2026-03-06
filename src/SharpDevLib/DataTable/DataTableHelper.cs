@@ -8,14 +8,16 @@ namespace SharpDevLib;
 public static class DataTableHelper
 {
     /// <summary>
-    /// 将集合转换为DataTable,以下元素属性将被忽略:
+    /// 将集合转换为DataTable，以下元素属性将被忽略:
     /// <para>1.属性不可读</para>
     /// <para>2.属性类型为Class(string除外)</para>
     /// <para>3.被new关键字覆盖的基类属性</para>
     /// </summary>
-    /// <typeparam name="T">集合元素类型</typeparam>
-    /// <param name="source">集合</param>
-    /// <returns>DataTable</returns>
+    /// <typeparam name="T">集合元素类型，必须为引用类型</typeparam>
+    /// <param name="source">要转换的集合</param>
+    /// <returns>转换后的DataTable对象</returns>
+    /// <exception cref="NotSupportedException">当属性类型不支持时抛出</exception>
+    /// <exception cref="InvalidCastException">当属性值转换失败时抛出</exception>
     public static DataTable ToDataTable<T>(this IEnumerable<T> source) where T : class
     {
         var table = new DataTable();
@@ -50,16 +52,18 @@ public static class DataTableHelper
     }
 
     /// <summary>
-    /// 将DataTable转换为列表,以下元素属性赋值将被忽略:
+    /// 将DataTable转换为指定类型的列表，以下元素属性赋值将被忽略:
     /// <para>1.非公共属性</para>
     /// <para>2.属性不可写</para>
     /// <para>3.属性类型为Class(string除外)</para>
     /// <para>4.被new关键字覆盖的基类属性</para>
     /// <para>5.属性名称不存在</para>
     /// </summary>
-    /// <typeparam name="T">列表元素类型</typeparam>
-    /// <param name="table">DataTable</param>
-    /// <returns>列表</returns>
+    /// <typeparam name="T">列表元素类型，必须为引用类型</typeparam>
+    /// <param name="table">要转换的DataTable对象</param>
+    /// <returns>转换后的对象列表</returns>
+    /// <exception cref="MissingMethodException">当类型没有无参构造函数或参数不匹配时抛出</exception>
+    /// <exception cref="InvalidCastException">当属性值转换失败时抛出</exception>
     public static List<T> ToList<T>(this DataTable table) where T : class
     {
         var result = new List<T>();
@@ -107,11 +111,13 @@ public static class DataTableHelper
     }
 
     /// <summary>
-    /// 根据提供的列对DataTable进行转换,并返回新的DataTable
+    /// 根据提供的列配置对DataTable进行转换，并返回新的DataTable
     /// </summary>
-    /// <param name="sourceTable">源DataTable</param>
-    /// <param name="columns">要转换的列</param>
-    /// <returns>目标DataTable</returns>
+    /// <param name="sourceTable">源DataTable对象</param>
+    /// <param name="columns">列转换配置数组，指定要转换的列及其转换规则</param>
+    /// <returns>转换后的新DataTable对象</returns>
+    /// <exception cref="ArgumentException">当指定的列名不存在时抛出</exception>
+    /// <exception cref="InvalidOperationException">当值转换器返回的类型与目标类型不一致时抛出</exception>
     public static DataTable Transfer(this DataTable sourceTable, params DataTableTransferColumn[] columns)
     {
         var table = new DataTable();

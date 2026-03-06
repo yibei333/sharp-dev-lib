@@ -1,7 +1,7 @@
 ﻿namespace SharpDevLib;
 
 /// <summary>
-/// Tcp监听器状态
+/// TCP监听器状态
 /// </summary>
 public enum TcpListnerStates
 {

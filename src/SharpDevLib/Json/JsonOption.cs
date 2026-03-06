@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace SharpDevLib;
 
 /// <summary>
-/// json选项
+/// JSON序列化和反序列化配置选项
 /// </summary>
 public class JsonOption
 {
@@ -18,24 +18,24 @@ public class JsonOption
     internal static JsonOption DefaultCompressJsonWithoutOrder = new() { FormatJson = false, OrderByNameProperty = false };
 
     /// <summary>
-    /// 默认选项
+    /// 默认JSON配置选项，所有序列化和反序列化操作都可以使用此默认配置
     /// </summary>
     public static JsonOption Default { get; set; } = new();
 
     /// <summary>
-    /// 是否格式华Json,默认为false
+    /// 是否格式化JSON输出，true表示使用缩进格式化，false表示压缩格式，默认为false
     /// </summary>
     public bool FormatJson { get; set; }
     /// <summary>
-    /// 是否忽略大小写,默认为true
+    /// 反序列化时是否忽略属性名称大小写，默认为true
     /// </summary>
     public bool CaseInsensitive { get; set; } = true;
     /// <summary>
-    /// 命名格式,默认为大驼峰
+    /// JSON属性命名格式，默认为大驼峰格式(CamelCaseUpper)
     /// </summary>
     public JsonNameFormat NameFormat { get; set; } = JsonNameFormat.CamelCaseUpper;
     /// <summary>
-    /// 是否根据属性名称排序,默认为true
+    /// 序列化时是否按属性名称字母顺序排序，默认为true
     /// </summary>
     public bool OrderByNameProperty { get; set; } = true;
 
@@ -69,8 +69,8 @@ public class JsonOption
     }
 
     /// <summary>
-    /// 重写ToString
+    /// 获取配置选项的字符串表示
     /// </summary>
-    /// <returns>string</returns>
+    /// <returns>配置选项的键值对字符串</returns>
     public override string ToString() => $"FormatJson->{FormatJson},CaseInsensitive->{CaseInsensitive},NameFormat->{NameFormat},OrderByNameProperty->{OrderByNameProperty}";
 }
