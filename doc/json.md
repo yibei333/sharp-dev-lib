@@ -21,8 +21,7 @@ var user = new { Name = "张三", Age = 25 };
 //全局配置，只需要设置一次
 JsonOption.Default = new JsonOption
 {
-    //反序列化只用到这三个属性，其余属性将影响序列化
-    OrderByNameProperty = true,
+    //序列化只用到FormatJson和NameFormat，其余属性将影响反序列化
     FormatJson = true,
     NameFormat = JsonNameFormat.CamelCaseLower
 };
@@ -79,9 +78,12 @@ Console.WriteLine(canDeserialize);
 
 ```csharp
 var compactJson = "{\"Name\":\"张三\",\"Age\":25}";
-var formattedJson = compactJson.FormatJson(true);
+var formattedJson = compactJson.FormatJson();
 Console.WriteLine(formattedJson);
 //{
+//  "Name": "张三",
+//  "Age": 25
+//}
 ```
 
 ##### 压缩 JSON
@@ -92,38 +94,9 @@ var formattedJson = @"{
   ""Age"": 25
 }";
 
-// 压缩 JSON
 var compressedJson = formattedJson.CompressJson();
-
-// 压缩 JSON（不排序属性）
-var compressedJson = formattedJson.CompressJson(orderByNameProperty: false);
-```
-
-## JsonOption 配置
-
-### 基本配置
-
-```csharp
-var option = new JsonOption
-{
-    FormatJson = true,              // 格式化输出
-    IgnoreNullValues = true,         // 忽略 null 值
-    WriteIndented = true,            // 缩进输出
-    PropertyNameCaseInsensitive = true  // 属性名不区分大小写
-};
-```
-
-### 预定义配置
-
-```csharp
-// 默认配置
-var json = user.Serialize(JsonOption.Default);
-
-// 默认格式化配置
-var json = user.Serialize(JsonOption.DefaultFormatJson);
-
-// 默认压缩配置
-var json = user.Serialize(JsonOption.DefaultCompressJson);
+Console.WriteLine(compressedJson);
+//{"Name":"张三","Age":25}
 ```
 
 ## 相关文档
