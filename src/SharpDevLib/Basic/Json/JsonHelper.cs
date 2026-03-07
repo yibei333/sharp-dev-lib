@@ -155,15 +155,13 @@ public static class JsonHelper
     /// 格式化JSON字符串，使其更易读
     /// </summary>
     /// <param name="json">需要格式化的JSON字符串</param>
-    /// <param name="orderByNameProperty">是否根据属性名称排序，默认为true</param>
     /// <returns>格式化后的JSON字符串，格式化失败时返回原字符串</returns>
-    public static string FormatJson(this string json, bool orderByNameProperty = true)
+    public static string FormatJson(this string json)
     {
         try
         {
-            var option = orderByNameProperty ? JsonOption.DefaultFormatJson : JsonOption.DefaultFormatJsonWithoutOrder;
-            var obj = json.DeSerialize<object>(option);
-            return obj.Serialize(option);
+            var obj = json.DeSerialize<object>(JsonOption.DefaultFormatJson);
+            return obj.Serialize(JsonOption.DefaultFormatJson);
         }
         catch
         {
@@ -175,15 +173,13 @@ public static class JsonHelper
     /// 压缩JSON字符串，移除空白字符
     /// </summary>
     /// <param name="json">需要压缩的JSON字符串</param>
-    /// <param name="orderByNameProperty">是否根据属性名称排序，默认为true</param>
     /// <returns>压缩后的JSON字符串，压缩失败时返回原字符串</returns>
-    public static string CompressJson(this string json, bool orderByNameProperty = true)
+    public static string CompressJson(this string json)
     {
         try
         {
-            var option = orderByNameProperty ? JsonOption.DefaultCompressJson : JsonOption.DefaultCompressJsonWithoutOrder;
-            var obj = json.DeSerialize<object>(option);
-            return obj.Serialize(option);
+            var obj = json.DeSerialize<object>(JsonOption.DefaultCompressJson);
+            return obj.Serialize(JsonOption.DefaultCompressJson);
         }
         catch
         {

@@ -11,10 +11,10 @@ public class JsonTests
     internal static readonly JsonOption FormatJsonOption = new() { FormatJson = true };
     static readonly User _user = new("foo", 10);
     static readonly string _userString = _user.ToString();
-    const string _json = "{\"Age\":10,\"Name\":\"foo\"}";
+    const string _json = "{\"Name\":\"foo\",\"Age\":10}";
     const string _formatedJson = @"{
-  ""Age"": 10,
-  ""Name"": ""foo""
+  ""Name"": ""foo"",
+  ""Age"": 10
 }";
 
     [TestMethod]

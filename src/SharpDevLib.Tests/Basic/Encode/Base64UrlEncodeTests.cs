@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib;
 using System.IO;
 
 namespace SharpDevLib.Tests.Basic.Encode;

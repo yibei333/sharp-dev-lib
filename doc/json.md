@@ -1,110 +1,90 @@
 # JSON 操作
 
-SharpDevLib 提供了基于 `System.Text.Json` 的 JSON 序列化和反序列化扩展，支持格式化、压缩、自定义配置等功能。
+SharpDevLib 提供了基于 `System.Text.Json` 的 JSON 序列化和反序列化扩展。
 
 ## 序列化
 
-### 基本序列化
+##### 简单示例
 
 ```csharp
-var user = new User { Name = "张三", Age = 25 };
-
-// 基本序列化
+var user = new { Name = "张三", Age = 25 };
 var json = user.Serialize();
-// 结果: {"Name":"张三","Age":25}
+Console.WriteLine(json);
+// {"Age":25,"Name":"张三"}
 ```
 
-### 格式化序列化
+##### 完整示例 
 
 ```csharp
-var user = new User { Name = "张三", Age = 25 };
+var user = new { Name = "张三", Age = 25 };
 
-// 格式化序列化
-var json = user.Serialize(new JsonOption { FormatJson = true });
-// 结果:
-// {
-//   "Name": "张三",
-//   "Age": 25
-// }
-```
-
-### 自定义配置序列化
-
-```csharp
-var json = user.Serialize(new JsonOption
+//全局配置，只需要设置一次
+JsonOption.Default = new JsonOption
 {
+    //反序列化只用到这三个属性，其余属性将影响序列化
+    OrderByNameProperty = true,
     FormatJson = true,
-    IgnoreNullValues = true,
-    WriteIndented = true
-});
-```
+    NameFormat = JsonNameFormat.CamelCaseLower
+};
+//或者每次传入
+//var json = user.Serialize(new JsonOption { FormatJson = true });
 
-### 尝试序列化
-
-```csharp
-// 尝试序列化（不抛出异常）
-var success = user.TrySerialize(out string json);
-if (success)
-{
-    Console.WriteLine(json);
-}
+var json = user.Serialize();
+Console.WriteLine(json);
+//{
+//  "age": 25,
+//  "name": "张三"
+//}
 ```
 
 ## 反序列化
 
-### 基本反序列化
+##### 简单示例
 
 ```csharp
-var json = "{\"Name\":\"张三\",\"Age\":25}";
-
-// 反序列化为对象
-var user = json.DeSerialize<User>();
+var json = "{\"Name\":\"张三\"}";
+var user = json.DeSerialize<NameDto>();
+Console.WriteLine(user.Name);
+//张三
 ```
 
-### 反序列化为指定类型
+##### 完整示例
 
 ```csharp
-var json = "{\"Name\":\"张三\",\"Age\":25}";
+var json = "{\"Name\":\"张三\"}";
 
-// 反序列化为指定类型
-var user = json.DeSerialize(typeof(User)) as User;
-```
-
-### 自定义配置反序列化
-
-```csharp
-var user = json.DeSerialize<User>(new JsonOption
+//全局配置，只需要设置一次
+JsonOption.Default = new JsonOption
 {
-    PropertyNameCaseInsensitive = true
-});
-```
+    //反序列化只用到此配置，其余属性将影响序列化
+    CaseInsensitive = true
+};
+//或者每次传入
+//var user = json.DeSerialize<NameDto>(new JsonOption { CaseInsensitive = false });
 
-### 尝试反序列化
+var user = json.DeSerialize<NameDto>();
+Console.WriteLine(user.Name);
+//张三
 
-```csharp
-// 尝试反序列化（不抛出异常）
-var success = json.TryDeSerialize(out User user);
-if (success)
-{
-    Console.WriteLine(user.Name);
-}
+var notJson = "hello";
+//var not = notJson.DeSerialize<NameDto>();将引发异常
+var canDeserialize = notJson.TryDeSerialize<NameDto>(out _);
+Console.WriteLine(canDeserialize);
+//false
 ```
 
 ## JSON 格式化
 
-### 格式化 JSON
+##### 格式化 JSON
 
 ```csharp
 var compactJson = "{\"Name\":\"张三\",\"Age\":25}";
-
-// 格式化 JSON
-var formattedJson = compactJson.FormatJson();
-
-// 格式化 JSON（不排序属性）
-var formattedJson = compactJson.FormatJson(orderByNameProperty: false);
+var formattedJson = compactJson.FormatJson(true);
+Console.WriteLine(formattedJson);
+//{
 ```
 
-### 压缩 JSON
+##### 压缩 JSON
 
 ```csharp
 var formattedJson = @"{

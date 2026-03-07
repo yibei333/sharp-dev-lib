@@ -31,7 +31,7 @@ public class TreeTests
             Descending = true
         };
 
-        var jsonOption = new JsonOption { FormatJson = true, OrderByNameProperty = false };
+        var jsonOption = new JsonOption { FormatJson = true };
         var tree = departments.BuildTree(option);
         var json = tree.Serialize(jsonOption);
 
@@ -73,7 +73,7 @@ public class TreeTests
             Descending = true
         };
 
-        var jsonOption = new JsonOption { FormatJson = true, OrderByNameProperty = false };
+        var jsonOption = new JsonOption { FormatJson = true };
         var tree = departments.BuildTree(option);
         var json = tree.Serialize(jsonOption);
 
@@ -114,7 +114,7 @@ public class TreeTests
         };
 
         var tree = departments.BuildTree(option);
-        var jsonOption = new JsonOption { FormatJson = true, OrderByNameProperty = false };
+        var jsonOption = new JsonOption { FormatJson = true };
         var json = tree.Serialize(jsonOption);
 
         var deserialized = json.DeSerializeTree<Department<int>>(option);
