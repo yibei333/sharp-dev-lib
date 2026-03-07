@@ -16,6 +16,7 @@ internal class SevenZipDeCompressHandler(DeCompressRequest request) : DeCompress
             if (Request.CancellationToken?.IsCancellationRequested ?? false) throw new OperationCanceledException(Request.CancellationToken.Value);
             using var entryStream = entry.OpenEntryStream();
             string targetFile = Path.Combine(Request.TargetPath, entry.Key);
+            targetFile.GetFileDirectory().CreateDirectoryIfNotExist();
             targetFile.RemoveFileIfExist();
             using var fileStream = File.Create(targetFile);
             await entryStream.CopyToAsync(fileStream, Request.CancellationToken ?? CancellationToken.None);

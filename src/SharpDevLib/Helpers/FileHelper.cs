@@ -1301,6 +1301,20 @@ public static class FileHelper
     }
 
     /// <summary>
+    /// 获取文件的所在文件夹
+    /// </summary>
+    /// <param name="path">文件路径</param>
+    /// <returns>文件的所在文件夹</returns>
+    public static string GetFileDirectory(this string? path)
+    {
+        if (path.IsNullOrWhiteSpace()) return string.Empty;
+        var formated = path.FormatPath();
+        var lastSplit = formated.LastIndexOf("/");
+        if (lastSplit < 0) return string.Empty;
+        return formated.Substring(0, lastSplit).FormatPath();
+    }
+
+    /// <summary>
     /// 如果文件夹存在则删除
     /// </summary>
     /// <param name="path">文件夹路径</param>
