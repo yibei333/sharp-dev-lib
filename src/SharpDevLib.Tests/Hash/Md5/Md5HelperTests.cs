@@ -5,7 +5,7 @@ using System.IO;
 namespace SharpDevLib.Tests.Hash.Md5;
 
 [TestClass]
-public class Md5ExtensionTests : HashTests
+public class Md5HelperTests : HashTests
 {
     #region MD5
     [TestMethod]

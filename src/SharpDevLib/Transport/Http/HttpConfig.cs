@@ -24,7 +24,7 @@ public class HttpConfig
     /// <summary>
     /// 请求超时时间
     /// </summary>
-    public TimeSpan? TimeOut { get; set; }
+    public TimeSpan? Timeout { get; set; }
 
     /// <summary>
     /// 请求失败时的重试次数

@@ -118,11 +118,11 @@ public static class ProcessHelper
             }
             return await tcs.Task.ConfigureAwait(false);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex)
         {
             result.ExitCode = -1;
             result.Error = ex.Message;
-            if (request.LogError) Logger?.LogError(ex, "启动进程失败:{Path} {Args}", request.Filename, request.Args);
+            if (request.LogError) Logger?.LogError(ex, "启动并运行进程失败:{Path} {Args}", request.Filename, request.Args);
             return result;
         }
         finally

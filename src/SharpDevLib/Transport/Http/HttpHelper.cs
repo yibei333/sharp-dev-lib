@@ -176,7 +176,7 @@ public static class HttpHelper
             }
         }
 
-        client.Timeout = request.Config?.TimeOut ?? HttpConfig.Default?.TimeOut ?? TimeSpan.FromDays(1);
+        client.Timeout = request.Config?.Timeout ?? HttpConfig.Default?.Timeout ?? TimeSpan.FromDays(1);
         return client;
     }
 

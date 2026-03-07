@@ -9,17 +9,25 @@ namespace SharpDevLib.Tests.Transport.Udp;
 public class UdpTests
 {
     [TestMethod]
+    public void GetAvailbelUdpTest()
+    {
+        var port = UdpHelper.GetAvailableUdpPort(50, 100);
+        Assert.IsGreaterThanOrEqualTo(50, port);
+        Assert.IsLessThanOrEqualTo(100, port);
+    }
+
+    [TestMethod]
     public async Task Test()
     {
         var client1 = UdpHelper.CreateClient(IPAddress.Loopback, 6000);
         ClientStartReceive(client1);
         var client2 = UdpHelper.CreateClient(IPAddress.Loopback, 6001);
         ClientStartReceive(client2);
-        await Task.Delay(500, TestContext.CancellationTokenSource.Token);
+        await Task.Delay(500, TestContext.CancellationToken);
 
         client1.Send(IPAddress.Loopback, 6001, "i am client1".Utf8Decode());
         client2.Send(IPAddress.Loopback, 6000, "i am client2".Utf8Decode());
-        await Task.Delay(1000, TestContext.CancellationTokenSource.Token);
+        await Task.Delay(1000, TestContext.CancellationToken);
 
         client1.Dispose();
         client2.Dispose();

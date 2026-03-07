@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 namespace SharpDevLib.Tests.Cryptography;
 
 [TestClass]
-public class SymmetricAlgorithmExtensionTests
+public class SymmetricAlgorithmHelperTests
 {
     const string plainText = "foo";
     static readonly byte[] key = "1234567".Utf8Decode();

@@ -181,7 +181,7 @@ public class HttpGetTests : HttpBaseTests
     [TestMethod]
     public void TimeoutTest()
     {
-        HttpConfig.Default.TimeOut = TimeSpan.FromSeconds(2);
+        HttpConfig.Default.Timeout = TimeSpan.FromSeconds(2);
         var url = BaseUrl.CombinePath("/api/get/timeout");
         var response = new HttpRequest(url) { Config = new HttpConfig { RetryCount = 0 } }
             .GetAsync()
@@ -189,20 +189,20 @@ public class HttpGetTests : HttpBaseTests
             .GetResult();
         Assert.IsTrue(response.IsSuccess);
 
-        HttpConfig.Default.TimeOut = TimeSpan.FromSeconds(1);
+        HttpConfig.Default.Timeout = TimeSpan.FromSeconds(1);
         response = new HttpRequest(url) { Config = new HttpConfig { RetryCount = 0 } }
             .GetAsync()
             .GetAwaiter()
             .GetResult();
         Assert.IsFalse(response.IsSuccess);
 
-        response = new HttpRequest(url) { Config = new HttpConfig { TimeOut = TimeSpan.FromSeconds(2), RetryCount = 0 } }
+        response = new HttpRequest(url) { Config = new HttpConfig { Timeout = TimeSpan.FromSeconds(2), RetryCount = 0 } }
             .GetAsync()
             .GetAwaiter()
             .GetResult();
         Assert.IsTrue(response.IsSuccess);
 
-        response = new HttpRequest(url) { Config = new HttpConfig { TimeOut = TimeSpan.FromSeconds(1), RetryCount = 0 } }
+        response = new HttpRequest(url) { Config = new HttpConfig { Timeout = TimeSpan.FromSeconds(1), RetryCount = 0 } }
             .GetAsync()
             .GetAwaiter()
             .GetResult();

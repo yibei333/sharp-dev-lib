@@ -5,7 +5,7 @@ using System.IO;
 namespace SharpDevLib.Tests.Hash.Sha;
 
 [TestClass]
-public class Sha512ExtensionTests : HashTests
+public class Sha512HelperTests : HashTests
 {
     #region SHA512
     [TestMethod]

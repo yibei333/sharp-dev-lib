@@ -5,7 +5,7 @@ using System.IO;
 namespace SharpDevLib.Tests.Hash.Sha;
 
 [TestClass]
-public class Sha384ExtensionTests : HashTests
+public class Sha384HelperTests : HashTests
 {
     #region SHA384
     [TestMethod]

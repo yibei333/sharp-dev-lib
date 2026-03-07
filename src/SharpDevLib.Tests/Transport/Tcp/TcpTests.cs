@@ -9,6 +9,14 @@ namespace SharpDevLib.Tests.Transport.Tcp;
 public class TcpTests
 {
     [TestMethod]
+    public void GetAvailbelTcpTest()
+    {
+        var port = TcpHelper.GetAvailableTcpPort(50, 100);
+        Assert.IsGreaterThanOrEqualTo(50, port);
+        Assert.IsLessThanOrEqualTo(100, port);
+    }
+
+    [TestMethod]
     public async Task Test()
     {
         var listener = TcpHelper.CreateListener(IPAddress.Any, 4098);
@@ -16,10 +24,10 @@ public class TcpTests
 
         var client = TcpHelper.CreateClient(IPAddress.Loopback, 4098);
         ClientStartConnectAndReceive(client);
-        await Task.Delay(500, TestContext.CancellationTokenSource.Token);
+        await Task.Delay(500, TestContext.CancellationToken);
 
         client.Send("hello,world".Utf8Decode());
-        await Task.Delay(500, TestContext.CancellationTokenSource.Token);
+        await Task.Delay(500, TestContext.CancellationToken);
 
         listener.Dispose();
         client.Dispose();

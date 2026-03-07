@@ -5,7 +5,7 @@ using System.IO;
 namespace SharpDevLib.Tests.Hash.Sha;
 
 [TestClass]
-public class Sha128ExtensionTests : HashTests
+public class Sha128HelperTests : HashTests
 {
     #region SHA128
     [TestMethod]
