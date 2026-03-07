@@ -191,7 +191,7 @@ internal class EncryptedPackageHandler
             InternalHashAlogorithm.SHA256 => new HMACSHA256(salt),
             InternalHashAlogorithm.SHA384 => new HMACSHA384(salt),
             InternalHashAlogorithm.SHA512 => new HMACSHA512(salt),
-            _ => throw (new NotSupportedException(string.Format("Hash method {0} not supported.", ei.HashAlgorithm))),
+            _ => throw (new NotSupportedException(string.Format("不支持的哈希算法: {0}", ei.HashAlgorithm))),
         };
     }
 
@@ -418,7 +418,7 @@ internal class EncryptedPackageHandler
 
     private MemoryStream DecryptAgile(EncryptionInfoAgile encryptionInfo, string password, long size, byte[] encryptedData, byte[] data)
     {
-        if (encryptionInfo.KeyData?.CipherAlgorithm != InternalCipherAlgorithm.AES) throw new NotSupportedException($"CipherAlgorithm({encryptionInfo.KeyData?.CipherAlgorithm}) not supported");
+        if (encryptionInfo.KeyData?.CipherAlgorithm != InternalCipherAlgorithm.AES) throw new NotSupportedException($"不支持的加密算法: CipherAlgorithm({encryptionInfo.KeyData?.CipherAlgorithm})");
 
         var encr = encryptionInfo.KeyEncryptors[0];
         using var hashProvider = GetHashProvider(encr);
@@ -484,7 +484,7 @@ internal class EncryptedPackageHandler
             InternalHashAlogorithm.SHA256 => SHA256.Create(),
             InternalHashAlogorithm.SHA384 => SHA384.Create(),
             InternalHashAlogorithm.SHA512 => SHA512.Create(),
-            _ => throw new NotSupportedException(string.Format("Hash provider is unsupported. {0}", encr.HashAlgorithm)),
+            _ => throw new NotSupportedException(string.Format("不支持的哈希提供程序: {0}", encr.HashAlgorithm)),
         };
     }
 
@@ -617,7 +617,7 @@ internal class EncryptedPackageHandler
             }
             else if (encryptionInfo.Header?.KeySize > 0 && encryptionInfo.Header.KeySize < 80)
             {
-                throw new NotSupportedException("RC4 Hash provider is not supported. Must be SHA1(AlgIDHash == 0x8004)");
+                throw new NotSupportedException("不支持RC4哈希提供程序。必须使用SHA1(AlgIDHash == 0x8004)");
             }
             else
             {

@@ -120,7 +120,7 @@ public class TreeItem<TMetaData> where TMetaData : class
             }
             else result = data.ToString();
         }
-        if (result.IsNullOrWhiteSpace() && required) throw new NullReferenceException($"property '{propertyInfo.Name}' should not be null or empty");
+        if (result.IsNullOrWhiteSpace() && required) throw new NullReferenceException($"属性'{propertyInfo.Name}'不能为空或空白字符");
         return result;
     }
 
@@ -133,7 +133,7 @@ public class TreeItem<TMetaData> where TMetaData : class
             ids.Add(current.Id);
             if (current.Equals(this))
             {
-                throw new InvalidOperationException($"cycle reference detected:'{string.Join("->", ids)}'");
+                throw new InvalidOperationException($"检测到循环引用:'{string.Join("->", ids)}'");
             }
             current = current.Parent;
         }

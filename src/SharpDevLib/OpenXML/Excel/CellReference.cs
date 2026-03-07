@@ -64,7 +64,7 @@ public class CellReference
         Reference = reference.ToUpper();
 
         var match = Regex.Match(Reference, _columnExpression);
-        if (!match.Success) throw new Exception($"{Reference} is not a valid CellReference");
+        if (!match.Success) throw new Exception($"{Reference}不是有效的单元格引用");
         ColumnName = match.Value;
         ColumnIndex = GetColumnIndex(ColumnName);
         RowIndex = uint.Parse(Regex.Match(Reference, _rowExpression).Value);

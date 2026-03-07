@@ -47,7 +47,7 @@ public static class StringHelper
     public static Guid ToGuid(this string? str, bool throwException = false)
     {
         var success = Guid.TryParse(str, out var guid);
-        if (throwException && !success) throw new InvalidCastException($"can not convert value \"{str}\" to guid");
+        if (throwException && !success) throw new InvalidCastException($"无法将值\"{str}\"转换为Guid");
         return success ? guid : Guid.Empty;
     }
 
@@ -78,11 +78,11 @@ public static class StringHelper
     public static List<Guid> SplitToGuidList(this string? str, char[] separators, bool removeEmptyEntries = true, bool throwException = false, bool distinct = true)
     {
         if (str.IsNullOrWhiteSpace()) return [];
-        if (separators.Contains('-')) throw new ArgumentException("separator can not be '-'");
+        if (separators.Contains('-')) throw new ArgumentException("分隔符不能为'-'");
         var list = str.Split(separators, removeEmptyEntries ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None).Select(x =>
         {
             var success = Guid.TryParse(x, out var y);
-            if (throwException && !success) throw new InvalidCastException($"can not convert value \"{x}\" to guid");
+            if (throwException && !success) throw new InvalidCastException($"无法将值\"{x}\"转换为Guid");
             return success ? y : Guid.Empty;
         }).ToList();
         if (distinct) list = [.. list.Distinct()];

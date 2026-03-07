@@ -11,7 +11,7 @@ public class HttpRequest
 
     internal HttpRequestMessage HttpRequestMessage
     {
-        get => _httpRequestMessage ?? throw new Exception("can not get request message,may be task cancled before request");
+        get => _httpRequestMessage ?? throw new Exception("无法获取请求消息,可能是请求任务在完成前被取消");
         set => _httpRequestMessage = value;
     }
 

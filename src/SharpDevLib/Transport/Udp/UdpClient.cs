@@ -112,7 +112,7 @@ public class UdpClient : IDisposable
     {
         try
         {
-            if (_isDisposed) throw new ObjectDisposedException("can not access a disposed udp client");
+            if (_isDisposed) throw new ObjectDisposedException("无法访问已释放的UDP客户端");
             AdapterType.GetSendAdapter(SendAdapter).SendTo(Socket, remoteAdress, remotePort, bytes);
             Sended?.Invoke(this, new UdpClientDataEventArgs(this, bytes));
         }

@@ -77,7 +77,7 @@ public static class ExcelHelper
     public static DataTable ReadTable(Stream stream, string[]? columnNames, int index = 0)
     {
         using var doc = SpreadsheetDocument.Open(stream, false);
-        var workbookPart = doc.WorkbookPart ?? throw new Exception($"WorkbookPart not found");
+        var workbookPart = doc.WorkbookPart ?? throw new Exception($"找不到WorkbookPart");
         var worksheetPart = workbookPart.GetPartsOfType<WorksheetPart>().ElementAt(index);
         return ReadTable(workbookPart, worksheetPart, columnNames);
     }
@@ -113,11 +113,11 @@ public static class ExcelHelper
     public static DataSet ReadSet(Stream stream, params string[][]? columnNames)
     {
         using var doc = SpreadsheetDocument.Open(stream, false);
-        var workbookPart = doc.WorkbookPart ?? throw new Exception($"WorkbookPart not found");
+        var workbookPart = doc.WorkbookPart ?? throw new Exception($"找不到WorkbookPart");
         var dataSet = new DataSet();
 
         var sheetIndex = -1;
-        if (columnNames.NotNullOrEmpty() && columnNames.Count() != workbookPart.GetPartsOfType<WorksheetPart>().Count()) throw new ArgumentException($"parameter '{nameof(columnNames)}' count not match sheet count");
+        if (columnNames.NotNullOrEmpty() && columnNames.Count() != workbookPart.GetPartsOfType<WorksheetPart>().Count()) throw new ArgumentException($"参数'{nameof(columnNames)}'的数量与工作表数量不匹配");
         foreach (var worksheetPart in workbookPart.GetPartsOfType<WorksheetPart>())
         {
             sheetIndex++;
@@ -175,7 +175,7 @@ public static class ExcelHelper
         uint sheetIndex = 1;
         var sharedStringTable = workbookPart.GetSharedStringTable();
         var sharedStringDictionary = new Dictionary<string, int>();
-        if (columnNames.NotNullOrEmpty() && columnNames.Length != dataSet.Tables.Count) throw new ArgumentException($"argument '{nameof(columnNames)}' not match table's count");
+        if (columnNames.NotNullOrEmpty() && columnNames.Length != dataSet.Tables.Count) throw new ArgumentException($"参数'{nameof(columnNames)}'与数据表数量不匹配");
         var columnNameIndex = 0;
         foreach (DataTable table in dataSet.Tables)
         {
@@ -201,7 +201,7 @@ public static class ExcelHelper
     static DataTable ReadTable(WorkbookPart workbookPart, WorksheetPart worksheetPart, string[]? columnNames)
     {
         var rid = workbookPart.GetIdOfPart(worksheetPart);
-        var tableName = workbookPart.Workbook?.Descendants<Sheet>().FirstOrDefault(x => x.Id == rid)?.Name ?? throw new Exception($"Get Sheet by rid('{rid}') failed");
+        var tableName = workbookPart.Workbook?.Descendants<Sheet>().FirstOrDefault(x => x.Id == rid)?.Name ?? throw new Exception($"通过rid('{rid}')获取工作表失败");
         var table = new DataTable(tableName);
         var rows = worksheetPart.Worksheet?.Descendants<Row>();
         var sharedStringItems = workbookPart.GetPartsOfType<SharedStringTablePart>()?.FirstOrDefault()?.SharedStringTable?.Elements<SharedStringItem>()?.ToList() ?? [];
@@ -210,7 +210,7 @@ public static class ExcelHelper
         var headerNameMap = new Dictionary<string, string>();
         var headerRow = rows.ElementAt(0);
         if (headerRow is null) return table;
-        if (columnNames.NotNullOrEmpty() && headerRow.Elements<Cell>().Count() != columnNames.Count()) throw new ArgumentException($"sheet '{tableName}' column count not match");
+        if (columnNames.NotNullOrEmpty() && headerRow.Elements<Cell>().Count() != columnNames.Count()) throw new ArgumentException($"工作表'{tableName}'的列数量不匹配");
         var index = 0;
         foreach (Cell headerCell in headerRow.Elements<Cell>())
         {
@@ -223,7 +223,7 @@ public static class ExcelHelper
             {
                 tableColumnName = headerCell.GetValue(sharedStringItems);
             }
-            if (tableColumnName.IsNullOrWhiteSpace()) throw new Exception($"unable to get cell value with reference '{headerCell.CellReference}'");
+            if (tableColumnName.IsNullOrWhiteSpace()) throw new Exception($"无法获取引用'{headerCell.CellReference}'对应的单元格值");
             var excelColumnName = new CellReference(headerCell.CellReference).ColumnName;
             headerNameMap.Add(excelColumnName, tableColumnName);
             table.Columns.Add(new DataColumn(tableColumnName, typeof(string)));//every cell has different type,so unify to string format

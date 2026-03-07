@@ -6,8 +6,8 @@ internal class GzCompressHandler(CompressRequest request) : CompressHandler(requ
 {
     public override async Task HandleAsync()
     {
-        if (Request.SourcePaths.IsNullOrEmpty()) throw new InvalidOperationException("source path required");
-        if (Request.Password.NotNullOrWhiteSpace()) throw new InvalidDataException("password not supported");
+        if (Request.SourcePaths.IsNullOrEmpty()) throw new InvalidOperationException("源路径不能为空");
+        if (Request.Password.NotNullOrWhiteSpace()) throw new InvalidDataException("不支持密码");
         Request.TargetPath.RemoveFileIfExist();
 
         var targetFileInfo = new FileInfo(Request.TargetPath);

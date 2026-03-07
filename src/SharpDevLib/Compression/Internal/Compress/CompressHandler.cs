@@ -46,7 +46,7 @@ internal abstract class CompressHandler(CompressRequest request)
         else
         {
             var fileInfo = new FileInfo(path);
-            if (!fileInfo.Exists) throw new FileNotFoundException("file not found", path);
+            if (!fileInfo.Exists) throw new FileNotFoundException("文件不存在", path);
             var pathInfo = new FilePathInfo(path, FormatPath(path).TrimStart(FormatPath(rootPath)).TrimStart("/").TrimEnd("/"), fileInfo.Name, fileInfo.Length);
             return [pathInfo];
         }
@@ -66,8 +66,8 @@ internal abstract class CompressHandler<TOutputStream, TEntry>(CompressRequest r
 
     public override async Task HandleAsync()
     {
-        if (Request.SourcePaths.IsNullOrEmpty()) throw new InvalidOperationException("source path required");
-        if (!SupportPassword && Request.Password.NotNullOrWhiteSpace()) throw new InvalidDataException("password not supported");
+        if (Request.SourcePaths.IsNullOrEmpty()) throw new InvalidOperationException("源路径不能为空");
+        if (!SupportPassword && Request.Password.NotNullOrWhiteSpace()) throw new InvalidDataException("不支持密码");
         Request.TargetPath.RemoveFileIfExist();
 
         var pathList = GetPathList();

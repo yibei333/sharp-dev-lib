@@ -44,7 +44,7 @@ public static class RsaKeyHelper
     public static void ImportPem(this RSA rsa, string pem, byte[]? password = null)
     {
         var pemObject = PemObject.Read(pem);
-        if (pemObject.PemType == PemType.UnKnown) throw new NotSupportedException("not supported pem format");
+        if (pemObject.PemType == PemType.UnKnown) throw new NotSupportedException("不支持的PEM格式");
         if (pemObject.PemType == PemType.Pkcs1PrivateKey)
         {
             rsa.ImportPkcs1PrivateKeyPem(pem);
@@ -90,7 +90,7 @@ public static class RsaKeyHelper
     /// <exception cref="NotImplementedException">X509Certificate和X509CertificateSigningRequest格式未实现</exception>
     public static string ExportPem(this RSA rsa, PemType pemType, byte[]? password = null, string encryptPkcs1PrivateKeyAlogorithm = "AES-256-CBC")
     {
-        if (pemType == PemType.UnKnown) throw new NotSupportedException("not supported pem format");
+        if (pemType == PemType.UnKnown) throw new NotSupportedException("不支持的PEM格式");
 
         if (pemType == PemType.Pkcs1PrivateKey)
         {
@@ -194,7 +194,7 @@ public static class RsaKeyHelper
 
     static void ImportEncryptedPkcs1PrivateKeyPem(this RSA rsa, string pkcs1PrivateKeyPem, byte[] password)
     {
-        if (password.IsNullOrEmpty()) throw new Exception("password required");
+        if (password.IsNullOrEmpty()) throw new Exception("密码不能为空");
         var pemObject = PemObject.Read(pkcs1PrivateKeyPem);
         if (pemObject.PemType != PemType.EncryptedPkcs1PrivateKey) throw new InvalidDataException($"key type({pemObject.PemType}) is not encrypted pkcs1 private key");
         if (pemObject.HeaderFields is null || pemObject.HeaderFields.DEKInfoAlgorithmFileds.IsNullOrEmpty()) throw new InvalidDataException("error DEK-INFO");
@@ -209,7 +209,7 @@ public static class RsaKeyHelper
         int ivLength;
         if (algorithm == "AES-256-CBC") ivLength = 16;
         else if (algorithm == "DES-EDE3-CBC") ivLength = 8;
-        else throw new NotSupportedException($"algorithm '{algorithm}' not supported yet");
+        else throw new NotSupportedException($"暂不支持的算法: '{algorithm}'");
 
         var iv = new byte[ivLength];
         new Random().NextBytes(iv);
@@ -252,7 +252,7 @@ public static class RsaKeyHelper
             tripleDES.Mode = (CipherMode)Enum.Parse(typeof(CipherMode), fields.DEKInfoAlgorithmFileds[2]);
             algorithm = tripleDES;
         }
-        else throw new NotSupportedException($"algorithm '{fields.DEKInfoAlgorithm}' not supported yet");
+        else throw new NotSupportedException($"暂不支持的算法: '{fields.DEKInfoAlgorithm}'");
         return algorithm;
     }
     #endregion

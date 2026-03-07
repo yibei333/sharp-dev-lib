@@ -155,7 +155,7 @@ public static class DataTableHelper
             {
                 return GetNonGenericPropertyTypeToColumnType(propertyType.GetGenericArguments()[0]);
             }
-            else throw new NotSupportedException($"property type '{propertyType.FullName}' not supported");
+            else throw new NotSupportedException($"不支持的属性类型: '{propertyType.FullName}'");
         }
 
         return propertyType;
@@ -190,7 +190,7 @@ public static class DataTableHelper
             else
             {
                 if (int.TryParse(rowValue.ToString(), out var intValue)) return intValue != 0;
-                else throw new InvalidCastException($"unable to cast value '{rowValue}' to boolean");
+                else throw new InvalidCastException($"无法将值'{rowValue}'转换为布尔类型");
             }
         }
         return Convert.ChangeType(rowValue, type);

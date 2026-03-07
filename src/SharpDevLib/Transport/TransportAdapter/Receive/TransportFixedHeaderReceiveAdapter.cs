@@ -19,12 +19,12 @@ public class TransportFixedHeaderReceiveAdapter : ITransportReceiveAdapter
     {
         var sizeBuffer = new byte[4];
         var sizeLength = socket.Receive(sizeBuffer);
-        if (sizeLength != sizeBuffer.Length) throw new InvalidDataException("fix header length should be 4");
+        if (sizeLength != sizeBuffer.Length) throw new InvalidDataException("固定头长度应为4字节");
 
         var size = BitConverter.ToInt32(sizeBuffer, 0);
         var buffer = new byte[size];
         var length = socket.Receive(buffer);
-        if (length != buffer.Length) throw new InvalidDataException($"client should use fix header adapter");
+        if (length != buffer.Length) throw new InvalidDataException("客户端应使用固定头适配器");
         return buffer;
     }
 
@@ -39,12 +39,12 @@ public class TransportFixedHeaderReceiveAdapter : ITransportReceiveAdapter
     {
         var sizeBuffer = new byte[4];
         var sizeLength = socket.ReceiveFrom(sizeBuffer, ref remoteEndPoint);
-        if (sizeLength != sizeBuffer.Length) throw new InvalidDataException("fix header length should be 4");
+        if (sizeLength != sizeBuffer.Length) throw new InvalidDataException("固定头长度应为4字节");
 
         var size = BitConverter.ToInt32(sizeBuffer, 0);
         var buffer = new byte[size];
         var length = socket.Receive(buffer);
-        if (length != buffer.Length) throw new InvalidDataException($"client should use fix header adapter");
+        if (length != buffer.Length) throw new InvalidDataException("客户端应使用固定头适配器");
         return buffer;
     }
 }

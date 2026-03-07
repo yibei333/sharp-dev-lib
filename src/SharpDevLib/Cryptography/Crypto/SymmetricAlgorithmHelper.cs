@@ -110,7 +110,7 @@ public static class SymmetricAlgorithmHelper
         if (algorithm is Aes) return [16, 24, 32];
         if (algorithm is DES) return [8];
         if (algorithm is TripleDES) return [16, 24];
-        else throw new NotImplementedException($"algorithm '{algorithm.GetType().FullName}' not supported yet");
+        else throw new NotImplementedException($"暂不支持的算法: '{algorithm.GetType().FullName}'");
     }
 
     /// <summary>
@@ -136,7 +136,7 @@ public static class SymmetricAlgorithmHelper
         if (algorithm is Aes) return 16;
         if (algorithm is DES) return 8;
         if (algorithm is TripleDES) return 8;
-        else throw new NotImplementedException($"algorithm '{algorithm.GetType().FullName}' not supported yet");
+        else throw new NotImplementedException($"暂不支持的算法: '{algorithm.GetType().FullName}'");
     }
 
     static byte[] PaddingBytes(this byte[] bytes, int length)

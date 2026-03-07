@@ -64,7 +64,7 @@ public class JsonOption
             TypeInfoResolver = _propertyNameOrderResolver
         };
         var addResult = _cache.TryAdd(key, optoins);
-        if (!addResult) throw new Exception($"json option add key '{key}' failed");
+        if (!addResult) throw new Exception($"添加JSON选项键'{key}'失败");
         return optoins;
     }
 

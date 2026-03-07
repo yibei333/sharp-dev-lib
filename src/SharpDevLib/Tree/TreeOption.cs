@@ -40,8 +40,8 @@ public class TreeOption(string idPropertyName = "Id", string parentIdPropertyNam
     {
         if (_cache.ContainsKey(IdPropertyName)) return _cache[IdPropertyName];
 
-        if (IdPropertyName.IsNullOrWhiteSpace()) throw new NullReferenceException($"id property name required");
-        var property = metaDataType.GetProperty(IdPropertyName) ?? throw new ArgumentException($"unable to find property '{IdPropertyName}' of type '{metaDataType.FullName}'");
+        if (IdPropertyName.IsNullOrWhiteSpace()) throw new NullReferenceException($"ID属性名称不能为空");
+        var property = metaDataType.GetProperty(IdPropertyName) ?? throw new ArgumentException($"无法在类型'{metaDataType.FullName}'中找到属性'{IdPropertyName}'");
         _cache[IdPropertyName] = property;
         return property;
     }
@@ -50,8 +50,8 @@ public class TreeOption(string idPropertyName = "Id", string parentIdPropertyNam
     {
         if (_cache.ContainsKey(ParentIdPropertyName)) return _cache[ParentIdPropertyName];
 
-        if (ParentIdPropertyName.IsNullOrWhiteSpace()) throw new NullReferenceException($"parent id property name required");
-        var property = metaDataType.GetProperty(ParentIdPropertyName) ?? throw new ArgumentException($"unable to find property '{ParentIdPropertyName}' of type '{metaDataType.FullName}'");
+        if (ParentIdPropertyName.IsNullOrWhiteSpace()) throw new NullReferenceException($"父ID属性名称不能为空");
+        var property = metaDataType.GetProperty(ParentIdPropertyName) ?? throw new ArgumentException($"无法在类型'{metaDataType.FullName}'中找到属性'{ParentIdPropertyName}'");
         _cache[ParentIdPropertyName] = property;
         return property;
     }
@@ -60,7 +60,7 @@ public class TreeOption(string idPropertyName = "Id", string parentIdPropertyNam
     {
         if (SortPropertyName.IsNullOrWhiteSpace()) return null;
         if (_cache.ContainsKey(SortPropertyName)) return _cache[SortPropertyName];
-        var property = metaDataType.GetProperty(SortPropertyName) ?? throw new ArgumentException($"unable to find property '{SortPropertyName}' of type '{metaDataType.FullName}'");
+        var property = metaDataType.GetProperty(SortPropertyName) ?? throw new ArgumentException($"无法在类型'{metaDataType.FullName}'中找到属性'{SortPropertyName}'");
         _cache[SortPropertyName] = property;
         return property;
     }

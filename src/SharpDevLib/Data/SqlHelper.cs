@@ -78,7 +78,7 @@ public sealed class SqlHelper : IDisposable
     public SqlHelper(DbContext dbContext)
     {
         Connection = dbContext.Database.GetDbConnection();
-        DbProviderFactory = (Connection.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Instance).FirstOrDefault(x => x.Name == nameof(DbProviderFactory))?.GetValue(Connection) as DbProviderFactory) ?? throw new Exception("unable to get DbProviderFactory from DbConnection");
+        DbProviderFactory = (Connection.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Instance).FirstOrDefault(x => x.Name == nameof(DbProviderFactory))?.GetValue(Connection) as DbProviderFactory) ?? throw new Exception("无法从DbConnection获取DbProviderFactory");
         Connection.Open();
     }
 

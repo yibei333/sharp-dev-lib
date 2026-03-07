@@ -20,7 +20,7 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
     /// 获取HTTP响应消息
     /// </summary>
     /// <exception cref="Exception">当无法获取响应消息时抛出异常</exception>
-    public HttpResponseMessage HttpResponseMessage => _httpResponseMessage ?? throw new Exception("can not get response message,may be task cancled before request");
+    public HttpResponseMessage HttpResponseMessage => _httpResponseMessage ?? throw new Exception("无法获取响应消息,可能是请求任务在完成前被取消");
 
     /// <summary>
     /// 获取请求是否成功
@@ -89,7 +89,7 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
         if (!IsSuccess)
         {
             (Request.Config ?? HttpConfig.Default).Logger?.LogInformation(ToString());
-            throw new Exception("请求失败");
+            throw new Exception("HTTP请求失败,请检查响应状态码和错误信息");
         }
         return this;
     }
@@ -234,7 +234,7 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
                 }
             }
         }
-        else throw new NotImplementedException($"content-type:{requestContentType} not supported yet");
+        else throw new NotImplementedException($"暂不支持的内容类型:{requestContentType}");
     }
 
     static void BuildResponseInfo(StringBuilder builder, HttpResponse response)

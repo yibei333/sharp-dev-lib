@@ -17,11 +17,11 @@ public static class EmailHelper
     /// <exception cref="EmailVerifyException">当配置无效时引发异常</exception>
     public static void SetConfig(EmailConfig config)
     {
-        if (config is null) throw new EmailVerifyException("call EmailHelper.SetConfig() to set config first");
-        if (config.Host.IsNullOrWhiteSpace()) throw new EmailVerifyException("host requried");
-        if (config.Port <= 0) throw new EmailVerifyException("port requried");
-        if (config.Sender.IsNullOrWhiteSpace()) throw new EmailVerifyException("sender address requried");
-        if (config.SenderPassword.IsNullOrWhiteSpace()) throw new EmailVerifyException("sender password requried");
+        if (config is null) throw new EmailVerifyException("请先调用EmailHelper.SetConfig()设置配置");
+        if (config.Host.IsNullOrWhiteSpace()) throw new EmailVerifyException("SMTP服务器地址不能为空");
+        if (config.Port <= 0) throw new EmailVerifyException("端口号必须大于0");
+        if (config.Sender.IsNullOrWhiteSpace()) throw new EmailVerifyException("发件人地址不能为空");
+        if (config.SenderPassword.IsNullOrWhiteSpace()) throw new EmailVerifyException("发件人密码不能为空");
         _config = config;
     }
 
@@ -34,10 +34,10 @@ public static class EmailHelper
     public static async Task SendAsync(this EmailContent content, CancellationToken? cancellationToken = null)
     {
         await Task.Yield();
-        var config = _config ?? throw new EmailVerifyException("call EmailHelper.SetConfig() to set config first");
-        if (content.Receivers.IsNullOrEmpty()) throw new EmailVerifyException("receivers requried");
-        if (content.Subject.IsNullOrWhiteSpace()) throw new EmailVerifyException("email subject requried");
-        if (content.Body.IsNullOrWhiteSpace()) throw new EmailVerifyException("email body requried");
+        var config = _config ?? throw new EmailVerifyException("请先调用EmailHelper.SetConfig()设置配置");
+        if (content.Receivers.IsNullOrEmpty()) throw new EmailVerifyException("收件人地址不能为空");
+        if (content.Subject.IsNullOrWhiteSpace()) throw new EmailVerifyException("邮件主题不能为空");
+        if (content.Body.IsNullOrWhiteSpace()) throw new EmailVerifyException("邮件正文不能为空");
 
         var message = BuildMailMessage(config, content);
         using var client = CreateClient(config);

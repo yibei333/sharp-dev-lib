@@ -107,7 +107,7 @@ internal static class Pkcs8
         //prf AlgorithmIdentifier { { PBKDF2 - PRFs} } DEFAULT
         //algid - hmacWithSHA1 }
         var saltTag = kdfParamsSequence.PeekTag();
-        if (saltTag == Asn1Tag.ObjectIdentifier) throw new NotSupportedException("nesting salt not supported yet");
+        if (saltTag == Asn1Tag.ObjectIdentifier) throw new NotSupportedException("暂不支持嵌套盐值");
         var salt = kdfParamsSequence.ReadOctetString();
         var iterationCount = kdfParamsSequence.ReadInteger();
         var keyLength = -1;
@@ -136,7 +136,7 @@ internal static class Pkcs8
         else if (prfIdentifier == "1.2.840.113549.2.9") hMAC = new HMACSHA256(password);
         else if (prfIdentifier == "1.2.840.113549.2.10") hMAC = new HMACSHA384(password);
         else if (prfIdentifier == "1.2.840.113549.2.11") hMAC = new HMACSHA512(password);
-        else throw new NotSupportedException($"digestAlgorithm with oid '{prfIdentifier}' not supported yet");
+        else throw new NotSupportedException($"暂不支持的摘要算法OID: '{prfIdentifier}'");
         //prf parameter null,ignored
 
         //1.1.2PBES2-Encs

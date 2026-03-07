@@ -174,7 +174,7 @@ public class TcpClient : IDisposable
     {
         try
         {
-            if (State != TcpClientStates.Connected || !Socket.Connected) throw new Exception("can not access a closed tcp client");
+            if (State != TcpClientStates.Connected || !Socket.Connected) throw new Exception("无法访问已关闭的TCP客户端");
             AdapterType.GetSendAdapter(SendAdapter).Send(Socket, bytes);
             Sended?.Invoke(this, new TcpClientDataEventArgs(this, bytes));
         }

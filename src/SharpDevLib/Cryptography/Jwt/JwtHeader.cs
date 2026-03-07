@@ -18,7 +18,7 @@ internal class JwtHeader
         Algorithm = algorithm;
         Type = type;
 
-        if (!Enum.TryParse<JwtAlgorithm>(algorithm, out var value)) throw new NotSupportedException($"algorithm '{algorithm}' not supported yet");
+        if (!Enum.TryParse<JwtAlgorithm>(algorithm, out var value)) throw new NotSupportedException($"暂不支持的算法: '{algorithm}'");
         JwtAlgorithm = value;
     }
 

@@ -19,8 +19,8 @@ public static class RandomHelper
     {
         var generateOption = option ?? GenerateRandomCodeOption.Default;
         var seed = generateOption.Seed;
-        if (generateOption.Length <= 0) throw new ArgumentException($"length should greater than zero");
-        if (seed is null || seed.Length <= 0) throw new ArgumentException($"seed data requires at least one character");
+        if (generateOption.Length <= 0) throw new ArgumentException($"随机码长度必须大于0");
+        if (seed is null || seed.Length <= 0) throw new ArgumentException($"种子数据至少包含一个字符");
         var builder = new StringBuilder();
         for (int i = 0; i < generateOption.Length; i++)
         {

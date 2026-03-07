@@ -181,7 +181,7 @@ internal class ProgressStream : DelegatingStream
 
 internal abstract class DelegatingStream(Stream innerStream) : Stream
 {
-    private readonly Stream _innerStream = innerStream ?? throw new NullReferenceException("innerStream");
+    private readonly Stream _innerStream = innerStream ?? throw new NullReferenceException("内部流不能为空");
 
     protected Stream InnerStream => _innerStream;
 

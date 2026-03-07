@@ -4,7 +4,7 @@ internal static class TransportAdapterFactory
 {
     public static ITransportReceiveAdapter GetReceiveAdapter(this TransportAdapterType type, ITransportReceiveAdapter? customAdapter = null)
     {
-        if (type == TransportAdapterType.Custom) return customAdapter ?? throw new NullReferenceException("set adapter first");
+        if (type == TransportAdapterType.Custom) return customAdapter ?? throw new NullReferenceException("请先设置适配器");
 
         if (type == TransportAdapterType.Default) return TransportReceiveAdapters.Default;
         else if (type == TransportAdapterType.FixHeader) return TransportReceiveAdapters.FixedHeader;
@@ -13,7 +13,7 @@ internal static class TransportAdapterFactory
 
     public static ITransportSendAdapter GetSendAdapter(this TransportAdapterType type, ITransportSendAdapter? customAdapter = null)
     {
-        if (type == TransportAdapterType.Custom) return customAdapter ?? throw new NullReferenceException("set adapter first");
+        if (type == TransportAdapterType.Custom) return customAdapter ?? throw new NullReferenceException("请先设置适配器");
 
         if (type == TransportAdapterType.Default) return TransportSendAdapters.Default;
         else if (type == TransportAdapterType.FixHeader) return TransportSendAdapters.FixedHeader;

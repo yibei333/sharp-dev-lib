@@ -70,11 +70,11 @@ public static class SpreadsheetHelper
     /// <exception cref="Exception">当指定表名不存在时引发异常</exception>
     public static Worksheet GetWorksheet(this WorkbookPart workbookPart, string tableName)
     {
-        Sheet sheet = workbookPart.Workbook?.Elements<Sheets>().SelectMany(x => x.Elements<Sheet>().Where(y => y.Name == tableName)).FirstOrDefault() ?? throw new Exception($"table with name '{tableName}' not found");
+        Sheet sheet = workbookPart.Workbook?.Elements<Sheets>().SelectMany(x => x.Elements<Sheet>().Where(y => y.Name == tableName)).FirstOrDefault() ?? throw new Exception($"找不到名称为'{tableName}'的工作表");
         string worksheetPartId = sheet.Id?.ToString() ?? string.Empty;
         if (worksheetPartId.IsNullOrWhiteSpace()) throw new Exception();
-        var worksheetPart = workbookPart.GetPartById(worksheetPartId) as WorksheetPart ?? throw new Exception($"WorksheetPart with id '{worksheetPartId}' not found");
-        return worksheetPart.Worksheet ?? throw new Exception("can't get worksheet");
+        var worksheetPart = workbookPart.GetPartById(worksheetPartId) as WorksheetPart ?? throw new Exception($"找不到ID为'{worksheetPartId}'的WorksheetPart");
+        return worksheetPart.Worksheet ?? throw new Exception("无法获取工作表");
     }
 
     /// <summary>
@@ -425,7 +425,7 @@ public static class SpreadsheetHelper
     /// <exception cref="Exception">当找不到 WorkbookPart 时引发异常</exception>
     public static MergeCell MergeCells(this Worksheet worksheet, string cellReference1, string cellReference2)
     {
-        var workbookPart = worksheet.GetParent<WorkbookPart>() ?? throw new Exception("WorkbookPart not found");
+        var workbookPart = worksheet.GetParent<WorkbookPart>() ?? throw new Exception("找不到WorkbookPart");
         var sharedStringItems = workbookPart.GetPartsOfType<SharedStringTablePart>()?.FirstOrDefault()?.SharedStringTable?.Elements<SharedStringItem>()?.ToList() ?? [];
         CreateCellIfNotExist(worksheet, cellReference1);
         CreateCellIfNotExist(worksheet, cellReference2);
@@ -570,7 +570,7 @@ public static class SpreadsheetHelper
     /// <exception cref="Exception">当找不到 WorkbookPart 时引发异常</exception>
     public static void AutoColumnWidth(this WorksheetPart worksheetPart)
     {
-        var workbookPart = worksheetPart.GetParent<WorkbookPart>() ?? throw new Exception($"unable to find WorkbookPart");
+        var workbookPart = worksheetPart.GetParent<WorkbookPart>() ?? throw new Exception($"无法找到WorkbookPart");
         var sharedStringItems = workbookPart.GetPartsOfType<SharedStringTablePart>()?.FirstOrDefault()?.SharedStringTable?.Elements<SharedStringItem>()?.ToList() ?? [];
         var worksheet = worksheetPart.Worksheet;
         if (worksheet is null) return;
@@ -724,7 +724,7 @@ public static class SpreadsheetHelper
     /// <exception cref="Exception">当找不到 WorkbookPart 时引发异常</exception>
     public static void UseStyle(this MergeCell mergeCell, CellStyle style)
     {
-        var workbookPart = mergeCell.GetParent<WorkbookPart>() ?? throw new Exception("unable to find WorkbookPart");
+        var workbookPart = mergeCell.GetParent<WorkbookPart>() ?? throw new Exception("无法找到WorkbookPart");
         var cells = mergeCell.GetCells();
         var styleId = workbookPart.CreateStyle(style);
         cells.ForEach(x => x.StyleIndex = styleId);
@@ -738,7 +738,7 @@ public static class SpreadsheetHelper
     /// <exception cref="Exception">当找不到 Worksheet 时引发异常</exception>
     public static List<Cell> GetCells(this MergeCell mergeCell)
     {
-        var worksheet = mergeCell.GetParent<Worksheet>() ?? throw new Exception("unable to find Worksheet");
+        var worksheet = mergeCell.GetParent<Worksheet>() ?? throw new Exception("无法找到Worksheet");
         var references = mergeCell.Reference!.Value!.Split(':');
         var refernece1 = new CellReference(references[0]);
         var refernece2 = new CellReference(references[1]);
@@ -789,8 +789,8 @@ public static class SpreadsheetHelper
     /// <exception cref="Exception">当找不到 WorkbookPart 或 WorksheetPart 时引发异常</exception>
     public static void SetComment(this Cell cell, string author, string comment)
     {
-        var workbookPart = cell.GetParent<WorkbookPart>() ?? throw new Exception("WorkbookPart not found");
-        var worksheetPart = cell.GetParent<WorksheetPart>() ?? throw new Exception("WorksheetPart not found");
+        var workbookPart = cell.GetParent<WorkbookPart>() ?? throw new Exception("找不到WorkbookPart");
+        var worksheetPart = cell.GetParent<WorksheetPart>() ?? throw new Exception("找不到WorksheetPart");
         var reference = new CellReference(cell.CellReference);
         var worksheetCommentsPart = worksheetPart.WorksheetCommentsPart ?? worksheetPart.AddNewPart<WorksheetCommentsPart>();
         worksheetCommentsPart.Comments ??= new Comments();

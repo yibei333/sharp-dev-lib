@@ -47,7 +47,7 @@ public static class JwtHelper
 
     static string CreateHeader(JwtAlgorithm algorithm)
     {
-        if (!Enum.IsDefined(typeof(JwtAlgorithm), algorithm)) throw new NotSupportedException($"{algorithm} not supported yet");
+        if (!Enum.IsDefined(typeof(JwtAlgorithm), algorithm)) throw new NotSupportedException($"暂不支持的算法: {algorithm}");
         var header = new JwtHeader(algorithm.ToString(), "JWT");
         var headerSegment = JsonSerializer.Serialize(header).Utf8Decode().Base64UrlEncode();
         return headerSegment;
@@ -87,7 +87,7 @@ public static class JwtHelper
         var payloadSegment = str[1];
         var signatureSegment = str[2];
 
-        var headerObject = JsonSerializer.Deserialize<JwtHeader>(headerSegment.Base64UrlDecode()) ?? throw new NullReferenceException($"unable to deserialize jwt header");
+        var headerObject = JsonSerializer.Deserialize<JwtHeader>(headerSegment.Base64UrlDecode()) ?? throw new NullReferenceException($"无法反序列化JWT头部");
         if (headerObject.JwtAlgorithm == JwtAlgorithm.HS256)
         {
             var signatureToVerify = new HMACSHA256(request.Key.HexStringDecode()).ComputeHash($"{headerSegment}.{payloadSegment}".Utf8Decode()).Base64UrlEncode();

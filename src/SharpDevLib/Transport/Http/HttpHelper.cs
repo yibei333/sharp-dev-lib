@@ -70,7 +70,7 @@ public static class HttpHelper
     #region Private
     static async Task<HttpResponse> SendAsync(this HttpRequest request, HttpMethod method, CancellationToken? cancellationToken = null)
     {
-        if (request.Url.IsNullOrWhiteSpace()) throw new InvalidOperationException("url requried");
+        if (request.Url.IsNullOrWhiteSpace()) throw new InvalidOperationException("URL不能为空");
         if (method == HttpMethod.Get || method == HttpMethod.Delete)
         {
             if (request.Parameters.NotNullOrEmpty())
@@ -105,7 +105,7 @@ public static class HttpHelper
                     var stream = file.Stream;
                     if (stream is null)
                     {
-                        if (file.Bytes.IsNullOrEmpty()) throw new Exception($"file data required");
+                        if (file.Bytes.IsNullOrEmpty()) throw new Exception($"文件数据不能为空");
                         else stream = new MemoryStream(file.Bytes);
                     }
                     multipartFormDataContent.Add(new StreamContent(stream), file.ParameterName, file.FileName);

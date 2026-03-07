@@ -83,7 +83,7 @@ public class TcpSession<TMetadata> : IDisposable
     {
         try
         {
-            if (State != TcpSessionStates.Connected || !Socket.Connected) throw new Exception("can not access a closed tcp session");
+            if (State != TcpSessionStates.Connected || !Socket.Connected) throw new Exception("无法访问已关闭的TCP会话");
             SendAdapter.Send(Socket, bytes);
             Sended?.Invoke(this, new TcpSessionDataEventArgs<TMetadata>(this, bytes));
         }

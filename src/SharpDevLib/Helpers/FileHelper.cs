@@ -1044,7 +1044,7 @@ public static class FileHelper
         var fileInfo = new FileInfo(filePath);
         if (fileInfo.Exists)
         {
-            if (throwIfFileExist) throw new InvalidOperationException($"file '{filePath}' already existed");
+            if (throwIfFileExist) throw new InvalidOperationException($"文件'{filePath}'已存在");
             fileInfo.Delete();
         }
         fileInfo.CreateFileIfNotExist();
@@ -1069,7 +1069,7 @@ public static class FileHelper
         var fileInfo = new FileInfo(filePath);
         if (fileInfo.Exists)
         {
-            if (throwIfFileExist) throw new InvalidOperationException($"file '{filePath}' already existed");
+            if (throwIfFileExist) throw new InvalidOperationException($"文件'{filePath}'已存在");
             fileInfo.Delete();
         }
         fileInfo.CreateFileIfNotExist();
@@ -1092,7 +1092,7 @@ public static class FileHelper
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
         if (File.Exists(filePath))
         {
-            if (throwIfFileExist) throw new InvalidOperationException($"file '{filePath}' already existed");
+            if (throwIfFileExist) throw new InvalidOperationException($"文件'{filePath}'已存在");
             File.Delete(filePath);
         }
 
@@ -1116,7 +1116,7 @@ public static class FileHelper
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
         if (File.Exists(filePath))
         {
-            if (throwIfFileExist) throw new InvalidOperationException($"file '{filePath}' already existed");
+            if (throwIfFileExist) throw new InvalidOperationException($"文件'{filePath}'已存在");
             File.Delete(filePath);
         }
 

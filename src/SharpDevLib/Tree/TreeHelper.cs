@@ -19,7 +19,7 @@ public static class TreeHelper
     {
         var list = items.Where(x => x is not null).Select(x => new TreeItem<TMetaData>(x, option)).ToList();
         var repeated = list.GroupBy(x => x.Id).Where(x => x.Count() > 1).Select(x => x.Key).ToList();
-        if (repeated.Any()) throw new InvalidDataException($"repeat id detected:'{string.Join(",", repeated)}'");
+        if (repeated.Any()) throw new InvalidDataException($"检测到重复ID:'{string.Join(",", repeated)}'");
         foreach (var item in list)
         {
             if (item.ParentId is not null) item.SetParent(list.FirstOrDefault(x => x.Id == item.ParentId));

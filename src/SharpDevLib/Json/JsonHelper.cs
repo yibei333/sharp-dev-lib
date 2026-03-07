@@ -74,7 +74,7 @@ public static class JsonHelper
     public static T DeSerialize<T>(this string json) where T : class
     {
         if (json.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(json));
-        return JsonSerializer.Deserialize<T>(json, JsonOption.Default.Create()) ?? throw new JsonException($"unable to deserialize json to object of type '{typeof(T).FullName}'");
+        return JsonSerializer.Deserialize<T>(json, JsonOption.Default.Create()) ?? throw new JsonException($"无法将JSON反序列化为类型'{typeof(T).FullName}'的对象");
     }
 
     /// <summary>
@@ -88,7 +88,7 @@ public static class JsonHelper
     public static object DeSerialize(this string json, Type type)
     {
         if (json.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(json));
-        return JsonSerializer.Deserialize(json, type, JsonOption.Default.Create()) ?? throw new JsonException($"unable to deserialize json to object of type '{type.FullName}'");
+        return JsonSerializer.Deserialize(json, type, JsonOption.Default.Create()) ?? throw new JsonException($"无法将JSON反序列化为类型'{type.FullName}'的对象");
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public static class JsonHelper
     public static T DeSerialize<T>(this string json, JsonOption option) where T : class
     {
         if (json.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(json));
-        return JsonSerializer.Deserialize<T>(json, (option ?? JsonOption.Default).Create()) ?? throw new JsonException($"unable to deserialize json to object of type '{typeof(T).FullName}'");
+        return JsonSerializer.Deserialize<T>(json, (option ?? JsonOption.Default).Create()) ?? throw new JsonException($"无法将JSON反序列化为类型'{typeof(T).FullName}'的对象");
     }
 
     /// <summary>
@@ -118,7 +118,7 @@ public static class JsonHelper
         try
         {
             if (json.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(json));
-            result = JsonSerializer.Deserialize<T>(json, JsonOption.Default.Create()) ?? throw new JsonException($"unable to deserialize json to object of type '{typeof(T).FullName}'");
+            result = JsonSerializer.Deserialize<T>(json, JsonOption.Default.Create()) ?? throw new JsonException($"无法将JSON反序列化为类型'{typeof(T).FullName}'的对象");
             return true;
         }
         catch
@@ -141,7 +141,7 @@ public static class JsonHelper
         try
         {
             if (json.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(json));
-            result = JsonSerializer.Deserialize<T>(json, (option ?? JsonOption.Default).Create()) ?? throw new JsonException($"unable to deserialize json to object of type '{typeof(T).FullName}'");
+            result = JsonSerializer.Deserialize<T>(json, (option ?? JsonOption.Default).Create()) ?? throw new JsonException($"无法将JSON反序列化为类型'{typeof(T).FullName}'的对象");
             return true;
         }
         catch

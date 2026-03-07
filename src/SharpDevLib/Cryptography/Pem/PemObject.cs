@@ -131,7 +131,7 @@ internal class PemObject
         //unkonw
         else
         {
-            throw new NotImplementedException($"format '{header}' not supported yet");
+            throw new NotImplementedException($"暂不支持的格式: '{header}'");
         }
     }
 

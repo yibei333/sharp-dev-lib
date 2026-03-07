@@ -108,7 +108,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
     public async Task ListenAsync(CancellationToken? cancellationToken = null)
     {
         if (State == TcpListnerStates.Listening) return;
-        if (State == TcpListnerStates.Closed) throw new Exception("can not access a closed tcp listener");
+        if (State == TcpListnerStates.Closed) throw new Exception("无法访问已关闭的TCP监听器");
 
         await Task.Run(() =>
         {

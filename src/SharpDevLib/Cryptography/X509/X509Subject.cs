@@ -50,7 +50,7 @@ public class X509Subject(string commonName)
         if (City.NotNullOrWhiteSpace()) collection.Add($"L = {City}");
         if (Organization.NotNullOrWhiteSpace()) collection.Add($"O = {Organization}");
         if (OrganizationalUnit.NotNullOrWhiteSpace()) collection.Add($"OU = {OrganizationalUnit}");
-        if (collection.IsNullOrEmpty()) throw new Exception($"subject info can not be empty");
+        if (collection.IsNullOrEmpty()) throw new Exception($"主题信息不能为空");
         return string.Join(",", collection);
     }
 }

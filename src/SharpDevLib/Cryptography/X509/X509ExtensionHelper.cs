@@ -77,7 +77,7 @@ internal static class X509ExtensionHelper
         var subjectKeyIdentifierExtension = CreateSubjectKeyIdentifierExtension(publicKey);
         if (caCert is null) return [subjectKeyIdentifierExtension];
 
-        var subjectKeyIdentifierRawData = caCert.Extensions.OfType<X509SubjectKeyIdentifierExtension>().FirstOrDefault()?.RawData ?? throw new Exception("unable to find ca X509SubjectKeyIdentifierExtension");
+        var subjectKeyIdentifierRawData = caCert.Extensions.OfType<X509SubjectKeyIdentifierExtension>().FirstOrDefault()?.RawData ?? throw new Exception("无法找到CA证书的X509SubjectKeyIdentifierExtension扩展");
         //授权密钥标识符
         var authorityKeyIdentifierExtension = new X509AuthorityKeyIdentifierExtension(subjectKeyIdentifierRawData, false);
         return [subjectKeyIdentifierExtension, authorityKeyIdentifierExtension];
@@ -93,7 +93,7 @@ internal static class X509ExtensionHelper
 
     static X509Extension GetSubjectAlternativeNameExtension(List<SubjectAlternativeName> alternativeNames)
     {
-        if (alternativeNames.IsNullOrEmpty()) throw new ArgumentException($"argument '{nameof(alternativeNames)}' can not be empty");
+        if (alternativeNames.IsNullOrEmpty()) throw new ArgumentException($"参数'{nameof(alternativeNames)}'不能为空");
 
         var subjectAlternativeNameBuilder = new SubjectAlternativeNameBuilder();
         foreach (var item in alternativeNames)
@@ -103,7 +103,7 @@ internal static class X509ExtensionHelper
             else if (item.Type == SubjectAlternativeNameType.UPN) subjectAlternativeNameBuilder.AddUserPrincipalName(item.Value);
             else if (item.Type == SubjectAlternativeNameType.Dns) subjectAlternativeNameBuilder.AddDnsName(item.Value);
             else if (item.Type == SubjectAlternativeNameType.IP) subjectAlternativeNameBuilder.AddIpAddress(IPAddress.Parse(item.Value));
-            else throw new NotSupportedException($"subject alternative name type [{item.Type}] not supported");
+            else throw new NotSupportedException($"不支持的主体备用名称类型: [{item.Type}]");
         }
         return subjectAlternativeNameBuilder.Build(false);
     }
