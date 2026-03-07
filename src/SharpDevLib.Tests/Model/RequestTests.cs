@@ -183,7 +183,7 @@ public class IdDataRequestTests
     [TestMethod]
     public void DefaultValuesTest()
     {
-        var request = new IdDataRequest<string,TestData>();
+        var request = new IdDataRequest<string, TestData>();
         Assert.IsNull(request.Id);
         Assert.IsNull(request.Data);
     }
@@ -192,7 +192,7 @@ public class IdDataRequestTests
     public void WithIdAndDataTest()
     {
         var data = new TestData { Value = "test" };
-        var request = new IdDataRequest<string,TestData>
+        var request = new IdDataRequest<string, TestData>
         {
             Id = "test-id",
             Data = data
@@ -205,7 +205,7 @@ public class IdDataRequestTests
     [TestMethod]
     public void OnlyIdTest()
     {
-        var request = new IdDataRequest<string,TestData> { Id = "test-id" };
+        var request = new IdDataRequest<string, TestData> { Id = "test-id" };
         Assert.AreEqual("test-id", request.Id);
         Assert.IsNull(request.Data);
     }
@@ -227,7 +227,7 @@ public class IdNameDataRequestTests
     [TestMethod]
     public void DefaultValuesTest()
     {
-        var request = new IdNameDataRequest<string,TestData>();
+        var request = new IdNameDataRequest<string, TestData>();
         Assert.IsNull(request.Id);
         Assert.IsNull(request.Name);
         Assert.IsNull(request.Data);
@@ -237,7 +237,7 @@ public class IdNameDataRequestTests
     public void WithAllFieldsTest()
     {
         var data = new TestData { Value = "test" };
-        var request = new IdNameDataRequest<string,TestData>
+        var request = new IdNameDataRequest<string, TestData>
         {
             Id = "test-id",
             Name = "TestName",

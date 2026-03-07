@@ -1,5 +1,4 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib.Tests.TestData;
 
 namespace SharpDevLib.Tests.Model;
 
@@ -13,7 +12,7 @@ public class IdDtoTests
         {
             Id = "test-id"
         };
-        
+
         Assert.AreEqual("test-id", dto.Id);
     }
 
@@ -104,7 +103,7 @@ public class IdNameDtoTests
             Id = "test-id",
             Name = "TestName"
         };
-        
+
         Assert.AreEqual("test-id", dto.Id);
         Assert.AreEqual("TestName", dto.Name);
     }
@@ -188,7 +187,7 @@ public class IdDataDtoTests
     [TestMethod]
     public void DefaultValuesTest()
     {
-        var dto = new IdDataDto<string,TestData>();
+        var dto = new IdDataDto<string, TestData>();
         Assert.IsNull(dto.Id);
         Assert.IsNull(dto.Data);
     }
@@ -197,7 +196,7 @@ public class IdDataDtoTests
     public void WithIdAndDataTest()
     {
         var data = new TestData { Value = "test" };
-        var dto = new IdDataDto<string,TestData>
+        var dto = new IdDataDto<string, TestData>
         {
             Id = "test-id",
             Data = data
@@ -210,7 +209,7 @@ public class IdDataDtoTests
     [TestMethod]
     public void OnlyIdTest()
     {
-        var dto = new IdDataDto<string,TestData> { Id = "test-id" };
+        var dto = new IdDataDto<string, TestData> { Id = "test-id" };
         Assert.AreEqual("test-id", dto.Id);
         Assert.IsNull(dto.Data);
     }
@@ -219,7 +218,7 @@ public class IdDataDtoTests
     public void OnlyDataTest()
     {
         var data = new TestData { Value = "test" };
-        var dto = new IdDataDto<string,TestData> { Data = data };
+        var dto = new IdDataDto<string, TestData> { Data = data };
         Assert.IsNull(dto.Id);
         Assert.IsNotNull(dto.Data);
         Assert.AreEqual("test", dto.Data.Value);
@@ -229,7 +228,7 @@ public class IdDataDtoTests
     public void ConstructorWithIdAndDataTest()
     {
         var data = new TestData { Value = "test" };
-        var dto = new IdDataDto<string,TestData>("test-id", data);
+        var dto = new IdDataDto<string, TestData>("test-id", data);
         Assert.AreEqual("test-id", dto.Id);
         Assert.IsNotNull(dto.Data);
         Assert.AreEqual("test", dto.Data.Value);
@@ -242,7 +241,7 @@ public class IdNameDataDtoTests
     [TestMethod]
     public void DefaultValuesTest()
     {
-        var dto = new IdNameDataDto<string,TestData>();
+        var dto = new IdNameDataDto<string, TestData>();
         Assert.IsNull(dto.Id);
         Assert.IsNull(dto.Name);
         Assert.IsNull(dto.Data);
@@ -252,7 +251,7 @@ public class IdNameDataDtoTests
     public void WithAllFieldsTest()
     {
         var data = new TestData { Value = "test" };
-        var dto = new IdNameDataDto<string,TestData>
+        var dto = new IdNameDataDto<string, TestData>
         {
             Id = "test-id",
             Name = "TestName",
@@ -267,7 +266,7 @@ public class IdNameDataDtoTests
     [TestMethod]
     public void PartialFieldsTest()
     {
-        var dto = new IdNameDataDto<string,TestData>
+        var dto = new IdNameDataDto<string, TestData>
         {
             Id = "test-id",
             Name = "TestName"

@@ -66,7 +66,6 @@ internal static class InternalCompressionExtension
 
     internal static async Task InternalCompressAsync(this CompressRequest request)
     {
-        await Task.Yield();
         var format = request.Format;
         var type = CompressHandlers.TryGetValue(format, out var handlerType) ? handlerType : throw new Exception($"找不到格式'{format}'对应的处理器");
         var instance = Activator.CreateInstance(type, request) as CompressHandler ?? throw new NullReferenceException();
@@ -75,7 +74,6 @@ internal static class InternalCompressionExtension
 
     internal static async Task InternalDeCompressAsync(this DeCompressRequest request)
     {
-        await Task.Yield();
         var format = request.Format;
         var type = DeCompressHandlers.TryGetValue(format, out var handlerType) ? handlerType : throw new Exception($"找不到格式'{format}'对应的处理器");
         var instance = Activator.CreateInstance(type, request) as DeCompressHandler ?? throw new NullReferenceException();

@@ -83,7 +83,7 @@ public class HttpFormFileTests
     {
         var bytes = new byte[] { 1, 2, 3 };
         var file = new HttpFormFile("file", "test.txt", bytes);
-        
+
         Assert.AreEqual("file", file.ParameterName);
         Assert.AreEqual("test.txt", file.FileName);
         Assert.AreEqual(bytes, file.Bytes);

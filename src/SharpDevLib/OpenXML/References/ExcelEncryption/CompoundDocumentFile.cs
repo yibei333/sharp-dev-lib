@@ -38,7 +38,7 @@ internal class CompoundDocumentFile : IDisposable
 {
     public CompoundDocumentFile()
     {
-        RootItem = new CompoundDocumentItem() { Name = "<Root>", Children = new List<CompoundDocumentItem>(), ObjectType = 5 };
+        RootItem = new CompoundDocumentItem() { Name = "<Root>", Children = [], ObjectType = 5 };
         minorVersion = 0x3E;
         majorVersion = 3;
         sectorShif = 9;
@@ -48,8 +48,8 @@ internal class CompoundDocumentFile : IDisposable
         _miniSectorSize = 1 << minSectorShift;
         _sectorSizeInt = _sectorSize / 4;
 
-        _sectors = new();
-        _miniSectors = new();
+        _sectors = [];
+        _miniSectors = [];
     }
 
     public CompoundDocumentFile(MemoryStream ms) : this()
@@ -147,7 +147,7 @@ internal class CompoundDocumentFile : IDisposable
         _numberofMiniFATSectors = br.ReadInt32();
         _firstDIFATSectorLocation = br.ReadInt32();
         _numberofDIFATSectors = br.ReadInt32();
-        var dwi = new DocWriteInfo() { DIFAT = new List<int>(), FAT = new List<int>(), miniFAT = new List<int>() };
+        var dwi = new DocWriteInfo() { DIFAT = [], FAT = [], miniFAT = [] };
 
         for (int i = 0; i < 109; i++)
         {
@@ -206,7 +206,7 @@ internal class CompoundDocumentFile : IDisposable
 
     private void LoadSectors(BinaryReader br)
     {
-        _sectors = new List<byte[]>();
+        _sectors = [];
         while (br.BaseStream.Position < br.BaseStream.Length)
         {
             _sectors.Add(br.ReadBytes(_sectorSize));
@@ -223,7 +223,7 @@ internal class CompoundDocumentFile : IDisposable
     private void GetMiniSectors(byte[] miniFATStream)
     {
         using var br = new BinaryReader(new MemoryStream(miniFATStream));
-        _miniSectors = new List<byte[]>();
+        _miniSectors = [];
         while (br.BaseStream.Position < br.BaseStream.Length)
         {
             _miniSectors.Add(br.ReadBytes(_miniSectorSize));

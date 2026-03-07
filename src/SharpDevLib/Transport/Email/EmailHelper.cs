@@ -33,7 +33,6 @@ public static class EmailHelper
     /// <exception cref="EmailVerifyException">当邮件内容无效时引发异常</exception>
     public static async Task SendAsync(this EmailContent content, CancellationToken? cancellationToken = null)
     {
-        await Task.Yield();
         var config = _config ?? throw new EmailVerifyException("请先调用EmailHelper.SetConfig()设置配置");
         if (content.Receivers.IsNullOrEmpty()) throw new EmailVerifyException("收件人地址不能为空");
         if (content.Subject.IsNullOrWhiteSpace()) throw new EmailVerifyException("邮件主题不能为空");
@@ -41,10 +40,8 @@ public static class EmailHelper
 
         var message = BuildMailMessage(config, content);
         using var client = CreateClient(config);
-        await Task.Run(() =>
-        {
-            client.Send(message);
-        }, cancellationToken ?? CancellationToken.None);
+        cancellationToken?.Register(client.SendAsyncCancel);
+        await client.SendMailAsync(message).ConfigureAwait(false);
     }
 
     #region Private

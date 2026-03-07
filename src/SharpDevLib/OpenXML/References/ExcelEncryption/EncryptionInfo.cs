@@ -142,7 +142,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
         _nsm.AddNamespace("d", "http://schemas.microsoft.com/office/2006/encryption");
         _nsm.AddNamespace("c", "http://schemas.microsoft.com/office/2006/keyEncryptor/certificate");
         _nsm.AddNamespace("p", "http://schemas.microsoft.com/office/2006/keyEncryptor/password");
-        KeyEncryptors = new List<EncryptionKeyEncryptor>();
+        KeyEncryptors = [];
     }
     internal class EncryptionKeyData : XmlHelper
     {
@@ -321,7 +321,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
         KeyData = new EncryptionKeyData(_nsm, node!);
         node = Xml.SelectSingleNode("/d:encryption/d:dataIntegrity", _nsm);
         DataIntegrity = new EncryptionDataIntegrity(_nsm, node!);
-        KeyEncryptors = new List<EncryptionKeyEncryptor>();
+        KeyEncryptors = [];
 
         var list = Xml.SelectNodes("/d:encryption/d:keyEncryptors/d:keyEncryptor/p:encryptedKey", _nsm);
         if (list == null) return;

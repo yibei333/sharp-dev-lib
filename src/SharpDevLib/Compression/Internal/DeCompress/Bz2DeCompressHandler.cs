@@ -21,7 +21,6 @@ internal class Bz2DeCompressHandler(DeCompressRequest request) : DeCompressHandl
             using var outputStream = new FileInfo(Request.TargetPath.CombinePath(fileName)).OpenOrCreate();
             await inputStream.CopyToAsync(outputStream, Request.CancellationToken ?? CancellationToken.None, transfered => Request.Transfered += transfered);
 
-            //bzip2 don't have uncompressed size meta data,so complete manual
             if (Request.OnProgress is not null && Request.Total > 0 && Request.Transfered != Request.Total)
             {
                 Request.Transfered = Request.Total;

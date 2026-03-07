@@ -34,7 +34,7 @@ namespace SharpDevLib.OpenXML.References.ExcelEncryption;
 
 internal abstract class ZipPackageRelationshipBase
 {
-    protected ZipPackageRelationshipCollection _rels = new();
+    protected ZipPackageRelationshipCollection _rels = [];
     protected internal int maxRId = 1;
 
     internal virtual ZipPackageRelationship CreateRelationship(Uri targetUri, TargetMode targetMode, string relationshipType)

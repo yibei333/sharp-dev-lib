@@ -36,7 +36,7 @@ internal class CompoundDocumentItem : IComparable<CompoundDocumentItem>
 {
     public CompoundDocumentItem()
     {
-        Children = new List<CompoundDocumentItem>();
+        Children = [];
         Name = string.Empty;
         Stream = Array.Empty<byte>();
     }

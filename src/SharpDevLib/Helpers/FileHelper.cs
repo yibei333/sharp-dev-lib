@@ -1331,16 +1331,14 @@ public static class FileHelper
     /// <returns>异步任务</returns>
     public static async Task CopyToAsync(this Stream source, Stream target, CancellationToken cancellationToken, Action<long>? transfered = null)
     {
-        await Task.Yield();
         var buffer = new byte[2048];
         int length;
         if (source.CanSeek) source.Seek(0, SeekOrigin.Begin);
 
         while ((length = source.Read(buffer, 0, buffer.Length)) > 0)
         {
-            if (cancellationToken.IsCancellationRequested) break;
-            target.Write(buffer, 0, length);
-
+            if (cancellationToken.IsCancellationRequested) throw new OperationCanceledException(cancellationToken);
+            await target.WriteAsync(buffer, 0, length, cancellationToken);
             transfered?.Invoke(length);
         }
     }
