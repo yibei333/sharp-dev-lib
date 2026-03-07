@@ -1,0 +1,19 @@
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SharpDevLib.Tests.TestData;
+
+namespace SharpDevLib.Tests.Basic.Helpers;
+
+[TestClass]
+public class CloneHelperTests
+{
+    static readonly User _user = new("foo", 10);
+    static readonly string _userString = _user.ToString();
+
+    [TestMethod]
+    public void CloneTest()
+    {
+        var obj = _user.DeepClone();
+        Assert.AreNotEqual(obj, _user);
+        Assert.AreEqual(_userString, obj?.ToString());
+    }
+}
