@@ -139,10 +139,8 @@ public static class RsaKeyHelper
             var exportPublicKey = rsa.ExportPem(pemObject.PemType);
             return publicPem == exportPublicKey;
         }
-        catch (Exception ex)
+        catch
         {
-            Debug.WriteLine(ex.Message);
-            Debug.WriteLine(ex.StackTrace);
             return false;
         }
     }

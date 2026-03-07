@@ -120,7 +120,7 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
             var type = typeof(T);
             if (type == typeof(byte[]))
             {
-                data = (T)Convert.ChangeType(content.ReadAsByteArrayAsync().Result, type);
+                data = (T)Convert.ChangeType(await content.ReadAsByteArrayAsync(), type);
             }
             else
             {

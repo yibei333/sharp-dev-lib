@@ -191,7 +191,7 @@ internal class EncryptedPackageHandler
             InternalHashAlogorithm.SHA256 => new HMACSHA256(salt),
             InternalHashAlogorithm.SHA384 => new HMACSHA384(salt),
             InternalHashAlogorithm.SHA512 => new HMACSHA512(salt),
-            _ => throw (new NotSupportedException(string.Format("不支持的哈希算法: {0}", ei.HashAlgorithm))),
+            _ => throw (new NotSupportedException($"不支持的哈希算法: {ei.HashAlgorithm}")),
         };
     }
 
@@ -484,7 +484,7 @@ internal class EncryptedPackageHandler
             InternalHashAlogorithm.SHA256 => SHA256.Create(),
             InternalHashAlogorithm.SHA384 => SHA384.Create(),
             InternalHashAlogorithm.SHA512 => SHA512.Create(),
-            _ => throw new NotSupportedException(string.Format("不支持的哈希提供程序: {0}", encr.HashAlgorithm)),
+            _ => throw new NotSupportedException($"不支持的哈希提供程序: {encr.HashAlgorithm}"),
         };
     }
 
@@ -579,7 +579,7 @@ internal class EncryptedPackageHandler
         {
             InternalCipherAlgorithm.AES => Aes.Create(),
             InternalCipherAlgorithm.TRIPLE_DES or InternalCipherAlgorithm.TRIPLE_DES_112 => TripleDES.Create(),
-            _ => throw (new NotSupportedException(string.Format("Unsupported Cipher Algorithm: {0}", encr.CipherAlgorithm.ToString()))),
+            _ => throw (new NotSupportedException($"不支持的加密算法: {encr.CipherAlgorithm}")),
         };
     }
 

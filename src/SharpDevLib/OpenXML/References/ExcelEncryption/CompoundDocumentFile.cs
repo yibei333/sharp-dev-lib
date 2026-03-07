@@ -319,7 +319,7 @@ internal class CompoundDocumentFile : IDisposable
 
     internal void AddChildTree(CompoundDocumentItem e, List<CompoundDocumentItem> dirs)
     {
-        if (e._handled == true) return;
+        if (e._handled) return;
         e._handled = true;
         if (e.ChildID > 0)
         {

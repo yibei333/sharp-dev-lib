@@ -142,7 +142,7 @@ internal class ZipPackage : ZipPackageRelationshipBase
             {
                 var name = Path.GetFileName(p.Key);
                 var extension = Path.GetExtension(p.Key);
-                var relFile = string.Format("{0}_rels/{1}.rels", p.Key.Substring(0, p.Key.Length - name.Length), name);
+                var relFile = $"{p.Key.Substring(0, p.Key.Length - name.Length)}_rels/{name}.rels";
                 if (rels.ContainsKey(relFile))
                 {
                     p.Value.ReadRelation(rels[relFile], p.Value.Uri.OriginalString);

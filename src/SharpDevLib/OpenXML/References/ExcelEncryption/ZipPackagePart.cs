@@ -110,7 +110,7 @@ internal class ZipPackagePart : ZipPackageRelationshipBase, IDisposable
         {
             var f = Uri.OriginalString;
             var name = Path.GetFileName(f);
-            _rels.WriteZip(os, (string.Format("{0}_rels/{1}.rels", f.Substring(0, f.Length - name.Length), name)));
+            _rels.WriteZip(os, $"{f.Substring(0, f.Length - name.Length)}_rels/{name}.rels");
         }
     }
 

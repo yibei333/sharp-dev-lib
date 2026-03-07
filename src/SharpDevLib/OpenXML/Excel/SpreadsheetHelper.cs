@@ -504,7 +504,10 @@ public static class SpreadsheetHelper
             leftTopCell.DataType = mainValueCell.DataType;
             leftTopCell.CellValue = new CellValue(mainValueCell.CellValue!.Text);
         }
-        cells.Where(x => x != leftTopCell).ToList().ForEach(x => x.Remove());
+        foreach (var cell in cells.Where(x => x != leftTopCell))
+        {
+            cell.Remove();
+        }
 
         worksheet.Save();
         return mergeCell;
@@ -559,7 +562,10 @@ public static class SpreadsheetHelper
     /// <param name="doc">电子表格文档对象</param>
     public static void AutoColumnWidth(this SpreadsheetDocument doc)
     {
-        doc.WorkbookPart?.GetPartsOfType<WorksheetPart>().ToList().ForEach(x => x.AutoColumnWidth());
+        foreach (var worksheetPart in doc.WorkbookPart?.GetPartsOfType<WorksheetPart>() ?? [])
+        {
+            worksheetPart.AutoColumnWidth();
+        }
         doc.Save();
     }
 
@@ -806,8 +812,7 @@ public static class SpreadsheetHelper
         var commentNode = new Comment(new CommentText(new Run(new Text(comment)))) { Reference = cell.CellReference, AuthorId = authorId };
         worksheetCommentsPart.Comments.CommentList.AppendChild(commentNode);
 
-        var shapeTemplate = "<v:shape type=\"#_x0000_t202\" style='position:absolute;margin-left:78pt;margin-top:1.2pt;width:100.8pt;height:56.4pt;z-index:1;visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\" o:insetmode=\"auto\"><v:fill color2=\"infoBackground [80]\"/><v:shadow color=\"none [81]\" obscured=\"t\"/><v:path o:connecttype=\"none\"/><v:textbox style='mso-direction-alt:auto'></v:textbox><x:ClientData ObjectType=\"Note\"><x:MoveWithCells/><x:SizeWithCells/><x:Anchor>1, 12, 0, 1, 3, 18, 4, 3</x:Anchor><x:AutoFill>False</x:AutoFill><x:Row>{0}</x:Row><x:Column>{1}</x:Column></x:ClientData></v:shape>";
-        var shapes = string.Format(shapeTemplate, reference.RowIndex - 1, reference.ColumnIndex - 1);
+        var shapes = $"<v:shape type=\"#_x0000_t202\" style='position:absolute;margin-left:78pt;margin-top:1.2pt;width:100.8pt;height:56.4pt;z-index:1;visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\" o:insetmode=\"auto\"><v:fill color2=\"infoBackground [80]\"/><v:shadow color=\"none [81]\" obscured=\"t\"/><v:path o:connecttype=\"none\"/><v:textbox style='mso-direction-alt:auto'></v:textbox><x:ClientData ObjectType=\"Note\"><x:MoveWithCells/><x:SizeWithCells/><x:Anchor>1, 12, 0, 1, 3, 18, 4, 3</x:Anchor><x:AutoFill>False</x:AutoFill><x:Row>{reference.RowIndex - 1}</x:Row><x:Column>{reference.ColumnIndex - 1}</x:Column></x:ClientData></v:shape>";
         var vmlStyleText = $"<xml xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:x=\"urn:schemas-microsoft-com:office:excel\"><o:shapelayout v:ext=\"edit\"><o:idmap v:ext=\"edit\" data=\"1\"/></o:shapelayout><v:shapetype id=\"_x0000_t202\" coordsize=\"21600,21600\" o:spt=\"202\" path=\"m,l,21600r21600,l21600,xe\"><v:stroke joinstyle=\"miter\"/><v:path gradientshapeok=\"t\" o:connecttype=\"rect\"/></v:shapetype>{shapes}</xml>";
 
         var vmlDrawingPart = worksheetPart.GetPartsOfType<VmlDrawingPart>().FirstOrDefault() ?? worksheetPart.AddNewPart<VmlDrawingPart>();
@@ -842,14 +847,14 @@ public static class SpreadsheetHelper
     /// <param name="worksheetPart">工作表部件</param>
     public static void RemoveBackground(this WorksheetPart worksheetPart)
     {
-        worksheetPart.ImageParts.ToList().ForEach(x =>
+        foreach (var imagePart in worksheetPart.ImageParts.ToList())
         {
-            worksheetPart.DeletePart(x);
-        });
-        worksheetPart.Worksheet?.Elements<Picture>().ToList().ForEach(x =>
+            worksheetPart.DeletePart(imagePart);
+        }
+        foreach (var picture in worksheetPart.Worksheet?.Elements<Picture>().ToList() ?? [])
         {
-            x.Remove();
-        });
+            picture.Remove();
+        }
         worksheetPart.Worksheet?.Save();
     }
     #endregion
