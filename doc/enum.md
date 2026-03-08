@@ -1,91 +1,101 @@
 # 枚举操作
 
-SharpDevLib 提供了枚举类型的转换和信息获取功能。
+SharpDevLib 提供了枚举类型的转换和获取功能。
 
-## 类型转换
+## 枚举转换
 
-### 整型转枚举
+##### 整型转枚举
 
 ```csharp
-// 转换为枚举
-var status = 1.ToEnum<UserStatus>();
-// 结果: UserStatus.Disabled
+enum Status
+{
+    Active = 1,
+    Inactive = 2,
+    Pending = 3
+}
 
-// 如果值不在枚举定义中则抛出异常
-var status = 99.ToEnum<UserStatus>();
-// 抛出: InvalidDataException
+var intValue = 1;
+var status = intValue.ToEnum<Status>();
+Console.WriteLine(status);
+//Active
 ```
 
-### 字符串转枚举
+##### 字符串转枚举
 
 ```csharp
-// 转换为枚举（忽略大小写）
-var status = "Active".ToEnum<UserStatus>();
-// 结果: UserStatus.Active
+enum Status
+{
+    Active = 1,
+    Inactive = 2,
+    Pending = 3
+}
 
-var status = "active".ToEnum<UserStatus>(ignoreCase: true);
-// 结果: UserStatus.Active
+var stringValue = "Active";
+var status = stringValue.ToEnum<Status>();
+Console.WriteLine(status);
+//Active
+```
 
-// 区分大小写
-var status = "Active".ToEnum<UserStatus>(ignoreCase: false);
-// 结果: UserStatus.Active
+##### 字符串转枚举（忽略大小写）
+
+```csharp
+enum Status
+{
+    Active = 1,
+    Inactive = 2,
+    Pending = 3
+}
+
+var stringValue = "active";
+var status = stringValue.ToEnum<Status>(ignoreCase: true);
+Console.WriteLine(status);
+//Active
 ```
 
 ## 获取枚举信息
 
-### GetDictionary
+##### 获取枚举字典
 
 ```csharp
-// 获取枚举字典
-var dict = EnumHelper.GetDictionary<UserStatus>();
-// 结果: { "Active": 0, "Disabled": 1 }
-
-foreach (var item in dict)
+enum Status
 {
-    Console.WriteLine($"{item.Key}: {item.Value}");
+    Active = 1,
+    Inactive = 2,
+    Pending = 3
 }
+
+var dictionary = EnumHelper.GetDictionary<Status>();
+foreach (var kvp in dictionary)
+{
+    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+}
+//Active: 1
+//Inactive: 2
+//Pending: 3
 ```
 
-### GetKeyValues
+##### 获取枚举键值对
 
 ```csharp
-// 获取枚举键值对集合
-var keyValues = EnumHelper.GetKeyValues<UserStatus>();
-
-foreach (var kv in keyValues)
+enum Status
 {
-    Console.WriteLine($"{kv.Key}: {kv.Value}");
-}
-```
-
-## 完整示例
-
-```csharp
-public enum UserStatus
-{
-    Active = 0,
-    Disabled = 1,
-    Pending = 2
+    Active = 1,
+    Inactive = 2,
+    Pending = 3
 }
 
-// 从整型转换
-var status1 = 0.ToEnum<UserStatus>();  // UserStatus.Active
-var status2 = 1.ToEnum<UserStatus>();  // UserStatus.Disabled
-
-// 从字符串转换
-var status3 = "Pending".ToEnum<UserStatus>();  // UserStatus.Pending
-var status4 = "pending".ToEnum<UserStatus>(ignoreCase: true);  // UserStatus.Pending
-
-// 获取所有枚举值
-var dictionary = EnumHelper.GetDictionary<UserStatus>();
-foreach (var item in dictionary)
+var keyValues = EnumHelper.GetKeyValues<Status>();
+foreach (var kvp in keyValues)
 {
-    Console.WriteLine($"{item.Key} = {item.Value}");
+    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
 }
+//Active: 1
+//Inactive: 2
+//Pending: 3
 ```
 
 ## 相关文档
 
-- [字符串](string.md)
-- [集合](collection.md)
+- [字符串操作](string.md)
+- [反射操作](reflection.md)
 - [基础扩展](../README.md#基础扩展)

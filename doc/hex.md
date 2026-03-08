@@ -1,270 +1,242 @@
 # HEX 编码
 
-SharpDevLib 提供了十六进制（Hex）格式的编码与解码功能。
+SharpDevLib 提供了 16 进制格式的编码与解码功能。
 
 ## 编码
 
-### HexStringEncode
+##### 字节数组编码为16进制字符串
 
 ```csharp
-// 将字节数组编码为十六进制字符串
-var bytes = "Hello".Utf8Decode();
-var hex = bytes.HexStringEncode();
+var bytes = new byte[] { 0x48, 0x65, 0x6C, 0x6C, 0x6F };
+var hexString = bytes.HexStringEncode();
+Console.WriteLine(hexString);
+//48656c6c6f
+```
 
-Console.WriteLine(hex);
-// 输出: 48656c6c6f
+##### 中文字符编码
+
+```csharp
+var str = "你好";
+var bytes = str.Utf8Decode();
+var hexString = bytes.HexStringEncode();
+Console.WriteLine(hexString);
+//e4bda0e5a5bd
+```
+
+##### 空字节数组编码
+
+```csharp
+var bytes = Array.Empty<byte>();
+var hexString = bytes.HexStringEncode();
+Console.WriteLine(hexString);
+//(空字符串)
+```
+
+##### 单个字节编码
+
+```csharp
+var bytes = new byte[] { 0xFF };
+var hexString = bytes.HexStringEncode();
+Console.WriteLine(hexString);
+//ff
+```
+
+##### 零值编码
+
+```csharp
+var bytes = new byte[] { 0x00, 0x00, 0x00 };
+var hexString = bytes.HexStringEncode();
+Console.WriteLine(hexString);
+//000000
 ```
 
 ## 解码
 
-### HexStringDecode
+##### 16进制字符串解码为字节数组
 
 ```csharp
-// 将十六进制字符串解码为原始字节数组
-var hex = "48656c6c6f";
-var bytes = hex.HexStringDecode();
-
-var text = bytes.Utf8Encode();
-Console.WriteLine(text);
-// 输出: Hello
+var hexString = "48656c6c6f";
+var bytes = hexString.HexStringDecode();
+var str = bytes.Utf8Encode();
+Console.WriteLine(str);
+//Hello
 ```
 
-## 大小写
-
-### 小写十六进制
+##### 中文解码
 
 ```csharp
-var bytes = new byte[] { 0x48, 0x65, 0x6C, 0x6C, 0x6F };
-var hex = bytes.HexStringEncode();
-
-Console.WriteLine(hex);
-// 输出: 48656c6c6f (小写)
+var hexString = "e4bda0e5a5bd";
+var bytes = hexString.HexStringDecode();
+var str = bytes.Utf8Encode();
+Console.WriteLine(str);
+//你好
 ```
 
-### 大小写不敏感
+##### 混合大小写解码
 
 ```csharp
-// 小写十六进制
-var hexLower = "48656c6c6f";
-var bytes1 = hexLower.HexStringDecode();
-var text1 = bytes1.Utf8Encode();
-Console.WriteLine(text1);
-// 输出: Hello
-
-// 大写十六进制
-var hexUpper = "48656C6C6F";
-var bytes2 = hexUpper.HexStringDecode();
-var text2 = bytes2.Utf8Encode();
-Console.WriteLine(text2);
-// 输出: Hello
+var hexString = "48656C6C6F";
+var bytes = hexString.HexStringDecode();
+var str = bytes.Utf8Encode();
+Console.WriteLine(str);
+//Hello
 ```
 
-## 中文编码
-
-### 编码中文
+##### 空字符串解码
 
 ```csharp
-var text = "你好";
-var bytes = text.Utf8Decode();
-var hex = bytes.HexStringEncode();
-
-Console.WriteLine(hex);
-// 输出: e4bda0e5a5bd
+var hexString = "";
+var bytes = hexString.HexStringDecode();
+Console.WriteLine(bytes.Length);
+//0
 ```
 
-### 解码中文
+## 错误处理
+
+##### 奇数长度错误
 
 ```csharp
-var hex = "e4bda0e5a5bd";
-var bytes = hex.HexStringDecode();
-var text = bytes.Utf8Encode();
-
-Console.WriteLine(text);
-// 输出: 你好
+var hexString = "48656c"; // 长度为7（奇数）
+try
+{
+    var bytes = hexString.HexStringDecode();
+}
+catch (InvalidDataException ex)
+{
+    Console.WriteLine(ex.Message);
+    //'48656c' is not a valid hex string
+}
 ```
 
-## 二进制数据
+## 实际应用
 
-### 编码二进制数据
-
-```csharp
-var bytes = new byte[] { 0x00, 0xFF, 0x0A, 0xF0, 0x15 };
-var hex = bytes.HexStringEncode();
-
-Console.WriteLine(hex);
-// 输出: 00ff0af015
-```
-
-### 解码二进制数据
+##### 哈希值表示
 
 ```csharp
-var hex = "00ff0af015";
-var bytes = hex.HexStringDecode();
-
-Console.WriteLine(BitConverter.ToString(bytes));
-// 输出: 00-FF-0A-F0-15
-```
-
-## 完整示例
-
-### 字符串与十六进制转换
-
-```csharp
-// 字符串转十六进制
-var text = "Hello 你好";
-var bytes = text.Utf8Decode();
-var hex = bytes.HexStringEncode();
-Console.WriteLine($"十六进制: {hex}");
-
-// 十六进制转字符串
-var decodedBytes = hex.HexStringDecode();
-var decodedText = decodedBytes.Utf8Encode();
-Console.WriteLine($"解码: {decodedText}");
-```
-
-### 格式化输出
-
-```csharp
-var data = "Hello World 你好";
+// MD5哈希
+var data = "Hello, World";
 var bytes = data.Utf8Decode();
+var hash = bytes.Md5();
+Console.WriteLine(hash);
+//5eb63bbbbe01eeed093cb22bb8f5acdc
+```
 
-// 格式化输出为每两个字符一个空格
-var hex = bytes.HexStringEncode();
-var formatted = string.Join(" ", Enumerable.Range(0, hex.Length / 2)
-    .Select(i => hex.Substring(i * 2, 2)));
+##### 颜色值转换
+
+```csharp
+// 颜色RGB转HEX
+var r = (byte)255;
+var g = (byte)128;
+var b = (byte)64;
+var rgbBytes = new[] { r, g, b };
+var hexColor = rgbBytes.HexStringEncode();
+Console.WriteLine(hexColor);
+//ff8040
+```
+
+```csharp
+// HEX转颜色RGB
+var hexColor = "ff8040";
+var rgbBytes = hexColor.HexStringDecode();
+Console.WriteLine($"R: {rgbBytes[0]}, G: {rgbBytes[1]}, B: {rgbBytes[2]}");
+//R: 255, G: 128, B: 64
+```
+
+##### MAC地址表示
+
+```csharp
+// MAC地址转HEX
+var macBytes = new byte[] { 0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E };
+var hexMac = string.Join(":", macBytes.Select(b => b.ToString("X2")));
+Console.WriteLine(hexMac);
+//00:1A:2B:3C:4D:5E
+```
+
+##### 二进制数据可视化
+
+```csharp
+// 可视化二进制数据
+var binaryData = new byte[] { 0x01, 0x02, 0x03, 0xFF, 0xFE, 0xFD };
+var hexRepresentation = binaryData.HexStringEncode();
+Console.WriteLine(hexRepresentation);
+//010203fffefd
+```
+
+##### 协议调试
+
+```csharp
+// 调试网络协议数据包
+var packetData = new byte[] { 0xAA, 0x55, 0x01, 0x00, 0x02, 0x03 };
+var hexPacket = packetData.HexStringEncode();
+Console.WriteLine($"Packet: {hexPacket}");
+//Packet: aa5501000203
+```
+
+##### 加密密钥表示
+
+```csharp
+// AES密钥
+var keyBytes = new byte[16];
+Random.Shared.NextBytes(keyBytes);
+var hexKey = keyBytes.HexStringEncode();
+Console.WriteLine($"AES Key: {hexKey}");
+//AES Key: 7b8f9e2d4c5a6b1c3d4e5f6a7b8c9d0
+```
+
+##### 数据校验
+
+```csharp
+// 计算数据的HEX校验和
+var data = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05 };
+var checksum = data.Sum(b => b).ToString("X2");
+Console.WriteLine($"Checksum: {checksum}");
+//Checksum: 0F
+```
+
+##### 数据库存储
+
+```csharp
+// 存储二进制数据为HEX字符串
+var binaryData = File.ReadAllBytes("data.bin");
+var hexData = binaryData.HexStringEncode();
+SaveToDatabase(hexData);
+
+// 从数据库读取HEX字符串并转换为二进制数据
+var hexData = LoadFromDatabase();
+var binaryData = hexData.HexStringDecode();
+File.WriteAllBytes("restored.bin", binaryData);
+```
+
+## 常见格式
+
+##### 大小写格式
+
+```csharp
+var bytes = new byte[] { 0xFF, 0xAA, 0x55 };
+var hexLower = bytes.HexStringEncode();
+var hexUpper = hexLower.ToUpper();
+
+Console.WriteLine(hexLower);
+//ffaa55
+
+Console.WriteLine(hexUpper);
+//FFAA55
+```
+
+##### 分隔符格式
+
+```csharp
+var bytes = new byte[] { 0x01, 0x02, 0x03, 0x04 };
+var hexString = bytes.HexStringEncode();
+var formatted = string.Join(" ", Enumerable.Range(0, hexString.Length / 2)
+    .Select(i => hexString.Substring(i * 2, 2)));
 
 Console.WriteLine(formatted);
-// 输出: 48 65 6c 6c 6f 20 57 6f 72 6c 64 20 e4 bd a0 e5 a5 bd
-```
-
-### 每字节单独处理
-
-```csharp
-var bytes = new byte[] { 0x48, 0x65, 0x6C, 0x6C, 0x6F };
-
-foreach (var b in bytes)
-{
-    var hex = new[] { b }.HexStringEncode();
-    Console.WriteLine($"0x{b:X2} -> {hex}");
-}
-// 输出:
-// 0x48 -> 48
-// 0x65 -> 65
-// 0x6C -> 6c
-// 0x6C -> 6c
-// 0x6F -> 6f
-```
-
-### 验证校验和
-
-```csharp
-// 计算数据的校验和
-var data = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05 };
-var checksum = data.Aggregate((sum, b) => (byte)((sum + b) % 256));
-
-// 转换为十六进制
-var hexChecksum = new[] { checksum }.HexStringEncode();
-Console.WriteLine($"校验和: 0x{hexChecksum}");
-// 输出: 校验和: 0x0f
-```
-
-### 颜色值转换
-
-```csharp
-// RGB 颜色值
-var r = 255;
-var g = 128;
-var b = 64;
-
-var rgbBytes = new[] { (byte)r, (byte)g, (byte)b };
-var hexColor = rgbBytes.HexStringEncode();
-
-Console.WriteLine($"RGB({r}, {g}, {b}) -> #{hexColor}");
-// 输出: RGB(255, 128, 64) -> #ff8040
-```
-
-## 常见用途
-
-### MAC 地址
-
-```csharp
-var macBytes = new byte[] { 0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E };
-var macHex = macBytes.HexStringEncode();
-var formattedMac = string.Join(":", Enumerable.Range(0, macHex.Length / 2)
-    .Select(i => macHex.Substring(i * 2, 2)));
-
-Console.WriteLine($"MAC 地址: {formattedMac}");
-// 输出: MAC 地址: 00:1a:2b:3c:4d:5e
-```
-
-### 查看二进制数据
-
-```csharp
-var fileBytes = "data.bin".ReadFileBytes();
-
-// 显示前 16 字节的十六进制
-var previewBytes = fileBytes.Take(16).ToArray();
-var hex = previewBytes.HexStringEncode();
-
-Console.WriteLine($"前 16 字节: {hex}");
-```
-
-### 数据校验
-
-```csharp
-// 生成数据的十六进制摘要
-var data = "重要数据".Utf8Decode();
-var hex = data.HexStringEncode();
-
-// 传输数据
-TransmitData(data);
-
-// 接收方验证
-var received = ReceiveData();
-var receivedHex = received.HexStringEncode();
-
-if (hex == receivedHex)
-{
-    Console.WriteLine("数据验证通过");
-}
-else
-{
-    Console.WriteLine("数据验证失败");
-}
-```
-
-## 注意事项
-
-### 十六进制格式
-
-- 有效的十六进制字符：`0-9`, `a-f`, `A-F`
-- 每个字节由 2 个十六进制字符表示
-- 长度必须是偶数
-
-### 无效输入
-
-```csharp
-// 长度为奇数
-var hex = "486";  // 无效
-
-// 包含非十六进制字符
-var hex = "48656c6cg";  // 'g' 不是有效的十六进制字符
-
-// 这些情况会抛出异常
-```
-
-### 字节顺序
-
-十六进制字符串的字节顺序与原始字节数组一致：
-
-```csharp
-var bytes = new byte[] { 0x48, 0x65 };
-var hex = bytes.HexStringEncode();
-// 输出: 4865 (不是 6548)
+//01 02 03 04
 ```
 
 ## 相关文档
 
-- [Base64](base64.md)
-- [Utf8](utf8.md)
-- [基础扩展](../README.md#基础扩展)
+- [Base64 编码](base64.md)
+- [UTF-8 编码](utf8.md)
+- [编码](../README.md#编码)

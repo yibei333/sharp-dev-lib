@@ -4,247 +4,219 @@ SharpDevLib 提供了 URL 格式的编码与解码功能。
 
 ## 编码
 
-### UrlEncode
+##### 字节数组编码为URL编码字符串
 
 ```csharp
-// 将字节数组编码为 URL 编码字符串
 var bytes = "Hello World".Utf8Decode();
 var urlEncoded = bytes.UrlEncode();
-
 Console.WriteLine(urlEncoded);
-// 输出: Hello+World
+//Hello+World
+```
+
+##### 中文编码
+
+```csharp
+var bytes = "你好世界".Utf8Decode();
+var urlEncoded = bytes.UrlEncode();
+Console.WriteLine(urlEncoded);
+//%e4%bd%a0%e5%a5%bd%e4%b8%96%e7%95%8c
+```
+
+##### 特殊字符编码
+
+```csharp
+var bytes = "hello@example.com".Utf8Decode();
+var urlEncoded = bytes.UrlEncode();
+Console.WriteLine(urlEncoded);
+//hello%40example.com
+```
+
+##### 空格编码
+
+```csharp
+var bytes = "Hello World Test".Utf8Decode();
+var urlEncoded = bytes.UrlEncode();
+Console.WriteLine(urlEncoded);
+//Hello+World+Test
+```
+
+##### 空字节数组编码
+
+```csharp
+var bytes = Array.Empty<byte>();
+var urlEncoded = bytes.UrlEncode();
+Console.WriteLine(urlEncoded);
+//(空字符串)
 ```
 
 ## 解码
 
-### UrlDecode
+##### URL编码字符串解码为字节数组
 
 ```csharp
-// 将 URL 编码字符串解码为原始字节数组
 var urlEncoded = "Hello+World";
 var bytes = urlEncoded.UrlDecode();
-
-var text = bytes.Utf8Encode();
-Console.WriteLine(text);
-// 输出: Hello World
+var str = bytes.Utf8Encode();
+Console.WriteLine(str);
+//Hello World
 ```
 
-## 特殊字符编码
-
-### 编码特殊字符
+##### 中文解码
 
 ```csharp
-var text = "Hello World!@#$%";
-var bytes = text.Utf8Decode();
-var urlEncoded = bytes.UrlEncode();
-
-Console.WriteLine(urlEncoded);
-// 输出: Hello+World%21%40%23%24%25
-```
-
-### 解码特殊字符
-
-```csharp
-var urlEncoded = "Hello+World%21%40%23";
+var urlEncoded = "%e4%bd%a0%e5%a5%bd";
 var bytes = urlEncoded.UrlDecode();
-var text = bytes.Utf8Encode();
-
-Console.WriteLine(text);
-// 输出: Hello World!@#
+var str = bytes.Utf8Encode();
+Console.WriteLine(str);
+//你好
 ```
 
-## 中文编码
-
-### 编码中文
+##### 特殊字符解码
 
 ```csharp
-var text = "你好世界";
-var bytes = text.Utf8Decode();
-var urlEncoded = bytes.UrlEncode();
-
-Console.WriteLine(urlEncoded);
-// 输出: %E4%BD%A0%E5%A5%BD%E4%B8%96%E7%95%8C
-```
-
-### 解码中文
-
-```csharp
-var urlEncoded = "%E4%BD%A0%E5%A5%BD";
+var urlEncoded = "hello%40example.com";
 var bytes = urlEncoded.UrlDecode();
-var text = bytes.Utf8Encode();
-
-Console.WriteLine(text);
-// 输出: 你好
+var str = bytes.Utf8Encode();
+Console.WriteLine(str);
+//hello@example.com
 ```
 
-## URL 参数
-
-### 编码 URL 参数
+##### 空格解码
 
 ```csharp
-var query = "name=张三&age=25&city=北京";
-var bytes = query.Utf8Decode();
-var urlEncoded = bytes.UrlEncode();
-
-var url = $"https://example.com/api?{urlEncoded}";
-Console.WriteLine(url);
-// 输出: https://example.com/api?name%3D%E5%BC%A0%E4%B8%89%26age%3D25%26city%3D%E5%8C%97%E4%BA%AC
-```
-
-### 解码 URL 参数
-
-```csharp
-var urlEncoded = "name%3D%E5%BC%A0%E4%B8%89%26age%3D25";
+var urlEncoded = "Hello+World+Test";
 var bytes = urlEncoded.UrlDecode();
-var query = bytes.Utf8Encode();
-
-Console.WriteLine(query);
-// 输出: name=张三&age=25
+var str = bytes.Utf8Encode();
+Console.WriteLine(str);
+//Hello World Test
 ```
 
-## 完整示例
-
-### 构建 URL 查询字符串
+##### 空字符串解码
 
 ```csharp
-var parameters = new Dictionary<string, string>
+var urlEncoded = "";
+var bytes = urlEncoded.UrlDecode();
+var str = bytes.Utf8Encode();
+Console.WriteLine(str);
+//(空字符串)
+```
+
+## 实际应用
+
+##### 构造URL查询参数
+
+```csharp
+// 构造查询参数
+var query = new
 {
-    ["name"] = "张三",
-    ["age"] = "25",
-    ["city"] = "北京"
+    name = "张三",
+    email = "zhangsan@example.com",
+    city = "北京"
+};
+var json = query.Serialize();
+var bytes = json.Utf8Decode();
+var urlEncoded = bytes.UrlEncode();
+
+var url = $"https://example.com/search?query={urlEncoded}";
+Console.WriteLine(url);
+//https://example.com/search?query=%7b%22name%22%3a%22%e5%bc%a0%e4%b8%89%22%2c%22email%22%3a%22zhangsan%40example.com%22%2c%22city%22%3a%22%e5%8c%97%e4%ba%ac%22%7d
+```
+
+##### 处理表单数据
+
+```csharp
+// 编码表单数据
+var formData = new Dictionary<string, string>
+{
+    ["username"] = "user123",
+    ["password"] = "pass@word",
+    ["location"] = "上海"
 };
 
-var queryString = string.Join("&", parameters.Select(kvp =>
+var encodedPairs = new List<string>();
+foreach (var kvp in formData)
 {
-    var key = kvp.Key.Utf8Decode().UrlEncode().Utf8Encode();
-    var value = kvp.Value.Utf8Decode().UrlEncode().Utf8Encode();
-    return $"{key}={value}";
-}));
-
-var url = $"https://example.com/api?{queryString}";
-Console.WriteLine(url);
-// 输出: https://example.com/api?name=%E5%BC%A0%E4%B8%89&age=25&city=%E5%8C%97%E4%BA%AC
-```
-
-### 解析 URL 查询字符串
-
-```csharp
-var queryString = "name=%E5%BC%A0%E4%B8%89&age=25&city=%E5%8C%97%E4%BA%AC";
-var parameters = queryString.Split('&')
-    .Select(param =>
-    {
-        var parts = param.Split('=');
-        var key = parts[0].Utf8Decode().UrlDecode().Utf8Encode();
-        var value = parts[1].Utf8Decode().UrlDecode().Utf8Encode();
-        return new { Key = key, Value = value };
-    })
-    .ToDictionary(x => x.Key, x => x.Value);
-
-foreach (var kvp in parameters)
-{
-    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+    var keyBytes = kvp.Key.Utf8Decode();
+    var valueBytes = kvp.Value.Utf8Decode();
+    encodedPairs.Add($"{keyBytes.UrlEncode()}={valueBytes.UrlEncode()}");
 }
-// 输出:
-// name: 张三
-// age: 25
-// city: 北京
+
+var formDataString = string.Join("&", encodedPairs);
+Console.WriteLine(formDataString);
+//username=user123&password=pass%40word&location=%e4%b8%8a%e6%b5%b7
 ```
 
-### URL 短链接
+##### 解析URL参数
 
 ```csharp
-var originalUrl = "https://example.com/articles/article-title-here";
-var bytes = originalUrl.Utf8Decode();
-var urlEncoded = bytes.UrlEncode();
+// 解码URL参数
+var urlEncoded = "name=%e5%bc%a0%e4%b8%89&email=zhangsan%40example.com";
+var bytes = urlEncoded.UrlDecode();
+var decoded = bytes.Utf8Encode();
 
-var shortUrl = $"https://short.example.com/{urlEncoded}";
-Console.WriteLine(shortUrl);
+// 解析参数
+var pairs = decoded.Split('&');
+foreach (var pair in pairs)
+{
+    var keyValue = pair.Split('=');
+    var key = Uri.UnescapeDataString(keyValue[0]);
+    var value = Uri.UnescapeDataString(keyValue[1]);
+    Console.WriteLine($"{key}: {value}");
+}
+//name: 张三
+//email: zhangsan@example.com
 ```
 
-### 处理用户输入
+##### API请求
 
 ```csharp
-var userInput = "张三 <script>alert('xss')</script>";
-var bytes = userInput.Utf8Decode();
-var urlEncoded = bytes.UrlEncode();
+// 构造API请求URL
+var baseUrl = "https://api.example.com/users";
+var parameters = new Dictionary<string, string>
+{
+    ["name"] = "Alice",
+    ["email"] = "alice@example.com",
+    ["page"] = "1"
+};
 
-// 安全地在 URL 中使用
-var url = $"https://example.com/search?q={urlEncoded}";
+var encodedParams = parameters
+    .Select(kvp => $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}")
+    .ToArray();
+
+var url = $"{baseUrl}?{string.Join("&", encodedParams)}";
 Console.WriteLine(url);
+//https://api.example.com/users?name=Alice&email=alice%40example.com&page=1
 ```
 
-## 常见字符编码
-
-### 特殊字符
-
-| 字符 | URL 编码 |
-|------|----------|
-| 空格 | `+` 或 `%20` |
-| `!` | `%21` |
-| `@` | `%40` |
-| `#` | `%23` |
-| `$` | `%24` |
-| `%` | `%25` |
-| `&` | `%26` |
-| `=` | `%3D` |
-| `?` | `%3F` |
-| `/` | `%2F` |
-| `:` | `%3A` |
-| `;` | `%3B` |
-
-### 保留字符
-
-以下字符在 URL 中有特殊含义，需要编码：
-
-- `:` - 协议分隔符
-- `/` - 路径分隔符
-- `?` - 查询字符串开始
-- `#` - 片段标识符
-- `&` - 参数分隔符
-- `=` - 参数赋值
-- `+` - 空格（在查询字符串中）
-- `%` - 编码前缀
-
-## 注意事项
-
-### 空格编码
+##### 处理文件名
 
 ```csharp
-// 空格可以编码为 + 或 %20
-var bytes = "Hello World".Utf8Decode();
-var urlEncoded = bytes.UrlEncode();
+// 编码文件名用于URL
+var fileName = "我的文档.pdf";
+var fileNameBytes = fileName.Utf8Decode();
+var urlEncodedFileName = fileNameBytes.UrlEncode();
 
-// 可能输出: Hello+World 或 Hello%20World
+var fileUrl = $"https://example.com/files/{urlEncodedFileName}";
+Console.WriteLine(fileUrl);
+//https://example.com/files/%e6%88%91%e7%9a%84%e6%96%87%e6%a1%a3.pdf
 ```
 
-### 大小写
+## 常见编码字符
 
-URL 编码通常使用大写的十六进制：
-
-```csharp
-// 虽然小写也有效，但通常使用大写
-// %E4%BD%A0 (推荐)
-// %e4%bd%a0 (也可用)
-```
-
-### 完整 URL
-
-注意不要对整个 URL 进行编码，只对需要编码的部分进行编码：
-
-```csharp
-// 错误：对整个 URL 编码
-var fullUrl = "https://example.com/api?name=张三";
-var encodedUrl = fullUrl.Utf8Decode().UrlEncode();
-// 这会破坏 URL 结构
-
-// 正确：只对参数值编码
-var baseUrl = "https://example.com/api?name=";
-var parameterValue = "张三".Utf8Decode().UrlEncode();
-var url = $"{baseUrl}{parameterValue}";
-```
+| 原字符 | URL编码 |
+|--------|---------|
+| 空格    | `+`     |
+| `!`     | `%21`   |
+| `@`     | `%40`   |
+| `#`     | `%23`   |
+| `$`     | `%24`   |
+| `%`     | `%25`   |
+| `&`     | `%26`   |
+| `=`     | `%3D`   |
+| `?`     | `%3F`   |
 
 ## 相关文档
 
-- [Base64Url](base64url.md)
-- [Utf8](utf8.md)
-- [基础扩展](../README.md#基础扩展)
+- [UTF-8 编码](utf8.md)
+- [Base64Url 编码](base64url.md)
+- [编码](../README.md#编码)

@@ -1,115 +1,142 @@
 # HMAC-MD5 哈希
 
-SharpDevLib 提供了 HMAC-MD5 哈希计算功能，用于消息认证。
+SharpDevLib 提供了基于密钥的 HMAC-MD5 哈希计算功能。
 
-## 字节数组 HMAC-MD5
+HMAC（Hash-based Message Authentication Code）是一种基于密钥的消息认证码，使用 MD5 哈希算法计算。
 
-### 基本用法
+## 字节数组HMAC
+
+##### 计算字节数组的HMAC-MD5（32位）
 
 ```csharp
-var bytes = "Hello".Utf8Decode();
-var secret = "secret".Utf8Decode();
-var hash = bytes.HmacMd5(secret);
-
-Console.WriteLine(hash);
-// 输出: 5f3e9f5a8b6d7c2a1e4f9b8d7c6a5b2
+var data = "Hello, World".Utf8Decode();
+var secret = "secret-key".Utf8Decode();
+var hmac = data.HmacMd5(secret);
+Console.WriteLine(hmac);
+//302d0a8c1f5e5a2d3b4c5d6e7f8a9b0c (示例值)
 ```
 
-### 16 位 HMAC-MD5
+##### 计算字节数组的HMAC-MD5（16位）
 
 ```csharp
-var bytes = "Hello".Utf8Decode();
-var secret = "secret".Utf8Decode();
-var hash = bytes.HmacMd5(secret, Md5OutputLength.Sixteen);
-
-Console.WriteLine(hash);
-// 输出: 9f5a8b6d7c2a1e4f
+var data = "Hello, World".Utf8Decode();
+var secret = "secret-key".Utf8Decode();
+var hmac = data.HmacMd5(secret, Md5OutputLength.Sixteen);
+Console.WriteLine(hmac);
+//5a2d3b4c5d6e7f8a (示例值)
 ```
 
-### 32 位 HMAC-MD5
+##### 中文数据HMAC
 
 ```csharp
-var bytes = "Hello".Utf8Decode();
-var secret = "secret".Utf8Decode();
-var hash = bytes.HmacMd5(secret, Md5OutputLength.ThirtyTwo);
-
-Console.WriteLine(hash);
-// 输出: 5f3e9f5a8b6d7c2a1e4f9b8d7c6a5b2
+var data = "你好世界".Utf8Decode();
+var secret = "密钥".Utf8Decode();
+var hmac = data.HmacMd5(secret);
+Console.WriteLine(hmac);
+//8f9e2d4c5a6b1c3d4e5f6a7b8c9d0e1f (示例值)
 ```
 
-## 流 HMAC-MD5
+## 流HMAC
 
-### 基本用法
+##### 计算流的HMAC-MD5（32位）
 
 ```csharp
-using var stream = new MemoryStream("Hello".Utf8Decode());
-var secret = "secret".Utf8Decode();
-var hash = stream.HmacMd5(secret);
-
-Console.WriteLine(hash);
+using var stream = File.OpenRead("data.txt");
+var secret = "secret-key".Utf8Decode();
+var hmac = stream.HmacMd5(secret);
+Console.WriteLine(hmac);
+//3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e (示例值)
 ```
 
-### 文件 HMAC-MD5
+##### 计算流的HMAC-MD5（16位）
 
 ```csharp
-using var stream = File.OpenRead("document.pdf");
-var secret = "shared_secret".Utf8Decode();
-var hash = stream.HmacMd5(secret);
-
-Console.WriteLine($"文件 HMAC-MD5: {hash}");
+using var stream = File.OpenRead("data.txt");
+var secret = "secret-key".Utf8Decode();
+var hmac = stream.HmacMd5(secret, Md5OutputLength.Sixteen);
+Console.WriteLine(hmac);
+//5d6e7f8a9b0c1d2e (示例值)
 ```
 
-## 完整示例
-
-### API 签名验证
+##### 大文件HMAC
 
 ```csharp
-// 生成签名
-var apiKey = "your_api_key";
-var timestamp = DateTime.UtcNow.ToUtcTimestamp().ToString();
-var data = "request_data";
+using var stream = new FileStream("large-file.bin", FileMode.Open);
+var secret = "secret-key".Utf8Decode();
+var hmac = stream.HmacMd5();
+Console.WriteLine($"大文件HMAC: {hmac}");
+```
 
-var signatureString = $"{apiKey}{timestamp}{data}";
-var signature = signatureString.Utf8Decode().HmacMd5("secret".Utf8Decode());
+## 错误处理
 
-Console.WriteLine($"签名: {signature}");
+##### 密钥长度超过64字节
 
-// 验证签名
-var receivedSignature = "received_signature_from_api";
-var computedSignature = signatureString.Utf8Decode().HmacMd5("secret".Utf8Decode());
-
-if (computedSignature == receivedSignature)
+```csharp
+var data = "Hello".Utf8Decode();
+var secret = new byte[65]; // 超过64字节
+try
 {
-    Console.WriteLine("签名验证通过");
+    var hmac = data.HmacMd5(secret);
+}
+catch (InvalidOperationException ex)
+{
+    Console.WriteLine(ex.Message);
+    //md5 secret length should less than equal 64 bytes
 }
 ```
 
-### 消息完整性验证
+## 实际应用
+
+##### API签名验证
+
+```csharp
+// 服务端生成签名
+var apiKey = "my-api-key";
+var timestamp = DateTime.Now.ToUtcTimestamp().ToString();
+var data = "request data";
+
+var signatureData = $"{apiKey}{timestamp}{data}".Utf8Decode();
+var secret = apiKey.Utf8Decode();
+var signature = signatureData.HmacMd5(secret);
+
+// 客户端发送请求
+var response = await HttpClient.PostAsJsonAsync("/api/endpoint", new
+{
+    Timestamp = timestamp,
+    Data = data,
+    Signature = signature
+});
+
+// 服务端验证签名
+var receivedSignature = "received-signature";
+var computedSignature = signatureData.HmacMd5(secret);
+
+if (computedSignature == receivedSignature)
+{
+    Console.WriteLine("签名验证成功");
+}
+```
+
+##### 消息完整性验证
 
 ```csharp
 // 发送方
-var message = "这是重要消息";
-var secret = "shared_secret".Utf8Decode();
+var message = "重要消息";
+var secretKey = "shared-secret".Utf8Decode();
+var messageBytes = message.Utf8Decode();
+var hmac = messageBytes.HmacMd5(secretKey);
 
-var hmac = message.Utf8Decode().HmacMd5(secret);
-var packet = $"{message}|{hmac}";
-
-// 发送数据包
-SendData(packet);
+SendMessage(message);
+SendHmac(hmac);
 
 // 接收方
-var receivedPacket = ReceiveData();
-var parts = receivedPacket.Split('|');
-var receivedMessage = parts[0];
-var receivedHmac = parts[1];
-
-// 验证完整性
-var computedHmac = receivedMessage.Utf8Decode().HmacMd5(secret);
+var receivedMessage = ReceiveMessage();
+var receivedHmac = ReceiveHmac();
+var computedHmac = receivedMessage.Utf8Decode().HmacMd5(secretKey);
 
 if (computedHmac == receivedHmac)
 {
-    Console.WriteLine("消息完整，未被篡改");
-    Console.WriteLine($"消息内容: {receivedMessage}");
+    Console.WriteLine("消息完整性验证成功");
 }
 else
 {
@@ -117,149 +144,147 @@ else
 }
 ```
 
-### JWT Token 签名 (HMAC-SHA256 替代)
+##### Token生成
 
 ```csharp
-// 注意：HMAC-MD5 不推荐用于 JWT，这里仅作示例
-var header = new { alg = "HS256", typ = "JWT" };
-var payload = new { sub = "1234567890", name = "张三", exp = 1699123456 };
+// 生成临时Token
+var userId = "user123";
+var secretKey = "token-secret".Utf8Decode();
+var timestamp = DateTime.Now.ToUtcTimestamp().ToString();
 
-var headerBase64 = header.Serialize().Utf8Decode().Base64UrlEncode();
-var payloadBase64 = payload.Serialize().Utf8Decode().Base64UrlEncode();
+var tokenData = $"{userId}:{timestamp}".Utf8Decode();
+var token = tokenData.HmacMd5(secretKey, Md5OutputLength.Sixteen);
 
-var signatureData = $"{headerBase64}.{payloadBase64}";
-var signature = signatureData.Utf8Decode().HmacMd5("secret".Utf8Decode());
-
-var token = $"{headerBase64}.{payloadBase64}.{signature}";
 Console.WriteLine($"Token: {token}");
+//Token: 5a2d3b4c5d6e7f8a
 ```
 
-### 密钥派生
+##### WebSocket消息认证
 
 ```csharp
-var password = "user_password";
-var salt = "unique_salt";
+// WebSocket握手认证
+var sessionId = "session-123";
+var secretKey = "websocket-secret".Utf8Decode();
+var challenge = "random-challenge";
 
-// 从密码派生密钥
-var derivedKey = (password + salt).Utf8Decode().HmacMd5("master_secret".Utf8Decode());
+var authData = $"{sessionId}:{challenge}".Utf8Decode();
+var response = authData.HmacMd5(secretKey);
 
-Console.WriteLine($"派生密钥: {derivedKey}");
+// 发送认证响应
+await WebSocket.SendAsync(response.Utf8Encode());
 ```
 
-### 文件验证
+##### 文件传输验证
 
 ```csharp
-// 保存文件时计算 HMAC
-var filePath = "document.pdf";
-var secret = "verification_secret".Utf8Decode();
-
+// 发送方
+var filePath = "important.dat";
 using var stream = File.OpenRead(filePath);
-var originalHmac = stream.HmacMd5(secret);
+var secretKey = "file-transfer-secret".Utf8Decode();
+var fileHmac = stream.HmacMd5(secretKey);
 
-Console.WriteLine($"原始 HMAC: {originalHmac}");
+SendFile(filePath);
+SendHmac(fileHmac);
 
-// 传输后验证
-var receivedFilePath = "received.pdf";
+// 接收方
+var receivedFilePath = "received.dat";
 using var receivedStream = File.OpenRead(receivedFilePath);
-var receivedHmac = receivedStream.HmacMd5(secret);
+var computedHmac = receivedStream.HmacMd5(secretKey);
 
-if (originalHmac == receivedHmac)
+if (computedHmac == receivedHmac)
 {
-    Console.WriteLine("文件验证通过，完整无损");
-}
-else
-{
-    Console.WriteLine("文件已损坏或被篡改");
+    Console.WriteLine("文件传输验证成功");
 }
 ```
 
-### 一次性密码 (OTP)
+##### 请求参数签名
 
 ```csharp
-var secret = "user_secret_key";
-var counter = 12345;
-
-// 生成 OTP
-var otp = counter.ToString().Utf8Decode().HmacMd5(secret.Utf8Decode());
-var otpCode = otp.Substring(0, 6);  // 取前 6 位
-
-Console.WriteLine($"OTP: {otpCode}");
-
-// 验证 OTP
-var userOtp = "abc123";
-var computedOtp = counter.ToString().Utf8Decode().HmacMd5(secret.Utf8Decode()).Substring(0, 6);
-
-if (computedOtp == userOtp)
+// 对请求参数进行排序和签名
+var parameters = new Dictionary<string, string>
 {
-    Console.WriteLine("OTP 验证成功");
+    ["name"] = "Alice",
+    ["email"] = "alice@example.com",
+    ["timestamp"] = DateTime.Now.ToUtcTimestamp().ToString()
+};
+
+var sortedParams = parameters.OrderBy(kvp => kvp.Key).Select(kvp => $"{kvp.Key}={kvp.Value}");
+var paramStr = string.Join("&", sortedParams);
+var secretKey = "api-secret".Utf8Decode();
+var signature = paramStr.Utf8Decode().HmacMd5(secretKey);
+
+// 发送请求
+var response = await HttpClient.PostAsJsonAsync("/api/endpoint", new
+{
+    Parameters = parameters,
+    Signature = signature
+});
+```
+
+##### 防重放攻击
+
+```csharp
+// 添加时间戳和nonce防止重放攻击
+var request = new
+{
+    Timestamp = DateTime.Now.ToUtcTimestamp(),
+    Nonce = Guid.NewGuid().ToString(),
+    Data = "sensitive data"
+};
+
+var requestStr = request.Serialize();
+var secretKey = "anti-replay-secret".Utf8Decode();
+var signature = requestStr.Utf8Decode().HmacMd5(secretKey);
+
+// 验证请求
+var receivedRequest = ReceiveRequest();
+var computedSignature = receivedRequest.Serialize().Utf8Decode().HmacMd5(secretKey);
+
+// 检查时间戳和nonce是否已使用
+if (IsTimestampValid(receivedRequest.Timestamp) && !IsNonceUsed(receivedRequest.Nonce))
+{
+    if (computedSignature == receivedRequest.Signature)
+    {
+        Console.WriteLine("请求验证成功");
+    }
 }
 ```
 
-### 多方认证
+## 密钥管理
+
+##### 使用固定密钥
 
 ```csharp
-var message = "需要多方确认的指令";
-var secret1 = "party1_secret".Utf8Decode();
-var secret2 = "party2_secret".Utf8Decode();
-var secret3 = "party3_secret".Utf8Decode();
+var secretKey = "my-fixed-secret-key".Utf8Decode();
+var hmac = data.HmacMd5(secretKey);
+```
 
-// 各方计算签名
-var signature1 = message.Utf8Decode().HmacMd5(secret1);
-var signature2 = message.Utf8Decode().HmacMd5(secret2);
-var signature3 = message.Utf8Decode().HmacMd5(secret3);
+##### 使用环境变量密钥
 
-// 组合签名
-var combinedSignature = $"{signature1}:{signature2}:{signature3}";
+```csharp
+var secretKey = Environment.GetEnvironmentVariable("HMAC_SECRET_KEY").Utf8Decode();
+var hmac = data.HmacMd5(secretKey);
+```
 
-Console.WriteLine($"组合签名: {combinedSignature}");
+##### 使用配置文件密钥
 
-// 验证各方签名
-var signatures = combinedSignature.Split(':');
-var isValid1 = message.Utf8Decode().HmacMd5(secret1) == signatures[0];
-var isValid2 = message.Utf8Decode().HmacMd5(secret2) == signatures[1];
-var isValid3 = message.Utf8Decode().HmacMd5(secret3) == signatures[2];
-
-if (isValid1 && isValid2 && isValid3)
-{
-    Console.WriteLine("所有签名验证通过");
-}
+```csharp
+var config = LoadConfiguration();
+var secretKey = config.HmacSecretKey.Utf8Decode();
+var hmac = data.HmacMd5(secretKey);
 ```
 
 ## 注意事项
 
-### 密钥长度限制
-
-HMAC-MD5 的密钥长度不能超过 64 字节：
-
-```csharp
-var secret = new byte[65];  // 65 字节
-
-// 会抛出异常
-var hash = bytes.HmacMd5(secret);
-// 抛出: InvalidOperationException (md5 secret length should less than equal 64 bytes)
-```
-
-### 安全性警告
-
-HMAC-MD5 已被认为不安全，不建议用于以下场景：
-- 新系统的安全认证
-- 长期有效的签名
-- 高安全性要求的场景
-
-建议使用 HMAC-SHA256 或更安全的算法。
-
-### 与 MD5 的区别
-
-| 特性 | MD5 | HMAC-MD5 |
-|------|-----|----------|
-| 用途 | 数据摘要 | 消息认证 |
-| 密钥 | 无 | 需要 |
-| 安全性 | 低 | 较低（但高于 MD5） |
-| 防篡改 | 不能 | 能 |
+- HMAC-MD5 使用 MD5 哈希算法，安全性较低，不建议用于安全敏感场景
+- 对于高安全性要求，建议使用 HMAC-SHA256 或 HMAC-SHA512
+- 密钥长度不应超过64字节
+- 密钥应该保密，不应该泄露给未授权方
+- 建议定期更换密钥以提高安全性
 
 ## 相关文档
 
-- [MD5](md5.md)
-- [HmacSHA](hmacsha.md)
-- [SHA](sha.md)
-- [基础扩展](../README.md#基础扩展)
+- [MD5 哈希](md5.md)
+- [HMAC-SHA 哈希](hmacsha.md)
+- [SHA 哈希](sha.md)
+- [哈希](../README.md#哈希)

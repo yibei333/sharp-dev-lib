@@ -1,283 +1,163 @@
 # 空值断言
 
-SharpDevLib 提供了各种类型的空值检查和验证功能。
+SharpDevLib 提供了字符串的空值和空白字符判断扩展方法。
 
-## 字符串空值检查
+## 判断为空
 
-### IsNullOrEmpty
+##### 判断是否为null或空字符串
 
 ```csharp
-string? str = "";
-
-// 检查是否为 null 或空
-var isEmpty = str.IsNullOrEmpty();
-// 结果: true
-
-str = null;
-isEmpty = str.IsNullOrEmpty();
-// 结果: true
-
-str = "hello";
-isEmpty = str.IsNullOrEmpty();
-// 结果: false
+string str = null;
+var result = str.IsNullOrEmpty();
+Console.WriteLine(result);
+//True
 ```
 
-### NotNullOrEmpty
-
 ```csharp
-string? str = "hello";
-
-// 检查是否不为 null 且不为空
-var isNotEmpty = str.NotNullOrEmpty();
-// 结果: true
-
-str = null;
-isNotEmpty = str.NotNullOrEmpty();
-// 结果: false
+string str = "";
+var result = str.IsNullOrEmpty();
+Console.WriteLine(result);
+//True
 ```
 
-### IsNullOrWhiteSpace
-
 ```csharp
-string? str = "  ";
-
-// 检查是否为 null 或空白
-var isEmpty = str.IsNullOrWhiteSpace();
-// 结果: true
-
-str = "";
-isEmpty = str.IsNullOrWhiteSpace();
-// 结果: true
-
-str = "hello";
-isEmpty = str.IsNullOrWhiteSpace();
-// 结果: false
+string str = "Hello";
+var result = str.IsNullOrEmpty();
+Console.WriteLine(result);
+//False
 ```
 
-### NotNullOrWhiteSpace
+##### 判断是否为null或空白字符串
 
 ```csharp
-string? str = "hello";
-
-// 检查是否不为 null 且不为空白
-var isNotEmpty = str.NotNullOrWhiteSpace();
-// 结果: true
-
-str = "  ";
-isNotEmpty = str.NotNullOrWhiteSpace();
-// 结果: false
+string str = null;
+var result = str.IsNullOrWhiteSpace();
+Console.WriteLine(result);
+//True
 ```
 
-## 集合空值检查
-
-### IsNullOrEmpty
-
 ```csharp
-List<int>? list = null;
-
-// 检查是否为 null 或空
-var isEmpty = list.IsNullOrEmpty();
-// 结果: true
-
-list = new List<int>();
-isEmpty = list.IsNullOrEmpty();
-// 结果: true
-
-list = new List<int> { 1, 2, 3 };
-isEmpty = list.IsNullOrEmpty();
-// 结果: false
+string str = "";
+var result = str.IsNullOrWhiteSpace();
+Console.WriteLine(result);
+//True
 ```
 
-### NotNullOrEmpty
-
 ```csharp
-List<int>? list = new List<int> { 1, 2, 3 };
-
-// 检查是否不为 null 且不为空
-var isNotEmpty = list.NotNullOrEmpty();
-// 结果: true
-
-list = null;
-isNotEmpty = list.NotNullOrEmpty();
-// 结果: false
+string str = "   ";
+var result = str.IsNullOrWhiteSpace();
+Console.WriteLine(result);
+//True
 ```
 
-## Guid 空值检查
-
-### IsNullOrEmpty
-
 ```csharp
-Guid? guid = Guid.Empty;
-
-// 检查是否为 null 或空
-var isEmpty = guid.IsNullOrEmpty();
-// 结果: true
-
-guid = null;
-isEmpty = guid.IsNullOrEmpty();
-// 结果: true
-
-guid = Guid.NewGuid();
-isEmpty = guid.IsNullOrEmpty();
-// 结果: false
+string str = "Hello";
+var result = str.IsNullOrWhiteSpace();
+Console.WriteLine(result);
+//False
 ```
 
-### NotNullOrEmpty
+## 判断不为空
+
+##### 判断是否不为null且不为空字符串
 
 ```csharp
-Guid? guid = Guid.NewGuid();
-
-// 检查是否不为 null 且不为空
-var isNotEmpty = guid.NotNullOrEmpty();
-// 结果: true
-
-guid = Guid.Empty;
-isNotEmpty = guid.NotNullOrEmpty();
-// 结果: false
+string str = "Hello";
+var result = str.NotNullOrEmpty();
+Console.WriteLine(result);
+//True
 ```
 
-## Null 特性
-
-### Null 特性
+```csharp
+string str = null;
+var result = str.NotNullOrEmpty();
+Console.WriteLine(result);
+//False
+```
 
 ```csharp
-public class User
+string str = "";
+var result = str.NotNullOrEmpty();
+Console.WriteLine(result);
+//False
+```
+
+##### 判断是否不为null且不为空白字符串
+
+```csharp
+string str = "Hello";
+var result = str.NotNullOrWhiteSpace();
+Console.WriteLine(result);
+//True
+```
+
+```csharp
+string str = "   Hello   ";
+var result = str.NotNullOrWhiteSpace();
+Console.WriteLine(result);
+//True
+```
+
+```csharp
+string str = "   ";
+var result = str.NotNullOrWhiteSpace();
+Console.WriteLine(result);
+//False
+```
+
+```csharp
+string str = null;
+var result = str.NotNullOrWhiteSpace();
+Console.WriteLine(result);
+//False
+```
+
+## 实际应用
+
+##### 条件判断
+
+```csharp
+string? input = GetUserInput();
+
+if (input.NotNullOrWhiteSpace())
 {
-    [Null]
-    public string? Name { get; set; }
-
-    [Null]
-    public int? Age { get; set; }
-
-    [NotNull]
-    public string Email { get; set; } = "";
-
-    public DateTime CreateTime { get; set; }
+    ProcessInput(input);
 }
 ```
 
-### ValidateNull
+##### 默认值处理
 
 ```csharp
-var user = new User
-{
-    Name = null,
-    Age = 25,
-    Email = "user@example.com",
-    CreateTime = DateTime.Now
-};
+string? configValue = GetConfigValue();
 
-// 验证对象（标记为 [Null] 的属性可以为 null，标记为 [NotNull] 的属性不能为 null）
-var isValid = user.ValidateNull();
-// 结果: true
+var value = configValue.NotNullOrWhiteSpace() ? configValue : "default";
 ```
 
-### GetNullErrors
+##### 验证输入
 
 ```csharp
-var user = new User
+bool ValidateInput(string? input)
 {
-    Name = null,
-    Age = null,
-    Email = "",  // [NotNull] 属性为空字符串
-    CreateTime = default
-};
-
-// 获取验证错误
-var errors = user.GetNullErrors();
-
-foreach (var error in errors)
-{
-    Console.WriteLine($"错误: {error}");
-}
-// 可能的输出:
-// 错误: Email cannot be null or empty
-```
-
-## 完整示例
-
-### 用户数据验证
-
-```csharp
-public class User
-{
-    [Null]
-    public string? Name { get; set; }
-
-    [Null]
-    public int? Age { get; set; }
-
-    [NotNull]
-    public string Email { get; set; } = "";
-}
-
-var user = new User
-{
-    Name = "张三",
-    Age = 25,
-    Email = "zhangsan@example.com"
-};
-
-// 验证
-if (user.ValidateNull())
-{
-    Console.WriteLine("用户数据有效");
-}
-else
-{
-    Console.WriteLine("用户数据无效:");
-    foreach (var error in user.GetNullErrors())
+    if (input.IsNullOrWhiteSpace())
     {
-        Console.WriteLine($"  - {error}");
+        Console.WriteLine("输入不能为空");
+        return false;
     }
+    return true;
 }
 ```
 
-### 可选参数处理
+##### 集合过滤
 
 ```csharp
-public void ProcessData(string? name, int? age)
-{
-    // 使用空值检查
-    if (name.NotNullOrWhiteSpace())
-    {
-        Console.WriteLine($"处理: {name}");
-    }
+var list = new List<string?> { "Hello", "", "World", null, "   " };
 
-    if (age.NotNullOrEmpty())
-    {
-        Console.WriteLine($"年龄: {age}");
-    }
-}
-
-ProcessData("张三", 25);      // 处理: 张三, 年龄: 25
-ProcessData("", null);          // 不输出
-ProcessData(null, null);        // 不输出
-```
-
-### 集合过滤
-
-```csharp
-var users = new List<User?>
-{
-    new User { Name = "张三", Age = 25 },
-    null,
-    new User { Name = "李四", Age = 30 },
-    new User { Name = "", Age = null },
-    new User { Name = "  ", Age = 35 }
-};
-
-// 过滤有效用户
-var validUsers = users
-    .Where(u => u != null && u.Name.NotNullOrWhiteSpace())
-    .ToList();
-
-// 输出: 张三, 李四
-validUsers.ForEach(u => Console.WriteLine(u!.Name));
+var validItems = list.Where(item => item.NotNullOrWhiteSpace()).ToList();
+Console.WriteLine(string.Join(", ", validItems));
+//Hello, World
 ```
 
 ## 相关文档
 
-- [字符串](string.md)
-- [集合](collection.md)
+- [字符串操作](string.md)
 - [基础扩展](../README.md#基础扩展)

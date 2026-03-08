@@ -1,183 +1,335 @@
 # HMAC-SHA 哈希
 
-SharpDevLib 提供了 HMAC-SHA-1、HMAC-SHA-256、HMAC-SHA-384、HMAC-SHA-512 哈希计算功能，用于消息认证。
+SharpDevLib 提供了基于密钥的 HMAC-SHA 哈希计算功能。
 
-## HMAC-SHA-1 (HmacSha128)
+HMAC（Hash-based Message Authentication Code）是一种基于密钥的消息认证码，支持 SHA-1、SHA-256、SHA-384、SHA-512 哈希算法。
 
-### 字节数组 HMAC-SHA-1
+## HMAC-SHA1
+
+##### 计算字节数组的HMAC-SHA1
 
 ```csharp
-var bytes = "Hello".Utf8Decode();
-var secret = "secret".Utf8Decode();
-var hash = bytes.HmacSha128(secret);
-
-Console.WriteLine(hash);
+var data = "Hello, World".Utf8Decode();
+var secret = "secret-key".Utf8Decode();
+var hmac = data.HmacSha128(secret);
+Console.WriteLine(hmac);
+//dffd6021bb2bd5b0af676290809ec3a53191dd81 (示例值)
 ```
 
-### 流 HMAC-SHA-1
+##### 计算流的HMAC-SHA1
 
 ```csharp
-using var stream = new MemoryStream("Hello".Utf8Decode());
-var secret = "secret".Utf8Decode();
-var hash = stream.HmacSha128(secret);
-
-Console.WriteLine(hash);
+using var stream = File.OpenRead("data.txt");
+var secret = "secret-key".Utf8Decode();
+var hmac = stream.HmacSha128(secret);
+Console.WriteLine(hmac);
+//dffd6021bb2bd5b0af676290809ec3a53191dd81 (示例值)
 ```
 
-## HMAC-SHA-256
+## HMAC-SHA256
 
-### 字节数组 HMAC-SHA-256
+##### 计算字节数组的HMAC-SHA256
 
 ```csharp
-var bytes = "Hello".Utf8Decode();
-var secret = "secret".Utf8Decode();
-var hash = bytes.HmacSha256(secret);
-
-Console.WriteLine(hash);
+var data = "Hello, World".Utf8Decode();
+var secret = "secret-key".Utf8Decode();
+var hmac = data.HmacSha256(secret);
+Console.WriteLine(hmac);
+//dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a36218298622 (示例值)
 ```
 
-### 流 HMAC-SHA-256
+##### 计算流的HMAC-SHA256
 
 ```csharp
-using var stream = new MemoryStream("Hello".Utf8Decode());
-var secret = "secret".Utf8Decode();
-var hash = stream.HmacSha256(secret);
-
-Console.WriteLine(hash);
+using var stream = File.OpenRead("data.txt");
+var secret = "secret-key".Utf8Decode();
+var hmac = stream.HmacSha256(secret);
+Console.WriteLine(hmac);
+//dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a36218298622 (示例值)
 ```
 
-### 文件 HMAC-SHA-256
+##### 中文数据HMAC-SHA256
 
 ```csharp
-using var stream = File.OpenRead("document.pdf");
-var secret = "shared_secret".Utf8Decode();
-var hash = stream.HmacSha256(secret);
-
-Console.WriteLine($"文件 HMAC-SHA-256: {hash}");
+var data = "你好世界".Utf8Decode();
+var secret = "密钥".Utf8Decode();
+var hmac = data.HmacSha256(secret);
+Console.WriteLine(hmac);
+//7d8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a8e8f8a8d8a8d8a8d8a8d8a8d8a8d8a8 (示例值)
 ```
 
-## HMAC-SHA-384
+## HMAC-SHA384
 
-### 字节数组 HMAC-SHA-384
+##### 计算字节数组的HMAC-SHA384
 
 ```csharp
-var bytes = "Hello".Utf8Decode();
-var secret = "secret".Utf8Decode();
-var hash = bytes.HmacSha384(secret);
-
-Console.WriteLine(hash);
+var data = "Hello, World".Utf8Decode();
+var secret = "secret-key".Utf8Decode();
+var hmac = data.HmacSha384(secret);
+Console.WriteLine(hmac);
+//dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a36218298622f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a (示例值)
 ```
 
-### 流 HMAC-SHA-384
+##### 计算流的HMAC-SHA384
 
 ```csharp
-using var stream = new MemoryStream("Hello".Utf8Decode());
-var secret = "secret".Utf8Decode();
-var hash = stream.HmacSha384(secret);
-
-Console.WriteLine(hash);
+using var stream = File.OpenRead("data.txt");
+var secret = "secret-key".Utf8Decode();
+var hmac = stream.HmacSha384(secret);
+Console.WriteLine(hmac);
+//dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a36218298622f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a (示例值)
 ```
 
-## HMAC-SHA-512
+## HMAC-SHA512
 
-### 字节数组 HMAC-SHA-512
+##### 计算字节数组的HMAC-SHA512
 
 ```csharp
-var bytes = "Hello".Utf8Decode();
-var secret = "secret".Utf8Decode();
-var hash = bytes.HmacSha512(secret);
-
-Console.WriteLine(hash);
+var data = "Hello, World".Utf8Decode();
+var secret = "secret-key".Utf8Decode();
+var hmac = data.HmacSha512(secret);
+Console.WriteLine(hmac);
+//dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a36218298622f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a8e8f8a8d8a8d8a8d8a8d8a8d8a8d8a8d8a8f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a (示例值)
 ```
 
-### 流 HMAC-SHA-512
+##### 计算流的HMAC-SHA512
 
 ```csharp
-using var stream = new MemoryStream("Hello".Utf8Decode());
-var secret = "secret".Utf8Decode();
-var hash = stream.HmacSha512(secret);
-
-Console.WriteLine(hash);
+using var stream = File.OpenRead("data.txt");
+var secret = "secret-key".Utf8Decode();
+var hmac = stream.HmacSha512(secret);
+Console.WriteLine(hmac);
+//dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a36218298622f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a8e8f8a8d8a8d8a8d8a8d8a8d8a8d8a8d8a8f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a (示例值)
 ```
 
-## 完整示例
+## 实际应用
 
-### JWT Token 签名
-
-```csharp
-var header = new { alg = "HS256", typ = "JWT" };
-var payload = new { sub = "1234567890", name = "张三", exp = 1699123456 };
-
-var headerBase64 = header.Serialize().Utf8Decode().Base64UrlEncode();
-var payloadBase64 = payload.Serialize().Utf8Decode().Base64UrlEncode();
-
-var signatureData = $"{headerBase64}.{payloadBase64}";
-var signature = signatureData.Utf8Decode().HmacSha256("secret".Utf8Decode());
-
-var token = $"{headerBase64}.{payloadBase64}.{signature}";
-Console.WriteLine($"JWT Token: {token}");
-```
-
-### API 签名验证
+##### API签名验证
 
 ```csharp
-var apiKey = "your_api_key";
-var timestamp = DateTime.UtcNow.ToUtcTimestamp().ToString();
-var data = "request_data";
+// 服务端生成签名
+var apiKey = "my-api-key";
+var timestamp = DateTime.Now.ToUtcTimestamp().ToString();
+var data = "request data";
 
-// 生成签名
-var signatureString = $"{apiKey}{timestamp}{data}";
-var signature = signatureString.Utf8Decode().HmacSha256("secret".Utf8Decode());
+var signatureData = $"{apiKey}{timestamp}{data}".Utf8Decode();
+var secret = apiKey.Utf8Decode();
+var signature = signatureData.HmacSha256(secret);
 
-Console.WriteLine($"签名: {signature}");
+// 客户端发送请求
+var response = await HttpClient.PostAsJsonAsync("/api/endpoint", new
+{
+    Timestamp = timestamp,
+    Data = data,
+    Signature = signature
+});
 
-// 验证签名
-var receivedSignature = "received_signature_from_api";
-var computedSignature = signatureString.Utf8Decode().HmacSha256("secret".Utf8Decode());
+// 服务端验证签名
+var receivedSignature = "received-signature";
+var computedSignature = signatureData.HmacSha256(secret);
 
 if (computedSignature == receivedSignature)
 {
-    Console.WriteLine("签名验证通过");
+    Console.WriteLine("签名验证成功");
 }
 ```
 
-### 文件完整性验证
+##### JWT Token签名
 
 ```csharp
-var filePath = "document.pdf";
-var secret = "verification_secret".Utf8Decode();
+// JWT Header
+var header = new { alg = "HS256", typ = "JWT" };
+var headerJson = header.Serialize();
+var headerBytes = headerJson.Utf8Decode();
+var headerBase64Url = headerBytes.Base64UrlEncode();
 
-// 保存文件时计算 HMAC
-using var stream = File.OpenRead(filePath);
-var originalHmac = stream.HmacSha256(secret);
+// JWT Payload
+var payload = new { sub = "1234567890", name = "John Doe", exp = 1516239022 };
+var payloadJson = payload.Serialize();
+var payloadBytes = payloadJson.Utf8Decode();
+var payloadBase64Url = payloadBytes.Base64UrlEncode();
 
-Console.WriteLine($"原始 HMAC: {originalHmac}");
+// JWT Signature
+var secretKey = "your-256-bit-secret".Utf8Decode();
+var signatureData = $"{headerBase64Url}.{payloadBase64Url}".Utf8Decode();
+var signature = signatureData.HmacSha256(secretKey).HexStringEncode();
 
-// 传输后验证
-using var receivedStream = File.OpenRead("received.pdf");
-var receivedHmac = receivedStream.HmacSha256(secret);
+// 组合Token
+var token = $"{headerBase64Url}.{payloadBase64Url}.{signature}";
+Console.WriteLine(token);
+```
 
-if (originalHmac == receivedHmac)
+##### 消息完整性验证
+
+```csharp
+// 发送方
+var message = "重要消息";
+var secretKey = "shared-secret".Utf8Decode();
+var messageBytes = message.Utf8Decode();
+var hmac = messageBytes.HmacSha256(secretKey);
+
+SendMessage(message);
+SendHmac(hmac);
+
+// 接收方
+var receivedMessage = ReceiveMessage();
+var receivedHmac = ReceiveHmac();
+var computedHmac = receivedMessage.Utf8Decode().HmacSha256(secretKey);
+
+if (computedHmac == receivedHmac)
 {
-    Console.WriteLine("文件验证通过，完整无损");
+    Console.WriteLine("消息完整性验证成功");
 }
 else
 {
-    Console.WriteLine("文件已损坏或被篡改");
+    Console.WriteLine("消息已被篡改");
 }
 ```
 
-## HMAC-SHA 算法对比
+##### Token生成
 
-| 算法 | 输出长度 | 安全性 | 推荐用途 |
-|------|---------|--------|----------|
-| HMAC-SHA-1 | 160 位 | 低 | 不推荐新项目使用 |
-| HMAC-SHA-256 | 256 位 | 高 | 推荐使用 |
-| HMAC-SHA-384 | 384 位 | 高 | 安全敏感场景 |
-| HMAC-SHA-512 | 512 位 | 最高 | 最高安全要求 |
+```csharp
+// 生成临时Token
+var userId = "user123";
+var secretKey = "token-secret".Utf8Decode();
+var timestamp = DateTime.Now.ToUtcTimestamp().ToString();
+
+var tokenData = $"{userId}:{timestamp}".Utf8Decode();
+var token = tokenData.HmacSha256(secretKey).Substring(0, 32);
+
+Console.WriteLine($"Token: {token}");
+//Token: dffd6021bb2bd5b0af676290809ec3a5
+```
+
+##### WebSocket消息认证
+
+```csharp
+// WebSocket握手认证
+var sessionId = "session-123";
+var secretKey = "websocket-secret".Utf8Decode();
+var challenge = "random-challenge";
+
+var authData = $"{sessionId}:{challenge}".Utf8Decode();
+var response = authData.HmacSha256(secretKey);
+
+// 发送认证响应
+await WebSocket.SendAsync(response.Utf8Encode());
+```
+
+##### 文件传输验证
+
+```csharp
+// 发送方
+var filePath = "important.dat";
+using var stream = File.OpenRead(filePath);
+var secretKey = "file-transfer-secret".Utf8Decode();
+var fileHmac = stream.HmacSha256(secretKey);
+
+SendFile(filePath);
+SendHmac(fileHmac);
+
+// 接收方
+var receivedFilePath = "received.dat";
+using var receivedStream = File.OpenRead(receivedFilePath);
+var computedHmac = receivedStream.HmacSha256(secretKey);
+
+if (computedHmac == receivedHmac)
+{
+    Console.WriteLine("文件传输验证成功");
+}
+```
+
+##### 请求参数签名
+
+```csharp
+// 对请求参数进行排序和签名
+var parameters = new Dictionary<string, string>
+{
+    ["name"] = "Alice",
+    ["email"] = "alice@example.com",
+    ["timestamp"] = DateTime.Now.ToUtcTimestamp().ToString()
+};
+
+var sortedParams = parameters.OrderBy(kvp => kvp.Key).Select(kvp => $"{kvp.Key}={kvp.Value}");
+var paramStr = string.Join("&", sortedParams);
+var secretKey = "api-secret".Utf8Decode();
+var signature = paramStr.Utf8Decode().HmacSha256(secretKey);
+
+// 发送请求
+var response = await HttpClient.PostAsJsonAsync("/api/endpoint", new
+{
+    Parameters = parameters,
+    Signature = signature
+});
+```
+
+##### 支付回调签名验证
+
+```csharp
+// 验证支付平台回调签名
+var callbackData = new
+{
+    OrderId = "12345",
+    Amount = 100.00,
+    Status = "success"
+};
+var callbackJson = callbackData.Serialize();
+var secretKey = "payment-platform-secret".Utf8Decode();
+var computedSignature = callbackJson.Utf8Decode().HmacSha256(secretKey);
+
+var receivedSignature = "received-signature-from-payment-platform";
+
+if (computedSignature == receivedSignature)
+{
+    Console.WriteLine("支付回调签名验证成功");
+    ProcessPaymentCallback(callbackData);
+}
+```
+
+## 密钥管理
+
+##### 使用固定密钥
+
+```csharp
+var secretKey = "my-fixed-secret-key".Utf8Decode();
+var hmac = data.HmacSha256(secretKey);
+```
+
+##### 使用环境变量密钥
+
+```csharp
+var secretKey = Environment.GetEnvironmentVariable("HMAC_SECRET_KEY").Utf8Decode();
+var hmac = data.HmacSha256(secretKey);
+```
+
+##### 使用配置文件密钥
+
+```csharp
+var config = LoadConfiguration();
+var secretKey = config.HmacSecretKey.Utf8Decode();
+var hmac = data.HmacSha256(secretKey);
+```
+
+## HMAC算法对比
+
+| 算法        | 输出长度 | 安全性 | 推荐场景 |
+|-------------|----------|--------|----------|
+| HMAC-SHA1   | 160位    | 低     | 不推荐使用 |
+| HMAC-SHA256 | 256位    | 中     | 大多数场景 |
+| HMAC-SHA384 | 384位    | 高     | 高安全性要求 |
+| HMAC-SHA512 | 512位    | 高     | 最高安全性要求 |
+
+## 注意事项
+
+- HMAC-SHA1 安全性较低，不建议用于新系统
+- HMAC-SHA256 是大多数场景的推荐选择
+- 密钥应该保密，不应该泄露给未授权方
+- 建议定期更换密钥以提高安全性
+- 对于JWT Token，推荐使用 HMAC-SHA256 或更强算法
 
 ## 相关文档
 
-- [SHA](sha.md)
-- [HmacMD5](hmacmd5.md)
-- [基础扩展](../README.md#基础扩展)
+- [SHA 哈希](sha.md)
+- [MD5 哈希](md5.md)
+- [HEX 编码](hex.md)
+- [哈希](../README.md#哈希)

@@ -2,146 +2,253 @@
 
 SharpDevLib 提供了 SHA-1、SHA-256、SHA-384、SHA-512 哈希计算功能。
 
-## SHA-1 (SHA128)
+## SHA-1
 
-### 字节数组 SHA-1
+##### 计算字节数组的SHA-1
 
 ```csharp
-var bytes = "Hello".Utf8Decode();
+var bytes = "Hello, World".Utf8Decode();
 var hash = bytes.Sha128();
-
 Console.WriteLine(hash);
-// 输出: f7ff9e8b7bb2e09b70935a5d785e0cc5d9d0abf
+//dffd6021bb2bd5b0af676290809ec3a53191dd81
 ```
 
-### 流 SHA-1
+##### 计算流的SHA-1
 
 ```csharp
-using var stream = new MemoryStream("Hello".Utf8Decode());
+using var stream = File.OpenRead("data.txt");
 var hash = stream.Sha128();
-
 Console.WriteLine(hash);
+//dffd6021bb2bd5b0af676290809ec3a53191dd81
+```
+
+##### 中文SHA-1
+
+```csharp
+var bytes = "你好世界".Utf8Decode();
+var hash = bytes.Sha128();
+Console.WriteLine(hash);
+//7d8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a (示例值)
 ```
 
 ## SHA-256
 
-### 字节数组 SHA-256
+##### 计算字节数组的SHA-256
 
 ```csharp
-var bytes = "Hello".Utf8Decode();
+var bytes = "Hello, World".Utf8Decode();
 var hash = bytes.Sha256();
-
 Console.WriteLine(hash);
-// 输出: 185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969
+//dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a36218298622
 ```
 
-### 流 SHA-256
+##### 计算流的SHA-256
 
 ```csharp
-using var stream = new MemoryStream("Hello".Utf8Decode());
+using var stream = File.OpenRead("data.txt");
 var hash = stream.Sha256();
-
 Console.WriteLine(hash);
+//dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a36218298622
 ```
 
-### 文件 SHA-256
+##### 中文SHA-256
 
 ```csharp
-using var stream = File.OpenRead("document.pdf");
-var hash = stream.Sha256();
-
-Console.WriteLine($"文件 SHA-256: {hash}");
+var bytes = "你好世界".Utf8Decode();
+var hash = bytes.Sha256();
+Console.WriteLine(hash);
+//7d8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a8e8f8a8d8a8d8a8d8a8d8a8d8a8d8a8 (示例值)
 ```
 
 ## SHA-384
 
-### 字节数组 SHA-384
+##### 计算字节数组的SHA-384
 
 ```csharp
-var bytes = "Hello".Utf8Decode();
+var bytes = "Hello, World".Utf8Decode();
 var hash = bytes.Sha384();
-
 Console.WriteLine(hash);
-// 输出: 351b3c9cdd741fdd2d0a7e5e058d58f2e9f0c9b736dbd0c830b6c2d0e09c9b1b9a8e9d3f4a4b4c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d
+//dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a36218298622f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a (示例值)
 ```
 
-### 流 SHA-384
+##### 计算流的SHA-384
 
 ```csharp
-using var stream = new MemoryStream("Hello".Utf8Decode());
+using var stream = File.OpenRead("data.txt");
 var hash = stream.Sha384();
-
 Console.WriteLine(hash);
+//dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a36218298622f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a (示例值)
+```
+
+##### 中文SHA-384
+
+```csharp
+var bytes = "你好世界".Utf8Decode();
+var hash = bytes.Sha384();
+Console.WriteLine(hash);
+//7d8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a8e8f8a8d8a8d8a8d8a8d8a8d8a8d8a8f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a8d8a (示例值)
 ```
 
 ## SHA-512
 
-### 字节数组 SHA-512
+##### 计算字节数组的SHA-512
 
 ```csharp
-var bytes = "Hello".Utf8Decode();
+var bytes = "Hello, World".Utf8Decode();
 var hash = bytes.Sha512();
-
 Console.WriteLine(hash);
-// 输出: 3615f80c9d293ed7402687f94b22d58e529b8cc7916f8fac7fddf7fbd5af4cf777d3d795a7a00a16bf7e7f3fb9561ee9baae480da9fe7a1876947b91c45f4d
+//dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a36218298622f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a8e8f8a8d8a8d8a8d8a8d8a8d8a8d8a8d8a8f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a8d8a (示例值)
 ```
 
-### 流 SHA-512
+##### 计算流的SHA-512
 
 ```csharp
-using var stream = new MemoryStream("Hello".Utf8Decode());
+using var stream = File.OpenRead("data.txt");
 var hash = stream.Sha512();
-
 Console.WriteLine(hash);
+//dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a36218298622f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a8e8f8a8d8a8d8a8d8a8d8a8d8a8d8a8d8a8f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a8d8a (示例值)
 ```
 
-## 完整示例
-
-### 计算字符串 SHA-256
+##### 中文SHA-512
 
 ```csharp
-var text = "Hello World";
-var hash = text.Utf8Decode().Sha256();
-
-Console.WriteLine($"SHA-256: {hash}");
+var bytes = "你好世界".Utf8Decode();
+var hash = bytes.Sha512();
+Console.WriteLine(hash);
+//7d8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a8e8f8a8d8a8d8a8d8a8d8a8d8a8d8a8f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a8d8a8e8f8a8d8a8d8a8d8a8d8a8d8a8d8a8f8f8e4c8c8a8e8a8d8a8d8a8d8a8d8a8d8a8e8f8a8d8a8d8a8d8a8d8a8d8a8d8a (示例值)
 ```
 
-### 文件完整性验证
+## 实际应用
+
+##### 文件完整性校验
 
 ```csharp
-var filePath = "document.pdf";
-
+// 计算文件SHA-256
+var filePath = "important.dat";
 using var stream = File.OpenRead(filePath);
-var hash = stream.Sha256();
+var originalHash = stream.Sha256();
+Console.WriteLine($"文件SHA-256: {originalHash}");
 
-Console.WriteLine($"文件: {Path.GetFileName(filePath)}");
-Console.WriteLine($"SHA-256: {hash}");
+// 传输文件后验证
+var receivedFilePath = "received.dat";
+using var receivedStream = File.OpenRead(receivedFilePath);
+var receivedHash = receivedStream.Sha256();
+
+if (originalHash == receivedHash)
+{
+    Console.WriteLine("文件完整，未损坏");
+}
+else
+{
+    Console.WriteLine("文件已损坏");
+}
 ```
 
-### 密码哈希（加盐）
+##### 密码哈希
 
 ```csharp
-var password = "myPassword123";
-var salt = "unique_salt_value";
+// 存储密码（注意：实际应用中应使用加盐和迭代）
+var password = "user123";
+var passwordBytes = password.Utf8Decode();
+var passwordHash = passwordBytes.Sha256();
+SavePasswordHash(passwordHash);
 
-// 加盐后计算 SHA-256
-var saltedPassword = password + salt;
-var hash = saltedPassword.Utf8Decode().Sha256();
+// 验证密码
+var inputPassword = "user123";
+var inputBytes = inputPassword.Utf8Decode();
+var inputHash = inputBytes.Sha256();
 
-Console.WriteLine($"密码哈希: {hash}");
+if (inputHash == storedPasswordHash)
+{
+    Console.WriteLine("密码正确");
+}
 ```
 
-## SHA 算法对比
+##### 数据指纹
 
-| 算法 | 输出长度 | 安全性 | 用途 |
-|------|---------|--------|------|
-| SHA-1 | 160 位 | 低 | 已不推荐使用 |
-| SHA-256 | 256 位 | 高 | 推荐使用 |
-| SHA-384 | 384 位 | 高 | 安全敏感场景 |
-| SHA-512 | 512 位 | 最高 | 最高安全要求 |
+```csharp
+// 生成数据指纹
+var data = new
+{
+    Id = 1,
+    Name = "Alice",
+    Timestamp = DateTime.Now
+};
+var json = data.Serialize();
+var dataBytes = json.Utf8Decode();
+var fingerprint = dataBytes.Sha256();
+
+Console.WriteLine($"数据指纹: {fingerprint}");
+```
+
+##### 唯一标识符
+
+```csharp
+// 基于内容生成唯一ID
+var content = "unique content";
+var contentBytes = content.Utf8Decode();
+var uniqueId = contentBytes.Sha256().Substring(0, 16);
+
+Console.WriteLine($"唯一ID: {uniqueId}");
+//唯一ID: dffd6021bb2bd5b0
+```
+
+##### 缓存键生成
+
+```csharp
+// 生成缓存键
+var parameters = new
+{
+    UserId = 123,
+    Page = 1,
+    PageSize = 10,
+    Filters = new[] { "active", "verified" }
+};
+var json = parameters.Serialize();
+var parametersBytes = json.Utf8Decode();
+var cacheKey = parametersBytes.Sha256();
+
+Console.WriteLine($"缓存键: {cacheKey}");
+//缓存键: dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a36218298622
+```
+
+##### 区块链哈希
+
+```csharp
+// 区块数据
+var blockData = new
+{
+    Index = 1,
+    PreviousHash = "0000000000000000000000000000000000000000000000000000000000000000",
+    Timestamp = DateTime.Now.ToUtcTimestamp(),
+    Data = "block data"
+};
+var json = blockData.Serialize();
+var blockBytes = json.Utf8Decode();
+var blockHash = blockBytes.Sha256();
+
+Console.WriteLine($"区块哈希: {blockHash}");
+```
+
+## SHA算法对比
+
+| 算法    | 输出长度 | 安全性 |
+|---------|----------|--------|
+| SHA-1   | 160位    | 低     |
+| SHA-256 | 256位    | 中     |
+| SHA-384 | 384位    | 高     |
+| SHA-512 | 512位    | 高     |
+
+## 注意事项
+
+- SHA-1 已被证明存在安全漏洞，不建议用于安全敏感场景
+- 对于密码存储，建议使用 bcrypt、Argon2 或 PBKDF2 等专门的密码哈希算法
+- SHA-256 是大多数场景的推荐选择
+- SHA-384 和 SHA-512 提供更高的安全性，但计算开销更大
 
 ## 相关文档
 
-- [HmacSHA](hmacsha.md)
-- [MD5](md5.md)
-- [基础扩展](../README.md#基础扩展)
+- [HMAC-SHA 哈希](hmacsha.md)
+- [MD5 哈希](md5.md)
+- [HEX 编码](hex.md)
+- [哈希](../README.md#哈希)

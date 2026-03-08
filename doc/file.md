@@ -1,141 +1,158 @@
 # 文件操作
 
-SharpDevLib 提供了文件读写、路径处理等扩展方法。
+SharpDevLib 提供了丰富的文件操作扩展方法。
 
-## 保存文件
+## 文件大小格式化
 
-### 保存字节数组
+##### 格式化为可读大小
 
 ```csharp
-// 保存字节数组到文件
-var bytes = "Hello World".Utf8Decode();
-bytes.SaveToFile("output.txt");
+var size = 1024L;
+var formatted = size.FormatFileSize();
+Console.WriteLine(formatted);
+//1.00 KB
 ```
 
-### 保存流到文件
+## 路径处理
+
+##### 格式化路径
 
 ```csharp
-// 保存流到文件
-using var stream = new MemoryStream(bytes);
-stream.SaveToFile("output.txt");
+var path = "/path/to//file";
+var formatted = path.FormatPath();
+Console.WriteLine(formatted);
+///path/to/file
 ```
 
-## 读取文件
-
-### 读取文件文本
+##### 获取文件扩展名
 
 ```csharp
-// 读取文件文本
-var content = "input.txt".ReadFileText();
+var path = "/path/to/file.txt";
+var extension = path.GetFileExtension();
+Console.WriteLine(extension);
+//.txt
 ```
 
-### 读取文件字节
+##### 获取文件名（不含扩展名）
 
 ```csharp
-// 读取文件字节
-var bytes = "input.txt".ReadFileBytes();
+var path = "/path/to/file.txt";
+var fileName = path.GetFileNameWithoutExtension();
+Console.WriteLine(fileName);
+//file
 ```
 
-## 文件路径处理
+## MIME类型
 
-### GetFileExtension
+##### 获取MIME类型
 
 ```csharp
-// 获取文件扩展名（带点）
-var ext = "file.txt".GetFileExtension(includePoint: true);
-// 结果: ".txt"
-
-// 获取文件扩展名（不带点）
-var ext = "file.txt".GetFileExtension(includePoint: false);
-// 结果: "txt"
-
-var ext = "/path/to/file.tar.gz".GetFileExtension(includePoint: true);
-// 结果: ".gz"
+var extension = ".pdf";
+var mimeType = extension.GetMimeType();
+Console.WriteLine(mimeType);
+//application/pdf
 ```
 
-### GetFileName
+##### 批量获取MIME类型
 
 ```csharp
-// 获取文件名（带扩展名）
-var name = "/path/to/file.txt".GetFileName(includeExtension: true);
-// 结果: "file.txt"
-
-// 获取文件名（不带扩展名）
-var name = "/path/to/file.txt".GetFileName(includeExtension: false);
-// 结果: "file"
-
-var name = "C:\\path\\to\\file.txt".GetFileName(includeExtension: true);
-// 结果: "file.txt"
+var extensions = new[] { ".pdf", ".jpg", ".mp4" };
+var mimeTypes = extensions.GetMimeTypes();
+foreach (var mimeType in mimeTypes)
+{
+    Console.WriteLine(mimeType);
+}
+//application/pdf
+//image/jpeg
+//video/mp4
 ```
 
-### GetFileDirectory
+## 文件读写
+
+##### 读取文件所有文本
 
 ```csharp
-// 获取文件目录
-var directory = "/path/to/file.txt".GetFileDirectory();
-// 结果: "/path/to"
-
-var directory = "C:\\path\\to\\file.txt".GetFileDirectory();
-// 结果: "C:\\path\\to"
-
-var directory = "file.txt".GetFileDirectory();
-// 结果: ""
+var path = "/path/to/file.txt";
+var content = path.ReadAllText();
+Console.WriteLine(content);
 ```
 
-## 删除文件
-
-### RemoveFileIfExist
+##### 写入文本到文件
 
 ```csharp
-// 删除文件（如果存在）
-"file.txt".RemoveFileIfExist();
-
-// 如果文件不存在也不会抛出异常
-"nonexistent.txt".RemoveFileIfExist();
+var path = "/path/to/file.txt";
+var content = "Hello, World!";
+path.WriteAllText(content);
 ```
 
-## 文件哈希
-
-### FileMd5
+##### 追加文本到文件
 
 ```csharp
-// 计算文件的 MD5
-var hash = "file.txt".FileMd5();
-
-// 16 位 MD5
-var hash = "file.txt".FileMd5(Md5OutputLength.Sixteen);
+var path = "/path/to/file.txt";
+var content = "New line";
+path.AppendAllText(content);
 ```
 
-## 完整示例
+## 文件操作
 
-### 读取、处理、写入文件
+##### 复制文件
 
 ```csharp
-// 读取文件
-var content = "input.txt".ReadFileText();
-
-// 处理内容
-var processed = content.ToUpper();
-
-// 写入文件
-processed.Utf8Decode().SaveToFile("output.txt");
+var sourcePath = "/path/to/source.txt";
+var destinationPath = "/path/to/destination.txt";
+sourcePath.CopyFile(destinationPath, overwrite: true);
 ```
 
-### 文件备份
+##### 移动文件
 
 ```csharp
-// 读取原文件
-var content = "data.txt".ReadFileBytes();
+var sourcePath = "/path/to/source.txt";
+var destinationPath = "/path/to/destination.txt";
+sourcePath.MoveFile(destinationPath);
+```
 
-// 计算哈希
-var hash = "data.txt".FileMd5();
-Console.WriteLine($"文件哈希: {hash}");
+##### 删除文件
 
-// 保存备份
-content.SaveToFile($"data_{DateTime.Now:yyyyMMddHHmmss}.txt");
+```csharp
+var path = "/path/to/file.txt";
+path.DeleteFile();
+```
+
+## 目录操作
+
+##### 创建目录
+
+```csharp
+var path = "/path/to/new/directory";
+path.CreateDirectory();
+```
+
+##### 删除目录
+
+```csharp
+var path = "/path/to/directory";
+path.DeleteDirectory(recursive: true);
+```
+
+##### 检查目录是否存在
+
+```csharp
+var path = "/path/to/directory";
+var exists = path.DirectoryExists();
+Console.WriteLine(exists);
+//True
+```
+
+##### 检查文件是否存在
+
+```csharp
+var path = "/path/to/file.txt";
+var exists = path.FileExists();
+Console.WriteLine(exists);
+//True
 ```
 
 ## 相关文档
 
-- [进程](process.md)
+- [字符串操作](string.md)
 - [基础扩展](../README.md#基础扩展)
