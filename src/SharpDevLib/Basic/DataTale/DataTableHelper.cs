@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Text;
 
 namespace SharpDevLib;
 
@@ -111,6 +112,27 @@ public static class DataTableHelper
     }
 
     /// <summary>
+    /// 将DataTable序列化为字符串
+    /// </summary>
+    /// <param name="table">table</param>
+    /// <param name="predicate">筛选条件</param>
+    /// <param name="takeCount">获取行数,默认最多10行</param>
+    /// <returns>字符串</returns>
+    public static string Serialize(this DataTable table, Func<DataRow, bool>? predicate = null, uint takeCount = 10)
+    {
+        var builder = new StringBuilder();
+        builder.AppendLine(string.Join("|", table.Columns.Cast<DataColumn>().Select(x => x.ColumnName)));
+        var rows = table.Rows.Cast<DataRow>();
+        if (predicate is not null) rows = rows.Where(predicate);
+        rows = rows.Take((int)takeCount);
+        foreach (DataRow row in rows)
+        {
+            builder.AppendLine(string.Join("|", row.ItemArray.Select(x => x.ToString())));
+        }
+        return builder.ToString();
+    }
+
+    /// <summary>
     /// 根据提供的列配置对DataTable进行转换，并返回新的DataTable
     /// </summary>
     /// <param name="sourceTable">源DataTable对象</param>
@@ -139,7 +161,7 @@ public static class DataTableHelper
             {
                 var column = columns[i];
                 var value = sourceRow[column.Name];
-                row[i] = (column.ValueConverter ?? DefaultValueConverter).Invoke(value, row);
+                row[i] = (column.ValueConverter ?? DefaultValueConverter).Invoke(value, sourceRow);
             }
             table.Rows.Add(row);
         }

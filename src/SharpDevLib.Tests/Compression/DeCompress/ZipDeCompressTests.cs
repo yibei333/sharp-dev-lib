@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib.Tests.Basic.Json;
+using SharpDevLib.Tests.Basic.Helpers;
 using System;
 using System.IO;
 
@@ -14,7 +14,7 @@ public class ZipDeCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/zip-decompress");
         var option = new DeCompressRequest(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/zip.zip"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonTests.FormatJsonOption)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonHelperTests.FormatJsonOption)),
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
@@ -28,7 +28,7 @@ public class ZipDeCompressTests
         var option = new DeCompressRequest(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/zip-password.zip"), targetPath)
         {
             Password = "foobar",
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonTests.FormatJsonOption)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonHelperTests.FormatJsonOption)),
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
@@ -41,7 +41,7 @@ public class ZipDeCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/zip-decompress-sync");
         var option = new DeCompressRequest(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/zip.zip"), targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonTests.FormatJsonOption)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonHelperTests.FormatJsonOption)),
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
@@ -55,7 +55,7 @@ public class ZipDeCompressTests
         var option = new DeCompressRequest(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/zip-password.zip"), targetPath)
         {
             Password = "foobar",
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonTests.FormatJsonOption)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonHelperTests.FormatJsonOption)),
         };
         option.DeCompressAsync().GetAwaiter().GetResult();
         Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));

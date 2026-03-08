@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpDevLib.Tests.Basic.Json;
+using SharpDevLib.Tests.Basic.Helpers;
 using System;
 using System.IO;
 
@@ -14,7 +14,7 @@ public class GzCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/gz-create.tgz");
         var option = new CompressRequest([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonTests.FormatJsonOption)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonHelperTests.FormatJsonOption)),
             IncludeSourceDiretory = true
         };
         option.CompressAsync().GetAwaiter().GetResult();
@@ -28,7 +28,7 @@ public class GzCompressTests
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/gz-create.gz");
         var option = new CompressRequest([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root/foo.txt")], targetPath)
         {
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonTests.FormatJsonOption)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonHelperTests.FormatJsonOption)),
             IncludeSourceDiretory = true
         };
         option.CompressAsync().GetAwaiter().GetResult();
@@ -45,7 +45,7 @@ public class GzCompressTests
             Password = "foobar",
             Level = CompressionLevel.MinimumSize,
             IncludeSourceDiretory = true,
-            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonTests.FormatJsonOption)),
+            OnProgress = (p) => Console.WriteLine(p.Serialize(JsonHelperTests.FormatJsonOption)),
         };
         Assert.ThrowsExactly<InvalidDataException>(() => option.CompressAsync().GetAwaiter().GetResult());
     }

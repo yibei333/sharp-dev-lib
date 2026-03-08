@@ -3,10 +3,10 @@ using SharpDevLib.Tests.TestData;
 using System;
 using System.Collections.Generic;
 
-namespace SharpDevLib.Tests.Basic.Json;
+namespace SharpDevLib.Tests.Basic.Helpers;
 
 [TestClass]
-public class JsonTests
+public class JsonHelperTests
 {
     internal static readonly JsonOption FormatJsonOption = new() { FormatJson = true };
     static readonly User _user = new("foo", 10);
@@ -66,5 +66,24 @@ public class JsonTests
         var actual = dictionary.Serialize();
         var expected = "{\"foo\":\"foo value\",\"bar\":\"bar value\"}";
         Assert.AreEqual(expected, actual);
+    }
+
+    [TestMethod]
+    public void EnumValuesTest()
+    {
+        var values = Enum.GetValues<JsonNameFormat>();
+        Assert.HasCount(6, values);
+    }
+
+    [TestMethod]
+    public void EnumParseTest()
+    {
+        var camelCaseLower = Enum.Parse<JsonNameFormat>("CamelCaseLower");
+        var snakeCaseLower = Enum.Parse<JsonNameFormat>("SnakeCaseLower");
+        var kebabCaseLower = Enum.Parse<JsonNameFormat>("KebabCaseLower");
+
+        Assert.AreEqual(JsonNameFormat.CamelCaseLower, camelCaseLower);
+        Assert.AreEqual(JsonNameFormat.SnakeCaseLower, snakeCaseLower);
+        Assert.AreEqual(JsonNameFormat.KebabCaseLower, kebabCaseLower);
     }
 }

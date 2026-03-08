@@ -48,6 +48,9 @@ public class DataTableExtensionTests
         var table = TestData.ToDataTable();
         Assert.HasCount(10, table.Columns);
         Assert.HasCount(2, table.Rows);
+        Console.WriteLine(table.Serialize());
+        Console.WriteLine(table.Serialize(x => (x["FooBase"]?.ToString()?.ToInt() ?? 0) == 2));
+        Console.WriteLine(table.Serialize(takeCount: 1));
     }
 
     [TestMethod]
