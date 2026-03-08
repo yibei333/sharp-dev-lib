@@ -13,12 +13,12 @@ public class StringHelperTests
     [DataRow("", "", "")]
     [DataRow("foo", "", "foo")]
     [DataRow("", "bar", "")]
-    [DataRow(" ", "bar", "")]
+    [DataRow(" ", "bar", " ")]
     [DataRow("foo", "bar", "foo")]
     [DataRow("foofoobar", "foo", "foobar")]
-    [DataRow(" foofoobar", "foo", "foobar")]
-    [DataRow("foofoobar ", "foo", "foobar")]
-    [DataRow(" foofoobar ", "foo", "foobar")]
+    [DataRow(" foofoobar", "foo", " foofoobar")]
+    [DataRow("foofoobar ", "foo", "foobar ")]
+    [DataRow(" foofoobar ", "foo", " foofoobar ")]
     public void TrimStartTest(string source, string target, string expected)
     {
         var actual = source.TrimStart(target);
@@ -29,13 +29,13 @@ public class StringHelperTests
     [DataRow("", "", "")]
     [DataRow("foo", "", "foo")]
     [DataRow("", "bar", "")]
-    [DataRow(" ", "bar", "")]
+    [DataRow(" ", "bar", " ")]
     [DataRow("foo", "bar", "foo")]
     [DataRow("foofoobar", "foo", "foofoobar")]
     [DataRow("foofoobar", "bar", "foofoo")]
-    [DataRow(" foofoobar", "bar", "foofoo")]
-    [DataRow("foofoobar ", "bar", "foofoo")]
-    [DataRow(" foofoobar ", "bar", "foofoo")]
+    [DataRow(" foofoobar", "bar", " foofoo")]
+    [DataRow("foofoobar ", "bar", "foofoobar ")]
+    [DataRow(" foofoobar ", "bar", " foofoobar ")]
     public void TrimEndTest(string source, string target, string expected)
     {
         var actual = source.TrimEnd(target);

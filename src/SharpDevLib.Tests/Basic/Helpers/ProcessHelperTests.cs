@@ -81,6 +81,7 @@ public class ProcessHelperTests
             CancellationToken = cancellationTokenSource.Token,
         };
         var result = process.StartAndWaitForExitAsync(request).GetAwaiter().GetResult();
+        Console.WriteLine(result.IsSuccess);
         Assert.IsFalse(result.IsSuccess);
         Assert.IsFalse(result.Error.IsNullOrWhiteSpace());
     }

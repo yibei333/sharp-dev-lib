@@ -65,7 +65,7 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
     /// 获取响应头信息
     /// </summary>
     /// <returns>响应头字典，键为头名称，值为头值数组</returns>
-    public Dictionary<string, string[]>? GetResponseHeaders() => HttpResponseMessage.Headers?.Select(x => new KeyValuePair<string, string[]>(x.Key, [.. x.Value])).ToDictionary();
+    public Dictionary<string, string[]>? GetResponseHeaders() => HttpResponseMessage.Headers?.Select(x => new KeyValuePair<string, string[]>(x.Key, [.. x.Value])).ToDictionary(x => x.Key, x => x.Value);
 
     /// <summary>
     /// 获取响应Cookie集合

@@ -28,22 +28,16 @@ Console.WriteLine(result.Output);
 
 ```csharp
 var cts = new CancellationTokenSource();
+cts.CancelAfter(5000);
 var request = new ProcessStartRequest("cmd.exe", "/c timeout 10")
 {
     CancellationToken = cts.Token
 };
-
-// 1秒后取消
-cts.CancelAfter(1000);
-
-try
-{
-    var result = await request.StartAndWaitForExitAsync();
-}
-catch (OperationCanceledException)
-{
-    Console.WriteLine("进程已取消");
-}
+var result = await request.StartAndWaitForExitAsync();
+Console.WriteLine(result.IsSuccess);
+// False
+result.EnsureSucceed();
+// 抛出异常
 ```
 
 ## 日志记录

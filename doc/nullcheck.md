@@ -1,160 +1,46 @@
 # 空值断言
 
-SharpDevLib 提供了字符串的空值和空白字符判断扩展方法。
+SharpDevLib 提供了`字符串、Guid、集合`的空值断扩展方法。
 
-## 判断为空
-
-##### 判断是否为null或空字符串
+##### 字符串
 
 ```csharp
-string str = null;
-var result = str.IsNullOrEmpty();
-Console.WriteLine(result);
-//True
-```
-
-```csharp
-string str = "";
-var result = str.IsNullOrEmpty();
-Console.WriteLine(result);
-//True
-```
-
-```csharp
-string str = "Hello";
-var result = str.IsNullOrEmpty();
-Console.WriteLine(result);
-//False
-```
-
-##### 判断是否为null或空白字符串
-
-```csharp
-string str = null;
-var result = str.IsNullOrWhiteSpace();
-Console.WriteLine(result);
-//True
-```
-
-```csharp
-string str = "";
-var result = str.IsNullOrWhiteSpace();
-Console.WriteLine(result);
-//True
-```
-
-```csharp
-string str = "   ";
-var result = str.IsNullOrWhiteSpace();
-Console.WriteLine(result);
-//True
-```
-
-```csharp
-string str = "Hello";
-var result = str.IsNullOrWhiteSpace();
-Console.WriteLine(result);
-//False
-```
-
-## 判断不为空
-
-##### 判断是否不为null且不为空字符串
-
-```csharp
-string str = "Hello";
-var result = str.NotNullOrEmpty();
-Console.WriteLine(result);
-//True
-```
-
-```csharp
-string str = null;
-var result = str.NotNullOrEmpty();
-Console.WriteLine(result);
-//False
-```
-
-```csharp
-string str = "";
-var result = str.NotNullOrEmpty();
-Console.WriteLine(result);
-//False
-```
-
-##### 判断是否不为null且不为空白字符串
-
-```csharp
-string str = "Hello";
-var result = str.NotNullOrWhiteSpace();
-Console.WriteLine(result);
-//True
-```
-
-```csharp
-string str = "   Hello   ";
-var result = str.NotNullOrWhiteSpace();
-Console.WriteLine(result);
-//True
-```
-
-```csharp
-string str = "   ";
-var result = str.NotNullOrWhiteSpace();
-Console.WriteLine(result);
-//False
-```
-
-```csharp
-string str = null;
-var result = str.NotNullOrWhiteSpace();
-Console.WriteLine(result);
-//False
-```
-
-## 实际应用
-
-##### 条件判断
-
-```csharp
-string? input = GetUserInput();
-
-if (input.NotNullOrWhiteSpace())
+List<string?> values = ["", null, " ", "foo"];
+values.ForEach(str =>
 {
-    ProcessInput(input);
-}
+    Console.WriteLine(str.IsNullOrEmpty());
+    Console.WriteLine(str.IsNullOrWhiteSpace());
+    Console.WriteLine(str.NotNullOrEmpty());
+    Console.WriteLine(str.NotNullOrWhiteSpace());
+});
 ```
 
-##### 默认值处理
-
+##### Guid
 ```csharp
-string? configValue = GetConfigValue();
-
-var value = configValue.NotNullOrWhiteSpace() ? configValue : "default";
-```
-
-##### 验证输入
-
-```csharp
-bool ValidateInput(string? input)
+List<Guid?> values = [
+    null,
+    Guid.Parse("00000000-0000-0000-0000-000000000000"),
+    Guid.Parse("44806b68-ea98-4af8-8062-78a5e34be746")
+];
+values.ForEach(id =>
 {
-    if (input.IsNullOrWhiteSpace())
-    {
-        Console.WriteLine("输入不能为空");
-        return false;
-    }
-    return true;
-}
+    Console.WriteLine(id.IsNullOrEmpty());
+    Console.WriteLine(id.NotNullOrEmpty());
+});
 ```
 
-##### 集合过滤
-
+##### 集合
 ```csharp
-var list = new List<string?> { "Hello", "", "World", null, "   " };
-
-var validItems = list.Where(item => item.NotNullOrWhiteSpace()).ToList();
-Console.WriteLine(string.Join(", ", validItems));
-//Hello, World
+List<IEnumerable<int>?> values = [
+    null,
+    [],
+    [1,2]
+];
+values.ForEach(collection =>
+{
+    Console.WriteLine(collection.IsNullOrEmpty());
+    Console.WriteLine(collection.NotNullOrEmpty());
+});
 ```
 
 ## 相关文档

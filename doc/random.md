@@ -1,142 +1,113 @@
-# 随机数生成
+# Random - 随机数生成
 
-SharpDevLib 提供了随机码生成功能。
+提供密码学安全的随机码生成功能。
 
-## 生成随机码
+## 随机数类型
 
-##### 使用默认选项
+| 类型 | 说明 | 字符集 |
+| --- | --- | --- |
+| `Number` | 纯数字 | 0-9 |
+| `LetterLower` | 小写字母 | a-z |
+| `LetterUpper` | 大写字母 | A-Z |
+| `Letter` | 字母 | a-z, A-Z |
+| `NumberAndLetter` | 数字+字母 | 0-9, a-z, A-Z |
+| `Mix` | 混合 | 数字+字母+特殊字符 |
 
-```csharp
-var random = new Random();
-var code = random.GenerateCode();
-Console.WriteLine(code);
-//生成8位数字和字母的随机码
-```
+## 方法
 
-##### 自定义长度
+### GenerateCode
 
-```csharp
-var random = new Random();
-var option = new GenerateRandomCodeOption { Length = 16 };
-var code = random.GenerateCode(option);
-Console.WriteLine(code);
-//生成16位数字和字母的随机码
-```
+生成随机码。
 
-##### 使用自定义字符集
+#### 方法签名
 
 ```csharp
-var random = new Random();
-var option = new GenerateRandomCodeOption
-{
-    Length = 10,
-    Seed = "0123456789"
-};
-var code = random.GenerateCode(option);
-Console.WriteLine(code);
-//生成10位纯数字的随机码
+public static string GenerateCode(this RandomType type, byte length)
 ```
 
-##### 使用大写字母
+#### 参数
+
+| 参数 | 类型 | 说明 |
+| --- | --- | --- |
+| type | RandomType | 随机数类型 |
+| length | byte | 长度，为0时返回空字符串 |
+
+#### 返回值
+
+随机码字符串。
+
+## 示例
+
+### 生成纯数字随机码
 
 ```csharp
-var random = new Random();
-var option = new GenerateRandomCodeOption
-{
-    Length = 8,
-    Seed = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-};
-var code = random.GenerateCode(option);
-Console.WriteLine(code);
-//生成8位大写字母的随机码
+var code = RandomType.Number.GenerateCode(6);
+Console.WriteLine(code); // 输出: 123456
 ```
 
-##### 使用特殊字符
+### 生成小写字母随机码
 
 ```csharp
-var random = new Random();
-var option = new GenerateRandomCodeOption
-{
-    Length = 12,
-    Seed = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*"
-};
-var code = random.GenerateCode(option);
-Console.WriteLine(code);
-//生成12位包含特殊字符的随机码
+var code = RandomType.LetterLower.GenerateCode(10);
+Console.WriteLine(code); // 输出: abcdefghij
 ```
 
-## 默认选项
-
-##### 查看默认配置
+### 生成大写字母随机码
 
 ```csharp
-var defaultOption = GenerateRandomCodeOption.Default;
-Console.WriteLine(defaultOption.Length);
-//8
-
-Console.WriteLine(defaultOption.Seed);
-//ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
+var code = RandomType.LetterUpper.GenerateCode(10);
+Console.WriteLine(code); // 输出: ABCDEFGHIJ
 ```
 
-## 实际应用
-
-##### 生成验证码
+### 生成字母随机码
 
 ```csharp
-var random = new Random();
-var option = new GenerateRandomCodeOption
-{
-    Length = 6,
-    Seed = "0123456789"
-};
-var verificationCode = random.GenerateCode(option);
-Console.WriteLine($"验证码: {verificationCode}");
+var code = RandomType.Letter.GenerateCode(10);
+Console.WriteLine(code); // 输出: AbCdEfGhIj
 ```
 
-##### 生成密码
+### 生成数字+字母随机码
 
 ```csharp
-var random = new Random();
-var option = new GenerateRandomCodeOption
-{
-    Length = 16,
-    Seed = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*"
-};
-var password = random.GenerateCode(option);
-Console.WriteLine($"密码: {password}");
+var code = RandomType.NumberAndLetter.GenerateCode(16);
+Console.WriteLine(code); // 输出: AbCdEf123456GhIj
 ```
 
-##### 生成订单号
+### 生成混合随机码（包含特殊字符）
 
 ```csharp
-var random = new Random();
-var timestamp = DateTime.Now.ToUtcTimestamp().ToString();
-var option = new GenerateRandomCodeOption { Length = 6, Seed = "0123456789" };
-var randomPart = random.GenerateCode(option);
-var orderId = $"{timestamp}{randomPart}";
-Console.WriteLine($"订单号: {orderId}");
+var code = RandomType.Mix.GenerateCode(20);
+Console.WriteLine(code); // 输出: AbCdEf@1234#GhIj$5678
 ```
 
-##### 生成临时token
+### 生成零长度随机码
 
 ```csharp
-var random = new Random();
-var option = new GenerateRandomCodeOption
-{
-    Length = 32,
-    Seed = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-};
-var token = random.GenerateCode(option);
-Console.WriteLine($"Token: {token}");
+var code = RandomType.Number.GenerateCode(0);
+Console.WriteLine(code); // 输出: (空字符串)
+Console.WriteLine(code == string.Empty); // 输出: True
 ```
 
-## 注意事项
+### 生成自定义长度随机码
 
-- 随机码长度必须大于0
-- 种子数据不能为空且长度必须大于0
-- 使用`System.Random`生成，不建议用于安全敏感场景
+```csharp
+var code1 = RandomType.NumberAndLetter.GenerateCode(1);  // 1位
+var code2 = RandomType.NumberAndLetter.GenerateCode(5);  // 5位
+var code3 = RandomType.NumberAndLetter.GenerateCode(10); // 10位
+var code4 = RandomType.NumberAndLetter.GenerateCode(50); // 50位
+var code5 = RandomType.NumberAndLetter.GenerateCode(100); // 100位
+var code6 = RandomType.NumberAndLetter.GenerateCode(255); // 255位（最大值）
+Console.WriteLine(code1.Length); // 输出: 1
+Console.WriteLine(code2.Length); // 输出: 5
+Console.WriteLine(code3.Length); // 输出: 10
+Console.WriteLine(code4.Length); // 输出: 50
+Console.WriteLine(code5.Length); // 输出: 100
+Console.WriteLine(code6.Length); // 输出: 255
+```
 
-## 相关文档
+## 特性
 
-- [字符串操作](string.md)
-- [基础扩展](../README.md#基础扩展)
+- 使用密码学安全的随机数生成器 (`RandomNumberGenerator`)
+- 使用拒绝采样算法确保字符分布均匀
+- 生成的随机码具有良好的随机性和唯一性
+- 适用于生成验证码、密码、随机ID等场景

@@ -54,8 +54,8 @@ Console.WriteLine(name);
 ##### 获取方法定义名称（不含参数名）
 
 ```csharp
-var method = typeof(string).GetMethod("Substring", new[] { typeof(int), typeof(int) });
-var name = method.GetMethodDefinitionName(containParameterName: false);
+var method = typeof(string).GetMethod("Substring", [typeof(int), typeof(int)]);
+var name = method?.GetMethodDefinitionName(containParameterName: false);
 Console.WriteLine(name);
 //Substring(Int32, Int32)
 ```
@@ -63,8 +63,8 @@ Console.WriteLine(name);
 ##### 获取方法定义名称（含参数名）
 
 ```csharp
-var method = typeof(string).GetMethod("Substring", new[] { typeof(int), typeof(int) });
-var name = method.GetMethodDefinitionName(containParameterName: true);
+var method = typeof(string).GetMethod("Substring", [typeof(int), typeof(int)]);
+var name = method?.GetMethodDefinitionName(containParameterName: true);
 Console.WriteLine(name);
 //Substring(Int32 startIndex, Int32 length)
 ```
@@ -73,7 +73,7 @@ Console.WriteLine(name);
 
 ```csharp
 var method = typeof(Enumerable).GetMethod("Empty");
-var name = method.GetMethodDefinitionName(containParameterName: false, isFullName: true);
+var name = method?.GetMethodDefinitionName(containParameterName: false, isFullName: true);
 Console.WriteLine(name);
 //Empty<TElement>()
 ```
@@ -82,7 +82,7 @@ Console.WriteLine(name);
 
 ```csharp
 var method = typeof(StringHelper).GetMethod("TrimStart", new[] { typeof(string), typeof(string) });
-var name = method.GetMethodDefinitionName(containParameterName: false);
+var name = method?.GetMethodDefinitionName(containParameterName: false);
 Console.WriteLine(name);
 //TrimStart(this String, String)
 ```
@@ -93,7 +93,7 @@ Console.WriteLine(name);
 
 ```csharp
 var constructor = typeof(List<string>).GetConstructor(new[] { typeof(int) });
-var name = constructor.GetConstructorDefinitionName(containParameterName: false);
+var name = constructor?.GetConstructorDefinitionName(containParameterName: false);
 Console.WriteLine(name);
 //List(Int32)
 ```
@@ -102,7 +102,7 @@ Console.WriteLine(name);
 
 ```csharp
 var constructor = typeof(List<string>).GetConstructor(new[] { typeof(int) });
-var name = constructor.GetConstructorDefinitionName(containParameterName: true);
+var name = constructor?.GetConstructorDefinitionName(containParameterName: true);
 Console.WriteLine(name);
 //List(Int32 capacity)
 ```
@@ -110,17 +110,17 @@ Console.WriteLine(name);
 ##### 无参构造函数
 
 ```csharp
-var constructor = typeof(string).GetConstructor(Type.EmptyTypes);
-var name = constructor.GetConstructorDefinitionName(containParameterName: false);
+var constructor = typeof(NameDto).GetConstructor(Type.EmptyTypes);
+var name = constructor?.GetConstructorDefinitionName(containParameterName: false);
 Console.WriteLine(name);
-//String()
+//NameDto()
 ```
 
 ##### 多个参数的构造函数
 
 ```csharp
-var constructor = typeof(DateTime).GetConstructor(new[] { typeof(int), typeof(int), typeof(int) });
-var name = constructor.GetConstructorDefinitionName(containParameterName: true);
+var constructor = typeof(DateTime).GetConstructor([typeof(int), typeof(int), typeof(int)]);
+var name = constructor?.GetConstructorDefinitionName(containParameterName: true);
 Console.WriteLine(name);
 //DateTime(Int32 year, Int32 month, Int32 day)
 ```
@@ -130,8 +130,8 @@ Console.WriteLine(name);
 ##### 使用完整类型名称
 
 ```csharp
-var method = typeof(string).GetMethod("Substring", new[] { typeof(int), typeof(int) });
-var name = method.GetMethodDefinitionName(containParameterName: false, isFullName: true);
+var method = typeof(string).GetMethod("Substring", [typeof(int), typeof(int)]);
+var name = method?.GetMethodDefinitionName(containParameterName: false, isFullName: true);
 Console.WriteLine(name);
 //Substring(System.Int32, System.Int32)
 ```

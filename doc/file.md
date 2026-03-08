@@ -1,158 +1,272 @@
 # 文件操作
 
-SharpDevLib 提供了丰富的文件操作扩展方法。
-
-## 文件大小格式化
-
-##### 格式化为可读大小
-
-```csharp
-var size = 1024L;
-var formatted = size.FormatFileSize();
-Console.WriteLine(formatted);
-//1.00 KB
-```
+SharpDevLib 提供了丰富的文件操作扩展方法，包括文件路径处理、文件读写、MIME类型识别等功能。
 
 ## 路径处理
-
-##### 格式化路径
-
-```csharp
-var path = "/path/to//file";
-var formatted = path.FormatPath();
-Console.WriteLine(formatted);
-///path/to/file
-```
 
 ##### 获取文件扩展名
 
 ```csharp
-var path = "/path/to/file.txt";
-var extension = path.GetFileExtension();
+var filePath = "/path/to/document.pdf";
+var extension = filePath.GetFileExtension();
 Console.WriteLine(extension);
-//.txt
+//.pdf
 ```
 
-##### 获取文件名（不含扩展名）
+##### 获取文件扩展名（不包含点号）
 
 ```csharp
-var path = "/path/to/file.txt";
-var fileName = path.GetFileNameWithoutExtension();
+var filePath = "/path/to/document.pdf";
+var extension = filePath.GetFileExtension(includePoint: false);
+Console.WriteLine(extension);
+//pdf
+```
+
+##### 获取文件名
+
+```csharp
+var filePath = "/path/to/document.pdf";
+var fileName = filePath.GetFileName();
 Console.WriteLine(fileName);
-//file
+//document.pdf
 ```
 
-## MIME类型
-
-##### 获取MIME类型
+##### 获取文件名（不包含扩展名）
 
 ```csharp
-var extension = ".pdf";
-var mimeType = extension.GetMimeType();
-Console.WriteLine(mimeType);
-//application/pdf
+var filePath = "/path/to/document.pdf";
+var fileName = filePath.GetFileName(includeExtension: false);
+Console.WriteLine(fileName);
+//document
 ```
 
-##### 批量获取MIME类型
+##### 获取文件所在文件夹
 
 ```csharp
-var extensions = new[] { ".pdf", ".jpg", ".mp4" };
-var mimeTypes = extensions.GetMimeTypes();
-foreach (var mimeType in mimeTypes)
-{
-    Console.WriteLine(mimeType);
-}
-//application/pdf
-//image/jpeg
-//video/mp4
+var filePath = "/path/to/document.pdf";
+var directory = filePath.GetFileDirectory();
+Console.WriteLine(directory);
+///path/to
+```
+
+##### 合并路径
+
+```csharp
+var leftPath = "/path/to";
+var rightPath = "file.txt";
+var combinedPath = leftPath.CombinePath(rightPath);
+Console.WriteLine(combinedPath);
+///path/to/file.txt
+```
+
+##### 格式化路径
+
+```csharp
+var path = "C:\\Users\\Name\\file.txt";
+var formatted = path.FormatPath();
+Console.WriteLine(formatted);
+//C:/Users/Name/file.txt
 ```
 
 ## 文件读写
 
-##### 读取文件所有文本
+##### 字节数组保存到文件
 
 ```csharp
-var path = "/path/to/file.txt";
-var content = path.ReadAllText();
-Console.WriteLine(content);
+var bytes = "Hello, World".Utf8Decode();
+bytes.SaveToFile("output.txt");
 ```
 
-##### 写入文本到文件
+##### 字节数组保存到文件（文件存在时抛出异常）
 
 ```csharp
-var path = "/path/to/file.txt";
-var content = "Hello, World!";
-path.WriteAllText(content);
+var bytes = "Hello, World".Utf8Decode();
+bytes.SaveToFile("output.txt", throwIfFileExist: true);
+// 如果文件已存在，抛出 InvalidOperationException
 ```
 
-##### 追加文本到文件
+##### 异步保存字节数组到文件
 
 ```csharp
-var path = "/path/to/file.txt";
-var content = "New line";
-path.AppendAllText(content);
+var bytes = "Hello, World".Utf8Decode();
+var cts = new CancellationTokenSource();
+await bytes.SaveToFileAsync("output.txt", cts.Token);
 ```
 
-## 文件操作
-
-##### 复制文件
+##### 流保存到文件
 
 ```csharp
-var sourcePath = "/path/to/source.txt";
-var destinationPath = "/path/to/destination.txt";
-sourcePath.CopyFile(destinationPath, overwrite: true);
+using var stream = new MemoryStream("Hello, World".Utf8Decode());
+stream.SaveToFile("output.txt");
 ```
 
-##### 移动文件
+##### 流保存到文件（文件存在时抛出异常）
 
 ```csharp
-var sourcePath = "/path/to/source.txt";
-var destinationPath = "/path/to/destination.txt";
-sourcePath.MoveFile(destinationPath);
+using var stream = new MemoryStream("Hello, World".Utf8Decode());
+stream.SaveToFile("output.txt", throwIfFileExist: true);
+// 如果文件已存在，抛出 InvalidOperationException
 ```
 
-##### 删除文件
+##### 异步保存流到文件
 
 ```csharp
-var path = "/path/to/file.txt";
-path.DeleteFile();
+using var stream = new MemoryStream("Hello, World".Utf8Decode());
+var cts = new CancellationTokenSource();
+await stream.SaveToFileAsync("output.txt", cts.Token);
 ```
 
-## 目录操作
-
-##### 创建目录
+##### 异步拷贝流（带进度回调）
 
 ```csharp
-var path = "/path/to/new/directory";
-path.CreateDirectory();
+using var sourceStream = File.OpenRead("source.txt");
+using var targetStream = File.Create("target.txt");
+
+long totalBytes = 0;
+await sourceStream.CopyToAsync(targetStream, CancellationToken.None, bytes =>
+{
+    totalBytes += bytes;
+    Console.WriteLine($"已传输: {totalBytes} 字节");
+});
 ```
 
-##### 删除目录
+##### 打开或创建文件流
 
 ```csharp
-var path = "/path/to/directory";
-path.DeleteDirectory(recursive: true);
+var fileInfo = new FileInfo("data.txt");
+using var stream = fileInfo.OpenOrCreate();
+// 使用stream进行读写操作
 ```
 
-##### 检查目录是否存在
+## 文件大小格式化
+
+##### 格式化字节大小
 
 ```csharp
-var path = "/path/to/directory";
-var exists = path.DirectoryExists();
-Console.WriteLine(exists);
-//True
+Console.WriteLine(104L.ToFileSizeString());
+//1KB
+
+Console.WriteLine(512L.ToFileSizeString());
+//512Byte
+
+Console.WriteLine(2048L.ToFileSizeString());
+//2KB
+
+Console.WriteLine(1048576L.ToFileSizeString());
+//1MB
+
+Console.WriteLine(1073741824L.ToFileSizeString());
+//1GB
+
+Console.WriteLine(1099511627776L.ToFileSizeString());
+//1TB
+
+Console.WriteLine(1125899906842624L.ToFileSizeString());
+//1PB
 ```
 
-##### 检查文件是否存在
+## MIME类型
+
+##### 获取文件MIME类型
 
 ```csharp
-var path = "/path/to/file.txt";
-var exists = path.FileExists();
-Console.WriteLine(exists);
-//True
+var filePath = "document.pdf";
+var mimeType = filePath.GetMimeType();
+Console.WriteLine(mimeType);
+//application/pdf
 ```
+
+## Base64文件编码
+
+##### 文件转换为Base64字符串
+
+```csharp
+"hello".Utf8Decode().SaveToFile("source.txt");
+var filePath = "source.txt";
+var base64String = filePath.FileBase64Encode();
+Console.WriteLine(base64String);
+//data:text/plain;base64,aGVsbG8=
+```
+
+##### Base64字符串转换为字节数组
+
+```csharp
+var base64String = "data:text/plain;base64,aGVsbG8=";
+var bytes = base64String.FileBase64Decode();
+Console.WriteLine(bytes.Utf8Encode());
+//hello
+```
+
+## 文件和目录操作
+
+##### 创建目录（如果不存在）
+
+```csharp
+var directoryPath = "/path/to/new/directory";
+directoryPath.CreateDirectoryIfNotExist();
+```
+
+##### 创建文件（如果不存在）
+
+```csharp
+var filePath = "/path/to/new/file.txt";
+filePath.CreateFileIfNotExist();
+```
+
+##### 删除目录（如果存在）
+
+```csharp
+var directoryPath = "/path/to/directory";
+directoryPath.RemoveDirectoryIfExist();
+```
+
+##### 删除文件（如果存在）
+
+```csharp
+var filePath = "/path/to/file.txt";
+filePath.RemoveFileIfExist();
+```
+
+## 异常抛出
+
+##### 目录不存在时抛出异常
+
+```csharp
+var directoryPath = "/path/to/nonexistent/directory";
+directoryPath.ThrowIfDirectoryNotExist();
+// 抛出 Exception: directory '/path/to/nonexistent/directory' not exist
+```
+
+##### 文件不存在时抛出异常
+
+```csharp
+var filePath = "/path/to/nonexistent/file.txt";
+filePath.ThrowIfFileNotExist();
+// 抛出 FileNotFoundException
+```
+
+## 常见MIME类型
+
+| 扩展名 | MIME类型 |
+|---------|----------|
+| .txt | text/plain |
+| .html | text/html |
+| .css | text/css |
+| .js | application/javascript |
+| .json | application/json |
+| .pdf | application/pdf |
+| .zip | application/zip |
+| .jpg | image/jpeg |
+| .png | image/png |
+| .gif | image/gif |
+| .svg | image/svg+xml |
+| .mp3 | audio/mpeg |
+| .mp4 | video/mp4 |
+| .avi | video/x-msvideo |
 
 ## 相关文档
 
 - [字符串操作](string.md)
+- [UTF-8 编码](utf8.md)
+- [Base64 编码](base64.md)
 - [基础扩展](../README.md#基础扩展)

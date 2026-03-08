@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace SharpDevLib;
+﻿namespace SharpDevLib;
 
 /// <summary>
 /// 字符串扩展，提供字符串处理、转换和验证功能

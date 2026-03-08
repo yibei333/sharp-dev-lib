@@ -9,16 +9,6 @@ namespace SharpDevLib;
 public static class EnumerableHelper
 {
     /// <summary>
-    /// 将KeyValuePair集合转换为字典
-    /// </summary>
-    /// <typeparam name="TKey">字典键类型</typeparam>
-    /// <typeparam name="TValue">字典值类型</typeparam>
-    /// <param name="source">KeyValuePair集合</param>
-    /// <returns>转换后的字典</returns>
-    /// <exception cref="ArgumentException">当集合中存在重复键时抛出</exception>
-    public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source) => source.ToDictionary(x => x.Key, x => x.Value);
-
-    /// <summary>
     /// 向列表添加项并返回原列表，支持链式调用
     /// </summary>
     /// <typeparam name="T">列表项类型</typeparam>

@@ -10,7 +10,7 @@ SharpDevLib 提供了时间戳转换和时间格式化功能。
 var time = new DateTime(2024, 1, 1, 12, 0, 0, DateTimeKind.Local);
 var timestamp = time.ToUtcTimestamp();
 Console.WriteLine(timestamp);
-//1704100800000 (示例值)
+//1704081600000
 ```
 
 ##### UTC时间戳转DateTime
@@ -19,7 +19,7 @@ Console.WriteLine(timestamp);
 var timestamp = 1704100800000L;
 var time = timestamp.ToUtcTime();
 Console.WriteLine(time);
-//2024-01-01 04:00:00 (UTC时间)
+//2024/1/1 9:20:00 (UTC时间)
 ```
 
 ##### 当前时间转时间戳
@@ -38,7 +38,7 @@ var timestamp = 1704100800000L;
 var utcTime = timestamp.ToUtcTime();
 var localTime = utcTime.ToLocalTime();
 Console.WriteLine(localTime);
-//2024-01-01 12:00:00 (本地时间)
+//2024/1/1 17:20:00 (本地时间)
 ```
 
 ## 时间格式化
