@@ -142,10 +142,15 @@ public static class ExcelHelper
     /// <param name="columnNames">自定义列名数组,如果为 null 则使用 DataTable 的列名</param>
     public static void Write(DataTable dataTable, Stream stream, string[]? columnNames)
     {
-        var set = new DataSet();
-        set.Tables.Add(dataTable);
-        if (columnNames.NotNullOrEmpty()) Write(set, stream, [columnNames]);
-        else Write(set, stream, null);
+        using var doc = SpreadsheetDocument.Create(stream, SpreadsheetDocumentType.Workbook);
+        var workbookPart = doc.AddWorkbookPart();
+        workbookPart.Workbook = new Workbook();
+        var sheets = new Sheets();
+        workbookPart.Workbook.AppendChild(sheets);
+        var sharedStringTable = workbookPart.GetSharedStringTable();
+        var sharedStringDictionary = new Dictionary<string, int>();
+        WriteTable(workbookPart,sheets,1,dataTable,columnNames,sharedStringTable,sharedStringDictionary);
+        doc.Save();
     }
 
     /// <summary>
@@ -179,19 +184,9 @@ public static class ExcelHelper
         var columnNameIndex = 0;
         foreach (DataTable table in dataSet.Tables)
         {
-            var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
-            worksheetPart.Worksheet = new Worksheet();
-            var sheetData = new SheetData();
-            worksheetPart.Worksheet.AppendChild(sheetData);
-
-            var tableName = table.TableName.IsNullOrWhiteSpace() ? $"Sheet{sheetIndex}" : table.TableName;
-            var sheet = new Sheet { Id = workbookPart.GetIdOfPart(worksheetPart), Name = tableName, SheetId = sheetIndex };
-            sheets.AppendChild(sheet);
-            sheetIndex++;
-
             var customColumnNames = columnNames.NotNullOrEmpty() ? columnNames[columnNameIndex++] : null;
-            SetTableData(sheetData, table, sharedStringTable, sharedStringDictionary, customColumnNames);
-            SetColumns(worksheetPart.Worksheet, table.Columns.Count);
+            WriteTable(workbookPart, sheets, sheetIndex, table, customColumnNames, sharedStringTable, sharedStringDictionary);
+            sheetIndex++;
         }
 
         doc.Save();
@@ -305,6 +300,21 @@ public static class ExcelHelper
             columns.AppendChild(column);
         }
         worksheet.InsertBefore(columns, worksheet.GetFirstChild<SheetData>());
+    }
+
+    static void WriteTable(WorkbookPart workbookPart,Sheets sheets,uint sheetIndex, DataTable dataTable, string[]? columnNames,SharedStringTable sharedStringTable,Dictionary<string,int> sharedStringDictionary)
+    {
+        var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
+        worksheetPart.Worksheet = new Worksheet();
+        var sheetData = new SheetData();
+        worksheetPart.Worksheet.AppendChild(sheetData);
+
+        var tableName = dataTable.TableName.IsNullOrWhiteSpace() ? $"Sheet{sheetIndex}" : dataTable.TableName;
+        var sheet = new Sheet { Id = workbookPart.GetIdOfPart(worksheetPart), Name = tableName, SheetId = sheetIndex };
+        sheets.AppendChild(sheet);
+
+        SetTableData(sheetData, dataTable, sharedStringTable, sharedStringDictionary, columnNames);
+        SetColumns(worksheetPart.Worksheet, dataTable.Columns.Count);
     }
     #endregion
 }

@@ -109,8 +109,10 @@ public static class FileHelper
         }
 
         using var fileStream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        stream.Seek(0, SeekOrigin.Begin);
         stream.CopyTo(fileStream);
         fileStream.Flush();
+        stream.Seek(0, SeekOrigin.Begin);
     }
 
     /// <summary>
@@ -133,8 +135,10 @@ public static class FileHelper
         }
 
         using var fileStream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        stream.Seek(0, SeekOrigin.Begin);
         await stream.CopyToAsync(fileStream, cancellationToken ?? CancellationToken.None);
         await fileStream.FlushAsync(cancellationToken ?? CancellationToken.None);
+        stream.Seek(0, SeekOrigin.Begin);
     }
 
     /// <summary>

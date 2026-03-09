@@ -180,7 +180,7 @@ public class ExcelTests
 
         var readSet = ExcelHelper.ReadSet(stream);
         Assert.AreEqual(1, readSet.Tables.Count);
-        var readTable1 = readSet.Tables["Table1"];
+        var readTable1 = readSet.Tables["Sheet1"];
         Assert.IsNotNull(readTable1);
         var readList1 = readTable1.ToList<Foo>();
         var readListJson1 = readList1.Serialize();
