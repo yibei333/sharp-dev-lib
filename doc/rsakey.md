@@ -306,3 +306,9 @@ Console.WriteLine(info.Serialize(new JsonOption { FormatJson = true }));
 //  }
 //}
 ```
+
+## 相关文档
+- [对称加密](symmetric.md)
+- [JWT](jwt.md)
+- [X.509证书](x509.md)
+- [加解密](../README.md#加解密)

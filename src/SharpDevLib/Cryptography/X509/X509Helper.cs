@@ -231,11 +231,9 @@ public static class X509Helper
     /// <param name="password">PFX文件保护密码</param>
     public static void SavePfx(this X509Certificate2 certificate, Stream stream, string privateKey, string password)
     {
-        using var rsa = RSA.Create();
-        rsa.ImportPem(privateKey);
-        certificate.PrivateKey = rsa;
-        var bytes = certificate.Export(X509ContentType.Pfx, password);
-        stream.Write(bytes, 0, bytes.Length);
+        var bytes = Pkcs12.Encode(certificate, privateKey, password);
+        using var memoryStream = new MemoryStream(bytes);
+        memoryStream.CopyTo(stream);
     }
 
     /// <summary>

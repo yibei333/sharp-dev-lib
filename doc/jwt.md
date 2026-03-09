@@ -2,112 +2,60 @@
 
 提供 JWT 的生成和验证功能。
 
-## 类
-
-### JwtHelper
-
-JWT 帮助类，提供 JWT 的生成和验证功能。
-
-## 扩展方法
-
-### GenerateToken
-
-生成 JWT 令牌。
-
-#### 方法签名
+#### 实例
 
 ```csharp
-public static string GenerateToken(string secret, IDictionary<string, object> payload, int expiryMinutes = 60)
-```
+using System.Security.Cryptography;
+using SharpDevLib;
 
-#### 参数
-
-| 参数 | 类型 | 默认值 | 说明 |
-| --- | --- | --- | --- |
-| secret | string | - | 密钥 |
-| payload | IDictionary\<string, object\> | - | 载荷数据 |
-| expiryMinutes | int | 60 | 过期时间（分钟） |
-
-#### 返回值
-
-JWT 令牌字符串。
-
-### ValidateToken
-
-验证 JWT 令牌。
-
-#### 方法签名
-
-```csharp
-public static bool ValidateToken(string token, string secret)
-```
-
-#### 参数
-
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| token | string | JWT 令牌字符串 |
-| secret | string | 密钥 |
-
-#### 返回值
-
-验证是否成功。
-
-### DecodeToken
-
-解码 JWT 令牌。
-
-#### 方法签名
-
-```csharp
-public static IDictionary<string, object> DecodeToken(string token)
-```
-
-#### 参数
-
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| token | string | JWT 令牌字符串 |
-
-#### 返回值
-
-载荷数据字典。
-
-## 示例
-
-### 生成 JWT 令牌
-
-```csharp
-var payload = new Dictionary<string, object>
+var payload = new
 {
-    { "userId", 123 },
-    { "username", "张三" },
-    { "role", "admin" }
+    id = 1,
+    name = "张三"
 };
 
-var token = JwtHelper.GenerateToken("mySecretKey", payload, 60);
-Console.WriteLine(token);
+//使用HMACSHA256算法创建JWT
+var token1 = new JwtCreateWithHMACSHA256Request(payload, "foo".Utf8Decode()).Create();
+Console.WriteLine(token1);
+//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6Ilx1NUYyMFx1NEUwOSJ9.nGBAztIkApT3NdQZowM0qgnrqN12zIdSPFobYanQKiQ
+
+//使用HMACSHA256算法验证JWT
+var result1 = new JwtVerifyWithHMACSHA256Request(token1, "foo".Utf8Decode()).Verify();
+Console.WriteLine(result1.Serialize(new JsonOption { FormatJson = true }));
+//{
+//  "IsVerified": true,
+//  "Algorithm": 1,
+//  "Header": "{\"alg\":\"HS256\",\"typ\":\"JWT\"}",
+//  "Payload": "{\"id\":1,\"name\":\"\\u5F20\\u4E09\"}",
+//  "Signature": "nGBAztIkApT3NdQZowM0qgnrqN12zIdSPFobYanQKiQ"
+//}
+Console.WriteLine(Regex.Unescape(result1.Payload!));
+//{"id":1,"name":"张三"}
+
+//使用RSA SHA256算法创建JWT
+using var rsa=RSA.Create();
+var privateKey=rsa.ExportPem(PemType.Pkcs1PrivateKey);
+var publicKey=rsa.ExportPem(PemType.X509SubjectPublicKey);
+var token2 = new JwtCreateWithRS256Request(payload,privateKey).Create();
+Console.WriteLine(token2);
+//eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6Ilx1NUYyMFx1NEUwOSJ9.mIG1wDNBGQdkS2mqKQe1SFojHW4zTbaAj3rY3gbF5jm559DJbXVWSg0HWhaejeBB7NMxU0aYMcuYmi44tvajFj9GQNLjAqWYz0VxwMGA98Imsrj9I82C-i12xh63FZ2_TyfMBPfQVuEM0xIUGxANLd8c0ovxLR_QxrPrXVoy5bvcpi_0Unr20y-0poE5nOJExuj93YVHFHNspMT1nZdxgDb0MaafDBQ90cRJ-j-k_ErRnBJMMV3D3_QThW79NUG_j2DjWsrg0m5n0VX8OFLCpfZNyKKnWG_7WpBAMNXCC5Ph4upxGYFjawE-aviudPBc7uvueVMqeTHcnQZoe1IXPw
+
+//使用HMACSHA256算法验证JWT
+var result2 = new JwtVerifyWithRS256Request(token2, publicKey).Verify();
+Console.WriteLine(result2.Serialize(new JsonOption { FormatJson = true }));
+//{
+//  "IsVerified": true,
+//  "Algorithm": 2,
+//  "Header": "{\"alg\":\"RS256\",\"typ\":\"JWT\"}",
+//  "Payload": "{\"id\":1,\"name\":\"\\u5F20\\u4E09\"}",
+//  "Signature": "mIG1wDNBGQdkS2mqKQe1SFojHW4zTbaAj3rY3gbF5jm559DJbXVWSg0HWhaejeBB7NMxU0aYMcuYmi44tvajFj9GQNLjAqWYz0VxwMGA98Imsrj9I82C-i12xh63FZ2_TyfMBPfQVuEM0xIUGxANLd8c0ovxLR_QxrPrXVoy5bvcpi_0Unr20y-0poE5nOJExuj93YVHFHNspMT1nZdxgDb0MaafDBQ90cRJ-j-k_ErRnBJMMV3D3_QThW79NUG_j2DjWsrg0m5n0VX8OFLCpfZNyKKnWG_7WpBAMNXCC5Ph4upxGYFjawE-aviudPBc7uvueVMqeTHcnQZoe1IXPw"
+//}
+Console.WriteLine(Regex.Unescape(result2.Payload!));
+//{"id":1,"name":"张三"}
 ```
 
-### 验证 JWT 令牌
-
-```csharp
-var isValid = JwtHelper.ValidateToken(token, "mySecretKey");
-Console.WriteLine(isValid ? "验证成功" : "验证失败");
-```
-
-### 解码 JWT 令牌
-
-```csharp
-var payload = JwtHelper.DecodeToken(token);
-Console.WriteLine($"用户ID: {payload["userId"]}");
-Console.WriteLine($"用户名: {payload["username"]}");
-Console.WriteLine($"角色: {payload["role"]}");
-```
-
-## 特性
-
-- 支持生成 JWT 令牌
-- 支持验证 JWT 令牌
-- 支持解码 JWT 令牌获取载荷
-- 支持设置过期时间
+## 相关文档
+- [对称加密](symmetric.md)
+- [RSA密钥](rsakey.md)
+- [X.509证书](x509.md)
+- [加解密](../README.md#加解密)
