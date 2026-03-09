@@ -138,6 +138,7 @@ public class CertificateTests
         var keyPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{keyName}.key");
         var certPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{keyName}.crt");
         var pfxCertPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{keyName}.pfx");
+        var pfxCertStreamPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{keyName}.stream.pfx");
         var derCertPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{keyName}.der");
         var csrPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath($"TestData/Tests/{keyName}.csr");
         keyPath.RemoveFileIfExist();
@@ -166,6 +167,7 @@ public class CertificateTests
         cert.SaveCrt(certPath);
         cert.SaveDer(derCertPath);
         SavePfxTest(cert, keyPath, pfxCertPath);
+        SavePfxStreamTest(cert, keyPath, pfxCertStreamPath);
 
         Assert.IsTrue(new FileInfo(keyPath).Exists);
         Assert.IsGreaterThan(0, new FileInfo(keyPath).Length);
@@ -180,6 +182,17 @@ public class CertificateTests
     static void SavePfxTest(X509Certificate2 certificate, string keyPath, string pfxPath)
     {
         certificate.SavePfx(pfxPath, File.ReadAllText(keyPath), "foo");
+
+        Assert.IsTrue(File.Exists(pfxPath));
+        Assert.IsGreaterThan(0, new FileInfo(pfxPath).Length);
+        Assert.IsTrue(X509CertificateLoader.LoadPkcs12FromFile(pfxPath, "foo").Subject.NotNullOrEmpty());
+    }
+
+    static void SavePfxStreamTest(X509Certificate2 certificate, string keyPath, string pfxPath)
+    {
+        var stream = new FileStream(pfxPath,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.ReadWrite);
+        certificate.SavePfx(stream, File.ReadAllText(keyPath), "foo");
+        stream.Close();
 
         Assert.IsTrue(File.Exists(pfxPath));
         Assert.IsGreaterThan(0, new FileInfo(pfxPath).Length);

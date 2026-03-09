@@ -40,6 +40,15 @@ Console.WriteLine(unescaped);
 //Hello "World"
 ```
 
+##### 将输入字符串中的任何转义字符进行转换
+
+```csharp
+var str = "\\u5F20\\u4E09";
+var unescaped = str.RegexUnescape();
+Console.WriteLine(unescaped);
+//张三
+```
+
 ##### 删除换行
 
 ```csharp

@@ -248,7 +248,7 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
             if (response.HttpResponseMessage.Content.Headers?.ContentType?.ToString().Contains("application/json") ?? false)
             {
                 builder.AppendLine("reply:");
-                builder.AppendLine(response.HttpResponseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult());
+                builder.AppendLine(response.HttpResponseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult().RegexUnescape());
             }
         }
     }

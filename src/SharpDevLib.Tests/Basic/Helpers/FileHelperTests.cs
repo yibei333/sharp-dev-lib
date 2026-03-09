@@ -226,4 +226,12 @@ public class FileHelperTests
         var actual = filePath.GetFileDirectory();
         Assert.AreEqual(expected.FormatPath(), actual);
     }
+
+    [TestMethod]
+    [DataRow("aa", "aa")]
+    [DataRow("\\u5F20\\u4E09", "张三")]
+    public void RegexUnescapeTest(string source, string expected)
+    {
+        Assert.AreEqual(expected, source.RegexUnescape());
+    }
 }

@@ -1,76 +1,121 @@
-# HTTP GET - HTTP GET 请求
+# HTTP GET
 
-提供 HTTP GET 请求功能。
+提供`HTTP` GET 请求功能。
 
-## 类
-
-### HttpRequest
-
-HTTP 请求类，用于配置和发送 HTTP 请求。
-
-## 扩展方法
-
-### GetAsync
-
-发送 HTTP GET 请求。
-
-#### 方法签名
+##### 实例
 
 ```csharp
-public static async Task<HttpResponse> GetAsync(this HttpRequest request)
-```
+using SharpDevLib;
+using System.Net;
 
-#### 参数
-
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| request | HttpRequest | HTTP 请求配置 |
-
-#### 返回值
-
-HTTP 响应对象。
-
-## 示例
-
-### 基本 GET 请求
-
-```csharp
+//基本GET请求
 var request = new HttpRequest("https://api.example.com/users");
 var response = await request.GetAsync();
+Console.WriteLine(response.StatusCode);
+//OK
 Console.WriteLine(response.Content);
-```
+//{"data":[...]}
 
-### 带查询参数的 GET 请求
-
-```csharp
+//带查询参数的GET请求
 var request = new HttpRequest("https://api.example.com/users")
 {
-    QueryParams = new Dictionary<string, string>
+    Parameters = new Dictionary<string, string?>
     {
         { "page", "1" },
-        { "size", "10" }
+        { "size", "10" },
+        { "keyword", "test" }
     }
 };
 var response = await request.GetAsync();
-```
+Console.WriteLine(response.HttpResponseMessage.RequestMessage.RequestUri);
+//https://api.example.com/users?page=1&size=10&keyword=test
 
-### 带请求头的 GET 请求
+//链式调用添加参数
+var request = new HttpRequest("https://api.example.com/search")
+    .AddParameter("q", "keyword")
+    .AddParameter("sort", "asc")
+    .AddParameter("limit", "20");
+var response = await request.GetAsync();
 
-```csharp
+//带请求头的GET请求
 var request = new HttpRequest("https://api.example.com/users")
 {
-    Headers = new Dictionary<string, string>
+    Headers = new Dictionary<string, string[]>
     {
-        { "Authorization", "Bearer token123" },
-        { "Accept", "application/json" }
+        { "Authorization", ["Bearer token123"] },
+        { "Accept", ["application/json"] }
     }
 };
 var response = await request.GetAsync();
+
+//添加Cookie
+var request = new HttpRequest("https://api.example.com/users")
+    .AddCookie(new Cookie("sessionId", "abc123", "/", "api.example.com"));
+var response = await request.GetAsync();
+
+//配置HTTP选项
+var config = new HttpConfig
+{
+    Timeout = TimeSpan.FromSeconds(30),
+    RetryCount = 3,
+    UserAgent = "MyApp/1.0"
+};
+var request = new HttpRequest("https://api.example.com/users")
+{
+    Config = config
+};
+var response = await request.GetAsync();
+
+//监控下载进度
+var progress = new HttpProgress();
+config = new HttpConfig
+{
+    OnReceiveProgress = p =>
+    {
+        Console.WriteLine($"进度: {p.ProgressString}");
+        Console.WriteLine($"速度: {p.Speed}");
+    }
+};
+var request = new HttpRequest("https://example.com/largefile.zip")
+{
+    Config = config
+};
+var response = await request.GetAsync();
+Console.WriteLine(progress.ToString());
+//********progress********
+//Total:10485760
+//Transfered:10485760
+//Progress:100
+//ProgressString:100%
+//Speed:1024KB/s
+
+//获取响应流（用于下载文件）
+var request = new HttpRequest("https://example.com/file.zip");
+using var stream = await request.GetStreamAsync();
+using var fileStream = File.Create("file.zip");
+await stream.CopyToAsync(fileStream);
+
+//检查响应状态
+var request = new HttpRequest("https://api.example.com/users");
+var response = await request.GetAsync();
+if (response.IsSuccessStatusCode)
+{
+    Console.WriteLine("请求成功");
+}
+else
+{
+    Console.WriteLine($"请求失败: {response.Message}");
+}
+
+//使用全局配置
+HttpConfig.Default.Timeout = TimeSpan.FromSeconds(60);
+HttpConfig.Default.UserAgent = "DefaultUserAgent";
+var request = new HttpRequest("https://api.example.com/users");
+var response = await request.GetAsync();
 ```
 
-## 特性
-
-- 支持发送 HTTP GET 请求
-- 支持查询参数
-- 支持自定义请求头
-- 异步操作
+## 相关文档
+- [HTTP POST](http-post.md)
+- [HTTP PUT](http-put.md)
+- [HTTP DELETE](http-delete.md)
+- [网络传输](../README.md#网络传输)

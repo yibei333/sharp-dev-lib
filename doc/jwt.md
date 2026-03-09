@@ -42,16 +42,14 @@ Console.WriteLine(token2);
 
 //使用HMACSHA256算法验证JWT
 var result2 = new JwtVerifyWithRS256Request(token2, publicKey).Verify();
-Console.WriteLine(result2.Serialize(new JsonOption { FormatJson = true }));
+Console.WriteLine(result2.Serialize(new JsonOption { FormatJson = true }).RegexUnescape());
 //{
 //  "IsVerified": true,
 //  "Algorithm": 2,
 //  "Header": "{\"alg\":\"RS256\",\"typ\":\"JWT\"}",
-//  "Payload": "{\"id\":1,\"name\":\"\\u5F20\\u4E09\"}",
+//  "Payload": "{\"id\":1,\"name\":\"张三\"}",
 //  "Signature": "mIG1wDNBGQdkS2mqKQe1SFojHW4zTbaAj3rY3gbF5jm559DJbXVWSg0HWhaejeBB7NMxU0aYMcuYmi44tvajFj9GQNLjAqWYz0VxwMGA98Imsrj9I82C-i12xh63FZ2_TyfMBPfQVuEM0xIUGxANLd8c0ovxLR_QxrPrXVoy5bvcpi_0Unr20y-0poE5nOJExuj93YVHFHNspMT1nZdxgDb0MaafDBQ90cRJ-j-k_ErRnBJMMV3D3_QThW79NUG_j2DjWsrg0m5n0VX8OFLCpfZNyKKnWG_7WpBAMNXCC5Ph4upxGYFjawE-aviudPBc7uvueVMqeTHcnQZoe1IXPw"
 //}
-Console.WriteLine(Regex.Unescape(result2.Payload!));
-//{"id":1,"name":"张三"}
 ```
 
 ## 相关文档

@@ -1,4 +1,6 @@
-﻿namespace SharpDevLib;
+﻿using System.Text.RegularExpressions;
+
+namespace SharpDevLib;
 
 /// <summary>
 /// 字符串扩展，提供字符串处理、转换和验证功能
@@ -202,6 +204,13 @@ public static class StringHelper
     /// <param name="str">字符串</param>
     /// <returns>字符串</returns>
     public static string RemoveEscape(this string str) => str.Replace("\\\"", "\"").Replace("\\\\", "\\");
+
+    /// <summary>
+    /// 将输入字符串中的任何转义字符进行转换
+    /// </summary>
+    /// <param name="str">字符串</param>
+    /// <returns>还原字符串</returns>
+    public static string RegexUnescape(this string str) => Regex.Unescape(str);
 
     /// <summary>
     /// 字符串删除换行
