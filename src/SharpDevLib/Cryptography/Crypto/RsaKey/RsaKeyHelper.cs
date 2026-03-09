@@ -136,7 +136,7 @@ public static class RsaKeyHelper
             using var rsa = RSA.Create();
             rsa.ImportPem(privatePem);
             var exportPublicKey = rsa.ExportPem(pemObject.PemType);
-            return publicPem == exportPublicKey;
+            return publicPem.RemoveLineBreak() == exportPublicKey.RemoveLineBreak();
         }
         catch
         {

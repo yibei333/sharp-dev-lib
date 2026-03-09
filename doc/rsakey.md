@@ -1,15 +1,12 @@
-# RSA Key - RSA 密钥
+# RSA 密钥
 
-提供 RSA 密钥的生成和管理功能。
+提供`RSA`密钥的导入导出。
 
 ##### 实例
 
 ```csharp
-#r "nuget: SharpDevLib, 2.0.6.4"
-using DocumentFormat.OpenXml.Office2013.PowerPoint.Roaming;
 using SharpDevLib;
 using System.Security.Cryptography;
-
 
 var rsaPrivateKey = @"
 -----BEGIN RSA PRIVATE KEY-----
@@ -48,16 +45,16 @@ rsa.ImportPem(rsaPrivateKey);
 //导出密钥
 Enum.GetValues<PemType>().ForEach(type =>
 {
-    //Console.WriteLine(type.ToString());
+    Console.WriteLine(type.ToString());
     try
     {
         byte[]? password = type.ToString().Contains("Encrypted") ? "foo".Utf8Decode() : null;
         var key = rsa.ExportPem(type, password);
-        //Console.WriteLine(key);
+        Console.WriteLine(key);
     }
     catch (Exception ex)
     {
-        //Console.WriteLine(ex.Message);
+        Console.WriteLine(ex.Message);
     }
 });
 //UnKnown
@@ -242,12 +239,12 @@ rBfB2SdDIUDTMgZPszqvkArTmvqkvaWdCaAr12/xmCft7W3yZp1tArIz0K/pP+ZK
 C3H8zlXUDecx4Iq2CG8OGgA8NbdIPnmSGr8vf0sUllV7FlnQc10+gA==
 ";
 var key1 = RsaKeyHelper.RemoveWrapLineAndTrim(keyBody);
-//Console.WriteLine(key1);
+Console.WriteLine(key1);
 //MIIEpAIBAAKCAQEArQ7mmjUpAbi3m2lqnAA/PKSnuiyiqekAwpjXmKWLyH3a13vH6jvqT+4qnTeUCCM/ZD7WbPQVOJhSvfWAynUJeGkgIOGiCgnuLTsLypM5L7qMcHbkbsO0AuPAdxeIM1MrJf9TLwW6VoesH+7DEqnhp/PUptwN+yESI5e/fDJ/3CZgvogZPI5KmR9mJOaQ5Ta61LerVZWbbNQ/sqDkcmS5kM/Wf4XpcGtnVMhjm/oHIcBR2Xranw+lu1Y9oQXEDMdGvke7Pe8Aq0PvpH2vPXJgBD1AwqPq3gxcrQQXPWjEiAET0TvoT+fXyTO92x3JoDnqBsrcEhHZO3TWopYLZME6FQIDAQABAoIBAQCWhpt2Dj84zB6IA01Dm8NlUCLEAQcLmyuaF6+Pio7nOPEc9QGSb8MC+zn9vdX4rg/5dd60rim3LGbr65q2fs5Z+baEYz26VaDhnrZG4X+gUDbPq9pNrdPpn4hNDh7d5b1mM4t7HxRRJ3lD3T24AiPRHnkdGdLfWIiahOd9c79bEGWBltpleiPlth8LiHCjDWm5pKsqrz5PgLITeA0dZ/+a6M6rLmabRjFB4lhX00QmCd50V0LQfCQN8eDCJIlGRLMYAK6+EWoqrAcUzI8nR5zb9WPUCiRWQFV3XhXcN/HHuDI+NdS3MggUZCazQ/Dt38s2UiSjE+npmNzyS18xK0WRAoGBALloNtw9vBcUcaBDHtdrEoWMp5KO+Nk0vNB8Sc/ah2iEQG1u833InDl7M28+f3kk4Ec7an9/hiXke/SYK/UjJTSTTKtufGY34Jwus1Vv9JA+5i2bQ+uABYiN2bveMFfyDhhdvvofseuHesVCxtxjlzsU8DyOyqtfwwYSTUBAzJLrAoGBAO7zB9a+q6UjmBr8fpNlffN3h7H0bUIgPYKhVw9SxXTR0TRFBWE/PUIKbUNJpgt1Qiy4cd3PVYcx63JHbiw0B5hs0YkSEvtUDK3wd0BLh6xLaSWvlaKjHKNDDxCLAfek1Qcrq0N1CPaOloVXyMeKfJh2dKFSV7OE2Ihs5P+uhCb/AoGARK+1+zunrck2GxAiod2Z2/3yqpnq2NTvyjDxS16C4ZZ1I9WBwSyLq8PXlzPJF8EwkVMSri85LFqMDV4+kq81fle/hJcG4Pt8a3/lkhZKvRGARo8Jx3oDEsayTiYPNNWIoUBBmvoY+M+VDPUjJMyEXy/vnA+uR3TPlDU9hzs6TocCgYEAqVborkKQSEcya6WXWoQpv5ptOytbJurMTMBkf4KMVx6/IUjs6B82HZBgILiYCTS/ggvw/l4KYfZ5wpJmvMLewyITWQ3LD/xfxAFPsewVKYCD8uY9qHXqPLWwfmvVKBjTs/I5vGO7x2gDuloc+3TkmfQQ8ab2ak3yWrS5kY2vMCcCgYBzIDl+8N1A723Zs68zoztsnyNIkdEPrPeYozYf08Mo2wINYsAfEHIprBfB2SdDIUDTMgZPszqvkArTmvqkvaWdCaAr12/xmCft7W3yZp1tArIz0K/pP+ZKC3H8zlXUDecx4Iq2CG8OGgA8NbdIPnmSGr8vf0sUllV7FlnQc10+gA==
 
 //将密钥体内容按64个字符换行
 var key2 = RsaKeyHelper.WrapLineWith64Char(key1);
-//Console.WriteLine(key2);
+Console.WriteLine(key2);
 //MIIEpAIBAAKCAQEArQ7mmjUpAbi3m2lqnAA/PKSnuiyiqekAwpjXmKWLyH3a13vH
 //6jvqT+4qnTeUCCM/ZD7WbPQVOJhSvfWAynUJeGkgIOGiCgnuLTsLypM5L7qMcHbk
 //bsO0AuPAdxeIM1MrJf9TLwW6VoesH+7DEqnhp/PUptwN+yESI5e/fDJ/3CZgvogZ
@@ -292,7 +289,7 @@ Console.WriteLine(isKeyPairMatch);
 
 //获取密钥信息
 var info = RsaKeyHelper.GetKeyInfo(rsaPrivateKey);
-//Console.WriteLine(info.Serialize(new JsonOption { FormatJson = true }));
+Console.WriteLine(info.Serialize(new JsonOption { FormatJson = true }));
 //{
 //  "Type": 1,
 //  "IsPrivate": true,
