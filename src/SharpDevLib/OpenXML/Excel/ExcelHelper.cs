@@ -39,7 +39,7 @@ public static class ExcelHelper
     {
         using var memoryStream = new MemoryStream();
         inputStream.CopyTo(memoryStream);
-        using var decryptedStream = new EncryptedPackageHandler().DecryptPackage(memoryStream, new ExcelEncryption { Password = password, IsEncrypted = true });
+        var decryptedStream = new EncryptedPackageHandler().DecryptPackage(memoryStream, new ExcelEncryption { Password = password, IsEncrypted = true });
         var zipPackage = new ZipPackage(decryptedStream);
         zipPackage.Save(outputStream);
     }
