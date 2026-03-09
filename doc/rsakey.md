@@ -2,143 +2,310 @@
 
 提供 RSA 密钥的生成和管理功能。
 
-## 类
-
-### RsaKeyHelper
-
-RSA 密钥帮助类，提供 RSA 密钥的生成、导入和导出功能。
-
-## 扩展方法
-
-### GenerateKeyPair
-
-生成 RSA 密钥对。
-
-#### 方法签名
+##### 实例
 
 ```csharp
-public static (string publicKey, string privateKey) GenerateKeyPair(int keySize = 2048)
-```
+#r "nuget: SharpDevLib, 2.0.6.4"
+using DocumentFormat.OpenXml.Office2013.PowerPoint.Roaming;
+using SharpDevLib;
+using System.Security.Cryptography;
 
-#### 参数
 
-| 参数 | 类型 | 默认值 | 说明 |
-| --- | --- | --- | --- |
-| keySize | int | 2048 | 密钥大小（位数） |
-
-#### 返回值
-
-包含公钥和私钥的元组。
-
-### ExportPublicKey
-
-导出公钥。
-
-#### 方法签名
-
-```csharp
-public static string ExportPublicKey(this RSA rsa)
-```
-
-#### 参数
-
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| rsa | RSA | RSA 实例 |
-
-#### 返回值
-
-公钥字符串。
-
-### ExportPrivateKey
-
-导出私钥。
-
-#### 方法签名
-
-```csharp
-public static string ExportPrivateKey(this RSA rsa)
-```
-
-#### 参数
-
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| rsa | RSA | RSA 实例 |
-
-#### 返回值
-
-私钥字符串。
-
-### ImportPublicKey
-
-导入公钥。
-
-#### 方法签名
-
-```csharp
-public static RSA ImportPublicKey(this string publicKey)
-```
-
-#### 参数
-
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| publicKey | string | 公钥字符串 |
-
-#### 返回值
-
-RSA 实例。
-
-### ImportPrivateKey
-
-导入私钥。
-
-#### 方法签名
-
-```csharp
-public static RSA ImportPrivateKey(this string privateKey)
-```
-
-#### 参数
-
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| privateKey | string | 私钥字符串 |
-
-#### 返回值
-
-RSA 实例。
-
-## 示例
-
-### 生成密钥对
-
-```csharp
-// 生成 2048 位密钥对
-var (publicKey, privateKey) = RsaKeyHelper.GenerateKeyPair(2048);
-Console.WriteLine($"公钥: {publicKey}");
-Console.WriteLine($"私钥: {privateKey}");
-```
-
-### 导出和导入密钥
-
-```csharp
-// 创建 RSA 实例
+var rsaPrivateKey = @"
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEArQ7mmjUpAbi3m2lqnAA/PKSnuiyiqekAwpjXmKWLyH3a13vH
+6jvqT+4qnTeUCCM/ZD7WbPQVOJhSvfWAynUJeGkgIOGiCgnuLTsLypM5L7qMcHbk
+bsO0AuPAdxeIM1MrJf9TLwW6VoesH+7DEqnhp/PUptwN+yESI5e/fDJ/3CZgvogZ
+PI5KmR9mJOaQ5Ta61LerVZWbbNQ/sqDkcmS5kM/Wf4XpcGtnVMhjm/oHIcBR2Xra
+nw+lu1Y9oQXEDMdGvke7Pe8Aq0PvpH2vPXJgBD1AwqPq3gxcrQQXPWjEiAET0Tvo
+T+fXyTO92x3JoDnqBsrcEhHZO3TWopYLZME6FQIDAQABAoIBAQCWhpt2Dj84zB6I
+A01Dm8NlUCLEAQcLmyuaF6+Pio7nOPEc9QGSb8MC+zn9vdX4rg/5dd60rim3LGbr
+65q2fs5Z+baEYz26VaDhnrZG4X+gUDbPq9pNrdPpn4hNDh7d5b1mM4t7HxRRJ3lD
+3T24AiPRHnkdGdLfWIiahOd9c79bEGWBltpleiPlth8LiHCjDWm5pKsqrz5PgLIT
+eA0dZ/+a6M6rLmabRjFB4lhX00QmCd50V0LQfCQN8eDCJIlGRLMYAK6+EWoqrAcU
+zI8nR5zb9WPUCiRWQFV3XhXcN/HHuDI+NdS3MggUZCazQ/Dt38s2UiSjE+npmNzy
+S18xK0WRAoGBALloNtw9vBcUcaBDHtdrEoWMp5KO+Nk0vNB8Sc/ah2iEQG1u833I
+nDl7M28+f3kk4Ec7an9/hiXke/SYK/UjJTSTTKtufGY34Jwus1Vv9JA+5i2bQ+uA
+BYiN2bveMFfyDhhdvvofseuHesVCxtxjlzsU8DyOyqtfwwYSTUBAzJLrAoGBAO7z
+B9a+q6UjmBr8fpNlffN3h7H0bUIgPYKhVw9SxXTR0TRFBWE/PUIKbUNJpgt1Qiy4
+cd3PVYcx63JHbiw0B5hs0YkSEvtUDK3wd0BLh6xLaSWvlaKjHKNDDxCLAfek1Qcr
+q0N1CPaOloVXyMeKfJh2dKFSV7OE2Ihs5P+uhCb/AoGARK+1+zunrck2GxAiod2Z
+2/3yqpnq2NTvyjDxS16C4ZZ1I9WBwSyLq8PXlzPJF8EwkVMSri85LFqMDV4+kq81
+fle/hJcG4Pt8a3/lkhZKvRGARo8Jx3oDEsayTiYPNNWIoUBBmvoY+M+VDPUjJMyE
+Xy/vnA+uR3TPlDU9hzs6TocCgYEAqVborkKQSEcya6WXWoQpv5ptOytbJurMTMBk
+f4KMVx6/IUjs6B82HZBgILiYCTS/ggvw/l4KYfZ5wpJmvMLewyITWQ3LD/xfxAFP
+sewVKYCD8uY9qHXqPLWwfmvVKBjTs/I5vGO7x2gDuloc+3TkmfQQ8ab2ak3yWrS5
+kY2vMCcCgYBzIDl+8N1A723Zs68zoztsnyNIkdEPrPeYozYf08Mo2wINYsAfEHIp
+rBfB2SdDIUDTMgZPszqvkArTmvqkvaWdCaAr12/xmCft7W3yZp1tArIz0K/pP+ZK
+C3H8zlXUDecx4Iq2CG8OGgA8NbdIPnmSGr8vf0sUllV7FlnQc10+gA==
+-----END RSA PRIVATE KEY-----
+";
 using var rsa = RSA.Create();
 
-// 导出公钥和私钥
-var publicKey = rsa.ExportPublicKey();
-var privateKey = rsa.ExportPrivateKey();
+//导入密钥
+rsa.ImportPem(rsaPrivateKey);
 
-// 导入密钥
-var rsa2 = publicKey.ImportPublicKey();
-var rsa3 = privateKey.ImportPrivateKey();
+//导出密钥
+Enum.GetValues<PemType>().ForEach(type =>
+{
+    //Console.WriteLine(type.ToString());
+    try
+    {
+        byte[]? password = type.ToString().Contains("Encrypted") ? "foo".Utf8Decode() : null;
+        var key = rsa.ExportPem(type, password);
+        //Console.WriteLine(key);
+    }
+    catch (Exception ex)
+    {
+        //Console.WriteLine(ex.Message);
+    }
+});
+//UnKnown
+//不支持的PEM格式
+
+//Pkcs1PrivateKey
+//-----BEGIN RSA PRIVATE KEY-----
+//MIIEpAIBAAKCAQEArQ7mmjUpAbi3m2lqnAA/PKSnuiyiqekAwpjXmKWLyH3a13vH
+//6jvqT+4qnTeUCCM/ZD7WbPQVOJhSvfWAynUJeGkgIOGiCgnuLTsLypM5L7qMcHbk
+//bsO0AuPAdxeIM1MrJf9TLwW6VoesH+7DEqnhp/PUptwN+yESI5e/fDJ/3CZgvogZ
+//PI5KmR9mJOaQ5Ta61LerVZWbbNQ/sqDkcmS5kM/Wf4XpcGtnVMhjm/oHIcBR2Xra
+//nw+lu1Y9oQXEDMdGvke7Pe8Aq0PvpH2vPXJgBD1AwqPq3gxcrQQXPWjEiAET0Tvo
+//T+fXyTO92x3JoDnqBsrcEhHZO3TWopYLZME6FQIDAQABAoIBAQCWhpt2Dj84zB6I
+//A01Dm8NlUCLEAQcLmyuaF6+Pio7nOPEc9QGSb8MC+zn9vdX4rg/5dd60rim3LGbr
+//65q2fs5Z+baEYz26VaDhnrZG4X+gUDbPq9pNrdPpn4hNDh7d5b1mM4t7HxRRJ3lD
+//3T24AiPRHnkdGdLfWIiahOd9c79bEGWBltpleiPlth8LiHCjDWm5pKsqrz5PgLIT
+//eA0dZ/+a6M6rLmabRjFB4lhX00QmCd50V0LQfCQN8eDCJIlGRLMYAK6+EWoqrAcU
+//zI8nR5zb9WPUCiRWQFV3XhXcN/HHuDI+NdS3MggUZCazQ/Dt38s2UiSjE+npmNzy
+//S18xK0WRAoGBALloNtw9vBcUcaBDHtdrEoWMp5KO+Nk0vNB8Sc/ah2iEQG1u833I
+//nDl7M28+f3kk4Ec7an9/hiXke/SYK/UjJTSTTKtufGY34Jwus1Vv9JA+5i2bQ+uA
+//BYiN2bveMFfyDhhdvvofseuHesVCxtxjlzsU8DyOyqtfwwYSTUBAzJLrAoGBAO7z
+//B9a+q6UjmBr8fpNlffN3h7H0bUIgPYKhVw9SxXTR0TRFBWE/PUIKbUNJpgt1Qiy4
+//cd3PVYcx63JHbiw0B5hs0YkSEvtUDK3wd0BLh6xLaSWvlaKjHKNDDxCLAfek1Qcr
+//q0N1CPaOloVXyMeKfJh2dKFSV7OE2Ihs5P+uhCb/AoGARK+1+zunrck2GxAiod2Z
+//2/3yqpnq2NTvyjDxS16C4ZZ1I9WBwSyLq8PXlzPJF8EwkVMSri85LFqMDV4+kq81
+//fle/hJcG4Pt8a3/lkhZKvRGARo8Jx3oDEsayTiYPNNWIoUBBmvoY+M+VDPUjJMyE
+//Xy/vnA+uR3TPlDU9hzs6TocCgYEAqVborkKQSEcya6WXWoQpv5ptOytbJurMTMBk
+//f4KMVx6/IUjs6B82HZBgILiYCTS/ggvw/l4KYfZ5wpJmvMLewyITWQ3LD/xfxAFP
+//sewVKYCD8uY9qHXqPLWwfmvVKBjTs/I5vGO7x2gDuloc+3TkmfQQ8ab2ak3yWrS5
+//kY2vMCcCgYBzIDl+8N1A723Zs68zoztsnyNIkdEPrPeYozYf08Mo2wINYsAfEHIp
+//rBfB2SdDIUDTMgZPszqvkArTmvqkvaWdCaAr12/xmCft7W3yZp1tArIz0K/pP+ZK
+//C3H8zlXUDecx4Iq2CG8OGgA8NbdIPnmSGr8vf0sUllV7FlnQc10+gA==
+//-----END RSA PRIVATE KEY-----
+
+//EncryptedPkcs1PrivateKey
+//-----BEGIN RSA PRIVATE KEY-----
+//Proc-Type: 4,ENCRYPTED
+//DEK-Info: AES-256-CBC,caabe69589fe124eebb365441b176dfc
+
+//JMGJavdi4nbqzIqNC0QoHYtIPxsEGy46TqqnabQGCapSQg3dG7HlhOy/2tEmo/sp
+//e4//iudWegHkYWVkXBB4WdC23KisWtW22iZ4UXYuTgqfFdh8nlmERwfdNPHltB/5
+//ktsKmyEdBqJmu8xb76S61GsB4kONeohgBlEi8dFzRkqzV40L1ThAeEbBLpGEiC2K
+//LlmJtpQJ+arXm0wuXesR3oHquDCDppGNRnjolNZtxhjS37eQIlLAVIxqnCsm5WEO
+//zSFTHtHzIU0mvZMgreI7B6rLWqRsP6P2lH5VoGD/3IVJInm4sKqd2JRc7mqvkqYO
+//DW4QQ9H3KnhLNtAopP28a2qaYuIRRSr3botjIlfPGx+Bde8GeGou7oX7cq7Ygb2+
+//1YcSfv8eqTmZI4njcGTTQZCyVK+KgLazVR008ZNwKfi24nQqpI3D/849AfDF/edI
+//S/VvwGEut+iWgzpa/DRPoER3pCmELpTyEZbLrqaC2R+lvN2xKv33c4M0zx+WKK//
+//9Ztt45b8+DQX/CGMUFju68VaYP/tjOD1bjTNcQ7IKVa9ps/LTG3d0luJZjAKSh5K
+//bafw2FbaJdmMrH//P2YWsj7b+Sw/2nGOcnKA99mD9GzKTI8EFW6olBOpL14HGBrE
+//oMmPQTCiGddRau8eYLMIXogrmlC4r9cw+jsNhteom/eRkdri+LkGF9lnfHNYMBs+
+//2m85ZsNxwwPidGFLhw8CgCaIxcoaA/x65/ekgU3ZrSZJ5Z1G0CUxkiuEWmC9dPeq
+//bbShxgU4J1bMg80+7Wc7eur2Q5wqCg2A2lfIpilZ54iNFrPs72ZRLU2oma5ZVA+W
+//HWw/LQBOB4ay+IU7ZC2i8sMDDYYZnhJldIOKwKS/5pkp2yYZ5ftvn50zkBIepqCP
+//S2uk7HJ+LvFZVB3IPqcjWPms70oUqH/VEWNniz8Yy5sB2ICqsJyn+96R6NlAZ+Zj
+//J0tmNQp9zOekamQx6qY6YEca2zFbPSoC0dHokVhhAj93f0Km4ixPtglFKIgQ5Os5
+//oKQZPB5SQo/YkwOpyouWB0cMDNwe/UYUFWlFDVDJH6t+3ji4FrltyqO/jj2eDQ55
+//Rb+fCkUv2KQuSbSSTk66ElR8IIp8gdieiAMheeCt7LplN5XkKksNKVGCm2Z/Vv2X
+//RYn303p3nTb76bcHcdypzNzzICOCSXdL31ZwZn8mTR7MIbRTBmGW7WoNzgZeEh/U
+//W+KCfrW2fiP98zm/IPkLEbeSNfQ1pfiHLmLOWWBFBnZ6hISKU29kwBIfHRhrpHoh
+//A9qP/zoq7dnWvYJHgs2ex3FBPcUr+2pawwae+RAQdwh9ky1ROrV+qqraeUMUZq5W
+//ooZA7jKkdC5FVUjxNJTBrx9/TdOE85rMmTkyxTEsTZ9BPU/WTSUa3B2co6o3Higr
+//UFVBa5ouIb3sf79lQZVKH0zXZlQVh8+76yu0sjyjzY8m0BCEKJE0dyZEud7yi9uo
+//9i9faa/hYO9VAb9wltM/pGktyAGMwjfV/3J+1gkoZjlj3gfWaEG4jDVjGUY2MeHx
+//M1gS8xr/LTrqlFQbss0Of9Ol3a30sgpUZJ69HKPnkVyHP90xkzgx1qz2Hjc7MAYU
+//-----END RSA PRIVATE KEY-----
+
+//Pkcs8PrivateKey
+//-----BEGIN PRIVATE KEY-----
+//MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCtDuaaNSkBuLeb
+//aWqcAD88pKe6LKKp6QDCmNeYpYvIfdrXe8fqO+pP7iqdN5QIIz9kPtZs9BU4mFK9
+//9YDKdQl4aSAg4aIKCe4tOwvKkzkvuoxwduRuw7QC48B3F4gzUysl/1MvBbpWh6wf
+//7sMSqeGn89Sm3A37IRIjl798Mn/cJmC+iBk8jkqZH2Yk5pDlNrrUt6tVlZts1D+y
+//oORyZLmQz9Z/helwa2dUyGOb+gchwFHZetqfD6W7Vj2hBcQMx0a+R7s97wCrQ++k
+//fa89cmAEPUDCo+reDFytBBc9aMSIARPRO+hP59fJM73bHcmgOeoGytwSEdk7dNai
+//lgtkwToVAgMBAAECggEBAJaGm3YOPzjMHogDTUObw2VQIsQBBwubK5oXr4+Kjuc4
+//8Rz1AZJvwwL7Of291fiuD/l13rSuKbcsZuvrmrZ+zln5toRjPbpVoOGetkbhf6BQ
+//Ns+r2k2t0+mfiE0OHt3lvWYzi3sfFFEneUPdPbgCI9EeeR0Z0t9YiJqE531zv1sQ
+//ZYGW2mV6I+W2HwuIcKMNabmkqyqvPk+AshN4DR1n/5rozqsuZptGMUHiWFfTRCYJ
+//3nRXQtB8JA3x4MIkiUZEsxgArr4RaiqsBxTMjydHnNv1Y9QKJFZAVXdeFdw38ce4
+//Mj411LcyCBRkJrND8O3fyzZSJKMT6emY3PJLXzErRZECgYEAuWg23D28FxRxoEMe
+//12sShYynko742TS80HxJz9qHaIRAbW7zfcicOXszbz5/eSTgRztqf3+GJeR79Jgr
+//9SMlNJNMq258ZjfgnC6zVW/0kD7mLZtD64AFiI3Zu94wV/IOGF2++h+x64d6xULG
+//3GOXOxTwPI7Kq1/DBhJNQEDMkusCgYEA7vMH1r6rpSOYGvx+k2V983eHsfRtQiA9
+//gqFXD1LFdNHRNEUFYT89QgptQ0mmC3VCLLhx3c9VhzHrckduLDQHmGzRiRIS+1QM
+//rfB3QEuHrEtpJa+VoqMco0MPEIsB96TVByurQ3UI9o6WhVfIx4p8mHZ0oVJXs4TY
+//iGzk/66EJv8CgYBEr7X7O6etyTYbECKh3Znb/fKqmerY1O/KMPFLXoLhlnUj1YHB
+//LIurw9eXM8kXwTCRUxKuLzksWowNXj6SrzV+V7+Elwbg+3xrf+WSFkq9EYBGjwnH
+//egMSxrJOJg801YihQEGa+hj4z5UM9SMkzIRfL++cD65HdM+UNT2HOzpOhwKBgQCp
+//VuiuQpBIRzJrpZdahCm/mm07K1sm6sxMwGR/goxXHr8hSOzoHzYdkGAguJgJNL+C
+//C/D+Xgph9nnCkma8wt7DIhNZDcsP/F/EAU+x7BUpgIPy5j2odeo8tbB+a9UoGNOz
+//8jm8Y7vHaAO6Whz7dOSZ9BDxpvZqTfJatLmRja8wJwKBgHMgOX7w3UDvbdmzrzOj
+//O2yfI0iR0Q+s95ijNh/TwyjbAg1iwB8QcimsF8HZJ0MhQNMyBk+zOq+QCtOa+qS9
+//pZ0JoCvXb/GYJ+3tbfJmnW0CsjPQr+k/5koLcfzOVdQN5zHgirYIbw4aADw1t0g+
+//eZIavy9/SxSWVXsWWdBzXT6A
+//-----END PRIVATE KEY-----
+
+//EncryptedPkcs8PrivateKey
+//-----BEGIN ENCRYPTED PRIVATE KEY-----
+//MIIFNTBfBgkqhkiG9w0BBQ0wUjAxBgkqhkiG9w0BBQwwJAQQvgO7sEoAba6pv3XZ
+//tXK+oQICCAAwDAYIKoZIhvcNAgkFADAdBglghkgBZQMEASoEECiIpqPKz9E+6Vsd
+//rStSCIwEggTQuB4Kuy3kzB6U0JxRC8wTSB7StTfatcMFWF4wr38vYJzcZbeUv+hL
+//tWPJlQ+a5hIw+yr0aLrC9FUlkNc9COkh6TR0yaGdycnwbI5FK2DfS/kVAafNpK8a
+//dGi9HDZH8Q73XwE4+wMEN/757ZOeCR6b/eC1daRkL7qiFlvQ26xR5ZNcZ/boridu
+//8bfJwvzpt/5wyKbSlUl3SV0Q7miLumdEh/cT35tnWXl41oCp6/4dAlwO1XbfAhJr
+//qU0ytpmMZiujireWXU/PTzgjGWoJY6BgAhi2MSzBVT31SXF0bcSxsMBdEjK4zX7r
+//f2LV6kmBRHvuLpIkDeK1Ma3tFhjbN4NNOnKxq4CHB8YBPKgO02PGNfYcllwT1YfC
+//tDnAqb10kGh6ySn+iX876L1UCiBD0LB4aYjQ++wykpRCtOABocEG41Pd1CYveUEo
+//T6GRnyEynxBXcqgzoUnUmjzMI4XeHBKXT/gWMhBayto1kvqieX3R7f+f3TWAFQ/R
+//5hRbcnVSt9XyM+3ucMOC/Pt6JVV+Y35kD17iBe0986rmGnTXdBu7YgxBbdQgga2D
+//eyBsp08sZMytKRPvrDJcXUdv3lFj2qzw94HjPqRZWo6BuQQlQSTJuExNH1twtJhf
+//NYWcLCoK6Ub050ZhRFOLfCKTmOzTV8wg+9bvE2CvxloaIc2NUvpZ790qPh0jiqZh
+//Zw877hyIxfMXcTMuNHAeqis4BztEATvu/l0yCpHwogT9mo4na/5qi8MH36ihEwOz
+//rM18ARGvVvUREDzvZ3drDjGBB3c619i+uOSdcsVdfBkjrBaNawzivWTNoxTrnqB+
+//vWq0LDyFZlttAHf1B+9UrXNf/cVZl6yBs5rfGoyBOEDV6F4MKSZc59pjIomv+L2j
+//lFu88Ut1CSFuvLyL5gTc1uVlGeRKMJ+eMTOEDZY4QKVwWE0IbLtWe8ZPzpZTfdIh
+//J3zNST8IJt/LCVDUv77tZ3DXfZs3gkNQlM+lSQtYj29QPHW87V/YTsvf1LVp51MU
+//L6d5AWI8Ww9QoNuQj+kS7YCme6ub515/63t672jKc8ssqkxWbo2J/3gamWvb4zhn
+//xFUW6J19UFLHFC4yASjsIa8RkRNXbK39oLzlgQmHW114KSNlmO7w+jKh8KOL1W12
+//aDyITMVAFlHCdOTtc0vAp5rT0K1Sd8clsjkw/VCJoqSWGdj72gCcqD4uA/Od3Qt9
+//HDfAU93duGlv5Wb255+dXsw214fSDQINrRdprskveG15wWsFWe16yBz4bUi7ZpkG
+///U+lNrgOrTzIB3C2qgYcSz3XvJOjmvqEygmmrVJ/h/i4VNg4yEFY3rLECUlZ/ABY
+//iQIxfXyrJHN+nqPiqumwUQDOfPhKCpLZeUoQersbhC/bHsWXzcprw9a4jqHQeqXL
+//7qnLl3MuisXbgZb17sRovRohZcQyNAnBQ6jUrP5RvSkwAbNTJYqLEGS4Zvt4qQsO
+//POEvqjTpQd6/VgmTJgv2UZ7Gu+8GfD53zOWQ9BPs7aj6c8DyT0lonShA1j9y7Rjw
+//68zxrGEoWN+PBEX2l8IzakDMA0PLi4lnfnacxsKJbi9/V3kL3PNxA8BjqyzmigtB
+//xa2mRRoWOmPYvHL+9vh/RheK5balflRkr/DUJ6IBMxSQApvxPbgH/mQ=
+//-----END ENCRYPTED PRIVATE KEY-----
+
+//PublicKey
+//-----BEGIN RSA PUBLIC KEY-----
+//MIIBCgKCAQEArQ7mmjUpAbi3m2lqnAA/PKSnuiyiqekAwpjXmKWLyH3a13vH6jvq
+//T+4qnTeUCCM/ZD7WbPQVOJhSvfWAynUJeGkgIOGiCgnuLTsLypM5L7qMcHbkbsO0
+//AuPAdxeIM1MrJf9TLwW6VoesH+7DEqnhp/PUptwN+yESI5e/fDJ/3CZgvogZPI5K
+//mR9mJOaQ5Ta61LerVZWbbNQ/sqDkcmS5kM/Wf4XpcGtnVMhjm/oHIcBR2Xranw+l
+//u1Y9oQXEDMdGvke7Pe8Aq0PvpH2vPXJgBD1AwqPq3gxcrQQXPWjEiAET0TvoT+fX
+//yTO92x3JoDnqBsrcEhHZO3TWopYLZME6FQIDAQAB
+//-----END RSA PUBLIC KEY-----
+
+//X509SubjectPublicKey
+//-----BEGIN PUBLIC KEY-----
+//MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArQ7mmjUpAbi3m2lqnAA/
+//PKSnuiyiqekAwpjXmKWLyH3a13vH6jvqT+4qnTeUCCM/ZD7WbPQVOJhSvfWAynUJ
+//eGkgIOGiCgnuLTsLypM5L7qMcHbkbsO0AuPAdxeIM1MrJf9TLwW6VoesH+7DEqnh
+//p/PUptwN+yESI5e/fDJ/3CZgvogZPI5KmR9mJOaQ5Ta61LerVZWbbNQ/sqDkcmS5
+//kM/Wf4XpcGtnVMhjm/oHIcBR2Xranw+lu1Y9oQXEDMdGvke7Pe8Aq0PvpH2vPXJg
+//BD1AwqPq3gxcrQQXPWjEiAET0TvoT+fXyTO92x3JoDnqBsrcEhHZO3TWopYLZME6
+//FQIDAQAB
+//-----END PUBLIC KEY-----
+
+//X509Certificate
+//The method or operation is not implemented.
+
+//X509CertificateSigningRequest
+//The method or operation is not implemented.
+
+//删除密钥换行和空白
+var keyBody = @"
+MIIEpAIBAAKCAQEArQ7mmjUpAbi3m2lqnAA/PKSnuiyiqekAwpjXmKWLyH3a13vH
+6jvqT+4qnTeUCCM/ZD7WbPQVOJhSvfWAynUJeGkgIOGiCgnuLTsLypM5L7qMcHbk
+bsO0AuPAdxeIM1MrJf9TLwW6VoesH+7DEqnhp/PUptwN+yESI5e/fDJ/3CZgvogZ
+PI5KmR9mJOaQ5Ta61LerVZWbbNQ/sqDkcmS5kM/Wf4XpcGtnVMhjm/oHIcBR2Xra
+nw+lu1Y9oQXEDMdGvke7Pe8Aq0PvpH2vPXJgBD1AwqPq3gxcrQQXPWjEiAET0Tvo
+T+fXyTO92x3JoDnqBsrcEhHZO3TWopYLZME6FQIDAQABAoIBAQCWhpt2Dj84zB6I
+A01Dm8NlUCLEAQcLmyuaF6+Pio7nOPEc9QGSb8MC+zn9vdX4rg/5dd60rim3LGbr
+65q2fs5Z+baEYz26VaDhnrZG4X+gUDbPq9pNrdPpn4hNDh7d5b1mM4t7HxRRJ3lD
+3T24AiPRHnkdGdLfWIiahOd9c79bEGWBltpleiPlth8LiHCjDWm5pKsqrz5PgLIT
+eA0dZ/+a6M6rLmabRjFB4lhX00QmCd50V0LQfCQN8eDCJIlGRLMYAK6+EWoqrAcU
+zI8nR5zb9WPUCiRWQFV3XhXcN/HHuDI+NdS3MggUZCazQ/Dt38s2UiSjE+npmNzy
+S18xK0WRAoGBALloNtw9vBcUcaBDHtdrEoWMp5KO+Nk0vNB8Sc/ah2iEQG1u833I
+nDl7M28+f3kk4Ec7an9/hiXke/SYK/UjJTSTTKtufGY34Jwus1Vv9JA+5i2bQ+uA
+BYiN2bveMFfyDhhdvvofseuHesVCxtxjlzsU8DyOyqtfwwYSTUBAzJLrAoGBAO7z
+B9a+q6UjmBr8fpNlffN3h7H0bUIgPYKhVw9SxXTR0TRFBWE/PUIKbUNJpgt1Qiy4
+cd3PVYcx63JHbiw0B5hs0YkSEvtUDK3wd0BLh6xLaSWvlaKjHKNDDxCLAfek1Qcr
+q0N1CPaOloVXyMeKfJh2dKFSV7OE2Ihs5P+uhCb/AoGARK+1+zunrck2GxAiod2Z
+2/3yqpnq2NTvyjDxS16C4ZZ1I9WBwSyLq8PXlzPJF8EwkVMSri85LFqMDV4+kq81
+fle/hJcG4Pt8a3/lkhZKvRGARo8Jx3oDEsayTiYPNNWIoUBBmvoY+M+VDPUjJMyE
+Xy/vnA+uR3TPlDU9hzs6TocCgYEAqVborkKQSEcya6WXWoQpv5ptOytbJurMTMBk
+f4KMVx6/IUjs6B82HZBgILiYCTS/ggvw/l4KYfZ5wpJmvMLewyITWQ3LD/xfxAFP
+sewVKYCD8uY9qHXqPLWwfmvVKBjTs/I5vGO7x2gDuloc+3TkmfQQ8ab2ak3yWrS5
+kY2vMCcCgYBzIDl+8N1A723Zs68zoztsnyNIkdEPrPeYozYf08Mo2wINYsAfEHIp
+rBfB2SdDIUDTMgZPszqvkArTmvqkvaWdCaAr12/xmCft7W3yZp1tArIz0K/pP+ZK
+C3H8zlXUDecx4Iq2CG8OGgA8NbdIPnmSGr8vf0sUllV7FlnQc10+gA==
+";
+var key1 = RsaKeyHelper.RemoveWrapLineAndTrim(keyBody);
+//Console.WriteLine(key1);
+//MIIEpAIBAAKCAQEArQ7mmjUpAbi3m2lqnAA/PKSnuiyiqekAwpjXmKWLyH3a13vH6jvqT+4qnTeUCCM/ZD7WbPQVOJhSvfWAynUJeGkgIOGiCgnuLTsLypM5L7qMcHbkbsO0AuPAdxeIM1MrJf9TLwW6VoesH+7DEqnhp/PUptwN+yESI5e/fDJ/3CZgvogZPI5KmR9mJOaQ5Ta61LerVZWbbNQ/sqDkcmS5kM/Wf4XpcGtnVMhjm/oHIcBR2Xranw+lu1Y9oQXEDMdGvke7Pe8Aq0PvpH2vPXJgBD1AwqPq3gxcrQQXPWjEiAET0TvoT+fXyTO92x3JoDnqBsrcEhHZO3TWopYLZME6FQIDAQABAoIBAQCWhpt2Dj84zB6IA01Dm8NlUCLEAQcLmyuaF6+Pio7nOPEc9QGSb8MC+zn9vdX4rg/5dd60rim3LGbr65q2fs5Z+baEYz26VaDhnrZG4X+gUDbPq9pNrdPpn4hNDh7d5b1mM4t7HxRRJ3lD3T24AiPRHnkdGdLfWIiahOd9c79bEGWBltpleiPlth8LiHCjDWm5pKsqrz5PgLITeA0dZ/+a6M6rLmabRjFB4lhX00QmCd50V0LQfCQN8eDCJIlGRLMYAK6+EWoqrAcUzI8nR5zb9WPUCiRWQFV3XhXcN/HHuDI+NdS3MggUZCazQ/Dt38s2UiSjE+npmNzyS18xK0WRAoGBALloNtw9vBcUcaBDHtdrEoWMp5KO+Nk0vNB8Sc/ah2iEQG1u833InDl7M28+f3kk4Ec7an9/hiXke/SYK/UjJTSTTKtufGY34Jwus1Vv9JA+5i2bQ+uABYiN2bveMFfyDhhdvvofseuHesVCxtxjlzsU8DyOyqtfwwYSTUBAzJLrAoGBAO7zB9a+q6UjmBr8fpNlffN3h7H0bUIgPYKhVw9SxXTR0TRFBWE/PUIKbUNJpgt1Qiy4cd3PVYcx63JHbiw0B5hs0YkSEvtUDK3wd0BLh6xLaSWvlaKjHKNDDxCLAfek1Qcrq0N1CPaOloVXyMeKfJh2dKFSV7OE2Ihs5P+uhCb/AoGARK+1+zunrck2GxAiod2Z2/3yqpnq2NTvyjDxS16C4ZZ1I9WBwSyLq8PXlzPJF8EwkVMSri85LFqMDV4+kq81fle/hJcG4Pt8a3/lkhZKvRGARo8Jx3oDEsayTiYPNNWIoUBBmvoY+M+VDPUjJMyEXy/vnA+uR3TPlDU9hzs6TocCgYEAqVborkKQSEcya6WXWoQpv5ptOytbJurMTMBkf4KMVx6/IUjs6B82HZBgILiYCTS/ggvw/l4KYfZ5wpJmvMLewyITWQ3LD/xfxAFPsewVKYCD8uY9qHXqPLWwfmvVKBjTs/I5vGO7x2gDuloc+3TkmfQQ8ab2ak3yWrS5kY2vMCcCgYBzIDl+8N1A723Zs68zoztsnyNIkdEPrPeYozYf08Mo2wINYsAfEHIprBfB2SdDIUDTMgZPszqvkArTmvqkvaWdCaAr12/xmCft7W3yZp1tArIz0K/pP+ZKC3H8zlXUDecx4Iq2CG8OGgA8NbdIPnmSGr8vf0sUllV7FlnQc10+gA==
+
+//将密钥体内容按64个字符换行
+var key2 = RsaKeyHelper.WrapLineWith64Char(key1);
+//Console.WriteLine(key2);
+//MIIEpAIBAAKCAQEArQ7mmjUpAbi3m2lqnAA/PKSnuiyiqekAwpjXmKWLyH3a13vH
+//6jvqT+4qnTeUCCM/ZD7WbPQVOJhSvfWAynUJeGkgIOGiCgnuLTsLypM5L7qMcHbk
+//bsO0AuPAdxeIM1MrJf9TLwW6VoesH+7DEqnhp/PUptwN+yESI5e/fDJ/3CZgvogZ
+//PI5KmR9mJOaQ5Ta61LerVZWbbNQ/sqDkcmS5kM/Wf4XpcGtnVMhjm/oHIcBR2Xra
+//nw+lu1Y9oQXEDMdGvke7Pe8Aq0PvpH2vPXJgBD1AwqPq3gxcrQQXPWjEiAET0Tvo
+//T+fXyTO92x3JoDnqBsrcEhHZO3TWopYLZME6FQIDAQABAoIBAQCWhpt2Dj84zB6I
+//A01Dm8NlUCLEAQcLmyuaF6+Pio7nOPEc9QGSb8MC+zn9vdX4rg/5dd60rim3LGbr
+//65q2fs5Z+baEYz26VaDhnrZG4X+gUDbPq9pNrdPpn4hNDh7d5b1mM4t7HxRRJ3lD
+//3T24AiPRHnkdGdLfWIiahOd9c79bEGWBltpleiPlth8LiHCjDWm5pKsqrz5PgLIT
+//eA0dZ/+a6M6rLmabRjFB4lhX00QmCd50V0LQfCQN8eDCJIlGRLMYAK6+EWoqrAcU
+//zI8nR5zb9WPUCiRWQFV3XhXcN/HHuDI+NdS3MggUZCazQ/Dt38s2UiSjE+npmNzy
+//S18xK0WRAoGBALloNtw9vBcUcaBDHtdrEoWMp5KO+Nk0vNB8Sc/ah2iEQG1u833I
+//nDl7M28+f3kk4Ec7an9/hiXke/SYK/UjJTSTTKtufGY34Jwus1Vv9JA+5i2bQ+uA
+//BYiN2bveMFfyDhhdvvofseuHesVCxtxjlzsU8DyOyqtfwwYSTUBAzJLrAoGBAO7z
+//B9a+q6UjmBr8fpNlffN3h7H0bUIgPYKhVw9SxXTR0TRFBWE/PUIKbUNJpgt1Qiy4
+//cd3PVYcx63JHbiw0B5hs0YkSEvtUDK3wd0BLh6xLaSWvlaKjHKNDDxCLAfek1Qcr
+//q0N1CPaOloVXyMeKfJh2dKFSV7OE2Ihs5P+uhCb/AoGARK+1+zunrck2GxAiod2Z
+//2/3yqpnq2NTvyjDxS16C4ZZ1I9WBwSyLq8PXlzPJF8EwkVMSri85LFqMDV4+kq81
+//fle/hJcG4Pt8a3/lkhZKvRGARo8Jx3oDEsayTiYPNNWIoUBBmvoY+M+VDPUjJMyE
+//Xy/vnA+uR3TPlDU9hzs6TocCgYEAqVborkKQSEcya6WXWoQpv5ptOytbJurMTMBk
+//f4KMVx6/IUjs6B82HZBgILiYCTS/ggvw/l4KYfZ5wpJmvMLewyITWQ3LD/xfxAFP
+//sewVKYCD8uY9qHXqPLWwfmvVKBjTs/I5vGO7x2gDuloc+3TkmfQQ8ab2ak3yWrS5
+//kY2vMCcCgYBzIDl+8N1A723Zs68zoztsnyNIkdEPrPeYozYf08Mo2wINYsAfEHIp
+//rBfB2SdDIUDTMgZPszqvkArTmvqkvaWdCaAr12/xmCft7W3yZp1tArIz0K/pP+ZK
+//C3H8zlXUDecx4Iq2CG8OGgA8NbdIPnmSGr8vf0sUllV7FlnQc10+gA==
+
+//验证私钥和公钥是否匹配
+var publicKey = @"
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArQ7mmjUpAbi3m2lqnAA/
+PKSnuiyiqekAwpjXmKWLyH3a13vH6jvqT+4qnTeUCCM/ZD7WbPQVOJhSvfWAynUJ
+eGkgIOGiCgnuLTsLypM5L7qMcHbkbsO0AuPAdxeIM1MrJf9TLwW6VoesH+7DEqnh
+p/PUptwN+yESI5e/fDJ/3CZgvogZPI5KmR9mJOaQ5Ta61LerVZWbbNQ/sqDkcmS5
+kM/Wf4XpcGtnVMhjm/oHIcBR2Xranw+lu1Y9oQXEDMdGvke7Pe8Aq0PvpH2vPXJg
+BD1AwqPq3gxcrQQXPWjEiAET0TvoT+fXyTO92x3JoDnqBsrcEhHZO3TWopYLZME6
+FQIDAQAB
+-----END PUBLIC KEY-----
+";
+var isKeyPairMatch = RsaKeyHelper.IsKeyPairMatch(rsaPrivateKey, publicKey);
+Console.WriteLine(isKeyPairMatch);
+//True
+
+//获取密钥信息
+var info = RsaKeyHelper.GetKeyInfo(rsaPrivateKey);
+//Console.WriteLine(info.Serialize(new JsonOption { FormatJson = true }));
+//{
+//  "Type": 1,
+//  "IsPrivate": true,
+//  "IsEncrypted": false,
+//  "KeySize": 2048,
+//  "Parameters": {
+//    "Modulus": "ad0ee69a352901b8b79b696a9c003f3ca4a7ba2ca2a9e900c298d798a58bc87ddad77bc7ea3bea4fee2a9d379408233f643ed66cf415389852bdf580ca750978692020e1a20a09ee2d3b0bca93392fba8c7076e46ec3b402e3c077178833532b25ff532f05ba5687ac1feec312a9e1a7f3d4a6dc0dfb21122397bf7c327fdc2660be88193c8e4a991f6624e690e536bad4b7ab55959b6cd43fb2a0e47264b990cfd67f85e9706b6754c8639bfa0721c051d97ada9f0fa5bb563da105c40cc746be47bb3def00ab43efa47daf3d7260043d40c2a3eade0c5cad04173d68c4880113d13be84fe7d7c933bddb1dc9a039ea06cadc1211d93b74d6a2960b64c13a15",
+//    "Exponent": "010001",
+//    "D": "96869b760e3f38cc1e88034d439bc3655022c401070b9b2b9a17af8f8a8ee738f11cf501926fc302fb39fdbdd5f8ae0ff975deb4ae29b72c66ebeb9ab67ece59f9b684633dba55a0e19eb646e17fa05036cfabda4dadd3e99f884d0e1edde5bd66338b7b1f1451277943dd3db80223d11e791d19d2df58889a84e77d73bf5b10658196da657a23e5b61f0b8870a30d69b9a4ab2aaf3e4f80b213780d1d67ff9ae8ceab2e669b463141e25857d3442609de745742d07c240df1e0c224894644b31800aebe116a2aac0714cc8f27479cdbf563d40a24564055775e15dc37f1c7b8323e35d4b73208146426b343f0eddfcb365224a313e9e998dcf24b5f312b4591",
+//    "P": "b96836dc3dbc171471a0431ed76b12858ca7928ef8d934bcd07c49cfda876884406d6ef37dc89c397b336f3e7f7924e0473b6a7f7f8625e47bf4982bf5232534934cab6e7c6637e09c2eb3556ff4903ee62d9b43eb8005888dd9bbde3057f20e185dbefa1fb1eb877ac542c6dc63973b14f03c8ecaab5fc306124d4040cc92eb",
+//    "DP": "44afb5fb3ba7adc9361b1022a1dd99dbfdf2aa99ead8d4efca30f14b5e82e1967523d581c12c8babc3d79733c917c130915312ae2f392c5a8c0d5e3e92af357e57bf849706e0fb7c6b7fe592164abd1180468f09c77a0312c6b24e260f34d588a140419afa18f8cf950cf52324cc845f2fef9c0fae4774cf94353d873b3a4e87",
+//    "DQ": "a956e8ae42904847326ba5975a8429bf9a6d3b2b5b26eacc4cc0647f828c571ebf2148ece81f361d906020b8980934bf820bf0fe5e0a61f679c29266bcc2dec32213590dcb0ffc5fc4014fb1ec15298083f2e63da875ea3cb5b07e6bd52818d3b3f239bc63bbc76803ba5a1cfb74e499f410f1a6f66a4df25ab4b9918daf3027",
+//    "InverseQ": "7320397ef0dd40ef6dd9b3af33a33b6c9f234891d10facf798a3361fd3c328db020d62c01f107229ac17c1d927432140d332064fb33aaf900ad39afaa4bda59d09a02bd76ff19827eded6df2669d6d02b233d0afe93fe64a0b71fcce55d40de731e08ab6086f0e1a003c35b7483e79921abf2f7f4b1496557b1659d0735d3e80"
+//  }
+//}
 ```
-
-## 特性
-
-- 支持生成不同大小的 RSA 密钥对
-- 支持导出和导入公钥
-- 支持导出和导入私钥
-- 支持从密钥字符串创建 RSA 实例
