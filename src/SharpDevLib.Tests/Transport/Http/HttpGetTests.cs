@@ -33,7 +33,8 @@ public class HttpGetTests : HttpBaseTests
                 Console.WriteLine($"receive->{p}");
             }
         };
-        var response = new HttpRequest(BaseUrl.CombinePath("/api/get/int")) { Config = config }
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/get/int"))
+            .SetConfig(config)
             .AddParameter("seed", "1")
             .GetAsync()
             .GetAwaiter()
@@ -99,7 +100,8 @@ public class HttpGetTests : HttpBaseTests
                 Console.WriteLine($"receive->{p}");
             }
         };
-        using var stream = new HttpRequest(BaseUrl.CombinePath("/statics/TestFile.txt")) { Config = config }
+        using var stream = new HttpRequest(BaseUrl.CombinePath("/statics/TestFile.txt"))
+            .SetConfig(config)
             .GetStreamAsync()
             .GetAwaiter()
             .GetResult();
@@ -161,7 +163,8 @@ public class HttpGetTests : HttpBaseTests
             .GetResult();
         Assert.IsFalse(response.IsSuccess);
 
-        response = new HttpRequest(url) { Config = new HttpConfig { RetryCount = 3 } }
+        response = new HttpRequest(url)
+            .SetConfig(new HttpConfig { RetryCount = 3 })
             .AddParameter("count", "6")
             .AddParameter("id", Guid.NewGuid().ToString())
             .GetAsync()
@@ -169,7 +172,8 @@ public class HttpGetTests : HttpBaseTests
             .GetResult();
         Assert.IsFalse(response.IsSuccess);
 
-        response = new HttpRequest(url) { Config = new HttpConfig { RetryCount = 10 } }
+        response = new HttpRequest(url)
+            .SetConfig(new HttpConfig { RetryCount = 10 })
             .AddParameter("count", "6")
             .AddParameter("id", Guid.NewGuid().ToString())
             .GetAsync()
@@ -183,26 +187,30 @@ public class HttpGetTests : HttpBaseTests
     {
         HttpConfig.Default.Timeout = TimeSpan.FromSeconds(2);
         var url = BaseUrl.CombinePath("/api/get/timeout");
-        var response = new HttpRequest(url) { Config = new HttpConfig { RetryCount = 0 } }
+        var response = new HttpRequest(url)
+            .SetConfig(new HttpConfig { RetryCount = 0 })
             .GetAsync()
             .GetAwaiter()
             .GetResult();
         Assert.IsTrue(response.IsSuccess);
 
         HttpConfig.Default.Timeout = TimeSpan.FromSeconds(1);
-        response = new HttpRequest(url) { Config = new HttpConfig { RetryCount = 0 } }
+        response = new HttpRequest(url)
+            .SetConfig(new HttpConfig { RetryCount = 0 })
             .GetAsync()
             .GetAwaiter()
             .GetResult();
         Assert.IsFalse(response.IsSuccess);
 
-        response = new HttpRequest(url) { Config = new HttpConfig { Timeout = TimeSpan.FromSeconds(2), RetryCount = 0 } }
+        response = new HttpRequest(url)
+            .SetConfig(new HttpConfig { Timeout = TimeSpan.FromSeconds(2), RetryCount = 0 })
             .GetAsync()
             .GetAwaiter()
             .GetResult();
         Assert.IsTrue(response.IsSuccess);
 
-        response = new HttpRequest(url) { Config = new HttpConfig { Timeout = TimeSpan.FromSeconds(1), RetryCount = 0 } }
+        response = new HttpRequest(url)
+            .SetConfig(new HttpConfig { Timeout = TimeSpan.FromSeconds(1), RetryCount = 0 })
             .GetAsync()
             .GetAwaiter()
             .GetResult();

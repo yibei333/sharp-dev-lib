@@ -10,11 +10,16 @@ public class HttpConfig
     /// <summary>
     /// 获取或设置默认的HTTP配置
     /// </summary>
-    public static HttpConfig Default { get; set; } = new()
+    public static HttpConfig Default { get; } = new()
     {
         Logger = new SimpleConsoleLogger(nameof(HttpHelper)),
         UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0"
     };
+
+    /// <summary>
+    /// 完成请求选项
+    /// </summary>
+    public HttpCompletionOption HttpCompletionOption { get; set; } = HttpCompletionOption.ResponseHeadersRead;
 
     /// <summary>
     /// 日志记录器
@@ -37,12 +42,12 @@ public class HttpConfig
     public string? UserAgent { get; set; }
 
     /// <summary>
-    /// 接收数据进度回调事件
+    /// 接收数据进度回调事件,需要响应头中包含Content-Length,一般适用于下载文件
     /// </summary>
     public Action<HttpProgress>? OnReceiveProgress { get; set; }
 
     /// <summary>
-    /// 发送数据进度回调事件
+    /// 发送数据进度回调事件,需要请求头中包含Content-Length,一般适用于上传文件
     /// </summary>
     public Action<HttpProgress>? OnSendProgress { get; set; }
 }

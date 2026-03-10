@@ -32,7 +32,8 @@ public class HttpDeleteTests : HttpBaseTests
                 Console.WriteLine($"receive->{p}");
             }
         };
-        var response = new HttpRequest(BaseUrl.CombinePath("/api/delete/int")) { Config = config }
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/delete/int"))
+            .SetConfig(config)
             .AddParameter("name", "foo")
             .AddParameter("age", "10")
             .DeleteAsync()

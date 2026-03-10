@@ -149,7 +149,7 @@ public static class ExcelHelper
         workbookPart.Workbook.AppendChild(sheets);
         var sharedStringTable = workbookPart.GetSharedStringTable();
         var sharedStringDictionary = new Dictionary<string, int>();
-        WriteTable(workbookPart,sheets,1,dataTable,columnNames,sharedStringTable,sharedStringDictionary);
+        WriteTable(workbookPart, sheets, 1, dataTable, columnNames, sharedStringTable, sharedStringDictionary);
         doc.Save();
     }
 
@@ -302,7 +302,7 @@ public static class ExcelHelper
         worksheet.InsertBefore(columns, worksheet.GetFirstChild<SheetData>());
     }
 
-    static void WriteTable(WorkbookPart workbookPart,Sheets sheets,uint sheetIndex, DataTable dataTable, string[]? columnNames,SharedStringTable sharedStringTable,Dictionary<string,int> sharedStringDictionary)
+    static void WriteTable(WorkbookPart workbookPart, Sheets sheets, uint sheetIndex, DataTable dataTable, string[]? columnNames, SharedStringTable sharedStringTable, Dictionary<string, int> sharedStringDictionary)
     {
         var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
         worksheetPart.Worksheet = new Worksheet();

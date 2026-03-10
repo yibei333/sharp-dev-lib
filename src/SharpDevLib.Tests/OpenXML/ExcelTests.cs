@@ -75,7 +75,7 @@ public class ExcelTests
         using var stream = GetSourceStream("Normal", out _);
 
         var set = ExcelHelper.ReadSet(stream);
-        Assert.AreEqual(2, set.Tables.Count);
+        Assert.HasCount(2, set.Tables);
         var table1 = set.Tables["T1"];
         Assert.IsNotNull(table1);
         var list1 = table1.ToList<Foo>();
@@ -105,7 +105,7 @@ public class ExcelTests
         using var stream = GetSourceStream("Normal", out _);
 
         var set = ExcelHelper.ReadSet(stream, [["字符串值", "整型值", "双精度浮点数值", "十进制值", "布尔值", "枚举值"], ["字符串值", "整型值", "双精度浮点数值", "十进制值", "布尔值", "枚举值"]]);
-        Assert.AreEqual(2, set.Tables.Count);
+        Assert.HasCount(2, set.Tables);
     }
 
     [TestMethod]
@@ -124,7 +124,7 @@ public class ExcelTests
         Assert.IsGreaterThan(0, new FileInfo(path).Length);
 
         var readSet = ExcelHelper.ReadSet(stream);
-        Assert.AreEqual(2, readSet.Tables.Count);
+        Assert.HasCount(2, readSet.Tables);
         var readTable1 = readSet.Tables["Table1"];
         Assert.IsNotNull(readTable1);
         var readList1 = readTable1.ToList<Foo>();
@@ -179,7 +179,7 @@ public class ExcelTests
         ExcelHelper.Write(writeTable1, stream);
 
         var readSet = ExcelHelper.ReadSet(stream);
-        Assert.AreEqual(1, readSet.Tables.Count);
+        Assert.HasCount(1, readSet.Tables);
         var readTable1 = readSet.Tables["Sheet1"];
         Assert.IsNotNull(readTable1);
         var readList1 = readTable1.ToList<Foo>();
@@ -240,7 +240,7 @@ public class ExcelTests
         Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
 
         var readSet = ExcelHelper.ReadSet(targetStream);
-        Assert.AreEqual(2, readSet.Tables.Count);
+        Assert.HasCount(2, readSet.Tables);
         var readTable2 = readSet.Tables["T2"];
         Assert.IsNotNull(readTable2);
         var readList2 = readTable2.ToList<Foo>();
@@ -270,7 +270,7 @@ public class ExcelTests
         Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
 
         var readSet = ExcelHelper.ReadSet(targetStream);
-        Assert.AreEqual(2, readSet.Tables.Count);
+        Assert.HasCount(2, readSet.Tables);
         var readTable2 = readSet.Tables["T2"];
         Assert.IsNotNull(readTable2);
         var readList2 = readTable2.ToList<Foo>();

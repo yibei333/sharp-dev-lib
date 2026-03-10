@@ -24,8 +24,10 @@ public class HttpProgress
         get => _transfered;
         internal set
         {
+            _lastTransferTime ??= DateTime.Now;
             var singleTransfered = value - _transfered;
             _transfered = value;
+            if (_transfered <= 0) return;
 
             var now = DateTime.Now;
             var time = now - (_lastTransferTime ?? now);
@@ -40,7 +42,7 @@ public class HttpProgress
     /// 传输进度百分比
     /// </summary>
     /// <value>范围0-100</value>
-    public double Progress => Total <= 0 ? 0 : Math.Round(Transfered * 100.0 / Total, 2);
+    public double Progress => Total <= 0 ? 0 : Transfered >= Total ? 100 : Math.Round(Transfered * 100.0 / Total, 2);
 
     /// <summary>
     /// 进度字符串（带百分号）
@@ -52,13 +54,6 @@ public class HttpProgress
     /// </summary>
     /// <value>格式为"XX/s"，XX为带单位的大小字符串</value>
     public string Speed { get; private set; } = string.Empty;
-
-    internal void Reset()
-    {
-        _lastTransferTime = DateTime.Now;
-        _transfered = 0;
-        Total = 0;
-    }
 
     /// <summary>
     /// 将进度信息转换为字符串

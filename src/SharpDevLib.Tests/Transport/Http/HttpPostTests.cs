@@ -14,7 +14,8 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public void PostJsonTest()
     {
-        var response = new HttpRequest(BaseUrl.CombinePath("/api/post"), _userJson)
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/post"))
+            .AddJson(_userJson)
             .PostAsync()
             .GetAwaiter()
             .GetResult();
@@ -24,7 +25,8 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public void PostJsonIntTest()
     {
-        var response = new HttpRequest(BaseUrl.CombinePath("/api/post/int"), _userJson)
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/post/int"))
+            .AddJson(_userJson)
             .PostAsync()
             .GetAwaiter()
             .GetResult();
@@ -35,7 +37,8 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public void PostJsonStringTest()
     {
-        var response = new HttpRequest(BaseUrl.CombinePath("/api/post/string"), _userJson)
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/post/string"))
+            .AddJson(_userJson)
             .PostAsync()
             .GetAwaiter()
             .GetResult();
@@ -46,7 +49,8 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public void PostJsonObjectTest()
     {
-        var response = new HttpRequest(BaseUrl.CombinePath("/api/post/object"), _userJson)
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/post/object"))
+            .AddJson(_userJson)
             .PostAsync()
             .GetAwaiter()
             .GetResult();
@@ -119,7 +123,8 @@ public class HttpPostTests : HttpBaseTests
                 Console.WriteLine($"send->{p}");
             }
         };
-        var response = new HttpRequest(BaseUrl.CombinePath("/api/post/form/multi/object")) { Config = config }
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/post/form/multi/object"))
+            .SetConfig(config)
             .AddParameter("Name", "foo")
             .AddParameter("Age", "10")
             .AddFile(new HttpFormFile("file", "TestFile.txt", File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))))

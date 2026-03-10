@@ -101,7 +101,7 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
     public override string ToString()
     {
         var builder = new StringBuilder();
-        BuildRequestInfo(builder, Request);
+        BuildRequestInfo(builder);
         BuildResponseInfo(builder, this);
         return builder.ToString();
     }
@@ -183,41 +183,41 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
         return new KeyValuePair<string, string?>(name, value);
     }
 
-    static void BuildRequestInfo(StringBuilder builder, HttpRequest request)
+    void BuildRequestInfo(StringBuilder builder)
     {
         builder.AppendLine($"****request****");
-        builder.AppendLine($"url:{request.RequestUrl}");
-        builder.AppendLine($"method:{request.HttpRequestMessage.Method}");
-        if (request.Headers.NotNullOrEmpty())
+        builder.AppendLine($"url:{HttpResponseMessage.RequestMessage.RequestUri}");
+        builder.AppendLine($"method:{HttpResponseMessage.RequestMessage.Method}");
+        if (HttpResponseMessage.Content.Headers.NotNullOrEmpty())
         {
             builder.AppendLine("headers:");
-            foreach (var item in request.Headers)
+            foreach (var item in HttpResponseMessage.Content.Headers)
             {
                 builder.AppendLine($"{item.Key}:{string.Join(",", item.Value)}");
             }
         }
 
-        var requestContentType = request.HttpRequestMessage.Content?.Headers?.ContentType?.ToString();
+        var requestContentType = HttpResponseMessage.RequestMessage.Content?.Headers?.ContentType?.ToString();
         if (requestContentType.IsNullOrWhiteSpace()) return;
         builder.AppendLine($"content-type:{requestContentType}");
         if (requestContentType.Contains("application/json"))
         {
             builder.AppendLine($"json:");
-            builder.AppendLine(request.Json);
+            builder.AppendLine(Request.Json);
         }
         else if (requestContentType.Contains("multipart/form-data"))
         {
             builder.AppendLine($"form:");
-            if (request.Parameters.NotNullOrEmpty())
+            if (Request.Parameters.NotNullOrEmpty())
             {
-                foreach (var item in request.Parameters)
+                foreach (var item in Request.Parameters)
                 {
                     builder.AppendLine($"{item.Key}:{item.Value}");
                 }
             }
-            if (request.Files.NotNullOrEmpty())
+            if (Request.Files.NotNullOrEmpty())
             {
-                foreach (var item in request.Files)
+                foreach (var item in Request.Files)
                 {
                     builder.AppendLine($"{item.ParameterName}:{item.FileName}");
                 }
@@ -226,9 +226,9 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
         else if (requestContentType.Contains("application/x-www-form-urlencoded"))
         {
             builder.AppendLine($"form:");
-            if (request.Parameters.NotNullOrEmpty())
+            if (Request.Parameters.NotNullOrEmpty())
             {
-                foreach (var item in request.Parameters)
+                foreach (var item in Request.Parameters)
                 {
                     builder.AppendLine($"{item.Key}:{item.Value}");
                 }

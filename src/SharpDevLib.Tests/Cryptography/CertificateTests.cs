@@ -190,7 +190,7 @@ public class CertificateTests
 
     static void SavePfxStreamTest(X509Certificate2 certificate, string keyPath, string pfxPath)
     {
-        var stream = new FileStream(pfxPath,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.ReadWrite);
+        var stream = new FileStream(pfxPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
         certificate.SavePfx(stream, File.ReadAllText(keyPath), "foo");
         stream.Close();
 

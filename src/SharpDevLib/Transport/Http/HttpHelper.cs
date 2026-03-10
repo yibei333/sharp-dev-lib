@@ -1,6 +1,4 @@
-﻿using SharpDevLib.Transport.Internal;
-using System.Net;
-using System.Text;
+﻿using System.Text;
 
 namespace SharpDevLib;
 
@@ -71,23 +69,28 @@ public static class HttpHelper
     static async Task<HttpResponse> SendAsync(this HttpRequest request, HttpMethod method, CancellationToken? cancellationToken = null)
     {
         if (request.Url.IsNullOrWhiteSpace()) throw new InvalidOperationException("URL不能为空");
+        var url = request.Url;
         if (method == HttpMethod.Get || method == HttpMethod.Delete)
         {
             if (request.Parameters.NotNullOrEmpty())
             {
-                var url = request.Url.TrimEnd("?");
+                url = request.Url.TrimEnd("?");
                 var prefix = url.Contains("?") ? "&" : "?";
-                request.RequestUrl = $"{url}{prefix}{request.Parameters.ToQueryString()}";
+                url = $"{url}{prefix}{request.Parameters.ToQueryString()}";
             }
         }
-        using var client = CreateClient(request);
+        var client = HttpClientFactory.GetClient(request.ClientId);
+        var timeout = request.Config?.Timeout ?? HttpConfig.Default.Timeout;
+        if (timeout is not null) client.Client.Timeout = timeout.Value;
+        request.Cookies?.ForEach(client.ClientHandler.CookieContainer.Add);
+
         HttpRequestMessage CreateRequestMessage()
         {
             //query string
-            if (method == HttpMethod.Get || method == HttpMethod.Delete) return new HttpRequestMessage(method, request.RequestUrl);
+            if (method == HttpMethod.Get || method == HttpMethod.Delete) return new HttpRequestMessage(method, url);
 
             //json
-            if (request.Json.NotNullOrEmpty()) return new HttpRequestMessage(method, request.RequestUrl) { Content = new StringContent(request.Json, Encoding.UTF8, "application/json") };
+            if (request.Json.NotNullOrEmpty()) return new HttpRequestMessage(method, url) { Content = new StringContent(request.Json, Encoding.UTF8, "application/json") };
 
             //multi part form data
             if (request.Files.NotNullOrEmpty())
@@ -110,74 +113,18 @@ public static class HttpHelper
                     }
                     multipartFormDataContent.Add(new StreamContent(stream), file.ParameterName, file.FileName);
                 }
-                return new HttpRequestMessage(method, request.RequestUrl) { Content = multipartFormDataContent };
+                return new HttpRequestMessage(method, url) { Content = multipartFormDataContent };
             }
 
             //form url encoded
-            if (request.Parameters.NotNullOrEmpty()) return new HttpRequestMessage(method, request.RequestUrl) { Content = new FormUrlEncodedContent(request.Parameters ?? []) };
+            if (request.Parameters.NotNullOrEmpty()) return new HttpRequestMessage(method, url) { Content = new FormUrlEncodedContent(request.Parameters ?? []) };
 
             //default
             return new HttpRequestMessage(method, request.Url);
         }
-        var responseMonitor = await RetryAsync(client, request, CreateRequestMessage, cancellationToken);
+
+        var responseMonitor = await RetryAsync(client.Client, request, CreateRequestMessage, cancellationToken);
         return responseMonitor.BuildResponse();
-    }
-
-    static HttpClient CreateClient(HttpRequest request)
-    {
-        var handler = new HttpClientHandler { CookieContainer = new CookieContainer() };
-        if (request.Cookies.NotNullOrEmpty())
-        {
-            handler.CookieContainer = new CookieContainer();
-            foreach (var cookie in request.Cookies) handler.CookieContainer.Add(cookie);
-        }
-
-        var progressHanlder = new ProgressMessageHandler(handler);
-        var client = new HttpClient(progressHanlder);
-
-        var onSendProgress = request.Config?.OnSendProgress ?? HttpConfig.Default?.OnSendProgress;
-        if (onSendProgress is not null)
-        {
-            var progress = new HttpProgress();
-            progressHanlder.HttpStartSend += (_, _) => progress.Reset();
-            progressHanlder.HttpSendProgress += (_, e) =>
-            {
-                progress.Total = e.TotalBytes ?? 0;
-                progress.Transfered = e.BytesTransferred;
-                onSendProgress(progress);
-            };
-        }
-
-        var onReceiveProgress = request.Config?.OnReceiveProgress ?? HttpConfig.Default?.OnReceiveProgress;
-        if (onReceiveProgress is not null)
-        {
-            var progress = new HttpProgress();
-            progressHanlder.HttpStartSend += (_, _) => progress.Reset();
-            progressHanlder.HttpReceiveProgress += (_, e) =>
-            {
-                progress.Total = e.TotalBytes ?? 0;
-                progress.Transfered = e.BytesTransferred;
-                onReceiveProgress(progress);
-            };
-        }
-
-        var ua = request.Config?.UserAgent ?? HttpConfig.Default?.UserAgent;
-        if (ua.NotNullOrWhiteSpace() && !(request.Headers?.ContainsKey("User-Agent") ?? false))
-        {
-            request.Headers ??= [];
-            request.Headers.Add("User-Agent", [ua]);
-        }
-
-        if (request.Headers.NotNullOrEmpty())
-        {
-            foreach (var header in request.Headers)
-            {
-                if (header.Value.NotNullOrEmpty()) client.DefaultRequestHeaders.Add(header.Key, header.Value);
-            }
-        }
-
-        client.Timeout = request.Config?.Timeout ?? HttpConfig.Default?.Timeout ?? TimeSpan.FromDays(1);
-        return client;
     }
 
     static async Task<ResponseMonitor> RetryAsync(HttpClient client, HttpRequest request, Func<HttpRequestMessage> createRequestMessage, CancellationToken? cancellationToken = null)
@@ -199,8 +146,22 @@ public static class HttpHelper
             retryIndex++;
             try
             {
-                request.HttpRequestMessage = createRequestMessage();
-                response = await client.SendAsync(request.HttpRequestMessage, HttpCompletionOption.ResponseContentRead, cancellationToken ?? CancellationToken.None);
+                var message = createRequestMessage();
+                var ua = request.Config?.UserAgent ?? HttpConfig.Default?.UserAgent;
+                if (ua.NotNullOrWhiteSpace() && !(request.Headers?.ContainsKey("User-Agent") ?? false))
+                {
+                    request.Headers ??= [];
+                    request.Headers.Add("User-Agent", [ua]);
+                }
+
+                if (request.Headers.NotNullOrEmpty())
+                {
+                    foreach (var header in request.Headers)
+                    {
+                        if (header.Value.NotNullOrEmpty()) message.Headers.Add(header.Key, header.Value);
+                    }
+                }
+                response = await client.SendAsync(HttpProgressContent.Convert(request, message), request.Config?.HttpCompletionOption ?? HttpConfig.Default!.HttpCompletionOption, cancellationToken ?? CancellationToken.None);
                 var endTime = DateTime.Now;
                 last = endTime - startTime;
                 total += last;

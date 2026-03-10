@@ -12,7 +12,9 @@ public class HttpPutTests : HttpBaseTests
     [TestMethod]
     public void PutTest()
     {
-        var response = new HttpRequest(BaseUrl.CombinePath("/api/put"), _userJson) { Config = new HttpConfig { UserAgent = null } }
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/put"))
+            .AddJson(_userJson)
+            .SetConfig(new HttpConfig { UserAgent = null })
             .PutAsync()
             .GetAwaiter()
             .GetResult();
@@ -22,7 +24,8 @@ public class HttpPutTests : HttpBaseTests
     [TestMethod]
     public void PutIntTest()
     {
-        var response = new HttpRequest(BaseUrl.CombinePath("/api/put/int"), _userJson)
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/put/int"))
+            .AddJson(_userJson)
             .PutAsync()
             .GetAwaiter()
             .GetResult();
@@ -33,7 +36,8 @@ public class HttpPutTests : HttpBaseTests
     [TestMethod]
     public void PutStringTest()
     {
-        var response = new HttpRequest(BaseUrl.CombinePath("/api/put/string"), _userJson)
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/put/string"))
+            .AddJson(_userJson)
             .PutAsync()
             .GetAwaiter()
             .GetResult();
@@ -44,7 +48,8 @@ public class HttpPutTests : HttpBaseTests
     [TestMethod]
     public void PutObjectTest()
     {
-        var response = new HttpRequest(BaseUrl.CombinePath("/api/put/object"), _userJson)
+        var response = new HttpRequest(BaseUrl.CombinePath("/api/put/object"))
+            .AddJson(_userJson)
             .PutAsync()
             .GetAwaiter()
             .GetResult();
