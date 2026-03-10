@@ -23,23 +23,12 @@ public class HttpDeleteTests : HttpBaseTests
     [TestMethod]
     public void DeleteIntTest()
     {
-        var count = 0;
-        var config = new HttpConfig
-        {
-            OnReceiveProgress = p =>
-            {
-                count++;
-                Console.WriteLine($"receive->{p}");
-            }
-        };
         var response = new HttpRequest(BaseUrl.CombinePath("/api/delete/int"))
-            .SetConfig(config)
             .AddParameter("name", "foo")
             .AddParameter("age", "10")
             .DeleteAsync()
             .GetAwaiter()
             .GetResult();
-        Assert.IsGreaterThan(0, count);
         Assert.IsTrue(response.IsSuccess);
         var actual = response.GetResponseDataAsync<int>().GetAwaiter().GetResult();
         Assert.AreEqual(10, actual);

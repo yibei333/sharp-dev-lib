@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using DocumentFormat.OpenXml.Office2016.Excel;
+using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text;
 
@@ -7,43 +8,56 @@ namespace SharpDevLib;
 /// <summary>
 /// HTTP响应，封装HTTP请求的响应信息
 /// </summary>
-public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponseMessage, string? errorMessage, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming)
+public class HttpResponse
 {
+    internal HttpResponse(HttpRequest request, HttpResponseMessage? httpResponseMessage, string? errorMessage, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming)
+    {
+        _httpResponseMessage = httpResponseMessage;
+        Code = _httpResponseMessage?.StatusCode ?? HttpStatusCode.Unused;
+        IsSuccess = _httpResponseMessage?.IsSuccessStatusCode ?? false;
+        Request = request;
+        ErrorMessage = errorMessage;
+        if (_httpResponseMessage is null && errorMessage.IsNullOrWhiteSpace()) ErrorMessage = "无响应";
+        RetryCount = retryCount;
+        LastTimeConsuming = lastTimeConsuming;
+        TotalTimeConsuming = totalTimeConsuming;
+    }
+
     /// <summary>
     /// 获取对应的HTTP请求
     /// </summary>
-    HttpRequest Request { get; } = request;
+    HttpRequest Request { get; }
 
-    readonly HttpResponseMessage? _httpResponseMessage = httpResponseMessage;
+    readonly HttpResponseMessage? _httpResponseMessage;
 
     /// <summary>
     /// 获取HTTP响应消息
     /// </summary>
     /// <exception cref="Exception">当无法获取响应消息时抛出异常</exception>
-    public HttpResponseMessage HttpResponseMessage => _httpResponseMessage ?? throw new Exception("无法获取响应消息,可能是请求任务在完成前被取消");
+    HttpResponseMessage HttpResponseMessage => _httpResponseMessage ?? throw new Exception("无法获取响应消息,可能是请求任务在完成前被取消");
 
     /// <summary>
     /// 获取请求是否成功
     /// </summary>
     /// <value>当HTTP状态码为2xx时返回true，否则返回false</value>
-    public bool IsSuccess { get; } = httpResponseMessage?.IsSuccessStatusCode ?? false;
+    public bool IsSuccess { get; }
 
     /// <summary>
     /// 获取HTTP状态码
     /// </summary>
-    public HttpStatusCode Code { get; } = httpResponseMessage?.StatusCode ?? HttpStatusCode.Unused;
+    public HttpStatusCode Code { get; }
 
     /// <summary>
     /// 获取错误消息
     /// </summary>
     /// <value>当请求失败时包含错误描述信息</value>
-    public string? ErrorMessage { get; } = errorMessage;
+    public string? ErrorMessage { get; }
 
     /// <summary>
     /// 获取重试次数
     /// </summary>
     /// <value>请求失败后的重试次数</value>
-    public int RetryCount { get; } = retryCount;
+    public int RetryCount { get; }
 
     /// <summary>
     /// 获取处理次数（重试次数+1）
@@ -53,13 +67,13 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
     /// <summary>
     /// 获取最后一次请求的耗时
     /// </summary>
-    public TimeSpan LastTimeConsuming { get; } = lastTimeConsuming;
+    public TimeSpan LastTimeConsuming { get; }
 
     /// <summary>
     /// 获取总耗时
     /// </summary>
     /// <value>包含所有重试在内的总耗时</value>
-    public TimeSpan TotalTimeConsuming { get; } = totalTimeConsuming;
+    public TimeSpan TotalTimeConsuming { get; }
 
     /// <summary>
     /// 获取响应头信息
@@ -77,6 +91,40 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
         if (headers.IsNullOrEmpty() || !headers.ContainsKey("Set-Cookie")) return null;
         var host = new Uri(Request.Url).Host;
         return [.. headers["Set-Cookie"].Select(x => ParseCookie(x, host))];
+    }
+
+    /// <summary>
+    /// 读取字节数组
+    /// </summary>
+    /// <returns>字节数组</returns>
+    public async Task<byte[]> ReadAsByteArrayAsync()
+    {
+        return await HttpResponseMessage.Content.ReadAsByteArrayAsync();
+    }
+    
+    /// <summary>
+    /// 读取流
+    /// </summary>
+    /// <returns>流</returns>
+    public async Task<Stream> ReadAsStreamAsync()
+    {
+        var sourceStream = await HttpResponseMessage.Content.ReadAsStreamAsync();
+        var progress = new HttpProgress { Total = HttpResponseMessage.Content?.Headers?.ContentLength ?? 0 };
+        var onProgress = Request.Config?.OnReceiveProgress ?? HttpConfig.Default.OnReceiveProgress;
+        return new ProgressStream(sourceStream, (p) =>
+        {
+            progress.Transfered = p;
+            onProgress?.Invoke(progress);
+        });
+    }
+    
+    /// <summary>
+    /// 读取字符串
+    /// </summary>
+    /// <returns>字符串</returns>
+    public async Task<string> ReadAsStringAsync()
+    {
+        return await HttpResponseMessage.Content.ReadAsStringAsync();
     }
 
     /// <summary>
@@ -113,7 +161,7 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
     /// <returns>反序列化后的响应数据</returns>
     public async Task<T> GetResponseDataAsync<T>()
     {
-        var content = HttpResponseMessage.Content;
+        var content = HttpResponseMessage!.Content;
         T? data = default;
         if (content is not null)
         {
@@ -186,18 +234,18 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
     void BuildRequestInfo(StringBuilder builder)
     {
         builder.AppendLine($"****request****");
-        builder.AppendLine($"url:{HttpResponseMessage.RequestMessage.RequestUri}");
-        builder.AppendLine($"method:{HttpResponseMessage.RequestMessage.Method}");
-        if (HttpResponseMessage.Content.Headers.NotNullOrEmpty())
+        builder.AppendLine($"url:{Request.Message?.RequestUri}");
+        builder.AppendLine($"method:{Request.Message?.Method}");
+        if (Request.Message?.Content?.Headers?.NotNullOrEmpty() ?? false)
         {
             builder.AppendLine("headers:");
-            foreach (var item in HttpResponseMessage.Content.Headers)
+            foreach (var item in Request.Message.Content.Headers)
             {
                 builder.AppendLine($"{item.Key}:{string.Join(",", item.Value)}");
             }
         }
 
-        var requestContentType = HttpResponseMessage.RequestMessage.Content?.Headers?.ContentType?.ToString();
+        var requestContentType = Request.Message?.Content?.Headers?.ContentType?.ToString();
         if (requestContentType.IsNullOrWhiteSpace()) return;
         builder.AppendLine($"content-type:{requestContentType}");
         if (requestContentType.Contains("application/json"))
@@ -242,7 +290,7 @@ public class HttpResponse(HttpRequest request, HttpResponseMessage? httpResponse
         builder.AppendLine($"****response****");
         builder.AppendLine($"code:{response.Code}");
         if (response.ErrorMessage.NotNullOrWhiteSpace()) builder.AppendLine($"error message:{response.ErrorMessage}");
-        if (response.HttpResponseMessage.Content is null) builder.AppendLine("no response");
+        if (response.HttpResponseMessage?.Content is null) builder.AppendLine("无响应");
         else
         {
             if (response.HttpResponseMessage.Content.Headers?.ContentType?.ToString().Contains("application/json") ?? false)

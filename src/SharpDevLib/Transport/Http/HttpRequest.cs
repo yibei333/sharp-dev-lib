@@ -11,6 +11,8 @@ namespace SharpDevLib;
 /// <param name="url">请求URL地址</param>
 public class HttpRequest(string url)
 {
+    internal HttpRequestMessage? Message { get; set; }
+
     /// <summary>
     /// 请求URL地址
     /// </summary>

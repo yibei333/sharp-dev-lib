@@ -35,7 +35,7 @@ public static class HttpHelper
     {
         var response = await request.GetAsync(cancellationToken);
         response.EnsureSuccessStatusCode();
-        return await response.HttpResponseMessage.Content.ReadAsStreamAsync();
+        return await response.ReadAsStreamAsync();
     }
 
     /// <summary>
@@ -147,6 +147,7 @@ public static class HttpHelper
             try
             {
                 var message = createRequestMessage();
+                request.Message = message;
                 var ua = request.Config?.UserAgent ?? HttpConfig.Default?.UserAgent;
                 if (ua.NotNullOrWhiteSpace() && !(request.Headers?.ContainsKey("User-Agent") ?? false))
                 {

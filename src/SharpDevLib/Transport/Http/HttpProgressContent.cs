@@ -10,35 +10,21 @@ internal class HttpProgressContent : HttpContent
         return requestMessage;
     }
 
-    public static HttpResponseMessage Convert(HttpRequest request, HttpResponseMessage responseMessage)
-    {
-        responseMessage.Content = new HttpProgressContent(request, responseMessage);
-        return responseMessage;
-    }
-
     readonly HttpProgress _progress;
-    readonly HttpContent _innerContent;
+    readonly HttpContent? _innerContent;
     readonly Action<HttpProgress>? _onProgress;
 
     HttpProgressContent(HttpRequest request, HttpRequestMessage requestMessage)
     {
         _innerContent = requestMessage.Content;
-        _progress = new HttpProgress { Total = requestMessage.Content.Headers?.ContentLength ?? 0 };
+        _progress = new HttpProgress { Total = requestMessage.Content?.Headers?.ContentLength ?? 0 };
         CopyHeaders();
         _onProgress = request.Config?.OnSendProgress ?? HttpConfig.Default.OnSendProgress;
     }
 
-    HttpProgressContent(HttpRequest request, HttpResponseMessage responseMessage)
-    {
-        _innerContent = responseMessage.Content;
-        _progress = new HttpProgress { Total = responseMessage.Content.Headers?.ContentLength ?? 0 };
-        CopyHeaders();
-        _onProgress = request.Config?.OnReceiveProgress ?? HttpConfig.Default.OnReceiveProgress;
-    }
-
     void CopyHeaders()
     {
-        if (_innerContent.Headers.IsNullOrEmpty()) return;
+        if (_innerContent?.Headers?.IsNullOrEmpty() ?? true) return;
         foreach (var header in _innerContent.Headers)
         {
             Headers.TryAddWithoutValidation(header.Key, header.Value);
@@ -47,6 +33,7 @@ internal class HttpProgressContent : HttpContent
 
     protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
     {
+        if (_innerContent is null) return Task.CompletedTask;
         var progressStream = new ProgressStream(stream, (p) =>
         {
             var lastProgress = _progress.Progress;
@@ -58,21 +45,21 @@ internal class HttpProgressContent : HttpContent
 
     protected override bool TryComputeLength(out long length)
     {
-        var contentLength = _innerContent.Headers.ContentLength;
+        var contentLength = _innerContent?.Headers?.ContentLength;
         if (contentLength.HasValue)
         {
             length = contentLength.Value;
             return true;
         }
 
-        length = -1;
+        length = 0;
         return false;
     }
 
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        if (disposing) _innerContent.Dispose();
+        if (disposing) _innerContent?.Dispose();
     }
 }
 
