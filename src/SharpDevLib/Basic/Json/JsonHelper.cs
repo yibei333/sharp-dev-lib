@@ -92,6 +92,21 @@ public static class JsonHelper
     }
 
     /// <summary>
+    /// 使用默认配置将JSON字符串反序列化为指定类型的对象
+    /// </summary>
+    /// <param name="json">JSON字符串</param>
+    /// <param name="type">目标类型</param>
+    /// <param name="option">配置</param>
+    /// <returns>反序列化后的对象</returns>
+    /// <exception cref="ArgumentNullException">当json参数为空或仅包含空白字符时引发异常</exception>
+    /// <exception cref="JsonException">当反序列化失败时引发异常</exception>
+    public static object DeSerialize(this string json, Type type, JsonOption? option)
+    {
+        if (json.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(json));
+        return JsonSerializer.Deserialize(json, type, (option ?? JsonOption.Default).Create()) ?? throw new JsonException($"无法将JSON反序列化为类型'{type.FullName}'的对象");
+    }
+
+    /// <summary>
     /// 使用指定配置将JSON字符串反序列化为指定类型的对象
     /// </summary>
     /// <typeparam name="T">目标类型</typeparam>

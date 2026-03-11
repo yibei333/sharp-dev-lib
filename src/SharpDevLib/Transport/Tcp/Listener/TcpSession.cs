@@ -11,11 +11,10 @@ public class TcpSession<TMetadata> : IDisposable
     TcpSessionStates _state = 0;
     bool _isDisposed;
 
-    internal TcpSession(TcpListener<TMetadata> listener, Socket socket, TMetadata metaData)
+    internal TcpSession(TcpListener<TMetadata> listener, Socket socket)
     {
         Listener = listener;
         Socket = socket;
-        Metadata = metaData;
         State = TcpSessionStates.Connected;
         ReceiveAdapter = Listener.AdapterType.GetReceiveAdapter(listener.ReceiveAdapter);
         SendAdapter = Listener.AdapterType.GetSendAdapter(listener.SendAdapter);
@@ -37,7 +36,7 @@ public class TcpSession<TMetadata> : IDisposable
     /// <summary>
     /// 会话元数据
     /// </summary>
-    public TMetadata Metadata { get; }
+    public TMetadata? Metadata { get; }
 
     /// <summary>
     /// 会话状态

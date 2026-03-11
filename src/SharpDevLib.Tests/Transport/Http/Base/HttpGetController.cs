@@ -39,12 +39,7 @@ internal class HttpGetController : WebApiController
     [Route(HttpVerbs.Get, "/get/users")]
     public void GetUsers()
     {
-        var data = new List<User>
-        {
-            new("foo",10),
-            new("bar",20),
-        };
-        HttpContext.WriteObject(data);
+        HttpContext.WriteObject("[{\"name\":\"foo\",\"age\":10,\"some-info\":\"ok\"},{\"name\":\"bar\",\"age\":20}]");
     }
 
     [Route(HttpVerbs.Get, "/get/cookie")]

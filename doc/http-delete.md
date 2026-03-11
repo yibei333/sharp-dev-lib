@@ -2,149 +2,108 @@
 
 提供`HTTP` DELETE 请求功能。
 
-##### 实例
+##### 简单实例
+
+``` csharp
+using SharpDevLib;
+
+var response = await new HttpRequest("https://jsonplaceholder.typicode.com/posts/1")
+                .DeleteAsync();
+Console.WriteLine(response);
+//****request****
+//url:https://jsonplaceholder.typicode.com/posts/1
+//method:DELETE
+//headers:
+//User-Agent:Mozilla/5.0,(Windows NT 10.0; Win64; x64),AppleWebKit/537.36,(KHTML, like Gecko),Chrome/124.0.0.0,Safari/537.36,Edg/124.0.0.0
+//Transfer-Encoding:chunked
+//****response****
+//code:OK
+//headers:
+//Date:Wed, 11 Mar 2026 08:05:17 GMT
+//Connection:keep-alive
+//Access-Control-Allow-Credentials:true
+//Cache-Control:no-cache
+//ETag:W/"2-vyGp6PvFo4RvsFtPoIWeCReyIC8"
+//nel:{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}
+//Pragma:no-cache
+//report-to:{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=ExTPbrdSqJmyYAAXdEEgST2uBKcrGMpcySKcPou9qOI%3D\u0026sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d\u0026ts=1773216317"}],"max_age":3600}
+//reporting-endpoints:heroku-nel="https://nel.heroku.com/reports?s=ExTPbrdSqJmyYAAXdEEgST2uBKcrGMpcySKcPou9qOI%3D&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&ts=1773216317"
+//Server:cloudflare
+//Vary:Origin,Accept-Encoding
+//Via:2.0 heroku-router
+//X-Content-Type-Options:nosniff
+//X-Powered-By:Express
+//x-ratelimit-limit:1000
+//x-ratelimit-remaining:999
+//x-ratelimit-reset:1773216337
+//cf-cache-status:DYNAMIC
+//Server-Timing:cfCacheStatus;desc="DYNAMIC",cfEdge;dur=5,cfOrigin;dur=256
+//CF-RAY:9da90da1dfddfc46-AMS
+//Alt-Svc:h3=":443"
+//Content-Type:application/json; charset=utf-8
+//Content-Length:2
+//Expires:-1
+//reply:
+//{}
+```
+
+##### 完整实例
 
 ```csharp
-using SharpDevLib;
-using System.Net;
-
-//基本DELETE请求
-var request = new HttpRequest("https://api.example.com/users/1");
-var response = await request.DeleteAsync();
-Console.WriteLine(response.StatusCode);
-//NoContent
-
-//带查询参数的DELETE请求
-var request = new HttpRequest("https://api.example.com/users")
+//配置，可以全局设置一次，也可以每次传入
+HttpConfig.Default.Timeout = TimeSpan.FromSeconds(10);
+HttpConfig.Default.RetryCount = 5;
+HttpConfig.Default.OnSendProgress = (p) =>
 {
-    Parameters = new Dictionary<string, string?>
-    {
-        { "id", "1" },
-        { "confirm", "true" }
-    }
+    Console.WriteLine($"进度: {p.ProgressString}");
+    Console.WriteLine($"速度: {p.Speed}");
 };
-var response = await request.DeleteAsync();
+HttpConfig.Default.UserAgent = null;
 
-//链式调用添加参数
-var request = new HttpRequest("https://api.example.com/users")
-    .AddParameter("id", "1")
-    .AddParameter("permanent", "true");
-var response = await request.DeleteAsync();
-
-//带请求头的DELETE请求
-var request = new HttpRequest("https://api.example.com/users/1")
-{
-    Headers = new Dictionary<string, string[]>
-    {
-        { "Authorization", ["Bearer token123"] },
-        { "X-Confirm", ["true"] }
-    }
-};
-var response = await request.DeleteAsync();
-
-//添加Cookie
-var request = new HttpRequest("https://api.example.com/users/1")
-    .AddCookie(new Cookie("sessionId", "xyz789", "/", "api.example.com"));
-var response = await request.DeleteAsync();
-
-//配置HTTP选项
-var config = new HttpConfig
-{
-    Timeout = TimeSpan.FromSeconds(30),
-    RetryCount = 3
-};
-var request = new HttpRequest("https://api.example.com/users/1")
-{
-    Config = config
-};
-var response = await request.DeleteAsync();
-Console.WriteLine($"重试次数: {response.RetryCount}");
-
-//删除并检查响应
-var request = new HttpRequest("https://api.example.com/users/1");
-var response = await request.DeleteAsync();
-if (response.IsSuccessStatusCode)
-{
-    Console.WriteLine("删除成功");
-}
-else
-{
-    Console.WriteLine($"删除失败: {response.Message}");
-}
-
-//批量删除多个资源
-var ids = new[] { 1, 2, 3, 4, 5 };
-foreach (var id in ids)
-{
-    var request = new HttpRequest($"https://api.example.com/users/{id}");
-    var response = await request.DeleteAsync();
-    if (response.IsSuccessStatusCode)
-    {
-        Console.WriteLine($"用户 {id} 删除成功");
-    }
-    else
-    {
-        Console.WriteLine($"用户 {id} 删除失败: {response.Message}");
-    }
-}
-
-//处理软删除
-var request = new HttpRequest("https://api.example.com/users/1")
-{
-    Parameters = new Dictionary<string, string?>
-    {
-        { "soft", "true" }
-    }
-};
-var response = await request.DeleteAsync();
-Console.WriteLine(response.Content);
-//{"success":true,"deleted":false,"message":"用户已软删除"}
-
-//删除失败处理
-var request = new HttpRequest("https://api.example.com/users/999");
-var response = await request.DeleteAsync();
-if (!response.IsSuccessStatusCode)
-{
-    switch (response.StatusCode)
-    {
-        case HttpStatusCode.NotFound:
-            Console.WriteLine("资源不存在");
-            break;
-        case HttpStatusCode.Forbidden:
-            Console.WriteLine("无权限删除");
-            break;
-        default:
-            Console.WriteLine($"删除失败: {response.Message}");
-            break;
-    }
-}
-
-//带确认的删除
-var request = new HttpRequest("https://api.example.com/users/1")
-{
-    Headers = new Dictionary<string, string[]>
-    {
-        { "X-Confirm-Delete", ["true"] },
-        { "X-Reason", ["用户请求"] }
-    }
-};
-var response = await request.DeleteAsync();
-
-//使用全局配置
-HttpConfig.Default.Timeout = TimeSpan.FromSeconds(60);
-var request = new HttpRequest("https://api.example.com/users/1");
-var response = await request.DeleteAsync();
-Console.WriteLine($"耗时: {response.TotalTimeConsuming}");
-
-//删除前检查
-var checkRequest = new HttpRequest("https://api.example.com/users/1");
-var checkResponse = await checkRequest.GetAsync();
-if (checkResponse.IsSuccessStatusCode)
-{
-    var deleteRequest = new HttpRequest("https://api.example.com/users/1");
-    var deleteResponse = await deleteRequest.DeleteAsync();
-    Console.WriteLine($"删除结果: {deleteResponse.IsSuccessStatusCode}");
-}
+var response = await new HttpRequest("https://jsonplaceholder.typicode.com/posts/1")
+                .UseClientId("some id")
+                .SetConfig(new HttpConfig { RetryCount = 1 })
+                .AddHeader("Authorization", ["Bearer token123"])
+                .AddCookie(new Cookie("foo", "bar", "/", "jsonplaceholder.typicode.com"))
+                .AddParameter("id","1")
+                .DeleteAsync();
+Console.WriteLine(response);
+//****request****
+//url:https://jsonplaceholder.typicode.com/posts/1?id=1
+//method:DELETE
+//headers:
+//Authorization:Bearer token123
+//Transfer-Encoding:chunked
+//Cookie:foo=bar;
+//****response****
+//code:OK
+//headers:
+//Date:Wed, 11 Mar 2026 08:03:57 GMT
+//Connection:keep-alive
+//Access-Control-Allow-Credentials:true
+//Cache-Control:no-cache
+//ETag:W/"2-vyGp6PvFo4RvsFtPoIWeCReyIC8"
+//nel:{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}
+//Pragma:no-cache
+//report-to:{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=mSMoyufS7RPZ4dUw71PdYrTYCcuvNIxrCjGZ8ibQzJs%3D\u0026sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d\u0026ts=1773216237"}],"max_age":3600}
+//reporting-endpoints:heroku-nel="https://nel.heroku.com/reports?s=mSMoyufS7RPZ4dUw71PdYrTYCcuvNIxrCjGZ8ibQzJs%3D&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&ts=1773216237"
+//Server:cloudflare
+//Vary:Origin,Accept-Encoding
+//Via:2.0 heroku-router
+//X-Content-Type-Options:nosniff
+//X-Powered-By:Express
+//x-ratelimit-limit:1000
+//x-ratelimit-remaining:999
+//x-ratelimit-reset:1773216277
+//cf-cache-status:DYNAMIC
+//Server-Timing:cfCacheStatus;desc="DYNAMIC",cfEdge;dur=5,cfOrigin;dur=85
+//CF-RAY:9da90babd9991c98-AMS
+//Alt-Svc:h3=":443"
+//Content-Type:application/json; charset=utf-8
+//Content-Length:2
+//Expires:-1
+//reply:
+//{}
 ```
 
 ## 相关文档

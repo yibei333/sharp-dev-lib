@@ -15,11 +15,10 @@ public class TcpListener<TSessionMetadata> : IDisposable
     readonly List<TcpSession<TSessionMetadata>> _sessions;
     static readonly object _lock = new();
 
-    internal TcpListener(IPAddress iPAddress, int port, Func<TSessionMetadata> initSessionMetadata, TransportAdapterType adapterType = TransportAdapterType.Default)
+    internal TcpListener(IPAddress iPAddress, int port, TransportAdapterType adapterType = TransportAdapterType.Default)
     {
         IPAddress = iPAddress;
         Port = port;
-        InitSessionMetadata = initSessionMetadata;
         AdapterType = adapterType;
 
         Socket = new Socket(iPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -74,11 +73,6 @@ public class TcpListener<TSessionMetadata> : IDisposable
     /// 监听端口
     /// </summary>
     public int Port { get; }
-
-    /// <summary>
-    /// 初始化会话元数据的函数
-    /// </summary>
-    public Func<TSessionMetadata> InitSessionMetadata { get; }
 
     /// <summary>
     /// 当前所有会话的只读集合
@@ -140,7 +134,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
             try
             {
                 var socket = Socket.Accept();
-                var session = new TcpSession<TSessionMetadata>(this, socket, InitSessionMetadata());
+                var session = new TcpSession<TSessionMetadata>(this, socket);
                 _sessions.Add(session);
                 SessionAdded?.Invoke(this, new TcpSessionEventArgs<TSessionMetadata>(session));
                 try
@@ -196,7 +190,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
 /// </summary>
 public class TcpListener : TcpListener<int>
 {
-    internal TcpListener(IPAddress iPAddress, int port, TransportAdapterType adapterType = TransportAdapterType.Default) : base(iPAddress, port, () => 0, adapterType)
+    internal TcpListener(IPAddress iPAddress, int port, TransportAdapterType adapterType = TransportAdapterType.Default) : base(iPAddress, port, adapterType)
     {
     }
 }

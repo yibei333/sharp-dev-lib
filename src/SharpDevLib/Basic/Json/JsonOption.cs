@@ -10,7 +10,7 @@ namespace SharpDevLib;
 /// </summary>
 public class JsonOption
 {
-    readonly ConcurrentDictionary<string, JsonSerializerOptions> _cache = new();
+    static readonly ConcurrentDictionary<string, JsonSerializerOptions> _cache = new();
     internal static JsonOption DefaultFormatJson = new() { FormatJson = true };
     internal static JsonOption DefaultCompressJson = new() { FormatJson = false };
 

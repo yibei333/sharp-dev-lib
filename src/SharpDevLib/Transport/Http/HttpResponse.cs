@@ -163,7 +163,7 @@ public class HttpResponse
     /// </summary>
     /// <typeparam name="T">目标数据类型</typeparam>
     /// <returns>反序列化后的响应数据</returns>
-    public async Task<T> GetResponseDataAsync<T>()
+    public async Task<T> GetResponseDataAsync<T>(JsonOption? option = null)
     {
         var content = HttpResponseMessage!.Content;
         T? data = default;
@@ -184,7 +184,7 @@ public class HttpResponse
                         if (type == typeof(string)) data = (T)Convert.ChangeType(responseText, type);
                         else
                         {
-                            var obj = responseText.DeSerialize(type);
+                            var obj = responseText.DeSerialize(type, option);
                             if (obj is not null) data = (T)obj;
                         }
                     }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SharpDevLib.Tests.Basic.Helpers;
 using SharpDevLib.Tests.TestData;
 using SharpDevLib.Tests.Transport.Http.Base;
 using System;
@@ -52,26 +53,28 @@ public class HttpGetTests : HttpBaseTests
     }
 
     [TestMethod]
-    public void GetUserTest()
+    public async Task GetUserTest()
     {
         var request = new HttpRequest(BaseUrl.CombinePath("/api/get/user"));
         var response = request.GetAsync().GetAwaiter().GetResult();
         Assert.IsTrue(response.IsSuccess);
-        var data = response.GetResponseDataAsync<User>().GetAwaiter().GetResult();
+        var data = await response.GetResponseDataAsync<User>();
         Assert.IsNotNull(data);
         Assert.AreEqual("foo", data.Name);
         Assert.AreEqual(10, data.Age);
     }
 
     [TestMethod]
-    public void GetUsersTest()
+    public async Task GetUsersTest()
     {
         var response = new HttpRequest(BaseUrl.CombinePath("/api/get/users"))
             .GetAsync()
             .GetAwaiter()
             .GetResult();
         Assert.IsTrue(response.IsSuccess);
-        var data = response.GetResponseDataAsync<List<User>>().GetAwaiter().GetResult();
+        var data = await response.GetResponseDataAsync<List<User>>(new JsonOption { NameFormat = JsonNameFormat.KebabCaseUpper });
+        Console.WriteLine(data.Serialize(JsonHelperTests.FormatJsonOption));
+
         Assert.IsNotNull(data);
         Assert.HasCount(2, data);
         Assert.AreEqual("foo", data.First().Name);

@@ -2,145 +2,95 @@
 
 提供`HTTP` POST 请求功能。
 
-##### 实例
-
-```csharp
+##### 简单实例
+``` csharp
 using SharpDevLib;
+
+var json = new { userId = 1, title = "foo", body = "bar" }.Serialize();
+var response=await new HttpRequest("https://jsonplaceholder.typicode.com/posts")
+                    .AddJson(json)
+                    .PostAsync();
+Console.WriteLine(response);
+//****request****
+//url:https://jsonplaceholder.typicode.com/posts
+//method:POST
+//headers:
+//User-Agent:Mozilla/5.0,(Windows NT 10.0; Win64; x64),AppleWebKit/537.36,(KHTML, like Gecko),Chrome/124.0.0.0,Safari/537.36,Edg/124.0.0.0
+//Content-Type:application/json; charset=utf-8
+//Content-Length:39
+//content-type:application/json; charset=utf-8
+//json:
+//{"userId":1,"title":"foo","body":"bar"}
+//****response****
+//code:Created
+//headers:
+//Date:Wed, 11 Mar 2026 07:51:31 GMT
+//Connection:keep-alive
+//Access-Control-Allow-Credentials:true
+//Access-Control-Expose-Headers:Location
+//Cache-Control:no-cache
+//ETag:W/"41-EnFAIaFe//2cDeroiws5hNclP8k"
+//Location:https://jsonplaceholder.typicode.com/posts/101
+//nel:{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}
+//Pragma:no-cache
+//report-to:{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=jE5A0mn3CEB0le8CeJWlTr4Vu22oOKtRKLBXl0T9LUI%3D\u0026sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d\u0026ts=1773215491"}],"max_age":3600}
+//reporting-endpoints:heroku-nel="https://nel.heroku.com/reports?s=jE5A0mn3CEB0le8CeJWlTr4Vu22oOKtRKLBXl0T9LUI%3D&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&ts=1773215491"
+//Server:cloudflare
+//Vary:Origin,X-HTTP-Method-Override,Accept-Encoding
+//Via:2.0 heroku-router
+//X-Content-Type-Options:nosniff
+//X-Powered-By:Express
+//x-ratelimit-limit:1000
+//x-ratelimit-remaining:999
+//x-ratelimit-reset:1773215497
+//cf-cache-status:DYNAMIC
+//Server-Timing:cfCacheStatus;desc="DYNAMIC",cfEdge;dur=3,cfOrigin;dur=86
+//CF-RAY:9da8f9780b9ad5a7-AMS
+//Alt-Svc:h3=":443"
+//Content-Type:application/json; charset=utf-8
+//Content-Length:65
+//Expires:-1
+//reply:
+//{
+//  "userId": 1,
+//  "title": "foo",
+//  "body": "bar",
+//  "id": 101
+//}
+```
+
+##### 完整实例
+```csharp
 using System.Net;
+using SharpDevLib;
 
-//基本POST请求（JSON格式）
-var request = new HttpRequest("https://api.example.com/users", @"{""name"":""张三"",""age"":25}");
-var response = await request.PostAsync();
-Console.WriteLine(response.Content);
-//{"id":1,"name":"张三","age":25}
-
-//使用对象序列化为JSON
-var data = new { name = "李四", age = 30 };
-var json = data.Serialize();
-var request = new HttpRequest("https://api.example.com/users", json);
-var response = await request.PostAsync();
-
-//发送表单数据
-var request = new HttpRequest("https://api.example.com/form")
+//配置，可以全局设置一次，也可以每次传入
+HttpConfig.Default.Timeout = TimeSpan.FromSeconds(10);
+HttpConfig.Default.RetryCount = 5;
+HttpConfig.Default.OnSendProgress = (p) =>
 {
-    Parameters = new Dictionary<string, string?>
-    {
-        { "username", "admin" },
-        { "password", "123456" }
-    }
+    Console.WriteLine($"进度: {p.ProgressString}");
+    Console.WriteLine($"速度: {p.Speed}");
 };
-var response = await request.PostAsync();
+HttpConfig.Default.UserAgent = null;
 
-//链式调用添加表单参数
-var request = new HttpRequest("https://api.example.com/form")
-    .AddParameter("field1", "value1")
-    .AddParameter("field2", "value2");
-var response = await request.PostAsync();
-
-//发送多部分表单数据（带文件）
-var fileBytes = File.ReadAllBytes("document.pdf");
-var request = new HttpRequest("https://api.example.com/upload")
-{
-    Files = new List<HttpFormFile>
-    {
-        new HttpFormFile("file", "document.pdf", fileBytes)
-    },
-    Parameters = new Dictionary<string, string?>
-    {
-        { "description", "test file" }
-    }
-};
-var response = await request.PostAsync();
-
-//使用文件流上传
-using var fileStream = File.OpenRead("image.jpg");
-var request = new HttpRequest("https://api.example.com/upload")
-{
-    Files = new List<HttpFormFile>
-    {
-        new HttpFormFile("file", "image.jpg", fileStream)
-    }
-};
-var response = await request.PostAsync();
-
-//带请求头的POST请求
-var request = new HttpRequest("https://api.example.com/users", @"{""name"":""王五""}")
-{
-    Headers = new Dictionary<string, string[]>
-    {
-        { "Authorization", ["Bearer token123"] },
-        { "Content-Type", ["application/json"] }
-    }
-};
-var response = await request.PostAsync();
-
-//添加Cookie
-var request = new HttpRequest("https://api.example.com/login", @"{""username"":""admin"",""password"":""123456""}")
-    .AddCookie(new Cookie("sessionId", "xyz789", "/", "api.example.com"));
-var response = await request.PostAsync();
-
-//配置重试和超时
-var config = new HttpConfig
-{
-    Timeout = TimeSpan.FromSeconds(30),
-    RetryCount = 3
-};
-var request = new HttpRequest("https://api.example.com/users", @"{""name"":""test""}")
-{
-    Config = config
-};
-var response = await request.PostAsync();
-Console.WriteLine($"重试次数: {response.RetryCount}");
-
-//监控上传进度
-var progress = new HttpProgress();
-config = new HttpConfig
-{
-    OnSendProgress = p =>
-    {
-        Console.WriteLine($"上传进度: {p.ProgressString}");
-        Console.WriteLine($"上传速度: {p.Speed}");
-    }
-};
-var request = new HttpRequest("https://api.example.com/upload")
-{
-    Files = new List<HttpFormFile>
-    {
-        new HttpFormFile("file", "largefile.zip", File.ReadAllBytes("largefile.zip"))
-    },
-    Config = config
-};
-var response = await request.PostAsync();
-
-//处理错误响应
-var request = new HttpRequest("https://api.example.com/users", @"{""name"":""test""}");
-var response = await request.PostAsync();
-if (!response.IsSuccessStatusCode)
-{
-    Console.WriteLine($"错误: {response.Message}");
-    Console.WriteLine($"状态码: {response.StatusCode}");
-}
-
-//发送大文件时显示进度
-var filePath = "largefile.zip";
-config = new HttpConfig
-{
-    OnSendProgress = p =>
-    {
-        Console.Write($"\r进度: {p.ProgressString} ({p.Transfered.ToFileSizeString()}/{p.Total.ToFileSizeString()}) 速度: {p.Speed}");
-    }
-};
-var request = new HttpRequest("https://api.example.com/upload")
-{
-    Files = new List<HttpFormFile>
-    {
-        new HttpFormFile("file", Path.GetFileName(filePath), File.ReadAllBytes(filePath))
-    },
-    Config = config
-};
-Console.WriteLine("开始上传...");
-await request.PostAsync();
-Console.WriteLine("\n上传完成!");
+var response = await new HttpRequest("https://jsonplaceholder.typicode.com/posts")
+                .UseClientId("some id")
+                .SetConfig(new HttpConfig { RetryCount = 1 })
+                .AddHeader("Authorization", ["Bearer token123"])
+                .AddCookie(new Cookie("foo", "bar", "/", "jsonplaceholder.typicode.com"))
+                .AddJson("{\"postId\":1}")
+                //form-data
+                //.AddParameter("postId", "1")
+                //multi-part form data
+                //.AddFile(new HttpFormFile("file","test.txt","hello,world".Utf8Decode()))
+                .PostAsync();
+var text = await response.EnsureSuccessStatusCode().ReadAsStringAsync();
+Console.WriteLine(text);
+//{
+//  "postId": 10,
+//  "id": 101
+//}
 ```
 
 ## 相关文档

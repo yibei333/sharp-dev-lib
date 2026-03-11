@@ -2,139 +2,93 @@
 
 提供`HTTP` PUT 请求功能。
 
-##### 实例
+##### 简单实例
+``` csharp
+using SharpDevLib;
+
+var json = new { id = 1, userId = 1, title = "foo", body = "bar" }.Serialize();
+var response = await new HttpRequest("https://jsonplaceholder.typicode.com/posts/1")
+                    .AddJson(json)
+                    .PutAsync();
+Console.WriteLine(response);
+//****request****
+//url:https://jsonplaceholder.typicode.com/posts/1
+//method:PUT
+//headers:
+//User-Agent:Mozilla/5.0,(Windows NT 10.0; Win64; x64),AppleWebKit/537.36,(KHTML, like Gecko),Chrome/124.0.0.0,Safari/537.36,Edg/124.0.0.0
+//Content-Type:application/json; charset=utf-8
+//Content-Length:46
+//content-type:application/json; charset=utf-8
+//json:
+//{"id":1,"userId":1,"title":"foo","body":"bar"}
+//****response****
+//code:OK
+//headers:
+//Date:Wed, 11 Mar 2026 08:00:22 GMT
+//Connection:keep-alive
+//Access-Control-Allow-Credentials:true
+//Cache-Control:no-cache
+//ETag:W/"3f-2+fbgxI9e+sa2n+BkM69S9SdnIY"
+//nel:{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}
+//Pragma:no-cache
+//report-to:{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=hKx0Fbp4ZO0I71dQaOhWOIKQsSRr1jUQORw2jyP80f0%3D\u0026sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d\u0026ts=1773216021"}],"max_age":3600}
+//reporting-endpoints:heroku-nel="https://nel.heroku.com/reports?s=hKx0Fbp4ZO0I71dQaOhWOIKQsSRr1jUQORw2jyP80f0%3D&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&ts=1773216021"
+//Server:cloudflare
+//Vary:Origin,Accept-Encoding
+//Via:2.0 heroku-router
+//X-Content-Type-Options:nosniff
+//X-Powered-By:Express
+//x-ratelimit-limit:1000
+//x-ratelimit-remaining:999
+//x-ratelimit-reset:1773216037
+//cf-cache-status:DYNAMIC
+//Server-Timing:cfCacheStatus;desc="DYNAMIC",cfEdge;dur=9,cfOrigin;dur=256
+//CF-RAY:9da906681ad80c13-AMS
+//Alt-Svc:h3=":443"
+//Content-Type:application/json; charset=utf-8
+//Content-Length:63
+//Expires:-1
+//reply:
+//{
+//  "id": 1,
+//  "userId": 1,
+//  "title": "foo",
+//  "body": "bar"
+//}
+```
+
+##### 完整实例
 
 ```csharp
-using SharpDevLib;
 using System.Net;
+using SharpDevLib;
 
-//基本PUT请求（JSON格式）
-var request = new HttpRequest("https://api.example.com/users/1", @"{""name"":""张三"",""age"":26}");
-var response = await request.PutAsync();
-Console.WriteLine(response.Content);
-//{"id":1,"name":"张三","age":26}
-
-//使用对象序列化为JSON
-var data = new { name = "李四", age = 31 };
-var json = data.Serialize();
-var request = new HttpRequest("https://api.example.com/users/2", json);
-var response = await request.PutAsync();
-
-//发送表单数据
-var request = new HttpRequest("https://api.example.com/users/1")
+//配置，可以全局设置一次，也可以每次传入
+HttpConfig.Default.Timeout = TimeSpan.FromSeconds(10);
+HttpConfig.Default.RetryCount = 5;
+HttpConfig.Default.OnSendProgress = (p) =>
 {
-    Parameters = new Dictionary<string, string?>
-    {
-        { "name", "王五" },
-        { "age", "32" }
-    }
+    Console.WriteLine($"进度: {p.ProgressString}");
+    Console.WriteLine($"速度: {p.Speed}");
 };
-var response = await request.PutAsync();
+HttpConfig.Default.UserAgent = null;
 
-//链式调用添加表单参数
-var request = new HttpRequest("https://api.example.com/users/1")
-    .AddParameter("name", "赵六")
-    .AddParameter("age", "33");
-var response = await request.PutAsync();
-
-//带请求头的PUT请求
-var request = new HttpRequest("https://api.example.com/users/1", @"{""name"":""孙七""}")
-{
-    Headers = new Dictionary<string, string[]>
-    {
-        { "Authorization", ["Bearer token123"] },
-        { "Content-Type", ["application/json"] }
-    }
-};
-var response = await request.PutAsync();
-
-//添加Cookie
-var request = new HttpRequest("https://api.example.com/users/1", @"{""name"":""周八""}")
-    .AddCookie(new Cookie("sessionId", "xyz789", "/", "api.example.com"));
-var response = await request.PutAsync();
-
-//配置HTTP选项
-var config = new HttpConfig
-{
-    Timeout = TimeSpan.FromSeconds(30),
-    RetryCount = 3
-};
-var request = new HttpRequest("https://api.example.com/users/1", @"{""name"":""test""}")
-{
-    Config = config
-};
-var response = await request.PutAsync();
-Console.WriteLine($"重试次数: {response.RetryCount}");
-
-//发送多部分表单数据（带文件）
-var fileBytes = File.ReadAllBytes("avatar.jpg");
-var request = new HttpRequest("https://api.example.com/users/1/avatar")
-{
-    Files = new List<HttpFormFile>
-    {
-        new HttpFormFile("file", "avatar.jpg", fileBytes)
-    }
-};
-var response = await request.PutAsync();
-
-//使用文件流更新文件
-using var fileStream = File.OpenRead("document.pdf");
-var request = new HttpRequest("https://api.example.com/documents/1/file")
-{
-    Files = new List<HttpFormFile>
-    {
-        new HttpFormFile("file", "document.pdf", fileStream)
-    }
-};
-var response = await request.PutAsync();
-
-//监控上传进度
-var progress = new HttpProgress();
-config = new HttpConfig
-{
-    OnSendProgress = p =>
-    {
-        Console.WriteLine($"上传进度: {p.ProgressString}");
-        Console.WriteLine($"上传速度: {p.Speed}");
-    }
-};
-var request = new HttpRequest("https://api.example.com/files/1")
-{
-    Files = new List<HttpFormFile>
-    {
-        new HttpFormFile("file", "update.zip", File.ReadAllBytes("update.zip"))
-    },
-    Config = config
-};
-var response = await request.PutAsync();
-
-//处理错误响应
-var request = new HttpRequest("https://api.example.com/users/999", @"{""name"":""test""}");
-var response = await request.PutAsync();
-if (!response.IsSuccessStatusCode)
-{
-    Console.WriteLine($"错误: {response.Message}");
-    Console.WriteLine($"状态码: {response.StatusCode}");
-}
-
-//批量更新多个资源
-var resources = new[]
-{
-    new { id = 1, name = "资源1", status = "active" },
-    new { id = 2, name = "资源2", status = "active" }
-};
-foreach (var resource in resources)
-{
-    var request = new HttpRequest($"https://api.example.com/resources/{resource.id}", resource.Serialize());
-    var response = await request.PutAsync();
-    Console.WriteLine($"更新资源 {resource.id}: {response.IsSuccessStatusCode}");
-}
-
-//使用全局配置
-HttpConfig.Default.Timeout = TimeSpan.FromSeconds(60);
-var request = new HttpRequest("https://api.example.com/users/1", @"{""name"":""test""}");
-var response = await request.PutAsync();
-Console.WriteLine($"耗时: {response.TotalTimeConsuming}");
+var json = new { id = 1, userId = 1, title = "foo", body = "bar" }.Serialize();
+var response = await new HttpRequest("https://jsonplaceholder.typicode.com/posts/1")
+                .UseClientId("some id")
+                .SetConfig(new HttpConfig { RetryCount = 1 })
+                .AddHeader("Authorization", ["Bearer token123"])
+                .AddCookie(new Cookie("foo", "bar", "/", "jsonplaceholder.typicode.com"))
+                .AddJson(json)
+                .PutAsync();
+var text = await response.EnsureSuccessStatusCode().ReadAsStringAsync();
+Console.WriteLine(text);
+//{
+//  "id": 1,
+//  "userId": 1,
+//  "title": "foo",
+//  "body": "bar"
+//}
 ```
 
 ## 相关文档

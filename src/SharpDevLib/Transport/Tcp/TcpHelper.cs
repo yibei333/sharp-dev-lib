@@ -62,10 +62,9 @@ public static class TcpHelper
     /// <typeparam name="TSessionMetadata">会话元数据类型（可以用来绑定会话的身份信息）</typeparam>
     /// <param name="address">监听IP地址</param>
     /// <param name="port">监听端口</param>
-    /// <param name="initSessionMetadata">初始化会话元数据的函数</param>
     /// <param name="adapterType">接收数据适配器类型，默认为Default</param>
     /// <returns>TCP监听器</returns>
-    public static TcpListener<TSessionMetadata> CreateListener<TSessionMetadata>(IPAddress address, int port, Func<TSessionMetadata> initSessionMetadata, TransportAdapterType adapterType = TransportAdapterType.Default) => new(address, port, initSessionMetadata, adapterType);
+    public static TcpListener<TSessionMetadata> CreateListener<TSessionMetadata>(IPAddress address, int port, TransportAdapterType adapterType = TransportAdapterType.Default) => new(address, port, adapterType);
 
     /// <summary>
     /// 创建TCP监听器（非泛型版本）
