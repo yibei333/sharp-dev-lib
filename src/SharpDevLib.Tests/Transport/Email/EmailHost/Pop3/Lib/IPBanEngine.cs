@@ -13,9 +13,9 @@ public interface IIPBanEngine
 public class ThreeStrikesBanEngine : IIPBanEngine
 {
     [System.Diagnostics.DebuggerDisplay("{ip}, {FailedAttemptCount}, {UtcLastAttempt}")]
-    private class Entry(IPAddress ip)
+    class Entry(IPAddress ip)
     {
-        private readonly IPAddress ip = ip;
+        readonly IPAddress ip = ip;
         internal int FailedAttemptCount = 0;
         internal DateTime UtcLastAttempt = DateTime.MinValue;
 
@@ -32,11 +32,11 @@ public class ThreeStrikesBanEngine : IIPBanEngine
         }
     }
 
-    private readonly object mutex;
-    private readonly Dictionary<IPAddress, Entry> banned;
-    private int failedAttemptThreshold;
-    private int attemptExpirySeconds;
-    private int ipv6UserBits;
+    readonly object mutex;
+    readonly Dictionary<IPAddress, Entry> banned;
+    int failedAttemptThreshold;
+    int attemptExpirySeconds;
+    int ipv6UserBits;
 
     public ThreeStrikesBanEngine()
     {
@@ -78,7 +78,7 @@ public class ThreeStrikesBanEngine : IIPBanEngine
         }
     }
 
-    private void NormalizeIP(ref IPAddress ip)
+    void NormalizeIP(ref IPAddress ip)
     {
         if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6 && ipv6UserBits < 128)
         {

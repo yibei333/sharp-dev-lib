@@ -4,12 +4,12 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib;
 
 public class LineBuffer(int bufferSize)
 {
-    private const byte CR = 13;
-    private const byte LF = 10;
-    private readonly byte[] buffer = new byte[bufferSize];
-    private int startIndex = 0;
-    private int usedLength = 0;
-    private bool expectLF = false;
+    const byte CR = 13;
+    const byte LF = 10;
+    readonly byte[] buffer = new byte[bufferSize];
+    int startIndex = 0;
+    int usedLength = 0;
+    bool expectLF = false;
 
     public byte[] Buffer => buffer;
     public int VacantStart => startIndex + usedLength;
@@ -43,7 +43,7 @@ public class LineBuffer(int bufferSize)
         return line!;
     }
 
-    private void ConsumeLF()
+    void ConsumeLF()
     {
         if (usedLength > 0 && expectLF)
         {
@@ -56,7 +56,7 @@ public class LineBuffer(int bufferSize)
         }
     }
 
-    private ByteString ScanForEndOfLine()
+    ByteString ScanForEndOfLine()
     {
         foreach (int offset in Enumerable.Range(0, usedLength))
         {

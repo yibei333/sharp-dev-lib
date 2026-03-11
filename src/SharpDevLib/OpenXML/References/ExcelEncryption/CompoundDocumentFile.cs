@@ -59,7 +59,7 @@ internal class CompoundDocumentFile : IDisposable
         Read(reader);
     }
 
-    private struct DocWriteInfo
+    struct DocWriteInfo
     {
         internal List<int> DIFAT, FAT, miniFAT;
     }
@@ -77,24 +77,24 @@ internal class CompoundDocumentFile : IDisposable
 
     #region Private Fields
 #pragma warning disable IDE0052 // Remove unread private members
-    private short minorVersion;
-    private short majorVersion;
-    private int numberOfDirectorySector;
-    private short sectorShif, minSectorShift;       //Bits for sector size
-    private int _numberOfFATSectors;            // (4 bytes): This integer field contains the count of the number of FAT sectors in the compound file.
-    private int _firstDirectorySectorLocation;  // (4 bytes): This integer field contains the starting sector number for the directory stream.            
-    private int _transactionSignatureNumber;    // (4 bytes): This integer field MAY contain a sequence number that is incremented every time the compound file is saved by an implementation that supports file transactions.This is the field that MUST be set to all zeroes if file transactions are not implemented.<1> 
-    private int _miniStreamCutoffSize;          // (4 bytes): This integer field MUST be set to 0x00001000. This field specifies the maximum size of a user-defined data stream that is allocated from the mini FAT and mini stream, and that cutoff is 4,096 bytes.Any user-defined data stream that is larger than or equal to this cutoff size must be allocated as normal sectors from the FAT.
-    private int _firstMiniFATSectorLocation;    // (4 bytes): This integer field contains the starting sector number for the mini FAT. 
-    private int _numberofMiniFATSectors;        // (4 bytes): This integer field contains the count of the number of mini FAT sectors in the compound file. 
-    private int _firstDIFATSectorLocation;      // (4 bytes): This integer field contains the starting sector number for the DIFAT. 
-    private int _numberofDIFATSectors;          // (4 bytes): This integer field contains the count of the number of DIFAT sectors in the compound file. 
+    short minorVersion;
+    short majorVersion;
+    int numberOfDirectorySector;
+    short sectorShif, minSectorShift;       //Bits for sector size
+    int _numberOfFATSectors;            // (4 bytes): This integer field contains the count of the number of FAT sectors in the compound file.
+    int _firstDirectorySectorLocation;  // (4 bytes): This integer field contains the starting sector number for the directory stream.            
+    int _transactionSignatureNumber;    // (4 bytes): This integer field MAY contain a sequence number that is incremented every time the compound file is saved by an implementation that supports file transactions.This is the field that MUST be set to all zeroes if file transactions are not implemented.<1> 
+    int _miniStreamCutoffSize;          // (4 bytes): This integer field MUST be set to 0x00001000. This field specifies the maximum size of a user-defined data stream that is allocated from the mini FAT and mini stream, and that cutoff is 4,096 bytes.Any user-defined data stream that is larger than or equal to this cutoff size must be allocated as normal sectors from the FAT.
+    int _firstMiniFATSectorLocation;    // (4 bytes): This integer field contains the starting sector number for the mini FAT. 
+    int _numberofMiniFATSectors;        // (4 bytes): This integer field contains the count of the number of mini FAT sectors in the compound file. 
+    int _firstDIFATSectorLocation;      // (4 bytes): This integer field contains the starting sector number for the DIFAT. 
+    int _numberofDIFATSectors;          // (4 bytes): This integer field contains the count of the number of DIFAT sectors in the compound file. 
 
-    private List<byte[]> _sectors, _miniSectors;
-    private int _sectorSize, _miniSectorSize;
-    private int _sectorSizeInt;
-    private int _currentDIFATSectorPos, _currentFATSectorPos, _currentDirSectorPos;
-    private int _prevDirFATSectorPos;
+    List<byte[]> _sectors, _miniSectors;
+    int _sectorSize, _miniSectorSize;
+    int _sectorSizeInt;
+    int _currentDIFATSectorPos, _currentFATSectorPos, _currentDirSectorPos;
+    int _prevDirFATSectorPos;
 #pragma warning restore IDE0052 // Remove unread private members
     #endregion
 
@@ -185,7 +185,7 @@ internal class CompoundDocumentFile : IDisposable
         AddChildTree(dir[0], dir);
     }
 
-    private void LoadDIFATSectors(DocWriteInfo dwi)
+    void LoadDIFATSectors(DocWriteInfo dwi)
     {
         var nextSector = _firstDIFATSectorLocation;
         while (nextSector > 0)
@@ -204,7 +204,7 @@ internal class CompoundDocumentFile : IDisposable
         }
     }
 
-    private void LoadSectors(BinaryReader br)
+    void LoadSectors(BinaryReader br)
     {
         _sectors = [];
         while (br.BaseStream.Position < br.BaseStream.Length)
@@ -213,14 +213,14 @@ internal class CompoundDocumentFile : IDisposable
         }
     }
 
-    private void LoadMinSectors(ref DocWriteInfo dwi, List<CompoundDocumentItem> dir)
+    void LoadMinSectors(ref DocWriteInfo dwi, List<CompoundDocumentItem> dir)
     {
         dwi.miniFAT = ReadMiniFAT(_sectors, dwi);
         dir[0].Stream = GetStream(dir[0].StartingSectorLocation, dir[0].StreamSize, dwi.FAT, _sectors);
         GetMiniSectors(dir[0].Stream);
     }
 
-    private void GetMiniSectors(byte[] miniFATStream)
+    void GetMiniSectors(byte[] miniFATStream)
     {
         using var br = new BinaryReader(new MemoryStream(miniFATStream));
         _miniSectors = [];
@@ -257,7 +257,7 @@ internal class CompoundDocumentFile : IDisposable
         return ms.ToArray();
     }
 
-    private List<int> ReadMiniFAT(List<byte[]> sectors, DocWriteInfo dwi)
+    List<int> ReadMiniFAT(List<byte[]> sectors, DocWriteInfo dwi)
     {
         var l = new List<int>();
         var nextSector = _firstMiniFATSectorLocation;
@@ -274,7 +274,7 @@ internal class CompoundDocumentFile : IDisposable
         return l;
     }
 
-    private List<CompoundDocumentItem> ReadDirectories(List<byte[]> sectors, DocWriteInfo dwi)
+    List<CompoundDocumentItem> ReadDirectories(List<byte[]> sectors, DocWriteInfo dwi)
     {
         var dir = new List<CompoundDocumentItem>();
         var nextSector = _firstDirectorySectorLocation;
@@ -286,7 +286,7 @@ internal class CompoundDocumentFile : IDisposable
         return dir;
     }
 
-    private List<int> ReadFAT(List<byte[]> sectors, DocWriteInfo dwi)
+    List<int> ReadFAT(List<byte[]> sectors, DocWriteInfo dwi)
     {
         var l = new List<int>();
         foreach (var i in dwi.DIFAT)
@@ -413,7 +413,7 @@ internal class CompoundDocumentFile : IDisposable
         WriteHeader(bw);
     }
 
-    private List<CompoundDocumentItem> FlattenDirs()
+    List<CompoundDocumentItem> FlattenDirs()
     {
         var l = new List<CompoundDocumentItem>();
         InitItem(RootItem);
@@ -429,7 +429,7 @@ internal class CompoundDocumentFile : IDisposable
         item._handled = false;
     }
 
-    private int AddChildren(CompoundDocumentItem item, List<CompoundDocumentItem> l)
+    int AddChildren(CompoundDocumentItem item, List<CompoundDocumentItem> l)
     {
         var childId = -1;
         item.ColorFlag = 1; //Always Black-No matter here, we just add nodes as a b-tree
@@ -452,7 +452,7 @@ internal class CompoundDocumentFile : IDisposable
         return childId;
     }
 
-    private int SetSiblings(int listAdd, List<CompoundDocumentItem> children, int fromPos, int toPos, int currSibl)
+    int SetSiblings(int listAdd, List<CompoundDocumentItem> children, int fromPos, int toPos, int currSibl)
     {
         var pos = GetPos(fromPos, toPos);
 
@@ -486,7 +486,7 @@ internal class CompoundDocumentFile : IDisposable
         return fromPos + div;
     }
 
-    private void FillDIFAT(BinaryWriter bw)
+    void FillDIFAT(BinaryWriter bw)
     {
         if (_currentDIFATSectorPos < _sectorSize)
         {
@@ -500,7 +500,7 @@ internal class CompoundDocumentFile : IDisposable
         }
     }
 
-    private void WritePosition(BinaryWriter bw, int sector, ref int writePos, bool isFATEntry)
+    void WritePosition(BinaryWriter bw, int sector, ref int writePos, bool isFATEntry)
     {
         int pos = (int)bw.BaseStream.Position;
         bw.Seek(writePos, SeekOrigin.Begin);
@@ -521,7 +521,7 @@ internal class CompoundDocumentFile : IDisposable
         }
         bw.Seek(pos, SeekOrigin.Begin);
     }
-    private void WriteDirs(BinaryWriter bw, List<CompoundDocumentItem> dirs)
+    void WriteDirs(BinaryWriter bw, List<CompoundDocumentItem> dirs)
     {
         var miniFAT = SetMiniStream(dirs);
         AllocateFAT(bw, miniFAT.Length, dirs);
@@ -534,7 +534,7 @@ internal class CompoundDocumentFile : IDisposable
         WriteDirStream(bw, dirs);
     }
 
-    private int WriteDirStream(BinaryWriter bw, List<CompoundDocumentItem> dirs)
+    int WriteDirStream(BinaryWriter bw, List<CompoundDocumentItem> dirs)
     {
         if (dirs.Count <= 0) return -1;
         bw.Seek((_firstDirectorySectorLocation + 1) * _sectorSize, SeekOrigin.Begin);
@@ -557,7 +557,7 @@ internal class CompoundDocumentFile : IDisposable
 
     }
 
-    private void WriteMiniFAT(BinaryWriter bw, byte[] miniFAT)
+    void WriteMiniFAT(BinaryWriter bw, byte[] miniFAT)
     {
         if (miniFAT.Length < _sectorSize) return;
 
@@ -579,7 +579,7 @@ internal class CompoundDocumentFile : IDisposable
         _numberofMiniFATSectors = (miniFAT.Length + 1) / _sectorSize;
     }
 
-    private int WriteStream(BinaryWriter bw, byte[] stream)
+    int WriteStream(BinaryWriter bw, byte[] stream)
     {
         bw.Seek(0, SeekOrigin.End);
         var start = (int)bw.BaseStream.Position / _sectorSize - 1;
@@ -589,7 +589,7 @@ internal class CompoundDocumentFile : IDisposable
         return start;
     }
 
-    private void WriteFAT(BinaryWriter bw, int sector, long size)
+    void WriteFAT(BinaryWriter bw, int sector, long size)
     {
         bw.Seek(_currentFATSectorPos, SeekOrigin.Begin);
         var pos = _sectorSize;
@@ -605,7 +605,7 @@ internal class CompoundDocumentFile : IDisposable
         bw.Seek(0, SeekOrigin.End);
     }
 
-    private void CheckUpdateDIFAT(BinaryWriter bw)
+    void CheckUpdateDIFAT(BinaryWriter bw)
     {
         if (bw.BaseStream.Position % _sectorSize != 0) return;
 
@@ -628,7 +628,7 @@ internal class CompoundDocumentFile : IDisposable
         }
     }
 
-    private void AllocateFAT(BinaryWriter bw, int miniFatLength, List<CompoundDocumentItem> dirs)
+    void AllocateFAT(BinaryWriter bw, int miniFatLength, List<CompoundDocumentItem> dirs)
     {
         /*** First calculate full size ***/
         var fullStreamSize = (long)miniFatLength - _sectorSize; //MiniFAT starts from sector 2, by default.
@@ -697,13 +697,13 @@ internal class CompoundDocumentFile : IDisposable
         bw.Seek(0, SeekOrigin.End);
     }
 
-    private int GetDIFatSectors(int FATSectors)
+    int GetDIFatSectors(int FATSectors)
     {
         if (FATSectors <= 109) return 0;
         return GetSectors((FATSectors - 109), _sectorSizeInt - 1);
     }
 
-    private void WriteFATItem(BinaryWriter bw, int value)
+    void WriteFATItem(BinaryWriter bw, int value)
     {
         bw.Write(value);
         CheckUpdateDIFAT(bw);
@@ -712,7 +712,7 @@ internal class CompoundDocumentFile : IDisposable
 
     static int GetSectors(int v, int size) => (v % size == 0) ? (v / size) : (v / size + 1);
 
-    private byte[] SetMiniStream(List<CompoundDocumentItem> dirs)
+    byte[] SetMiniStream(List<CompoundDocumentItem> dirs)
     {
         using var ms = new MemoryStream();
         using var bwMiniFATStream = new BinaryWriter(ms);
@@ -748,7 +748,7 @@ internal class CompoundDocumentFile : IDisposable
         if (rest > 0 && rest < sectorSize) bw.Write(new byte[rest]);
     }
 
-    private void WriteHeader(BinaryWriter bw)
+    void WriteHeader(BinaryWriter bw)
     {
         bw.Seek(0, SeekOrigin.Begin);
         bw.Write(header);
@@ -770,7 +770,7 @@ internal class CompoundDocumentFile : IDisposable
         bw.Write(_numberofDIFATSectors);     //Number of DIFAT Sectors
     }
 
-    private void CreateFATStreams(CompoundDocumentItem item, BinaryWriter bw, BinaryWriter bwMini, DocWriteInfo dwi)
+    void CreateFATStreams(CompoundDocumentItem item, BinaryWriter bw, BinaryWriter bwMini, DocWriteInfo dwi)
     {
         if (item.ObjectType != 5)   //Root, we must have the miniStream first.
         {

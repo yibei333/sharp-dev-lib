@@ -23,7 +23,7 @@ internal class XzDeCompressHandler(DeCompressRequest request) : DeCompressHandle
         }
     }
 
-    private const int XzHeaderSize = 12;
+    const int XzHeaderSize = 12;
     static long GetUncompressedSize(string filePath)
     {
         using var file = File.Open(filePath, FileMode.Open);

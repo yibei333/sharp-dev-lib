@@ -65,12 +65,12 @@ internal class ZipPackage : ZipPackageRelationshipBase
             Match = match;
         }
     }
-    private readonly Dictionary<string, ZipPackagePart> Parts = new(StringComparer.OrdinalIgnoreCase);
+    readonly Dictionary<string, ZipPackagePart> Parts = new(StringComparer.OrdinalIgnoreCase);
     internal Dictionary<string, ContentType> _contentTypes = new(StringComparer.OrdinalIgnoreCase);
     internal char _dirSeparator = '/';
     internal const string schemaXmlExtension = "application/xml";
     internal const string schemaRelsExtension = "application/vnd.openxmlformats-package.relationships+xml";
-    private void AddNew()
+    void AddNew()
     {
         _contentTypes.Add("xml", new ContentType(schemaXmlExtension, true, "xml"));
         _contentTypes.Add("rels", new ContentType(schemaRelsExtension, true, "rels"));
@@ -169,7 +169,7 @@ internal class ZipPackage : ZipPackageRelationshipBase
         }
     }
 
-    private void AddContentTypes(string xml)
+    void AddContentTypes(string xml)
     {
         var doc = new XmlDocument();
         XmlHelper.LoadXmlSafe(doc, xml, Encoding.UTF8);
@@ -220,7 +220,7 @@ internal class ZipPackage : ZipPackageRelationshipBase
         os.Flush();
     }
 
-    private string GetContentTypeXml()
+    string GetContentTypeXml()
     {
         var xml = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">");
         foreach (ContentType ct in _contentTypes.Values)

@@ -12,7 +12,7 @@ internal sealed class SubjectAlternativeNameBuilder
     static readonly IdnMapping s_idnMapping = new();
 
     // Because GeneralNames is a SEQUENCE, just make a rolling list, it doesn't need to be re-sorted.
-    private readonly List<byte[]> _encodedNames = [];
+    readonly List<byte[]> _encodedNames = [];
 
     public void AddEmailAddress(string emailAddress)
     {
@@ -78,7 +78,7 @@ internal sealed class SubjectAlternativeNameBuilder
             critical);
     }
 
-    private void AddGeneralName(GeneralNameAsn generalName)
+    void AddGeneralName(GeneralNameAsn generalName)
     {
         try
         {

@@ -7,7 +7,7 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib;
 
 public class ByteString(byte[] bytes)
 {
-    private readonly byte[] bytes = bytes;
+    readonly byte[] bytes = bytes;
     static readonly UTF8Encoding UTF8 = new(false);
     public static readonly ByteString Empty = new([]);
 

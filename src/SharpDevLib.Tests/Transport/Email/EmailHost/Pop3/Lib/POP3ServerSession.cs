@@ -8,18 +8,18 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib
 {
     internal class POP3ServerSession
     {
-        private readonly System.Net.Sockets.TcpClient tcp;
-        private readonly bool immediateTls;
-        private readonly POP3Listener service;
-        private readonly long connectionID;
+        readonly System.Net.Sockets.TcpClient tcp;
+        readonly bool immediateTls;
+        readonly POP3Listener service;
+        readonly long connectionID;
 
-        private readonly object mutex;
-        private readonly CommandHandler handler;
-        private readonly LineBuffer buffer;
-        private NetworkStream tcpstr;
-        private SslStream tls;
-        private Stream CurrStream => tls as Stream ?? tcpstr;
-        private PopResponse currResp;
+        readonly object mutex;
+        readonly CommandHandler handler;
+        readonly LineBuffer buffer;
+        NetworkStream tcpstr;
+        SslStream tls;
+        Stream CurrStream => tls as Stream ?? tcpstr;
+        PopResponse currResp;
 
         internal POP3ServerSession(System.Net.Sockets.TcpClient tcp, bool immediateTls, POP3Listener service, long connectionID)
         {
@@ -66,7 +66,7 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib
             lock (mutex) tcp.Close();
         }
 
-        private void HandshakeTLS()
+        void HandshakeTLS()
         {
             if (tls != null) return;
 
@@ -88,12 +88,12 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib
         }
 
 
-        private void SendConnectBanner()
+        void SendConnectBanner()
         {
             StartSendResponse(handler.Connect());
         }
 
-        private void StartSendResponse(PopResponse resp)
+        void StartSendResponse(PopResponse resp)
         {
             if (currResp != null) throw new ApplicationException("StartSendResponse called before conclusion of response.");
             currResp = resp;
@@ -105,7 +105,7 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib
             else task.LockContinueWith(mutex, CompleteSendResponse(InterpretCommand));
         }
 
-        private void ContinueSendResponse(Task task)
+        void ContinueSendResponse(Task task)
         {
             if (task.Status == TaskStatus.RanToCompletion)
             {
@@ -125,7 +125,7 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib
             else throw new ApplicationException("Unknown task status: " + task.Status);
         }
 
-        private Action<Task> CompleteSendResponse(Action onRanToComplete)
+        Action<Task> CompleteSendResponse(Action onRanToComplete)
         {
             return Internal;
             void Internal(Task task)
@@ -144,7 +144,7 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib
             }
         }
 
-        private void InterpretCommand()
+        void InterpretCommand()
         {
             var linePacket = buffer.GetLine();
 

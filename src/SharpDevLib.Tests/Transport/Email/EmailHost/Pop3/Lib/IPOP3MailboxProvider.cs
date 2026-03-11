@@ -41,7 +41,7 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib
             AcceptRetrieval = false;
         }
 
-        private void DefaultOnClose()
+        void DefaultOnClose()
         {
         }
 

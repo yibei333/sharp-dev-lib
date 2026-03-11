@@ -8,9 +8,9 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib;
 
 public class POP3Listener : IDisposable
 {
-    private readonly object mutex;
-    private readonly List<System.Net.Sockets.TcpListener> listeners;
-    private readonly List<POP3ServerSession> connections;
+    readonly object mutex;
+    readonly List<System.Net.Sockets.TcpListener> listeners;
+    readonly List<POP3ServerSession> connections;
     public IIPBanEngine IPBanEngine { get; set; } = new ThreeStrikesBanEngine();
     public bool RequireSecureLogin { get; set; }
     public X509Certificate SecureCertificate { get; set; } = null!;
@@ -58,12 +58,12 @@ public class POP3Listener : IDisposable
         StoreNewListener(listen);
     }
 
-    private void StoreNewListener(System.Net.Sockets.TcpListener listen)
+    void StoreNewListener(System.Net.Sockets.TcpListener listen)
     {
         lock (mutex) listeners.Add(listen);
     }
 
-    private TcpListenerHelper.OnNewConnectionDelegate OnNewConnection(bool immediateTls)
+    TcpListenerHelper.OnNewConnectionDelegate OnNewConnection(bool immediateTls)
     {
         return Internal;
         void Internal(System.Net.Sockets.TcpClient tcp)

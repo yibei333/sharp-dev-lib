@@ -5,7 +5,7 @@
 /// </summary>
 public class EmailAttachment
 {
-    private EmailAttachment() { }
+    EmailAttachment() { }
 
     /// <summary>
     /// 从文件路径实例化邮件附件

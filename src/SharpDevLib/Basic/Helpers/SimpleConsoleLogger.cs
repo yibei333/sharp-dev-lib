@@ -7,8 +7,8 @@ namespace SharpDevLib;
 /// </summary>
 public class SimpleConsoleLogger(string categoryName, LogLevel minLevel = LogLevel.Information) : ILogger
 {
-    private readonly string _categoryName = categoryName;
-    private readonly LogLevel _minLevel = minLevel;
+    readonly string _categoryName = categoryName;
+    readonly LogLevel _minLevel = minLevel;
 
     /// <summary>
     /// 开始日志作用域，返回一个空的作用域实例
@@ -72,7 +72,7 @@ public class SimpleConsoleLogger(string categoryName, LogLevel minLevel = LogLev
         /// </summary>
         public static NullScope Instance { get; } = new NullScope();
 
-        private NullScope() { }
+        NullScope() { }
 
         /// <summary>
         /// 释放资源，此方法不执行任何操作

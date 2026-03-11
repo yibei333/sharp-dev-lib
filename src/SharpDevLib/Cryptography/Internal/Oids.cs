@@ -129,13 +129,13 @@ internal static partial class Oids
     internal const string TimeStampingPurpose = "1.3.6.1.5.5.7.3.8";
 
     // PKCS#12
-    private const string Pkcs12Prefix = "1.2.840.113549.1.12.";
-    private const string Pkcs12PbePrefix = Pkcs12Prefix + "1.";
+    const string Pkcs12Prefix = "1.2.840.113549.1.12.";
+    const string Pkcs12PbePrefix = Pkcs12Prefix + "1.";
     internal const string Pkcs12PbeWithShaAnd3Key3Des = Pkcs12PbePrefix + "3";
     internal const string Pkcs12PbeWithShaAnd2Key3Des = Pkcs12PbePrefix + "4";
     internal const string Pkcs12PbeWithShaAnd128BitRC2 = Pkcs12PbePrefix + "5";
     internal const string Pkcs12PbeWithShaAnd40BitRC2 = Pkcs12PbePrefix + "6";
-    private const string Pkcs12BagTypesPrefix = Pkcs12Prefix + "10.1.";
+    const string Pkcs12BagTypesPrefix = Pkcs12Prefix + "10.1.";
     internal const string Pkcs12KeyBag = Pkcs12BagTypesPrefix + "1";
     internal const string Pkcs12ShroudedKeyBag = Pkcs12BagTypesPrefix + "2";
     internal const string Pkcs12CertBag = Pkcs12BagTypesPrefix + "3";
@@ -146,7 +146,7 @@ internal static partial class Oids
     internal const string Pkcs12SdsiCertBagType = "1.2.840.113549.1.9.22.2";
 
     // PKCS#5
-    private const string Pkcs5Prefix = "1.2.840.113549.1.5.";
+    const string Pkcs5Prefix = "1.2.840.113549.1.5.";
     internal const string PbeWithMD5AndDESCBC = Pkcs5Prefix + "3";
     internal const string PbeWithMD5AndRC2CBC = Pkcs5Prefix + "6";
     internal const string PbeWithSha1AndDESCBC = Pkcs5Prefix + "10";
@@ -154,7 +154,7 @@ internal static partial class Oids
     internal const string Pbkdf2 = Pkcs5Prefix + "12";
     internal const string PasswordBasedEncryptionScheme2 = Pkcs5Prefix + "13";
 
-    private const string RsaDsiDigestAlgorithmPrefix = "1.2.840.113549.2.";
+    const string RsaDsiDigestAlgorithmPrefix = "1.2.840.113549.2.";
     internal const string HmacWithSha1 = RsaDsiDigestAlgorithmPrefix + "7";
     internal const string HmacWithSha256 = RsaDsiDigestAlgorithmPrefix + "9";
     internal const string HmacWithSha384 = RsaDsiDigestAlgorithmPrefix + "10";

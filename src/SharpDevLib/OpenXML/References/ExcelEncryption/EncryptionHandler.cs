@@ -49,7 +49,7 @@ internal class EncryptedPackageHandler
         throw new ArgumentException("Unsupported encryption version.");
     }
 
-    private MemoryStream EncryptPackageAgile(byte[] package, ExcelEncryption encryption)
+    MemoryStream EncryptPackageAgile(byte[] package, ExcelEncryption encryption)
     {
         var xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n";
         xml += "<encryption xmlns=\"http://schemas.microsoft.com/office/2006/encryption\" xmlns:p=\"http://schemas.microsoft.com/office/2006/keyEncryptor/password\" xmlns:c=\"http://schemas.microsoft.com/office/2006/keyEncryptor/certificate\">";
@@ -166,7 +166,7 @@ internal class EncryptedPackageHandler
     }
 
     // Set the dataintegrity
-    private void SetHMAC(EncryptionInfoAgile ei, HashAlgorithm hashProvider, byte[] salt, byte[] data)
+    void SetHMAC(EncryptionInfoAgile ei, HashAlgorithm hashProvider, byte[] salt, byte[] data)
     {
         var iv = GetFinalHash(hashProvider, BlockKey_HmacKey, ei.KeyData?.SaltValue ?? Array.Empty<byte>());
         using var ms = new MemoryStream();
@@ -390,7 +390,7 @@ internal class EncryptedPackageHandler
         }
     }
 
-    private MemoryStream GetStreamFromPackage(CompoundDocument doc, ExcelEncryption encryption)
+    MemoryStream GetStreamFromPackage(CompoundDocument doc, ExcelEncryption encryption)
     {
         if (doc.Storage.DataStreams.ContainsKey("EncryptionInfo") || doc.Storage.DataStreams.ContainsKey("EncryptedPackage"))
         {
@@ -400,7 +400,7 @@ internal class EncryptedPackageHandler
         throw (new InvalidDataException("Invalid document. EncryptionInfo or EncryptedPackage stream is missing"));
     }
 
-    private MemoryStream DecryptDocument(byte[] data, EncryptionInfo encryptionInfo, string password)
+    MemoryStream DecryptDocument(byte[] data, EncryptionInfo encryptionInfo, string password)
     {
         var size = BitConverter.ToInt64(data, 0);
 
@@ -416,7 +416,7 @@ internal class EncryptedPackageHandler
     readonly byte[] BlockKey_HmacKey = new byte[] { 0x5f, 0xb2, 0xad, 0x01, 0x0c, 0xb9, 0xe1, 0xf6 };//MSOFFCRYPTO 2.3.4.14 section 3
     readonly byte[] BlockKey_HmacValue = new byte[] { 0xa0, 0x67, 0x7f, 0x02, 0xb2, 0x2c, 0x84, 0x33 };//MSOFFCRYPTO 2.3.4.14 section 5
 
-    private MemoryStream DecryptAgile(EncryptionInfoAgile encryptionInfo, string password, long size, byte[] encryptedData, byte[] data)
+    MemoryStream DecryptAgile(EncryptionInfoAgile encryptionInfo, string password, long size, byte[] encryptedData, byte[] data)
     {
         if (encryptionInfo.KeyData?.CipherAlgorithm != InternalCipherAlgorithm.AES) throw new NotSupportedException($"不支持的加密算法: CipherAlgorithm({encryptionInfo.KeyData?.CipherAlgorithm})");
 

@@ -151,7 +151,7 @@ internal abstract class XmlHelper
     /// <param name="nodeName">name of the node to check</param>
     /// <param name="node">Topnode to check children</param>
     /// <returns></returns>
-    private XmlNode? GetPrependNode(string nodeName, XmlNode? node)
+    XmlNode? GetPrependNode(string nodeName, XmlNode? node)
     {
         if (node == null) return null;
         int pos = GetNodePos(nodeName);
@@ -174,7 +174,7 @@ internal abstract class XmlHelper
         }
         return prependNode;
     }
-    private int GetNodePos(string nodeName)
+    int GetNodePos(string nodeName)
     {
         int ix = nodeName.IndexOf(":");
         if (ix > 0)

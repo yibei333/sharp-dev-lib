@@ -134,7 +134,7 @@ internal enum InternalHashAlogorithm
 /// </summary>
 internal class EncryptionInfoAgile : EncryptionInfo
 {
-    private readonly XmlNamespaceManager _nsm;
+    readonly XmlNamespaceManager _nsm;
     public EncryptionInfoAgile()
     {
         var nt = new NameTable();

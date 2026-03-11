@@ -6,17 +6,17 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib;
 
 internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener service) : IPOP3ConnectionInfo
 {
-    private readonly POP3Listener service = service;
+    readonly POP3Listener service = service;
 
-    private string unauthUserName = null!;
-    private string userNameAtLogin = null!;
-    private string authMailboxID = null!;
-    private bool mailboxIsReadOnly = true;
-    private bool Authenticated => authMailboxID != null;
-    private IList<string> uniqueIDs = [];
-    private readonly List<string> deletedUniqueIDs = [];
-    private readonly POP3ServerSession activeConnection = activeConnection;
-    private bool isSleeping = false;
+    string unauthUserName = null!;
+    string userNameAtLogin = null!;
+    string authMailboxID = null!;
+    bool mailboxIsReadOnly = true;
+    bool Authenticated => authMailboxID != null;
+    IList<string> uniqueIDs = [];
+    readonly List<string> deletedUniqueIDs = [];
+    readonly POP3ServerSession activeConnection = activeConnection;
+    bool isSleeping = false;
 
     System.Net.IPAddress IPOP3ConnectionInfo.ClientIP => activeConnection.ClientIP;
 
@@ -28,7 +28,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
 
     bool IPOP3ConnectionInfo.IsSecure => activeConnection.IsSecure;
 
-    private bool IsUserLoginAllowed => service.RequireSecureLogin == false || activeConnection.IsSecure || activeConnection.IsLocalHost;
+    bool IsUserLoginAllowed => service.RequireSecureLogin == false || activeConnection.IsSecure || activeConnection.IsLocalHost;
 
     static readonly List<string> capabilities =
     [
@@ -48,7 +48,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
 
     static PopResponse BadCommandSyntaxResponse => PopResponse.ERR("Bad command syntax.");
 
-    private const string UidParamPrefix = "UID:";
+    const string UidParamPrefix = "UID:";
 
     internal PopResponse Connect() => PopResponse.OKSingle(service.ServiceName);
 
@@ -81,7 +81,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         };
     }
 
-    private PopResponse CAPA()
+    PopResponse CAPA()
     {
         var resp = new List<string>(capabilities);
 
@@ -96,7 +96,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         return PopResponse.OKMulti("Capabilities are...", resp);
     }
 
-    private PopResponse USER(string claimedUser)
+    PopResponse USER(string claimedUser)
     {
         if (IsUserLoginAllowed == false) return PopResponse.ERR("Call STLS and negotiate TLS first.");
 
@@ -108,7 +108,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         return PopResponse.OKSingle("Thank you. Send password.");
     }
 
-    private PopResponse PASS(string claimedPassClear)
+    PopResponse PASS(string claimedPassClear)
     {
         static PopResponse badPasswordResponse() => PopResponse.ERR("AUTH", "Wrong username or password.");
 
@@ -142,7 +142,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         }
     }
 
-    private IList<string> RefreshUniqueIDsFromMailbox
+    IList<string> RefreshUniqueIDsFromMailbox
     {
         get
         {
@@ -162,7 +162,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         }
     }
 
-    private PopResponse XLOG(string pars)
+    PopResponse XLOG(string pars)
     {
         int spaceIndex = pars.IndexOf(' ');
         if (spaceIndex < 1) return PopResponse.ERR("Syntax: XLOG (username) (password)");
@@ -173,26 +173,26 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         return PASS(claimedPassword);
     }
 
-    private PopResponse STAT()
+    PopResponse STAT()
     {
         var countedUniqueIDs = uniqueIDs.Except(deletedUniqueIDs).ToList();
         var totalBytes = countedUniqueIDs.Select(uniqueID => service.Events.OnMessageSize(authMailboxID, uniqueID)).Sum();
         return PopResponse.OKSingle($"{countedUniqueIDs.Count} {totalBytes}");
     }
 
-    private PopResponse LIST(string id)
+    PopResponse LIST(string id)
     {
         return PerMessageOrSingle(id, Translate, "Message sizes follow...");
         string Translate(int messageID, string uniqueID) => $"{messageID} {service.Events.OnMessageSize(authMailboxID, uniqueID)}";
     }
 
-    private PopResponse UIDL(string id)
+    PopResponse UIDL(string id)
     {
         return PerMessageOrSingle(id, Translate, "Unique-IDs follow...");
         static string Translate(int messageID, string uniqueID) => $"{messageID} {uniqueID}";
     }
 
-    private PopResponse PerMessageOrSingle(string id, MultiLinePerMessageTranslate translateFn, string firstLineText)
+    PopResponse PerMessageOrSingle(string id, MultiLinePerMessageTranslate translateFn, string firstLineText)
     {
         if (string.IsNullOrEmpty(id)) return MultiLinePerMessage(firstLineText, translateFn);
 
@@ -201,8 +201,8 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         return PopResponse.OKSingle(translateFn(messageID, uniqueID));
     }
 
-    private delegate string MultiLinePerMessageTranslate(int messageID, string uniqueID);
-    private PopResponse MultiLinePerMessage(string introText, MultiLinePerMessageTranslate translate)
+    delegate string MultiLinePerMessageTranslate(int messageID, string uniqueID);
+    PopResponse MultiLinePerMessage(string introText, MultiLinePerMessageTranslate translate)
     {
         int messageID = 0;
         string NextResponseLine()
@@ -221,9 +221,9 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         return PopResponse.OKMulti(introText, NextResponseLine);
     }
 
-    private PopResponse RETR(string pars) => RetrOrTop(pars, -1);
+    PopResponse RETR(string pars) => RetrOrTop(pars, -1);
 
-    private PopResponse TOP(string pars)
+    PopResponse TOP(string pars)
     {
         if (string.IsNullOrEmpty(pars)) return BadCommandSyntaxResponse;
 
@@ -234,7 +234,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         return RetrOrTop(pars[..spaceIndex].Trim(), lineCount);
     }
 
-    private PopResponse RetrOrTop(string pars, int lineCountSend)
+    PopResponse RetrOrTop(string pars, int lineCountSend)
     {
         if (string.IsNullOrEmpty(pars)) return BadCommandSyntaxResponse;
 
@@ -247,7 +247,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         else return PopResponse.OKMulti($"Header and first {lineCountSend} lines...", ContentWrappers.WrapForTop(request, lineCountSend));
     }
 
-    private PopResponse DELE(string pars)
+    PopResponse DELE(string pars)
     {
         return DeleteWrapper(pars, Internal);
         PopResponse Internal(string uniqueID)
@@ -257,7 +257,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         }
     }
 
-    private PopResponse DELI(string pars)
+    PopResponse DELI(string pars)
     {
         return DeleteWrapper(pars, Internal);
         PopResponse Internal(string uniqueID)
@@ -268,7 +268,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         }
     }
 
-    private PopResponse DeleteWrapper(string pars, Func<string, PopResponse> action)
+    PopResponse DeleteWrapper(string pars, Func<string, PopResponse> action)
     {
         if (string.IsNullOrEmpty(pars)) return BadCommandSyntaxResponse;
 
@@ -279,7 +279,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         return action(uniqueID);
     }
 
-    private PopResponse QUIT()
+    PopResponse QUIT()
     {
         if (Authenticated == false) return PopResponse.Quit("Closing connection without authenticating.");
         DeleteFlaggedMessages(out int messageCount);
@@ -288,7 +288,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         return PopResponse.Quit(messagesDeletedReport + "Closing connection.");
     }
 
-    private void DeleteFlaggedMessages(out int messageCount)
+    void DeleteFlaggedMessages(out int messageCount)
     {
         messageCount = deletedUniqueIDs.Count;
         if (messageCount == 0) return;
@@ -296,13 +296,13 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         deletedUniqueIDs.Clear();
     }
 
-    private PopResponse RSET()
+    PopResponse RSET()
     {
         deletedUniqueIDs.Clear();
         return PopResponse.OKSingle("Un-flagged all messages flagged for delete.");
     }
 
-    private PopResponse QAUT()
+    PopResponse QAUT()
     {
         if (Authenticated == false) return PopResponse.ERR("Not logged in.");
         DeleteFlaggedMessages(out _);
@@ -316,7 +316,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         return PopResponse.OKSingle("Logged out. You can either reauthenticate or exit.");
     }
 
-    private PopResponse SLEE()
+    PopResponse SLEE()
     {
         if (isSleeping) return PopResponse.ERR("Already sleeping.");
 
@@ -327,7 +327,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
         return PopResponse.OKSingle($"Zzzzz. Deleted {messageCount} messages.");
     }
 
-    private PopResponse WAKE()
+    PopResponse WAKE()
     {
         if (isSleeping == false) return PopResponse.ERR("Not sleeping.");
         var newUniqueIDs = RefreshUniqueIDsFromMailbox;
@@ -341,7 +341,7 @@ internal class CommandHandler(POP3ServerSession activeConnection, POP3Listener s
 
     static PopResponse NOOP() => PopResponse.OKSingle("There's no-one here but us POP3 services.");
 
-    private void ParseForUniqueId(string id, out int messageID, out string uniqueID)
+    void ParseForUniqueId(string id, out int messageID, out string uniqueID)
     {
         if (int.TryParse(id, out int parsedMessageID))
         {

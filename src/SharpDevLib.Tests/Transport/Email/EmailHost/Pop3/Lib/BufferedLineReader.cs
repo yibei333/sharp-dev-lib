@@ -5,16 +5,16 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib;
 
 public class BufferedLineReader(Stream stream, int maxLineLength)
 {
-    private const byte CR = 13;
-    private const byte LF = 10;
-    private readonly Stream stream = stream;
-    private readonly byte[] buffer = new byte[maxLineLength];
-    private int startIndex = 0;
-    private int usedLength = 0;
-    private int AvailIndex => startIndex + usedLength;
-    private int AvailLength => buffer.Length - AvailIndex;
-    private bool expectLF = false;
-    private bool streamHasClosed = false;
+    const byte CR = 13;
+    const byte LF = 10;
+    readonly Stream stream = stream;
+    readonly byte[] buffer = new byte[maxLineLength];
+    int startIndex = 0;
+    int usedLength = 0;
+    int AvailIndex => startIndex + usedLength;
+    int AvailLength => buffer.Length - AvailIndex;
+    bool expectLF = false;
+    bool streamHasClosed = false;
 
     public delegate void OnLineReadDelegate(ByteString? line, bool isCompleteLine);
 

@@ -130,7 +130,7 @@ internal class ExcelEncryption
     /// Algorithm used for encrypting the package. Default is AES 128-bit for standard and AES 256 for agile
     /// </summary>
     public EncryptionAlgorithm Algorithm { get; set; }
-    private EncryptionVersion _version = EncryptionVersion.Agile;
+    EncryptionVersion _version = EncryptionVersion.Agile;
     /// <summary>
     /// The version of the encryption.        
     /// </summary>

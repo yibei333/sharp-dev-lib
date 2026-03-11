@@ -8,7 +8,7 @@ namespace SharpDevLib;
 /// </summary>
 public class EmailContent
 {
-    private EmailContent() { }
+    EmailContent() { }
 
     /// <summary>
     /// 实例化邮件内容

@@ -5,8 +5,8 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib;
 
 internal class PopResponse
 {
-    private readonly ResponseClass respType;
-    private readonly NextLineFn nextLineGen;
+    readonly ResponseClass respType;
+    readonly NextLineFn nextLineGen;
 
     internal bool IsQuit => respType == ResponseClass.OKQuit || respType == ResponseClass.Critical;
     internal bool IsNormal => IsQuit == false;
@@ -17,7 +17,7 @@ internal class PopResponse
     internal string Code { get; }
     internal string Text { get; }
 
-    private PopResponse(ResponseClass respType, string code, string text, NextLineFn nextlineGen)
+    PopResponse(ResponseClass respType, string code, string text, NextLineFn nextlineGen)
     {
         if (text.Contains('[') || text.Contains(']') || text.Contains('\r') || text.Contains('\n') || text.EndsWith(" _")) throw new ApplicationException("Response text contains disallowed characters.");
 
@@ -27,7 +27,7 @@ internal class PopResponse
         nextLineGen = nextlineGen;
     }
 
-    private enum ResponseClass
+    enum ResponseClass
     {
         OK,
         OKQuit,
