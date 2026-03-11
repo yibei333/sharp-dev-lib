@@ -19,12 +19,9 @@ Console.WriteLine(json);
 var user = new { Name = "张三", Age = 25 };
 
 //全局配置，只需要设置一次
-JsonOption.Default = new JsonOption
-{
-    //序列化只用到FormatJson和NameFormat，其余属性将影响反序列化
-    FormatJson = true,
-    NameFormat = JsonNameFormat.CamelCaseLower
-};
+//序列化只用到FormatJson和NameFormat，其余属性将影响反序列化
+JsonOption.Default.FormatJson = true;
+JsonOption.Default.NameFormat = JsonNameFormat.CamelCaseLower;
 //或者每次传入
 //var json = user.Serialize(new JsonOption { FormatJson = true });
 
@@ -53,11 +50,8 @@ Console.WriteLine(user.Name);
 var json = "{\"Name\":\"张三\"}";
 
 //全局配置，只需要设置一次
-JsonOption.Default = new JsonOption
-{
-    //反序列化只用到此配置，其余属性将影响序列化
-    CaseInsensitive = true
-};
+//反序列化只用到此配置，其余属性将影响序列化
+JsonOption.Default.CaseInsensitive = true;
 //或者每次传入
 //var user = json.DeSerialize<NameDto>(new JsonOption { CaseInsensitive = false });
 

@@ -17,7 +17,7 @@ public class JsonOption
     /// <summary>
     /// 默认JSON配置选项，所有序列化和反序列化操作都可以使用此默认配置
     /// </summary>
-    public static JsonOption Default { get; set; } = new();
+    public static JsonOption Default { get; } = new();
 
     /// <summary>
     /// 是否格式化JSON输出，true表示使用缩进格式化，false表示压缩格式，默认为false
@@ -28,6 +28,7 @@ public class JsonOption
     /// 反序列化时是否忽略属性名称大小写，默认为true
     /// </summary>
     public bool CaseInsensitive { get; set; } = true;
+
     /// <summary>
     /// JSON属性命名格式，默认为大驼峰格式(CamelCaseUpper)
     /// </summary>
