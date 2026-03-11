@@ -15,11 +15,13 @@ public class TcpListener<TSessionMetadata> : IDisposable
     readonly List<TcpSession<TSessionMetadata>> _sessions;
     static readonly object _lock = new();
 
-    internal TcpListener(IPAddress iPAddress, int port, TransportAdapterType adapterType = TransportAdapterType.Default)
+    internal TcpListener(IPAddress iPAddress, int port, int bufferSize, ITcpAdapter? adapter)
     {
+        if (bufferSize <= 4) throw new Exception("bufferSize需要大于4");
+        BufferSize = bufferSize;
         IPAddress = iPAddress;
         Port = port;
-        AdapterType = adapterType;
+        Adapter = adapter ?? TcpAdapters.Default;
 
         Socket = new Socket(iPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         Socket.Bind(new IPEndPoint(iPAddress, port));
@@ -30,24 +32,19 @@ public class TcpListener<TSessionMetadata> : IDisposable
     }
 
     /// <summary>
+    /// 缓冲区大小
+    /// </summary>
+    public int BufferSize { get; }
+
+    /// <summary>
     /// 底层套接字
     /// </summary>
     public Socket Socket { get; }
 
     /// <summary>
-    /// 接收数据适配器类型
+    /// 发送/接收数据适配器
     /// </summary>
-    public TransportAdapterType AdapterType { get; }
-
-    /// <summary>
-    /// 接收数据适配器(仅当AdapterType=TcpAdapterType.Custom时有用)
-    /// </summary>
-    public ITransportReceiveAdapter? ReceiveAdapter { get; set; }
-
-    /// <summary>
-    /// 发送数据适配器(仅当AdapterType=TcpAdapterType.Custom时有用)
-    /// </summary>
-    public ITransportSendAdapter? SendAdapter { get; set; }
+    public ITcpAdapter Adapter { get; set; }
 
     /// <summary>
     /// 监听器状态
@@ -99,7 +96,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
     /// </summary>
     /// <param name="cancellationToken">取消令牌</param>
     /// <exception cref="Exception">监听器已关闭时引发异常</exception>
-    public void Listen(CancellationToken? cancellationToken = null)
+    public void StartListen(CancellationToken? cancellationToken = null)
     {
         if (State == TcpListnerStates.Listening) return;
         if (State == TcpListnerStates.Closed) throw new Exception("无法访问已关闭的TCP监听器");
@@ -133,14 +130,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
             var session = new TcpSession<TSessionMetadata>(this, socket);
             _sessions.Add(session);
             SessionAdded?.Invoke(this, new TcpSessionEventArgs<TSessionMetadata>(session));
-            try
-            {
-                session.Receive();
-            }
-            catch (Exception ex)
-            {
-                TcpHelper.Logger?.LogError(ex, ex.Message);
-            }
+            session.Receive();
             Socket.BeginAccept(AcceptCallback, cancellationToken);
         }
         catch
@@ -185,7 +175,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
 /// </summary>
 public class TcpListener : TcpListener<int>
 {
-    internal TcpListener(IPAddress iPAddress, int port, TransportAdapterType adapterType = TransportAdapterType.Default) : base(iPAddress, port, adapterType)
+    internal TcpListener(IPAddress iPAddress, int port, int bufferSize, ITcpAdapter? adapter) : base(iPAddress, port, bufferSize, adapter)
     {
     }
 }

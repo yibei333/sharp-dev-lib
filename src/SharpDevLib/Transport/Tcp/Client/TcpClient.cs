@@ -10,27 +10,36 @@ public class TcpClient : IDisposable
 {
     TcpClientStates _state = 0;
 
-    internal TcpClient(IPAddress remoteAdress, int remotePort, TransportAdapterType adapterType = TransportAdapterType.Default)
+    internal TcpClient(IPAddress remoteAdress, int remotePort, int bufferSize, ITcpAdapter? tcpAdapter)
     {
+        if (bufferSize <= 4) throw new Exception("bufferSize需要大于4");
+        BufferSize = bufferSize;
         RemoteAdress = remoteAdress;
         RemotePort = remotePort;
-        AdapterType = adapterType;
+        Adapter = tcpAdapter ?? TcpAdapters.Default;
 
         Socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
         State = TcpClientStates.Created;
     }
 
-    internal TcpClient(IPAddress localAdress, int localPort, IPAddress remoteAdress, int remotePort, TransportAdapterType adapterType = TransportAdapterType.Default)
+    internal TcpClient(IPAddress localAdress, int localPort, IPAddress remoteAdress, int remotePort, int bufferSize, ITcpAdapter? tcpAdapter)
     {
+        if (bufferSize <= 4) throw new Exception("bufferSize需要大于4");
+        BufferSize = bufferSize;
         LocalAdress = localAdress;
         LocalPort = localPort;
         RemoteAdress = remoteAdress;
         RemotePort = remotePort;
-        AdapterType = adapterType;
+        Adapter = tcpAdapter ?? TcpAdapters.Default;
 
         Socket = new Socket(SocketType.Dgram, ProtocolType.Udp);
         State = TcpClientStates.Created;
     }
+
+    /// <summary>
+    /// 缓冲区大小
+    /// </summary>
+    public int BufferSize { get; }
 
     /// <summary>
     /// 底层套接字
@@ -78,19 +87,9 @@ public class TcpClient : IDisposable
     public int RemotePort { get; }
 
     /// <summary>
-    /// 收发适配器类型
+    /// 发送/接收数据适配器
     /// </summary>
-    public TransportAdapterType AdapterType { get; }
-
-    /// <summary>
-    /// 接收数据适配器(仅当AdapterType=TcpAdapterType.Custom时有用)
-    /// </summary>
-    public ITransportReceiveAdapter? ReceiveAdapter { get; set; }
-
-    /// <summary>
-    /// 发送数据适配器(仅当AdapterType=TcpAdapterType.Custom时有用)
-    /// </summary>
-    public ITransportSendAdapter? SendAdapter { get; set; }
+    public ITcpAdapter Adapter { get; set; }
 
     /// <summary>
     /// 接收到数据事件
@@ -111,7 +110,7 @@ public class TcpClient : IDisposable
     /// 连接到服务器并开始接收数据
     /// </summary>
     /// <param name="cancellationToken">取消令牌</param>
-    public void ConnectAndReceive(CancellationToken? cancellationToken = null)
+    public void StartConnectAndReceive(CancellationToken? cancellationToken = null)
     {
         if (State == TcpClientStates.Connected) return;
 
@@ -127,9 +126,8 @@ public class TcpClient : IDisposable
         Receive(cancellationToken);
     }
 
-    async void Receive(CancellationToken? cancellationToken = null)
+    void Receive(CancellationToken? cancellationToken = null)
     {
-        await Task.Yield();
         if (cancellationToken?.IsCancellationRequested ?? false)
         {
             Close();
@@ -140,14 +138,7 @@ public class TcpClient : IDisposable
 
         try
         {
-            var bytes = AdapterType.GetReceiveAdapter(ReceiveAdapter).Receive(Socket);
-            if (bytes.IsNullOrEmpty())
-            {
-                Close();
-                return;
-            }
-            Received?.Invoke(this, new TcpClientDataEventArgs(this, bytes));
-            Receive(cancellationToken);
+            Adapter.BeginReceive(Socket, BufferSize, ReceiveCallback);
         }
         catch (SocketException ex)
         {
@@ -161,6 +152,31 @@ public class TcpClient : IDisposable
         }
     }
 
+    void ReceiveCallback(IAsyncResult asyncResult)
+    {
+        try
+        {
+            var bytes = Adapter.EndReceive(Socket, asyncResult);
+            if (bytes.IsNullOrEmpty())
+            {
+                Close();
+                return;
+            }
+            Received?.Invoke(this, new TcpClientDataEventArgs(this, bytes));
+            Adapter.BeginReceive(Socket, BufferSize, ReceiveCallback);
+        }
+        catch (SocketException ex)
+        {
+            Close();
+            Error?.Invoke(this, new TcpClientExceptionEventArgs(this, ex));
+        }
+        catch (Exception ex)
+        {
+            Error?.Invoke(this, new TcpClientExceptionEventArgs(this, ex));
+            Adapter.BeginReceive(Socket, BufferSize, ReceiveCallback);
+        }
+    }
+
     /// <summary>
     /// 发送数据
     /// </summary>
@@ -171,7 +187,7 @@ public class TcpClient : IDisposable
         try
         {
             if (State != TcpClientStates.Connected || !Socket.Connected) throw new Exception("无法访问已关闭的TCP客户端");
-            AdapterType.GetSendAdapter(SendAdapter).Send(Socket, bytes);
+            Adapter.Send(Socket, bytes);
             Sended?.Invoke(this, new TcpClientDataEventArgs(this, bytes));
         }
         catch (SocketException ex)

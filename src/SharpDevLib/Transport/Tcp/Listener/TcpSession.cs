@@ -8,6 +8,8 @@ namespace SharpDevLib;
 /// <typeparam name="TMetadata">会话元数据类型</typeparam>
 public class TcpSession<TMetadata> : IDisposable
 {
+    const int maxLength = (int)(1.9 * 1024 * 1024 * 1024);
+
     TcpSessionStates _state = 0;
     bool _isDisposed;
 
@@ -16,12 +18,7 @@ public class TcpSession<TMetadata> : IDisposable
         Listener = listener;
         Socket = socket;
         State = TcpSessionStates.Connected;
-        ReceiveAdapter = Listener.AdapterType.GetReceiveAdapter(listener.ReceiveAdapter);
-        SendAdapter = Listener.AdapterType.GetSendAdapter(listener.SendAdapter);
     }
-
-    ITransportReceiveAdapter ReceiveAdapter { get; }
-    ITransportSendAdapter SendAdapter { get; }
 
     /// <summary>
     /// 底层套接字
@@ -82,8 +79,9 @@ public class TcpSession<TMetadata> : IDisposable
     {
         try
         {
+            if (bytes.Length > maxLength) throw new NotSupportedException($"数据长度超出限制{maxLength},请分段传输数据");
             if (State != TcpSessionStates.Connected || !Socket.Connected) throw new Exception("无法访问已关闭的TCP会话");
-            SendAdapter.Send(Socket, bytes);
+            Listener.Adapter.Send(Socket, bytes);
             Sended?.Invoke(this, new TcpSessionDataEventArgs<TMetadata>(this, bytes));
         }
         catch (SocketException ex)
@@ -99,22 +97,13 @@ public class TcpSession<TMetadata> : IDisposable
         }
     }
 
-    internal async void Receive()
+    internal void Receive()
     {
-        await Task.Yield();
         if (State != TcpSessionStates.Connected || !Socket.Connected) return;
         if (_isDisposed) return;
-
         try
         {
-            var bytes = ReceiveAdapter.Receive(Socket);
-            if (bytes.IsNullOrEmpty())
-            {
-                Close();
-                return;
-            }
-            Received?.Invoke(this, new TcpSessionDataEventArgs<TMetadata>(this, bytes));
-            Receive();
+            Listener.Adapter.BeginReceive(Socket, Listener.BufferSize, ReceiveCallback);
         }
         catch (SocketException ex)
         {
@@ -125,7 +114,32 @@ public class TcpSession<TMetadata> : IDisposable
         {
             if (_isDisposed) return;
             Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
-            Receive();
+        }
+    }
+
+    void ReceiveCallback(IAsyncResult result)
+    {
+        try
+        {
+            var bytes = Listener.Adapter.EndReceive(Socket, result);
+            if (bytes.IsNullOrEmpty())
+            {
+                Close();
+                return;
+            }
+            Received?.Invoke(this, new TcpSessionDataEventArgs<TMetadata>(this, bytes));
+            Listener.Adapter.BeginReceive(Socket, Listener.BufferSize, ReceiveCallback);
+        }
+        catch (SocketException ex)
+        {
+            Close();
+            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
+        }
+        catch (Exception ex)
+        {
+            if (_isDisposed) return;
+            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
+            Listener.Adapter.BeginReceive(Socket, Listener.BufferSize, ReceiveCallback);
         }
     }
 

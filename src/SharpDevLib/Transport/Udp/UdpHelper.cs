@@ -33,16 +33,16 @@ public static class UdpHelper
     /// <summary>
     /// 创建UDP客户端
     /// </summary>
-    /// <param name="adapterType">收发适配器类型</param>
+    /// <param name="bufferSize">缓存区大小,默认2048字节</param>
     /// <returns>UDP客户端</returns>
-    public static UdpClient CreateClient(TransportAdapterType adapterType = TransportAdapterType.Default) => new(adapterType);
+    public static UdpClient CreateClient(int bufferSize = 2048) => new(bufferSize);
 
     /// <summary>
     /// 创建UDP客户端（指定本地绑定地址）
     /// </summary>
     /// <param name="localAdress">本地绑定IP地址</param>
     /// <param name="localPort">本地绑定端口</param>
-    /// <param name="adapterType">收发适配器类型</param>
+    /// <param name="bufferSize">缓存区大小,默认2048字节</param>
     /// <returns>UDP客户端</returns>
-    public static UdpClient CreateClient(IPAddress localAdress, int localPort, TransportAdapterType adapterType = TransportAdapterType.Default) => new(localAdress, localPort, adapterType);
+    public static UdpClient CreateClient(IPAddress localAdress, int localPort, int bufferSize = 2048) => new(localAdress, localPort, bufferSize);
 }

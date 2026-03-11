@@ -41,9 +41,10 @@ public static class TcpHelper
     /// </summary>
     /// <param name="remoteAdress">远程服务器IP地址</param>
     /// <param name="remotePort">远程服务器端口</param>
-    /// <param name="adapterType">收发适配器类型，默认为Default</param>
+    /// <param name="bufferSize">缓存区大小,默认2048字节</param>
+    /// <param name="adapter">发送/接收数据适配器类型，默认为TcpAdapters.Default</param>
     /// <returns>TCP客户端</returns>
-    public static TcpClient CreateClient(IPAddress remoteAdress, int remotePort, TransportAdapterType adapterType = TransportAdapterType.Default) => new(remoteAdress, remotePort, adapterType);
+    public static TcpClient CreateClient(IPAddress remoteAdress, int remotePort, int bufferSize = 2048, ITcpAdapter? adapter = null) => new(remoteAdress, remotePort, bufferSize, adapter);
 
     /// <summary>
     /// 创建TCP客户端（指定本地和远程地址）
@@ -52,9 +53,10 @@ public static class TcpHelper
     /// <param name="localPort">本地绑定端口</param>
     /// <param name="remoteAdress">远程服务器IP地址</param>
     /// <param name="remotePort">远程服务器端口</param>
-    /// <param name="adapterType">收发适配器类型，默认为Default</param>
+    /// <param name="bufferSize">缓存区大小,默认2048字节</param>
+    /// <param name="adapter">发送/接收数据适配器类型，默认为TcpAdapters.Default</param>
     /// <returns>TCP客户端</returns>
-    public static TcpClient CreateClient(IPAddress localAdress, int localPort, IPAddress remoteAdress, int remotePort, TransportAdapterType adapterType = TransportAdapterType.Default) => new(localAdress, localPort, remoteAdress, remotePort, adapterType);
+    public static TcpClient CreateClient(IPAddress localAdress, int localPort, IPAddress remoteAdress, int remotePort, int bufferSize = 2048, ITcpAdapter? adapter = null) => new(localAdress, localPort, remoteAdress, remotePort, bufferSize, adapter);
 
     /// <summary>
     /// 创建TCP监听器（泛型版本，支持会话元数据）
@@ -62,16 +64,18 @@ public static class TcpHelper
     /// <typeparam name="TSessionMetadata">会话元数据类型（可以用来绑定会话的身份信息）</typeparam>
     /// <param name="address">监听IP地址</param>
     /// <param name="port">监听端口</param>
-    /// <param name="adapterType">接收数据适配器类型，默认为Default</param>
+    /// <param name="bufferSize">缓存区大小,默认2048字节</param>
+    /// <param name="adapter">发送/接收数据适配器类型，默认为TcpAdapters.Default</param>
     /// <returns>TCP监听器</returns>
-    public static TcpListener<TSessionMetadata> CreateListener<TSessionMetadata>(IPAddress address, int port, TransportAdapterType adapterType = TransportAdapterType.Default) => new(address, port, adapterType);
+    public static TcpListener<TSessionMetadata> CreateListener<TSessionMetadata>(IPAddress address, int port, int bufferSize = 2048, ITcpAdapter? adapter = null) => new(address, port, bufferSize, adapter);
 
     /// <summary>
     /// 创建TCP监听器（非泛型版本）
     /// </summary>
     /// <param name="address">监听IP地址</param>
     /// <param name="port">监听端口</param>
-    /// <param name="adapterType">接收数据适配器类型，默认为Default</param>
+    /// <param name="bufferSize">缓存区大小,默认2048字节</param>
+    /// <param name="adapter">发送/接收数据适配器类型，默认为TcpAdapters.Default</param>
     /// <returns>TCP监听器</returns>
-    public static TcpListener CreateListener(IPAddress address, int port, TransportAdapterType adapterType = TransportAdapterType.Default) => new(address, port, adapterType);
+    public static TcpListener CreateListener(IPAddress address, int port, int bufferSize = 2048, ITcpAdapter? adapter = null) => new(address, port, bufferSize, adapter);
 }
