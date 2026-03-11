@@ -17,7 +17,7 @@ internal class HttpProgressContent : HttpContent
     HttpProgressContent(HttpRequest request, HttpRequestMessage requestMessage)
     {
         _innerContent = requestMessage.Content;
-        _progress = new HttpProgress { Total = requestMessage.Content?.Headers?.ContentLength ?? 0 };
+        _progress = new HttpProgress { RequestUrl = request.Message?.RequestUri?.ToString() ?? string.Empty, Total = requestMessage.Content?.Headers?.ContentLength ?? 0 };
         CopyHeaders();
         _onProgress = request.Config?.OnSendProgress ?? HttpConfig.Default.OnSendProgress;
     }
@@ -34,11 +34,15 @@ internal class HttpProgressContent : HttpContent
     protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
     {
         if (_innerContent is null) return Task.CompletedTask;
-        var progressStream = new ProgressStream(stream, (p) =>
+        var lastProgress = _progress.Progress;
+        var progressStream = new HttpProgressStream(stream, (p) =>
         {
-            var lastProgress = _progress.Progress;
             _progress.Transfered = p;
-            if (_progress.Progress == 1 || (_progress.Progress - lastProgress) > 5) _onProgress?.Invoke(_progress);
+            if (_progress.Progress >= 100 || (_progress.Progress - lastProgress) > 5)
+            {
+                _onProgress?.Invoke(_progress);
+                lastProgress = _progress.Progress;
+            }
         });
         return _innerContent.CopyToAsync(progressStream);
     }
@@ -60,84 +64,5 @@ internal class HttpProgressContent : HttpContent
     {
         base.Dispose(disposing);
         if (disposing) _innerContent?.Dispose();
-    }
-}
-
-internal class ProgressStream(Stream innerStream, Action<long> onProgress) : Stream
-{
-    readonly Stream _innerStream = innerStream;
-    readonly Action<long> _onProgress = onProgress;
-    long _bytesSent = 0;
-
-    public override bool CanRead => _innerStream.CanRead;
-
-    public override bool CanSeek => _innerStream.CanSeek;
-
-    public override bool CanWrite => _innerStream.CanWrite;
-
-    public override long Length => _innerStream.Length;
-
-    public override long Position { get => _innerStream.Position; set => _innerStream.Position = value; }
-
-    public override int Read(byte[] buffer, int offset, int count)
-    {
-        int bytesRead = _innerStream.Read(buffer, offset, count);
-        ReportBytesTransfered(bytesRead);
-        return bytesRead;
-    }
-
-    public override int ReadByte()
-    {
-        int byteRead = _innerStream.ReadByte();
-        ReportBytesTransfered(byteRead);
-        return byteRead;
-    }
-
-    public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-    {
-        int readCount = await _innerStream.ReadAsync(buffer, offset, count, cancellationToken);
-        ReportBytesTransfered(readCount);
-        return readCount;
-    }
-
-    public override void Write(byte[] buffer, int offset, int count)
-    {
-        _innerStream.Write(buffer, offset, count);
-        ReportBytesTransfered(count);
-    }
-
-    public override void WriteByte(byte value)
-    {
-        _innerStream.WriteByte(value);
-        ReportBytesTransfered(1);
-    }
-
-    public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-    {
-        await _innerStream.WriteAsync(buffer, offset, count, cancellationToken);
-        ReportBytesTransfered(count);
-    }
-
-    internal void ReportBytesTransfered(int bytesSent)
-    {
-        if (bytesSent <= 0) return;
-
-        _bytesSent += bytesSent;
-        _onProgress(_bytesSent);
-    }
-
-    public override void Flush()
-    {
-        _innerStream.Flush();
-    }
-
-    public override long Seek(long offset, SeekOrigin origin)
-    {
-        return _innerStream.Seek(offset, origin);
-    }
-
-    public override void SetLength(long value)
-    {
-        _innerStream.SetLength(value);
     }
 }

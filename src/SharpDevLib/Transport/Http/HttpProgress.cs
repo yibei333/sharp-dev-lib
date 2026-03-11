@@ -17,6 +17,11 @@ public class HttpProgress
     public long Total { get; internal set; }
 
     /// <summary>
+    /// 请求地址
+    /// </summary>
+    public string RequestUrl { get; internal set; } = "";
+
+    /// <summary>
     /// 已传输字节数
     /// </summary>
     public long Transfered
@@ -63,6 +68,7 @@ public class HttpProgress
     {
         var builder = new StringBuilder();
         builder.AppendLine($"********progress********");
+        builder.AppendLine($"RequestUrl:{RequestUrl}");
         builder.AppendLine($"Total:{Total}");
         builder.AppendLine($"Transfered:{Transfered}");
         builder.AppendLine($"Progress:{Progress}");

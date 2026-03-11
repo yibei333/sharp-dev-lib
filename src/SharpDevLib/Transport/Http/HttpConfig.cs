@@ -27,6 +27,11 @@ public class HttpConfig
     public ILogger? Logger { get; set; }
 
     /// <summary>
+    /// 基础地址
+    /// </summary>
+    public string? BaseUrl { get; set; }
+
+    /// <summary>
     /// 请求超时时间
     /// </summary>
     public TimeSpan? Timeout { get; set; }

@@ -79,10 +79,7 @@ public static class HttpHelper
                 url = $"{url}{prefix}{request.Parameters.ToQueryString()}";
             }
         }
-        var client = HttpClientFactory.GetClient(request.ClientId);
-        var timeout = request.Config?.Timeout ?? HttpConfig.Default.Timeout;
-        if (timeout is not null) client.Client.Timeout = timeout.Value;
-        request.Cookies?.ForEach(client.ClientHandler.CookieContainer.Add);
+        var client = HttpClientFactory.GetClient(request);
 
         HttpRequestMessage CreateRequestMessage()
         {

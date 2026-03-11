@@ -48,6 +48,7 @@ public class HttpGetTests : HttpBaseTests
             .GetResult();
         Assert.IsTrue(response.IsSuccess);
         Assert.AreEqual("foo_bar", response.GetResponseDataAsync<string>().GetAwaiter().GetResult());
+        Assert.AreEqual("foo_bar", response.GetResponseDataAsync<string>().GetAwaiter().GetResult());
     }
 
     [TestMethod]
@@ -105,52 +106,35 @@ public class HttpGetTests : HttpBaseTests
     }
 
     [TestMethod]
-    public async Task GetStreamAATest()
-    {
-        var count = 0;
-        var config = new HttpConfig
-        {
-            OnReceiveProgress = p =>
-            {
-                count++;
-                Console.WriteLine($"receive->{p}");
-            }
-        };
-        var response = new HttpRequest(BaseUrl.CombinePath("/statics/TestFile.txt"))
-            .SetConfig(config)
-            .GetAsync()
-            .GetAwaiter()
-            .GetResult();
-        Console.WriteLine("xxx");
-        using var memoryStream = new MemoryStream();
-        var stream = await response.ReadAsStreamAsync();
-        Console.WriteLine("yyy");
-        stream.CopyTo(memoryStream);
-        var actual = memoryStream.ToArray().Utf8Encode();
-        Assert.AreEqual("Hello,World!", actual);
-        //Assert.IsGreaterThan(0, count);
-
-        var stream1 = await response.ReadAsStreamAsync();
-        stream1.CopyTo(memoryStream);
-        var actual1 = memoryStream.ToArray().Utf8Encode();
-        Console.WriteLine(actual);
-    }
-
-    static readonly string[] value = ["BIDUPSID=601145944A9976FC12AF00B3136B48F0; PSTM=1715422096; BAIDUID=59DA881A28C93BDBA3A461A5358B8861:FG=1; delPer=0; PSINO=7; ZFY=m:Bnz:BEloKMh6w68:AuIR5F:Bb:BXP9xty8LFvFaveyp9H4:C; BAIDUID_BFESS=59DA881A28C93BDBA3A461A5358B8861:FG=1; H_WISE_SIDS=60175_60269_60274_60289_60299; H_PS_PSSID=60269_60274_60289_60299; BA_HECTOR=80aga10g04050ga5ak8lak85dtl3dc1j4lbe61v; BDRCVFR[S4-dAuiWMmn]=I67x6TjHwwYf0; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598; RT=\"z=1&dm=baidu.com&si=7b9c824a-f453-4b8f-af11-4d5eae458720&ss=lw8my2mv&sl=0&tt=0&bcn=https%3A%2F%2Ffclog.baidu.com%2Flog%2Fweirwood%3Ftype%3Dperf\""];
-
-    [TestMethod]
-    public void CookieTest()
+    public async Task GetCookieTest()
     {
         var url = "/api/get/cookie";
         var response = new HttpRequest(BaseUrl.CombinePath(url))
-            .AddHeader("Cookie", value)
+            .AddCookie(new System.Net.Cookie("foo", "bar", "/", "localhost"))
             .GetAsync()
             .GetAwaiter()
             .GetResult();
         Assert.IsTrue(response.IsSuccess);
-        var cookies = response.GetResponseCookies();
-        Assert.AreEqual(1, cookies?.Count(x => x?.Name == "BIDUPSID"));
-        Assert.AreEqual("601145944A9976FC12AF00B3136B48F0", cookies?.FirstOrDefault(x => x?.Name == "BIDUPSID")?.Value);
+        var cookies = await response.GetResponseDataAsync<string>();
+        Console.WriteLine(cookies);
+        Assert.Contains("bar", cookies);
+    }
+
+    [TestMethod]
+    public async Task SetCookieTestAsync()
+    {
+        var url = "/api/get/cookie/set";
+        var response = await new HttpRequest(BaseUrl.CombinePath(url)).GetAsync();
+        Console.WriteLine(response);
+        Assert.IsTrue(response.IsSuccess);
+
+        url = "/api/get/cookie";
+        var response1 = await new HttpRequest(BaseUrl.CombinePath(url)).AddCookie(new System.Net.Cookie("foo", "bar", "/", "localhost")).GetAsync();
+        Assert.IsTrue(response1.IsSuccess);
+        Console.WriteLine(response1);
+        var cookies1 = await response1.GetResponseDataAsync<string>();
+        Assert.Contains("bar", cookies1);
+        Assert.Contains("baz", cookies1);
     }
 
     [TestMethod]

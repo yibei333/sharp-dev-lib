@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2016.Excel;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text;
 
@@ -94,6 +93,15 @@ public class HttpResponse
     }
 
     /// <summary>
+    /// 读取字符串
+    /// </summary>
+    /// <returns>字符串</returns>
+    public async Task<string> ReadAsStringAsync()
+    {
+        return await HttpResponseMessage.Content.ReadAsStringAsync();
+    }
+
+    /// <summary>
     /// 读取字节数组
     /// </summary>
     /// <returns>字节数组</returns>
@@ -101,7 +109,7 @@ public class HttpResponse
     {
         return await HttpResponseMessage.Content.ReadAsByteArrayAsync();
     }
-    
+
     /// <summary>
     /// 读取流
     /// </summary>
@@ -109,22 +117,18 @@ public class HttpResponse
     public async Task<Stream> ReadAsStreamAsync()
     {
         var sourceStream = await HttpResponseMessage.Content.ReadAsStreamAsync();
-        var progress = new HttpProgress { Total = HttpResponseMessage.Content?.Headers?.ContentLength ?? 0 };
+        var progress = new HttpProgress { RequestUrl = Request.Message?.RequestUri.ToString() ?? string.Empty, Total = HttpResponseMessage.Content?.Headers?.ContentLength ?? 0 };
         var onProgress = Request.Config?.OnReceiveProgress ?? HttpConfig.Default.OnReceiveProgress;
-        return new ProgressStream(sourceStream, (p) =>
+        var lastProgress = progress.Progress;
+        return new HttpProgressStream(sourceStream, (p) =>
         {
             progress.Transfered = p;
-            onProgress?.Invoke(progress);
+            if (progress.Progress == 100 || (progress.Progress - lastProgress) > 5)
+            {
+                onProgress?.Invoke(progress);
+                lastProgress = progress.Progress;
+            }
         });
-    }
-    
-    /// <summary>
-    /// 读取字符串
-    /// </summary>
-    /// <returns>字符串</returns>
-    public async Task<string> ReadAsStringAsync()
-    {
-        return await HttpResponseMessage.Content.ReadAsStringAsync();
     }
 
     /// <summary>
@@ -150,7 +154,7 @@ public class HttpResponse
     {
         var builder = new StringBuilder();
         BuildRequestInfo(builder);
-        BuildResponseInfo(builder, this);
+        BuildResponseInfo(builder);
         return builder.ToString();
     }
 
@@ -168,11 +172,11 @@ public class HttpResponse
             var type = typeof(T);
             if (type == typeof(byte[]))
             {
-                data = (T)Convert.ChangeType(await content.ReadAsByteArrayAsync(), type);
+                data = (T)Convert.ChangeType(await ReadAsByteArrayAsync(), type);
             }
             else
             {
-                var responseText = await content.ReadAsStringAsync();
+                var responseText = await ReadAsStringAsync();
                 if (responseText.NotNullOrWhiteSpace())
                 {
                     if (type.IsClass)
@@ -236,10 +240,39 @@ public class HttpResponse
         builder.AppendLine($"****request****");
         builder.AppendLine($"url:{Request.Message?.RequestUri}");
         builder.AppendLine($"method:{Request.Message?.Method}");
-        if (Request.Message?.Content?.Headers?.NotNullOrEmpty() ?? false)
+
+        var headers = new List<KeyValuePair<string, List<string>>>();
+        Request.Message?.Headers.ForEach((_, y) =>
+        {
+            headers.Add(new KeyValuePair<string, List<string>>(y.Key, [.. y.Value]));
+        });
+        Request.Message?.Content?.Headers.ForEach((_, y) =>
+        {
+            headers.Add(new KeyValuePair<string, List<string>>(y.Key, [.. y.Value]));
+        });
+        if (Request.Message?.RequestUri?.ToString().NotNullOrWhiteSpace() ?? false)
+        {
+            var cookies = HttpClientFactory.GetClient(Request).ClientHandler.CookieContainer.GetCookies(Request.Message.RequestUri);
+            if (cookies.Count > 0)
+            {
+                if (!headers.Any(x => x.Key.Equals("Cookie")))
+                {
+                    headers.Add(new KeyValuePair<string, List<string>>("Cookie", [""]));
+                }
+                var cookie = headers.First(x => x.Key.Equals("Cookie"));
+                var cookieValue = cookie.Value.First();
+                foreach (Cookie item in HttpClientFactory.GetClient(Request).ClientHandler.CookieContainer.GetCookies(Request.Message.RequestUri))
+                {
+                    cookieValue += $"{item.Name}={item.Value};";
+                }
+                cookie.Value.Clear();
+                cookie.Value.Add(cookieValue);
+            }
+        }
+        if (headers.NotNullOrEmpty())
         {
             builder.AppendLine("headers:");
-            foreach (var item in Request.Message.Content.Headers)
+            foreach (var item in headers)
             {
                 builder.AppendLine($"{item.Key}:{string.Join(",", item.Value)}");
             }
@@ -285,18 +318,36 @@ public class HttpResponse
         else throw new NotImplementedException($"暂不支持的内容类型:{requestContentType}");
     }
 
-    static void BuildResponseInfo(StringBuilder builder, HttpResponse response)
+    void BuildResponseInfo(StringBuilder builder)
     {
         builder.AppendLine($"****response****");
-        builder.AppendLine($"code:{response.Code}");
-        if (response.ErrorMessage.NotNullOrWhiteSpace()) builder.AppendLine($"error message:{response.ErrorMessage}");
-        if (response.HttpResponseMessage?.Content is null) builder.AppendLine("无响应");
-        else
+        builder.AppendLine($"code:{Code}");
+        var headers = new List<KeyValuePair<string, List<string>>>();
+        _httpResponseMessage?.Headers.ForEach((_, y) =>
         {
-            if (response.HttpResponseMessage.Content.Headers?.ContentType?.ToString().Contains("application/json") ?? false)
+            headers.Add(new KeyValuePair<string, List<string>>(y.Key, [.. y.Value]));
+        });
+        _httpResponseMessage?.Content?.Headers.ForEach((_, y) =>
+        {
+            headers.Add(new KeyValuePair<string, List<string>>(y.Key, [.. y.Value]));
+        });
+        if (headers.NotNullOrEmpty())
+        {
+            builder.AppendLine("headers:");
+            foreach (var item in headers)
+            {
+                builder.AppendLine($"{item.Key}:{string.Join(",", item.Value)}");
+            }
+        }
+
+        if (ErrorMessage.NotNullOrWhiteSpace()) builder.AppendLine($"error message:{ErrorMessage}");
+        if (HttpResponseMessage?.Content is not null)
+        {
+            var contentType = HttpResponseMessage.Content.Headers?.ContentType?.ToString() ?? string.Empty;
+            if (contentType.Contains("application/json") || contentType.Contains("text/plain"))
             {
                 builder.AppendLine("reply:");
-                builder.AppendLine(response.HttpResponseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult().RegexUnescape());
+                builder.AppendLine(HttpResponseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult().RegexUnescape());
             }
         }
     }

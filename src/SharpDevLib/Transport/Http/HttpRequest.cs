@@ -125,7 +125,7 @@ public static class HttpRequestExtension
     }
 
     /// <summary>
-    /// 添加Cookie
+    /// 添加Cookie,一般不会调用,内置了CookieContainer会自动处理Cookie
     /// </summary>
     /// <param name="request">请求</param>
     /// <param name="cookie">Cookie对象</param>

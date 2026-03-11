@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDevLib.Tests.TestData;
 using SharpDevLib.Tests.Transport.Http.Base;
-using System;
 
 namespace SharpDevLib.Tests.Transport.Http;
 

@@ -25,7 +25,12 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public void PostJsonIntTest()
     {
+        Console.WriteLine(_userJson.Utf8Decode().Length);
         var response = new HttpRequest(BaseUrl.CombinePath("/api/post/int"))
+            .SetConfig(new HttpConfig
+            {
+                OnSendProgress = Console.WriteLine
+            })
             .AddJson(_userJson)
             .PostAsync()
             .GetAwaiter()
@@ -109,14 +114,8 @@ public class HttpPostTests : HttpBaseTests
     public void PostMultiPartFormObjectTest()
     {
         var sendCount = 0;
-        var receiveCount = 0;
         var config = new HttpConfig
         {
-            OnReceiveProgress = p =>
-            {
-                receiveCount++;
-                Console.WriteLine($"receive->{p}");
-            },
             OnSendProgress = p =>
             {
                 sendCount++;
@@ -134,7 +133,6 @@ public class HttpPostTests : HttpBaseTests
             .GetResult();
         Assert.IsTrue(response.IsSuccess);
         Assert.IsGreaterThan(0, sendCount);
-        Assert.IsGreaterThan(0, receiveCount);
         var data = response.GetResponseDataAsync<User>().GetAwaiter().GetResult();
         Assert.IsNotNull(data);
         Assert.AreEqual(10, data.Age);

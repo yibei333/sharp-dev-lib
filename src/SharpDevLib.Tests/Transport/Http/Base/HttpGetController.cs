@@ -50,11 +50,19 @@ internal class HttpGetController : WebApiController
     [Route(HttpVerbs.Get, "/get/cookie")]
     public void GetCookie()
     {
+        var result = "cookie-values:";
         var cookies = HttpContext.Request.Cookies.Select(x => new KeyValuePair<string, string>(x.Name, x.Value)).ToList();
         cookies.ForEach(x =>
         {
-            Response.Headers.Add("Set-Cookie", $"{x.Key}={x.Value}");
+            result += $"{x.Key}={x.Value};";
         });
+        HttpContext.WriteObject(result);
+    }
+
+    [Route(HttpVerbs.Get, "/get/cookie/set")]
+    public void SetCookie()
+    {
+        Response.Cookies.Add(new System.Net.Cookie("name", "baz", "/", "localhost"));
     }
 
     static readonly Dictionary<string, int> _retryCount = [];
