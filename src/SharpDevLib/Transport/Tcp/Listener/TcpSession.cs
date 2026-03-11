@@ -36,7 +36,7 @@ public class TcpSession<TMetadata> : IDisposable
     /// <summary>
     /// 会话元数据
     /// </summary>
-    public TMetadata? Metadata { get; }
+    public TMetadata? Metadata { get; set; }
 
     /// <summary>
     /// 会话状态
