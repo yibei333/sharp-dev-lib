@@ -99,58 +99,53 @@ public class TcpListener<TSessionMetadata> : IDisposable
     /// </summary>
     /// <param name="cancellationToken">取消令牌</param>
     /// <exception cref="Exception">监听器已关闭时引发异常</exception>
-    public async Task ListenAsync(CancellationToken? cancellationToken = null)
+    public void Listen(CancellationToken? cancellationToken = null)
     {
         if (State == TcpListnerStates.Listening) return;
         if (State == TcpListnerStates.Closed) throw new Exception("无法访问已关闭的TCP监听器");
 
-        await Task.Run(() =>
+        try
         {
+            Socket.Listen(int.MaxValue);
+            State = TcpListnerStates.Listening;
+            Socket.BeginAccept(AcceptCallback, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            TcpHelper.Logger?.LogError(ex, ex.Message);
+            Close();
+        }
+    }
+
+    void AcceptCallback(IAsyncResult result)
+    {
+        if (State != TcpListnerStates.Listening) return;
+        var cancellationToken = (CancellationToken?)result.AsyncState;
+        if (cancellationToken?.IsCancellationRequested ?? false)
+        {
+            Close();
+            return;
+        }
+
+        try
+        {
+            var socket = Socket.EndAccept(result);
+            var session = new TcpSession<TSessionMetadata>(this, socket);
+            _sessions.Add(session);
+            SessionAdded?.Invoke(this, new TcpSessionEventArgs<TSessionMetadata>(session));
             try
             {
-                Socket.Listen(int.MaxValue);
-                State = TcpListnerStates.Listening;
-                Accept(cancellationToken);
+                session.Receive();
             }
             catch (Exception ex)
             {
                 TcpHelper.Logger?.LogError(ex, ex.Message);
-                Close();
             }
-        }, cancellationToken ?? CancellationToken.None);
-    }
-
-    void Accept(CancellationToken? cancellationToken)
-    {
-        while (true)
+            Socket.BeginAccept(AcceptCallback, cancellationToken);
+        }
+        catch
         {
-            if (State != TcpListnerStates.Listening) break;
-            if (cancellationToken?.IsCancellationRequested ?? false)
-            {
-                Close();
-                break;
-            }
-
-            try
-            {
-                var socket = Socket.Accept();
-                var session = new TcpSession<TSessionMetadata>(this, socket);
-                _sessions.Add(session);
-                SessionAdded?.Invoke(this, new TcpSessionEventArgs<TSessionMetadata>(session));
-                try
-                {
-                    Task.Run(session.Receive);
-                }
-                catch (Exception ex)
-                {
-                    TcpHelper.Logger?.LogError(ex, ex.Message);
-                }
-            }
-            catch
-            {
-                Close();
-                break;
-            }
+            Close();
         }
     }
 

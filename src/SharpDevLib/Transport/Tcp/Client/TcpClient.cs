@@ -111,57 +111,53 @@ public class TcpClient : IDisposable
     /// 连接到服务器并开始接收数据
     /// </summary>
     /// <param name="cancellationToken">取消令牌</param>
-    public async Task ConnectAndReceiveAsync(CancellationToken? cancellationToken = null)
+    public void ConnectAndReceive(CancellationToken? cancellationToken = null)
     {
-        await Task.Run(() =>
+        if (State == TcpClientStates.Connected) return;
+
+        if (State == TcpClientStates.Closed)
         {
-            if (State == TcpClientStates.Connected) return;
+            Socket = new Socket(SocketType.Dgram, ProtocolType.Udp);
+            State = TcpClientStates.Created;
+        }
 
-            if (State == TcpClientStates.Closed)
-            {
-                Socket = new Socket(SocketType.Dgram, ProtocolType.Udp);
-                State = TcpClientStates.Created;
-            }
-
-            if (LocalPort is not null && LocalPort > 0 && LocalPort < 256) Socket.Bind(new IPEndPoint(LocalAdress ?? IPAddress.None, LocalPort.Value));
-            Socket.Connect(new IPEndPoint(RemoteAdress, RemotePort));
-            State = TcpClientStates.Connected;
-            Receive(cancellationToken);
-        }, cancellationToken ?? CancellationToken.None);
+        if (LocalPort is not null && LocalPort > 0 && LocalPort < 256) Socket.Bind(new IPEndPoint(LocalAdress ?? IPAddress.None, LocalPort.Value));
+        Socket.Connect(new IPEndPoint(RemoteAdress, RemotePort));
+        State = TcpClientStates.Connected;
+        Receive(cancellationToken);
     }
 
-    void Receive(CancellationToken? cancellationToken = null)
+    async void Receive(CancellationToken? cancellationToken = null)
     {
-        while (true)
+        await Task.Yield();
+        if (cancellationToken?.IsCancellationRequested ?? false)
         {
-            if (cancellationToken?.IsCancellationRequested ?? false)
+            Close();
+            return;
+        }
+
+        if (State != TcpClientStates.Connected || !Socket.Connected) return;
+
+        try
+        {
+            var bytes = AdapterType.GetReceiveAdapter(ReceiveAdapter).Receive(Socket);
+            if (bytes.IsNullOrEmpty())
             {
                 Close();
-                break;
+                return;
             }
-
-            if (State != TcpClientStates.Connected || !Socket.Connected) break;
-
-            try
-            {
-                var bytes = AdapterType.GetReceiveAdapter(ReceiveAdapter).Receive(Socket);
-                if (bytes.IsNullOrEmpty())
-                {
-                    Close();
-                    break;
-                }
-                Received?.Invoke(this, new TcpClientDataEventArgs(this, bytes));
-            }
-            catch (SocketException ex)
-            {
-                Close();
-                Error?.Invoke(this, new TcpClientExceptionEventArgs(this, ex));
-                break;
-            }
-            catch (Exception ex)
-            {
-                Error?.Invoke(this, new TcpClientExceptionEventArgs(this, ex));
-            }
+            Received?.Invoke(this, new TcpClientDataEventArgs(this, bytes));
+            Receive(cancellationToken);
+        }
+        catch (SocketException ex)
+        {
+            Close();
+            Error?.Invoke(this, new TcpClientExceptionEventArgs(this, ex));
+        }
+        catch (Exception ex)
+        {
+            Error?.Invoke(this, new TcpClientExceptionEventArgs(this, ex));
+            Receive(cancellationToken);
         }
     }
 

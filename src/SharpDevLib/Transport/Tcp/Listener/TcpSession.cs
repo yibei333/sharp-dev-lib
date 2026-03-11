@@ -99,34 +99,33 @@ public class TcpSession<TMetadata> : IDisposable
         }
     }
 
-    internal void Receive()
+    internal async void Receive()
     {
-        while (true)
-        {
-            if (State != TcpSessionStates.Connected || !Socket.Connected) break;
-            if (_isDisposed) break;
+        await Task.Yield();
+        if (State != TcpSessionStates.Connected || !Socket.Connected) return;
+        if (_isDisposed) return;
 
-            try
-            {
-                var bytes = ReceiveAdapter.Receive(Socket);
-                if (bytes.IsNullOrEmpty())
-                {
-                    Close();
-                    break;
-                }
-                Received?.Invoke(this, new TcpSessionDataEventArgs<TMetadata>(this, bytes));
-            }
-            catch (SocketException ex)
+        try
+        {
+            var bytes = ReceiveAdapter.Receive(Socket);
+            if (bytes.IsNullOrEmpty())
             {
                 Close();
-                Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
-                break;
+                return;
             }
-            catch (Exception ex)
-            {
-                if (_isDisposed) break;
-                Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
-            }
+            Received?.Invoke(this, new TcpSessionDataEventArgs<TMetadata>(this, bytes));
+            Receive();
+        }
+        catch (SocketException ex)
+        {
+            Close();
+            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
+        }
+        catch (Exception ex)
+        {
+            if (_isDisposed) return;
+            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
+            Receive();
         }
     }
 
