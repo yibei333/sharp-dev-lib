@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,39 +23,6 @@ public class UdpTests
     }
 
     [TestMethod]
-    public async Task Test()
-    {
-        var client1 = UdpHelper.CreateClient(IPAddress.Loopback, 6000);
-        ClientStartReceive(client1);
-        var client2 = UdpHelper.CreateClient(IPAddress.Loopback, 6001);
-        ClientStartReceive(client2);
-        await Task.Delay(500, CancellationToken.None);
-
-        client1.Send(IPAddress.Loopback, 6001, "i am client1".Utf8Decode());
-        client2.Send(IPAddress.Loopback, 6000, "i am client2".Utf8Decode());
-        await Task.Delay(1000, CancellationToken.None);
-
-        client1.Dispose();
-        client2.Dispose();
-
-        static void ClientStartReceive(UdpClient client)
-        {
-            client.Received += (s, e) =>
-            {
-                var content = e.Bytes.Utf8Encode();
-                var remoteEndPoint = e.RemoteEndPoint;
-                Console.WriteLine($"client received:{content}");
-                if (!content.StartsWith("ok")) e.Client.Send(remoteEndPoint!.Address, remoteEndPoint.Port, $"ok,{e.Bytes.Utf8Encode()}".Utf8Decode());
-            };
-            client.Error += (s, e) =>
-            {
-                Console.WriteLine($"client error:{e.Exception.Message}");
-            };
-            client.StartReceive();
-        }
-    }
-
-    [TestMethod]
     public async Task SendFileTest()
     {
         //消息格式
@@ -64,10 +32,19 @@ public class UdpTests
         //2-数据包,数据包格式,4个字节为分片索引,后续为内容
         //3-确认收到文件信息
         //4-确认收到包信息,4个字节为分片索引
-
+        var builder = new StringBuilder();
+        for (int i = 0; i < 10240; i++)
+        {
+            builder.AppendLine("Hello,World");
+            builder.AppendLine("Hello,World");
+            builder.AppendLine("Hello,World");
+            builder.AppendLine("Hello,World");
+            builder.AppendLine("Hello,World");
+        }
+        builder.ToString().Utf8Decode().SaveToFile("source.txt");
         var chunkSize = 1024 * 16;//16kb
         using var receiver = new Receiver(chunkSize);
-        using var sender = new Sender(chunkSize, receiver.Port, @"D:\Meida\三国演义\三国演义01.mp4");
+        using var sender = new Sender(chunkSize, receiver.Port, "source.txt");
         sender.SendFile();
         await receiver.WaitForComplete();
         Console.WriteLine(receiver.Result);
@@ -98,6 +75,12 @@ public class UdpTests
 
         public void SendFile()
         {
+            SendFileInfo();
+            EnsureFileInfoSend();
+        }
+
+        void EnsureFileInfoSend()
+        {
             var cancle = new CancellationTokenSource();
             cancle.CancelAfter(TimeSpan.FromMilliseconds(500));//0.5s后如果没有收到确认文件信息,重发
             cancle.Token.Register(() =>
@@ -105,7 +88,6 @@ public class UdpTests
                 if (IsFileInfoConfirmed) return;
                 SendFile();
             });
-            SendFileInfo();
         }
 
         void SendFileInfo()
@@ -158,10 +140,8 @@ public class UdpTests
             for (int i = 0; i < FileInfo.ChunkCount; i++)
             {
                 SendSinglePacket(i);
-                await Task.Delay(1);
+                await Task.Delay(1);//防止太集中发送,丢包率太大
             }
-            Console.WriteLine(_packets.Count);
-            Console.WriteLine(FileInfo.ChunkCount);
         }
 
         void HandleConfirmPacketMessage(byte[] bytes)
@@ -169,7 +149,7 @@ public class UdpTests
             var index = BitConverter.ToInt32(bytes);
             var packet = _packets.First(x => x.Index == index);
             packet.IsComplete = true;
-            _packets.Where(x => !x.IsComplete && (DateTime.Now - x.SendTime > TimeSpan.FromMilliseconds(500))).ForEach(x =>
+            _packets.Where(x => !x.IsComplete && (DateTime.Now - x.SendTime > TimeSpan.FromSeconds(2))).ForEach(x =>
             {
                 Console.WriteLine($"重发分片:{x.Index}");
                 SendSinglePacket(x.Index);
@@ -206,7 +186,13 @@ public class UdpTests
 
         public async Task WaitForComplete()
         {
-            await Task.Delay(TimeSpan.FromSeconds(30), CompleteCancellationTokenSource.Token);
+            try
+            {
+                await Task.Delay(TimeSpan.FromMinutes(20), CompleteCancellationTokenSource.Token);
+            }
+            catch
+            {
+            }
         }
 
         void SendConfirmFileInfo()

@@ -65,7 +65,7 @@ public class TcpClient : IDisposable
             if (_state == value) return;
             var before = _state;
             _state = value;
-            StateChanged?.Invoke(this, new TcpClientStateChangedEventArgs(this, before, _state));
+            NotifyStageChanged(before);
         }
     }
 
@@ -114,6 +114,38 @@ public class TcpClient : IDisposable
     /// </summary>
     public event EventHandler<TcpClientExceptionEventArgs>? Error;
 
+    async void NotifyStageChanged(TcpClientStates before)
+    {
+        await Task.Run(() =>
+        {
+            StateChanged?.Invoke(this, new TcpClientStateChangedEventArgs(this, before, _state));
+        });
+    }
+
+    async void NotifyReceived(byte[] bytes)
+    {
+        await Task.Run(() =>
+        {
+            Received?.Invoke(this, new TcpClientDataEventArgs(this, bytes));
+        });
+    }
+
+    async void NotifySended(byte[] bytes)
+    {
+        await Task.Run(() =>
+        {
+            Sended?.Invoke(this, new TcpClientDataEventArgs(this, bytes));
+        });
+    }
+
+    async void NotifyError(Exception ex)
+    {
+        await Task.Run(() =>
+        {
+            Error?.Invoke(this, new TcpClientExceptionEventArgs(this, ex));
+        });
+    }
+
     /// <summary>
     /// 连接到服务器并开始接收数据
     /// </summary>
@@ -151,11 +183,11 @@ public class TcpClient : IDisposable
         catch (SocketException ex)
         {
             Close();
-            Error?.Invoke(this, new TcpClientExceptionEventArgs(this, ex));
+            NotifyError(ex);
         }
         catch (Exception ex)
         {
-            Error?.Invoke(this, new TcpClientExceptionEventArgs(this, ex));
+            NotifyError(ex);
             Receive(cancellationToken);
         }
     }
@@ -170,17 +202,17 @@ public class TcpClient : IDisposable
                 Close();
                 return;
             }
-            Received?.Invoke(this, new TcpClientDataEventArgs(this, bytes));
+            NotifyReceived(bytes);
             Adapter.BeginReceive(Socket, BufferSize, ReceiveCallback);
         }
         catch (SocketException ex)
         {
             Close();
-            Error?.Invoke(this, new TcpClientExceptionEventArgs(this, ex));
+            NotifyError(ex);
         }
         catch (Exception ex)
         {
-            Error?.Invoke(this, new TcpClientExceptionEventArgs(this, ex));
+            NotifyError(ex);
             Adapter.BeginReceive(Socket, BufferSize, ReceiveCallback);
         }
     }
@@ -196,17 +228,17 @@ public class TcpClient : IDisposable
         {
             if (State != TcpClientStates.Connected || !Socket.Connected) throw new Exception("无法访问已关闭的TCP客户端");
             Adapter.Send(Socket, bytes);
-            Sended?.Invoke(this, new TcpClientDataEventArgs(this, bytes));
+            NotifySended(bytes);
         }
         catch (SocketException ex)
         {
             Close();
-            Error?.Invoke(this, new TcpClientExceptionEventArgs(this, ex));
+            NotifyError(ex);
             if (throwIfException) throw ex;
         }
         catch (Exception ex)
         {
-            Error?.Invoke(this, new TcpClientExceptionEventArgs(this, ex));
+            NotifyError(ex);
             if (throwIfException) throw ex;
         }
     }

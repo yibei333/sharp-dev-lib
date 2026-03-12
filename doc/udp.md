@@ -2,189 +2,255 @@
 
 提供`UDP`网络通信功能。
 
-##### 实例
+##### 文件传输实例,只是演示,实际TCP用得较多
 
 ```csharp
-using SharpDevLib;
+using System.Collections.Concurrent;
 using System.Net;
+using System.Net.Http;
+using SharpDevLib;
 
-//获取可用UDP端口
-var port = UdpHelper.GetAvailableUdpPort(8000, 9000);
-Console.WriteLine(port);
-//8000
-
-//检查指定范围内是否有可用端口
-var port = UdpHelper.GetAvailableUdpPort(1024, 65535);
-if (port == -1)
+//准备数据
+var builder = new StringBuilder();
+for (int i = 0; i < 10240; i++)
 {
-    Console.WriteLine("无可用端口");
+    builder.AppendLine("Hello,World");
+    builder.AppendLine("Hello,World");
+    builder.AppendLine("Hello,World");
+    builder.AppendLine("Hello,World");
+    builder.AppendLine("Hello,World");
 }
-else
-{
-    Console.WriteLine($"可用端口: {port}");
-}
+builder.ToString().Utf8Decode().SaveToFile("source.txt");
 
-//创建UDP客户端
-var client = UdpHelper.CreateClient();
-client.Received += (sender, e) =>
+//消息格式
+//第一个字节为消息类型,后面为内容
+//消息类型
+//1-文件信息
+//2-数据包,数据包格式,4个字节为分片索引,后续为内容
+//3-确认收到文件信息
+//4-确认收到包信息,4个字节为分片索引
+var chunkSize = 1024 * 16;//16kb
+using var receiver = new Receiver(chunkSize);
+using var sender = new Sender(chunkSize, receiver.Port, "source.txt");
+sender.SendFile();
+await receiver.WaitForComplete();
+Console.WriteLine(receiver.Result);
+
+class Sender : IDisposable
 {
-    var message = e.Bytes.Utf8Encode();
-    Console.WriteLine($"收到来自 {e.RemoteEndPoint} 的消息: {message}");
-};
-client.Error += (sender, e) =>
-{
-    Console.WriteLine($"错误: {e.Exception.Message}");
-    if (e.RemoteEndPoint is not null)
+    public Sender(int chunkSize, int receiverPort, string filePath)
     {
-        Console.WriteLine($"远程端点: {e.RemoteEndPoint}");
+        var info = new FileInfo(filePath);
+        FileInfo = new FileInfoDto(info.Name, info.Length, chunkSize);
+        ReceiverPort = receiverPort;
+        Stream = info.OpenRead();
+        Port = UdpHelper.GetAvailableUdpPort(8000, 9000);
+        Client = UdpHelper.CreateClient(IPAddress.Loopback, Port, chunkSize + 100);
+        Client.Error += (_, e) => Console.WriteLine($"Sender异常:{e.Exception.Message}");
+        Client.Received += HandleMessage;
+        Client.StartReceive();
     }
-};
-await client.ReceiveAsync();
 
-//创建绑定到本地地址的UDP客户端
-var client = UdpHelper.CreateClient(IPAddress.Parse("192.168.1.100"), 12345);
-await client.ReceiveAsync();
+    int ReceiverPort { get; }
+    FileStream Stream { get; }
+    int Port { get; }
+    UdpClient Client { get; }
+    FileInfoDto FileInfo { get; set; } = null!;
+    bool IsFileInfoConfirmed { get; set; }
+    readonly BlockingCollection<Packet> _packets = [];
 
-//发送数据到指定远程端点
-client.Send(IPAddress.Parse("192.168.1.1"), 8080, "Hello UDP".Utf8Decode());
-
-//发送数据到多个目标
-var targets = new[]
-{
-    (IPAddress.Parse("192.168.1.1"), 8080),
-    (IPAddress.Parse("192.168.1.2"), 8080),
-    (IPAddress.Parse("192.168.1.3"), 8080)
-};
-foreach (var (ip, port) in targets)
-{
-    client.Send(ip, port, "Broadcast Message".Utf8Decode());
-}
-
-//处理数据发送完成事件
-client.Sended += (sender, e) =>
-{
-    Console.WriteLine($"已发送: {e.Bytes.Utf8Encode()}");
-};
-client.Send(IPAddress.Parse("192.168.1.1"), 8080, "test".Utf8Decode());
-
-//UDP服务端示例
-var server = UdpHelper.CreateClient(IPAddress.Parse("127.0.0.1"), 8080);
-var clients = new Dictionary<EndPoint, (string Name, DateTime LastActive)>();
-server.Received += (sender, e) =>
-{
-    var message = e.Bytes.Utf8Encode();
-    Console.WriteLine($"收到来自 {e.RemoteEndPoint} 的消息: {message}");
-
-    if (message.StartsWith("REGISTER:"))
+    public void SendFile()
     {
-        var name = message.Substring(9);
-        clients[e.RemoteEndPoint] = (name, DateTime.Now);
-        server.Send(((IPEndPoint)e.RemoteEndPoint).Address, ((IPEndPoint)e.RemoteEndPoint).Port,
-            $"注册成功, {name}".Utf8Decode());
+        SendFileInfo();
+        EnsureFileInfoSend();
     }
-    else if (message == "LIST")
+
+    void EnsureFileInfoSend()
     {
-        var clientList = string.Join(", ", clients.Values.Select(x => x.Name));
-        server.Send(((IPEndPoint)e.RemoteEndPoint).Address, ((IPEndPoint)e.RemoteEndPoint).Port,
-            $"在线客户端: {clientList}".Utf8Decode());
-    }
-    else if (message.StartsWith("SEND:"))
-    {
-        var parts = message.Substring(5).Split(':');
-        if (parts.Length == 2)
+        var cancle = new CancellationTokenSource();
+        cancle.CancelAfter(TimeSpan.FromMilliseconds(500));//0.5s后如果没有收到确认文件信息,重发
+        cancle.Token.Register(() =>
         {
-            var targetName = parts[0];
-            var content = parts[1];
-            var targetEndpoint = clients.FirstOrDefault(x => x.Value.Name == targetName).Key;
-            if (targetEndpoint is not null)
-            {
-                server.Send(((IPEndPoint)targetEndpoint).Address, ((IPEndPoint)targetEndpoint).Port,
-                    content.Utf8Decode());
-            }
+            if (IsFileInfoConfirmed) return;
+            SendFile();
+        });
+    }
+
+    void SendFileInfo()
+    {
+        byte[] bytes = [1, .. FileInfo.Serialize().Utf8Decode()];
+        Client.Send(IPAddress.Loopback, ReceiverPort, bytes);
+    }
+
+    void SendSinglePacket(int index)
+    {
+        try
+        {
+            var buffer = new byte[FileInfo.ChunkSize];
+            Stream.Seek(index * FileInfo.ChunkSize, SeekOrigin.Begin);
+            var count = Stream.Read(buffer);
+            byte[] bytes = [2, .. BitConverter.GetBytes(index), .. buffer.Take(count)];
+            SetPacket(index);
+            Client.Send(IPAddress.Loopback, ReceiverPort, bytes);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"发送异常{index}:{ex.Message}");
+            SetPacket(index);
         }
     }
-    else
+
+    void SetPacket(int index)
     {
-        server.Send(((IPEndPoint)e.RemoteEndPoint).Address, ((IPEndPoint)e.RemoteEndPoint).Port,
-            "未知命令".Utf8Decode());
-    }
-
-    //更新最后活跃时间
-    if (clients.ContainsKey(e.RemoteEndPoint))
-    {
-        clients[e.RemoteEndPoint] = (clients[e.RemoteEndPoint].Name, DateTime.Now);
-    }
-};
-await server.ReceiveAsync();
-
-//UDP客户端示例
-var client = UdpHelper.CreateClient();
-client.Received += (sender, e) =>
-{
-    var message = e.Bytes.Utf8Encode();
-    Console.WriteLine($"收到: {message}");
-};
-client.Error += (sender, e) =>
-{
-    Console.WriteLine($"错误: {e.Exception.Message}");
-};
-await client.ReceiveAsync();
-
-client.Send(IPAddress.Parse("127.0.0.1"), 8080, "REGISTER:Alice".Utf8Decode());
-client.Send(IPAddress.Parse("127.0.0.1"), 8080, "LIST".Utf8Decode());
-client.Send(IPAddress.Parse("127.0.0.1"), 8080, "SEND:Bob:Hello Bob".Utf8Decode());
-
-//心跳检测（服务端）
-var server = UdpHelper.CreateClient(IPAddress.Parse("127.0.0.1"), 8080);
-var clients = new Dictionary<EndPoint, DateTime>();
-server.Received += (sender, e) =>
-{
-    if (e.Bytes.Utf8Encode() == "HEARTBEAT")
-    {
-        clients[e.RemoteEndPoint] = DateTime.Now;
-        server.Send(((IPEndPoint)e.RemoteEndPoint).Address, ((IPEndPoint)e.RemoteEndPoint).Port,
-            "PONG".Utf8Decode());
-    }
-};
-await server.ReceiveAsync();
-
-//定时清理超时客户端
-var cleanupTask = Task.Run(async () =>
-{
-    while (true)
-    {
-        await Task.Delay(30000); //每30秒检查一次
-        var timeout = DateTime.Now.AddSeconds(60);
-        var timedOut = clients.Where(x => x.Value < timeout).Select(x => x.Key).ToList();
-        foreach (var endpoint in timedOut)
+        var packet = _packets.FirstOrDefault(x => x.Index == index);
+        if (packet is null) _packets.Add(new Packet { Index = index, SendTime = DateTime.Now });
+        else
         {
-            clients.Remove(endpoint);
-            Console.WriteLine($"移除超时客户端: {endpoint}");
+            packet.RetryCount++;
+            packet.SendTime = DateTime.Now;
         }
     }
-});
 
-//使用自定义适配器（需要实现ITransportSendAdapter和ITransportReceiveAdapter）
-var customSendAdapter = new CustomSendAdapter();
-var customReceiveAdapter = new CustomReceiveAdapter();
-var client = UdpHelper.CreateClient(TransportAdapterType.Custom)
+    void HandleMessage(object? sender, UdpClientDataEventArgs args)
+    {
+        var bytes = args.Bytes;
+        var type = bytes[0];
+        var data = bytes.Skip(1).ToArray();
+        if (type == 3) HandleConfirmFileInfoMessage();
+        else if (type == 4) HandleConfirmPacketMessage(data);
+    }
+
+    async void HandleConfirmFileInfoMessage()
+    {
+        IsFileInfoConfirmed = true;
+        for (int i = 0; i < FileInfo.ChunkCount; i++)
+        {
+            SendSinglePacket(i);
+            await Task.Delay(1);//防止太集中发送,丢包率太大
+        }
+    }
+
+    void HandleConfirmPacketMessage(byte[] bytes)
+    {
+        var index = BitConverter.ToInt32(bytes);
+        var packet = _packets.First(x => x.Index == index);
+        packet.IsComplete = true;
+        _packets.Where(x => !x.IsComplete && (DateTime.Now - x.SendTime > TimeSpan.FromSeconds(2))).ForEach(x =>
+        {
+            Console.WriteLine($"重发分片:{x.Index}");
+            SendSinglePacket(x.Index);
+        });
+    }
+
+    public void Dispose()
+    {
+        Stream.Dispose();
+    }
+}
+
+class Receiver : IDisposable
 {
-    SendAdapter = customSendAdapter,
-    ReceiveAdapter = customReceiveAdapter
-};
-await client.ReceiveAsync();
+    public Receiver(int chunkSize)
+    {
+        Port = UdpHelper.GetAvailableUdpPort(8000, 9000);
+        Client = UdpHelper.CreateClient(IPAddress.Loopback, Port, chunkSize + 100);
+        Client.Error += (_, e) => Console.WriteLine($"Receiver异常:{e.Exception.Message}");
+        Client.Received += HandleMessage;
+        Client.StartReceive();
+    }
 
-//UDP广播
-var broadcastAddress = IPAddress.Parse("192.168.1.255");
-client.Send(broadcastAddress, 8080, "Broadcast Message".Utf8Decode());
+    public int Port { get; }
+    bool IsComplete => FileInfo is not null && FileInfo.ChunkCount == ReceiveChunkData.Count;
+    public string Result => $"是否完成:{IsComplete}{(FileInfo is null ? "" : $",接收进度:{Math.Round(ReceiveChunkData.Count * 100m / FileInfo.ChunkCount, 2)}%")}";
 
-//多播示例
-var multicastAddress = IPAddress.Parse("239.0.0.1");
-//注意：多播需要额外的Socket选项设置，此处仅展示发送接口
-//client.Send(multicastAddress, 8080, "Multicast Message".Utf8Decode());
+    FileStream? Stream { get; set; }
+    IPEndPoint? RemoteEndPoint { get; set; }
+    UdpClient Client { get; }
+    readonly List<int> ReceiveChunkData = [];
+    FileInfoDto? FileInfo { get; set; }
+    readonly CancellationTokenSource CompleteCancellationTokenSource = new();
 
-//释放资源
-client.Dispose();
+    public async Task WaitForComplete()
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromMinutes(20), CompleteCancellationTokenSource.Token);
+        }
+        catch
+        {
+        }
+    }
+
+    void SendConfirmFileInfo()
+    {
+        if (RemoteEndPoint is null) return;
+        Client.Send(RemoteEndPoint.Address, RemoteEndPoint.Port, [3]);
+    }
+
+    void SendConfirmPacket(int index)
+    {
+        if (RemoteEndPoint is null) return;
+        byte[] bytes = [4, .. BitConverter.GetBytes(index)];
+        Client.Send(RemoteEndPoint.Address, RemoteEndPoint.Port, bytes);
+    }
+
+    void HandleMessage(object? sender, UdpClientDataEventArgs args)
+    {
+        var bytes = args.Bytes;
+        var type = bytes[0];
+        var data = bytes.Skip(1).ToArray();
+        RemoteEndPoint = args.RemoteEndPoint;
+        if (type == 1) HandleFileInfoMessage(data);
+        else if (type == 2) HandlePacketMessage(data);
+    }
+
+    void HandleFileInfoMessage(byte[] bytes)
+    {
+        FileInfo = bytes.Utf8Encode().DeSerialize<FileInfoDto>();
+        Stream = new FileStream($"Saved_{FileInfo.Name}", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        SendConfirmFileInfo();
+    }
+
+    void HandlePacketMessage(byte[] bytes)
+    {
+        if (FileInfo is null || Stream is null) return;
+        var index = BitConverter.ToInt32(bytes.Take(4).ToArray());
+        if (ReceiveChunkData.Contains(index))
+        {
+            SendConfirmPacket(index);
+            Console.WriteLine($"分片{index}已处理,忽略");
+            return;
+        }
+        var data = bytes.Skip(4).ToArray();
+        Stream.Seek(index * FileInfo.ChunkSize, SeekOrigin.Begin);
+        Stream.Write(data);
+        ReceiveChunkData.Add(index);
+        SendConfirmPacket(index);
+        //Console.WriteLine($"接收进度:{Math.Round(ReceiveChunkData.Count * 100m / FileInfo.ChunkCount, 2)}%");
+        if (IsComplete) CompleteCancellationTokenSource.Cancel();
+    }
+
+    public void Dispose()
+    {
+        Stream?.Dispose();
+    }
+}
+
+class Packet
+{
+    public int Index { get; set; }
+    public DateTime SendTime { get; set; }
+    public int RetryCount { get; set; }
+    public bool IsComplete { get; set; }
+}
+
+class FileInfoDto(string name, long length, int chunkSize)
+{
+    public string Name { get; } = name;
+    public long Length { get; } = length;
+    public int ChunkCount => (int)Math.Ceiling(Length * 1m / ChunkSize);
+    public int ChunkSize { get; } = chunkSize;
+}
 ```
 
 ## 相关文档

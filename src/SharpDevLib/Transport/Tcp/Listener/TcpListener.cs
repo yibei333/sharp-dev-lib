@@ -61,7 +61,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
             if (_state == value) return;
             var before = _state;
             _state = value;
-            StateChanged?.Invoke(this, new TcpListenerStateChangedEventArgs(before, _state));
+            NotifyStageChanged(before);
         }
     }
 
@@ -94,6 +94,30 @@ public class TcpListener<TSessionMetadata> : IDisposable
     /// 移除会话事件
     /// </summary>
     public event EventHandler<TcpSessionEventArgs<TSessionMetadata>>? SessionRemoved;
+
+    async void NotifyStageChanged(TcpListnerStates before)
+    {
+        await Task.Run(() =>
+        {
+            StateChanged?.Invoke(this, new TcpListenerStateChangedEventArgs(before, _state));
+        });
+    }
+
+    async void NotifySessionAdded(TcpSession<TSessionMetadata> session)
+    {
+        await Task.Run(() =>
+        {
+            SessionAdded?.Invoke(this, new TcpSessionEventArgs<TSessionMetadata>(session));
+        });
+    }
+
+    async void NotifySessionRemoved(TcpSession<TSessionMetadata> session)
+    {
+        await Task.Run(() =>
+        {
+            SessionRemoved?.Invoke(this, new TcpSessionEventArgs<TSessionMetadata>(session));
+        });
+    }
 
     /// <summary>
     /// 开始监听连接
@@ -135,7 +159,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
             socket.ReceiveBufferSize = BufferSize;
             var session = new TcpSession<TSessionMetadata>(this, socket);
             _sessions.Add(session);
-            SessionAdded?.Invoke(this, new TcpSessionEventArgs<TSessionMetadata>(session));
+            NotifySessionAdded(session);
             session.Receive();
             Socket.BeginAccept(AcceptCallback, cancellationToken);
         }
@@ -152,7 +176,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
         {
             if (!_sessions.Contains(session)) return;
             _sessions.Remove(session);
-            SessionRemoved?.Invoke(this, new TcpSessionEventArgs<TSessionMetadata>(session));
+            NotifySessionRemoved(session);
         }
     }
 

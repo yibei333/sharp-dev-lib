@@ -46,7 +46,7 @@ public class TcpSession<TMetadata> : IDisposable
             if (_state == value) return;
             var before = _state;
             _state = value;
-            StateChanged?.Invoke(this, new TcpSessionStateChangedEventArgs<TMetadata>(this, before, _state));
+            NotifyStateChanged(before);
         }
     }
 
@@ -70,6 +70,38 @@ public class TcpSession<TMetadata> : IDisposable
     /// </summary>
     public event EventHandler<TcpSessionExceptionEventArgs<TMetadata>>? Error;
 
+    async void NotifyStateChanged(TcpSessionStates before)
+    {
+        await Task.Run(() =>
+        {
+            StateChanged?.Invoke(this, new TcpSessionStateChangedEventArgs<TMetadata>(this, before, _state));
+        });
+    }
+
+    async void NotifyReceived(byte[] bytes)
+    {
+        await Task.Run(() =>
+        {
+            Received?.Invoke(this, new TcpSessionDataEventArgs<TMetadata>(this, bytes));
+        });
+    }
+
+    async void NotifySended(byte[] bytes)
+    {
+        await Task.Run(() =>
+        {
+            Sended?.Invoke(this, new TcpSessionDataEventArgs<TMetadata>(this, bytes));
+        });
+    }
+
+    async void NotifyError(Exception ex)
+    {
+        await Task.Run(() =>
+        {
+            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
+        });
+    }
+
     /// <summary>
     /// 发送数据
     /// </summary>
@@ -82,17 +114,17 @@ public class TcpSession<TMetadata> : IDisposable
             if (bytes.Length > maxLength) throw new NotSupportedException($"数据长度超出限制{maxLength},请分段传输数据");
             if (State != TcpSessionStates.Connected || !Socket.Connected) throw new Exception("无法访问已关闭的TCP会话");
             Listener.Adapter.Send(Socket, bytes);
-            Sended?.Invoke(this, new TcpSessionDataEventArgs<TMetadata>(this, bytes));
+            NotifySended(bytes);
         }
         catch (SocketException ex)
         {
             Close();
-            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
+            NotifyError(ex);
             if (throwIfException) throw ex;
         }
         catch (Exception ex)
         {
-            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
+            NotifyError(ex);
             if (throwIfException) throw ex;
         }
     }
@@ -108,12 +140,12 @@ public class TcpSession<TMetadata> : IDisposable
         catch (SocketException ex)
         {
             Close();
-            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
+            NotifyError(ex);
         }
         catch (Exception ex)
         {
             if (_isDisposed) return;
-            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
+            NotifyError(ex);
         }
     }
 
@@ -127,18 +159,18 @@ public class TcpSession<TMetadata> : IDisposable
                 Close();
                 return;
             }
-            Received?.Invoke(this, new TcpSessionDataEventArgs<TMetadata>(this, bytes));
+            NotifyReceived(bytes);
             Listener.Adapter.BeginReceive(Socket, Listener.BufferSize, ReceiveCallback);
         }
         catch (SocketException ex)
         {
             Close();
-            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
+            NotifyError(ex);
         }
         catch (Exception ex)
         {
             if (_isDisposed) return;
-            Error?.Invoke(this, new TcpSessionExceptionEventArgs<TMetadata>(this, ex));
+            NotifyError(ex);
             Listener.Adapter.BeginReceive(Socket, Listener.BufferSize, ReceiveCallback);
         }
     }
