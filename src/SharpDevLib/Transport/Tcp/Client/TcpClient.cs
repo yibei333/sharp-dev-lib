@@ -18,7 +18,11 @@ public class TcpClient : IDisposable
         RemotePort = remotePort;
         Adapter = tcpAdapter ?? TcpAdapters.Default;
 
-        Socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+        Socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
+        {
+            SendBufferSize = BufferSize,
+            ReceiveBufferSize = BufferSize,
+        };
         State = TcpClientStates.Created;
     }
 
@@ -32,7 +36,11 @@ public class TcpClient : IDisposable
         RemotePort = remotePort;
         Adapter = tcpAdapter ?? TcpAdapters.Default;
 
-        Socket = new Socket(SocketType.Dgram, ProtocolType.Udp);
+        Socket = new Socket(SocketType.Dgram, ProtocolType.Udp)
+        {
+            SendBufferSize = BufferSize,
+            ReceiveBufferSize = BufferSize,
+        };
         State = TcpClientStates.Created;
     }
 

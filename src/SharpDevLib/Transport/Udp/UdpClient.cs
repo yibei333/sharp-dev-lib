@@ -9,13 +9,17 @@ namespace SharpDevLib;
 public class UdpClient : IDisposable
 {
     bool _isDisposed;
-    const int maxLength = (int)(1.9 * 1024 * 1024 * 1024);
+    const int maxLength = 65507;//这是UDP协议的极限
 
     internal UdpClient(int bufferSize)
     {
         if (bufferSize <= 4) throw new Exception("bufferSize需要大于4");
         BufferSize = bufferSize;
-        Socket = new Socket(SocketType.Dgram, ProtocolType.Udp);
+        Socket = new Socket(SocketType.Dgram, ProtocolType.Udp)
+        {
+            SendBufferSize = BufferSize,
+            ReceiveBufferSize = BufferSize
+        };
     }
 
     internal UdpClient(IPAddress localAdress, int localPort, int bufferSize)
@@ -25,7 +29,11 @@ public class UdpClient : IDisposable
         LocalAdress = localAdress;
         LocalPort = localPort;
 
-        Socket = new Socket(SocketType.Dgram, ProtocolType.Udp);
+        Socket = new Socket(SocketType.Dgram, ProtocolType.Udp)
+        {
+            SendBufferSize = BufferSize,
+            ReceiveBufferSize = BufferSize
+        };
         Socket.Bind(new IPEndPoint(localAdress, localPort));
     }
 
@@ -64,6 +72,30 @@ public class UdpClient : IDisposable
     /// </summary>
     public event EventHandler<UdpClientExceptionEventArgs>? Error;
 
+    async void NotifyReceived(byte[] bytes, IPEndPoint? remoteEndPoint)
+    {
+        await Task.Run(() =>
+        {
+            Received?.Invoke(this, new UdpClientDataEventArgs(this, bytes) { RemoteEndPoint = remoteEndPoint?.Port == 0 ? null : remoteEndPoint });
+        });
+    }
+
+    async void NotifySended(byte[] bytes, IPEndPoint? remoteEndPoint)
+    {
+        await Task.Run(() =>
+        {
+            Sended?.Invoke(this, new UdpClientDataEventArgs(this, bytes) { RemoteEndPoint = remoteEndPoint?.Port == 0 ? null : remoteEndPoint });
+        });
+    }
+
+    async void NotifyError(Exception ex, IPEndPoint? remoteEndPoint)
+    {
+        await Task.Run(() =>
+        {
+            Error?.Invoke(this, new UdpClientExceptionEventArgs(this, ex) { RemoteEndPoint = remoteEndPoint?.Port == 0 ? null : remoteEndPoint });
+        });
+    }
+
     /// <summary>
     /// 开始异步接收数据
     /// </summary>
@@ -73,21 +105,22 @@ public class UdpClient : IDisposable
         if (cancellationToken?.IsCancellationRequested ?? false) return;
         if (_isDisposed) return;
 
+        EndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
         try
         {
-            EndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
             var buffer = new byte[BufferSize];
             Socket.BeginReceiveFrom(buffer, 0, BufferSize, SocketFlags.None, ref remoteEndPoint, ReceiveCallback, buffer);
         }
         catch (Exception ex)
         {
             if (_isDisposed) return;
-            Error?.Invoke(this, new UdpClientExceptionEventArgs(this, ex));
+            NotifyError(ex, remoteEndPoint as IPEndPoint);
         }
     }
 
     void ReceiveCallback(IAsyncResult result)
     {
+        EndPoint endPoint = new IPEndPoint(IPAddress.Any, 0);
         try
         {
             var buffer = (byte[])result.AsyncState;
@@ -95,17 +128,14 @@ public class UdpClient : IDisposable
             var length = Socket.EndReceiveFrom(result, ref remoteEndPoint);
             var bytes = buffer.Take(length).ToArray();
             if (bytes.IsNullOrEmpty()) return;
-            Received?.Invoke(this, new UdpClientDataEventArgs(this, bytes) { RemoteEndPoint = remoteEndPoint });
-
-            EndPoint endPoint = new IPEndPoint(IPAddress.Any, 0);
+            NotifyReceived(bytes, remoteEndPoint as IPEndPoint);
             var nextBuffer = new byte[BufferSize];
             Socket.BeginReceiveFrom(nextBuffer, 0, BufferSize, SocketFlags.None, ref endPoint, ReceiveCallback, nextBuffer);
         }
         catch (Exception ex)
         {
             if (_isDisposed) return;
-            Error?.Invoke(this, new UdpClientExceptionEventArgs(this, ex));
-
+            NotifyError(ex, endPoint as IPEndPoint);
             EndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
             var buffer = new byte[BufferSize];
             Socket.BeginReceiveFrom(buffer, 0, BufferSize, SocketFlags.None, ref remoteEndPoint, ReceiveCallback, buffer);
@@ -121,16 +151,17 @@ public class UdpClient : IDisposable
     /// <param name="throwIfException">发送失败是否抛出异常，默认false，可订阅Error事件</param>
     public void Send(IPAddress remoteAdress, int remotePort, byte[] bytes, bool throwIfException = false)
     {
+        var remoteEndPoint = new IPEndPoint(remoteAdress, remotePort);
         try
         {
             if (_isDisposed) throw new ObjectDisposedException("无法访问已释放的UDP客户端");
-            if (bytes.Length > BufferSize) throw new NotSupportedException($"数据长度超出限制{maxLength},请分段传输数据");
-            Socket.SendTo(bytes, new IPEndPoint(remoteAdress, remotePort));
-            Sended?.Invoke(this, new UdpClientDataEventArgs(this, bytes));
+            if (bytes.Length > maxLength) throw new NotSupportedException($"数据长度超出限制{maxLength},请分段传输数据");
+            Socket.SendTo(bytes, remoteEndPoint);
+            NotifySended(bytes, remoteEndPoint);
         }
         catch (Exception ex)
         {
-            Error?.Invoke(this, new UdpClientExceptionEventArgs(this, ex) { RemoteEndPoint = new IPEndPoint(remotePort, remotePort) });
+            NotifyError(ex, remoteEndPoint);
             if (throwIfException) throw ex;
         }
     }

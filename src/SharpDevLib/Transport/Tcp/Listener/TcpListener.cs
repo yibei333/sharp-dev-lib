@@ -23,7 +23,11 @@ public class TcpListener<TSessionMetadata> : IDisposable
         Port = port;
         Adapter = adapter ?? TcpAdapters.Default;
 
-        Socket = new Socket(iPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+        Socket = new Socket(iPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp)
+        {
+            SendBufferSize = bufferSize,
+            ReceiveBufferSize = bufferSize,
+        };
         Socket.Bind(new IPEndPoint(iPAddress, port));
         State = TcpListnerStates.Created;
 
@@ -127,6 +131,8 @@ public class TcpListener<TSessionMetadata> : IDisposable
         try
         {
             var socket = Socket.EndAccept(result);
+            socket.SendBufferSize = BufferSize;
+            socket.ReceiveBufferSize = BufferSize;
             var session = new TcpSession<TSessionMetadata>(this, socket);
             _sessions.Add(session);
             SessionAdded?.Invoke(this, new TcpSessionEventArgs<TSessionMetadata>(session));

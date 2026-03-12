@@ -16,5 +16,5 @@ public class UdpClientEventArgs(UdpClient client)
     /// <summary>
     /// 远程端点
     /// </summary>
-    public EndPoint? RemoteEndPoint { get; internal set; }
+    public IPEndPoint? RemoteEndPoint { get; internal set; }
 }

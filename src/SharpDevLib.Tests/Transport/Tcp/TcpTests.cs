@@ -24,32 +24,29 @@ public class TcpTests
     {
         var port = TcpHelper.GetAvailableTcpPort(8000, 9000);
         StartListen(port);
-        var client1 = TcpHelper.CreateClient(IPAddress.Loopback, port);
-        var client2 = TcpHelper.CreateClient(IPAddress.Loopback, port);
-        StartClientTask(client1);
-        StartClientTask(client2);
-        await Task.Delay(TimeSpan.FromMilliseconds(100), CancellationToken.None);
-        Console.WriteLine("准备发送");
+        var client1 = TcpHelper.CreateClient(IPAddress.Loopback, port, adapter: TcpAdapters.FixedHeader);
+        var client2 = TcpHelper.CreateClient(IPAddress.Loopback, port, adapter: TcpAdapters.FixedHeader);
+        StartClient(client1, nameof(client1));
+        StartClient(client2, nameof(client2));
+
         client1.Send("登录:1".Utf8Decode());
         client2.Send("登录:2".Utf8Decode());
+        await Task.Delay(TimeSpan.FromMilliseconds(100), CancellationToken.None);
+
         client1.Send("发送:2;你叫什么名字".Utf8Decode());
+        await Task.Delay(TimeSpan.FromMilliseconds(100), CancellationToken.None);
+
         client2.Send("发送:1;我叫bar".Utf8Decode());
         await Task.Delay(TimeSpan.FromMilliseconds(100), CancellationToken.None);
 
         static void StartListen(int port)
         {
-            var listener = TcpHelper.CreateListener<UserInfo>(IPAddress.Loopback, port);
-            listener.StateChanged += (s, e) =>
-            {
-                Console.WriteLine($"服务端状态变化:{e.Before}->{e.Current}");
-            };
+            var listener = TcpHelper.CreateListener<IdNameDto<int>>(IPAddress.Loopback, port, adapter: TcpAdapters.FixedHeader);
             listener.SessionAdded += (s, e) =>
             {
-                Console.WriteLine("会话连接");
                 e.Session.Received += (ss, ee) =>
                 {
                     var message = ee.Bytes.Utf8Encode();
-                    Console.WriteLine($"服务器收到消息:{message}");
 
                     //1.登录
                     if (message.StartsWith("登录:"))
@@ -57,7 +54,7 @@ public class TcpTests
                         var id = message.TrimStart("登录:").ToInt();
                         var user = UserRepository.FindUser(id);
                         ee.Session.Metadata = user;
-                        ee.Session.Send($"{user.Name}登录成功".Utf8Decode());
+                        ee.Session.Send($"登录成功,id:{id},name:{user.Name}".Utf8Decode());
                         return;
                     }
 
@@ -78,7 +75,7 @@ public class TcpTests
                             ee.Session.Send("发送失败,对方不在线".Utf8Decode());
                             return;
                         }
-                        toSession.Send($"{toSession.Metadata!.Name}收到来自{ee.Session.Metadata.Name}的消息:{text}".Utf8Decode());
+                        toSession.Send($"{text}(from:{ee.Session.Metadata.Name})".Utf8Decode());
                         return;
                     }
                 };
@@ -86,33 +83,25 @@ public class TcpTests
             listener.StartListen();
         }
 
-        static void StartClientTask(TcpClient client)
+        static void StartClient(TcpClient client, string clientName)
         {
-            client.Received += (s, e) => Console.WriteLine(e.Bytes.Utf8Encode());
-            client.StateChanged += (s, e) => Console.WriteLine($"客户端状态变化:{e.Before}->{e.Current}");
+            client.Received += (s, e) => Console.WriteLine($"{clientName}收到信息->{e.Bytes.Utf8Encode()}");
             client.StartConnectAndReceive();
+        }
+    }
+
+    class UserRepository
+    {
+        readonly static List<IdNameDto<int>> _users =
+        [
+            new IdNameDto<int>(1,"foo"),
+            new IdNameDto<int>(2,"bar"),
+        ];
+
+        public static IdNameDto<int> FindUser(int id)
+        {
+            return _users.FirstOrDefault(x => x.Id == id) ?? throw new Exception($"找不到Id为'{id}'的用户");
         }
     }
 }
 
-class UserInfo
-{
-    public int Id { get; set; }
-    public string? Name { get; set; }
-    public IPAddress? Address { get; set; }
-    public int Port { get; set; }
-}
-
-class UserRepository
-{
-    readonly static List<UserInfo> _users =
-    [
-        new UserInfo{Id=1,Name="foo"},
-        new UserInfo{Id=2,Name="bar"},
-    ];
-
-    public static UserInfo FindUser(int id)
-    {
-        return _users.FirstOrDefault(x => x.Id == id) ?? throw new Exception($"找不到Id为'{id}'的用户");
-    }
-}
