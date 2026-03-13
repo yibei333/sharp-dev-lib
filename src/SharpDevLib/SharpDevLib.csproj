@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>12.0</LangVersion>
 		<Authors>developer333</Authors>
-		<Description>基于netstandard2.0的常用开发扩展</Description>
+		<Description>基于netstandard2.0的常用开发扩展.</Description>
 		<Copyright>developer333</Copyright>
 		<PackageId>SharpDevLib</PackageId>
 		<PackageProjectUrl>https://github.com/yibei333/sharp-dev-lib</PackageProjectUrl>

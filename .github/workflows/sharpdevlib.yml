@@ -24,11 +24,14 @@ jobs:
     - name: GetVersionFromCsproj
       id: GetVersionFromCsproj
       run: |
-        $content = Get-Content "src/SharpDevLib/SharpDevLib.csproj"
+        $content = Get-Content "src/SharpDevLib/SharpDevLib.csproj" -Raw
         if ($content -match '<Version>(.*?)<\/Version>') {
-          $localVersion = $matches[1]
+          $localVersion = $matches[1].Trim()
           echo "local_version=$localVersion" >> $ENV:GITHUB_OUTPUT
           echo "Local version: $localVersion"
+        } else {
+          echo "Failed to extract version from csproj file"
+          exit 1
         }
 
     - name: CheckNuGetVersion
