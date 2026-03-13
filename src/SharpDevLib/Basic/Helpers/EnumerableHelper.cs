@@ -71,9 +71,9 @@ public static class EnumerableHelper
     /// <typeparam name="T">集合元素类型</typeparam>
     /// <param name="source">源集合</param>
     /// <param name="action">要对每个元素执行的操作</param>
-    public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
+    public static void ForEach<T>(this IEnumerable<T>? source, Action<T> action)
     {
-        if (source.IsNullOrEmpty()) return;
+        if (source is null) return;
         foreach (var item in source) action(item);
     }
 
@@ -83,9 +83,9 @@ public static class EnumerableHelper
     /// <typeparam name="T">集合元素类型</typeparam>
     /// <param name="source">源集合</param>
     /// <param name="action">要对每个元素执行的操作，第一个参数为元素索引，第二个参数为元素</param>
-    public static void ForEach<T>(this IEnumerable<T> source, Action<int, T> action)
+    public static void ForEach<T>(this IEnumerable<T>? source, Action<int, T> action)
     {
-        if (source.IsNullOrEmpty()) return;
+        if (source is null) return;
         var index = 0;
         foreach (var item in source) action(index++, item);
     }
@@ -134,15 +134,31 @@ public static class EnumerableHelper
 
     internal class ObjectValueComparer<T> : IEqualityComparer<T?> where T : class
     {
+        static readonly PropertyInfo[] _properties = [.. typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanRead)];
+
         public bool Equals(T? x, T? y)
         {
-            if (x is null && y is null) return true;
-            return x?.Serialize() == y?.Serialize();
+            if (ReferenceEquals(x, y)) return true;
+            if (x is null || y is null) return false;
+
+            foreach (var prop in _properties)
+            {
+                var valX = prop.GetValue(x);
+                var valY = prop.GetValue(y);
+                if (!Equals(valX, valY)) return false;
+            }
+            return true;
         }
 
         public int GetHashCode(T? obj)
         {
-            return obj is null ? -1 : 1;
+            if (obj is null) return 0;
+            var hashCode = new HashCode();
+            foreach (var prop in _properties)
+            {
+                hashCode.Add(prop.GetValue(obj));
+            }
+            return hashCode.ToHashCode();
         }
     }
 }

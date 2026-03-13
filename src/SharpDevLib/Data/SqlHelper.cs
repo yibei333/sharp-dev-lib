@@ -100,13 +100,15 @@ public sealed class SqlHelper : IDisposable
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>查询结果的单个值</returns>
     /// <exception cref="Exception">当T的类型为引用类型（排除string类型）时抛出异常</exception>
+    /// <exception cref="InvalidCastException">当T的类型为值类型且返回结果为null时抛出异常</exception>
     public T ExecuteScalar<T>(string sql, params DbParameter[] parameters)
     {
         var type = typeof(T);
-        if (!type.IsValueType && type != typeof(string)) throw new Exception($"type of T must be ValueType or String");
+        if (!type.IsValueType && type != typeof(string)) throw new Exception($"当前只支持值类型和string类型");
 
         using var command = CreateCommand(sql, parameters);
         var result = command.ExecuteScalar();
+        if ((result is null || result == DBNull.Value) && type.IsValueType) throw new InvalidCastException($"不能将NULL转换为类型'{type.FullName}'");
         return (T)Convert.ChangeType(result, type);
     }
 
@@ -118,14 +120,10 @@ public sealed class SqlHelper : IDisposable
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>查询结果的单个值</returns>
     /// <exception cref="Exception">当T的类型为引用类型（排除string类型）时抛出异常</exception>
+    /// <exception cref="InvalidCastException">当T的类型为值类型且返回结果为null时抛出异常</exception>
     public async Task<T> ExecuteScalarAsync<T>(string sql, params DbParameter[] parameters)
     {
-        var type = typeof(T);
-        if (!type.IsValueType && type != typeof(string)) throw new Exception($"type of T must be ValueType or String");
-
-        using var command = CreateCommand(sql, parameters);
-        var result = await command.ExecuteScalarAsync();
-        return (T)Convert.ChangeType(result, type);
+        return await ExecuteScalarAsync<T>(CancellationToken.None, sql, parameters);
     }
 
     /// <summary>
@@ -137,13 +135,15 @@ public sealed class SqlHelper : IDisposable
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>查询结果的单个值</returns>
     /// <exception cref="Exception">当T的类型为引用类型（排除string类型）时抛出异常</exception>
-    public async Task<T?> ExecuteScalarAsync<T>(CancellationToken cancellationToken, string sql, params DbParameter[] parameters)
+    /// <exception cref="InvalidCastException">当T的类型为值类型且返回结果为null时抛出异常</exception>
+    public async Task<T> ExecuteScalarAsync<T>(CancellationToken cancellationToken, string sql, params DbParameter[] parameters)
     {
         var type = typeof(T);
-        if (!type.IsValueType && type != typeof(string)) throw new Exception($"type of T must be ValueType or String");
+        if (!type.IsValueType && type != typeof(string)) throw new Exception($"当前只支持值类型和string类型");
 
         using var command = CreateCommand(sql, parameters);
         var result = await command.ExecuteScalarAsync(cancellationToken);
+        if ((result is null || result == DBNull.Value) && type.IsValueType) throw new InvalidCastException($"不能将NULL转换为类型'{type.FullName}'");
         return (T)Convert.ChangeType(result, type);
     }
 

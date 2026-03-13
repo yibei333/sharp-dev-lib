@@ -70,11 +70,9 @@ public static class ProcessHelper
                 tcs.TrySetResult(result);
             };
             process.EnableRaisingEvents = true;
-            process.Exited += exitedHandler;
 
             if (request.CancellationToken.HasValue)
             {
-                process.Exited -= exitedHandler;
                 ctr = request.CancellationToken.Value.Register(() =>
                 {
                     try
@@ -98,6 +96,7 @@ public static class ProcessHelper
                     }
                 });
             }
+            else process.Exited += exitedHandler;
 
             if (request.CancellationToken.HasValue && request.CancellationToken.Value.IsCancellationRequested)
             {

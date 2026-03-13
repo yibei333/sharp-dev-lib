@@ -16,7 +16,7 @@ public static class StringHelper
     public static string TrimStart(this string source, string target)
     {
         if (source.IsNullOrWhiteSpace() || target.IsNullOrWhiteSpace()) return source;
-        if (source.StartsWith(target)) return source.Substring(source.IndexOf(target) + target.Length);
+        if (source.StartsWith(target)) return source.Substring(target.Length);
         return source;
     }
 
@@ -163,7 +163,7 @@ public static class StringHelper
     /// <param name="str">要转换的字符串</param>
     /// <param name="defaultValue">转换失败时的默认返回值，默认为0</param>
     /// <returns>转换后的decimal值</returns>
-    public static decimal ToDecimal(this string? str, int defaultValue = 0)
+    public static decimal ToDecimal(this string? str, decimal defaultValue = 0)
     {
         return decimal.TryParse(str, out var value) ? value : defaultValue;
     }
@@ -186,7 +186,7 @@ public static class StringHelper
     /// <param name="str">要转换的字符串</param>
     /// <param name="defaultValue">转换失败时的默认返回值，默认为0</param>
     /// <returns>转换后的double值</returns>
-    public static double ToDouble(this string? str, int defaultValue = 0)
+    public static double ToDouble(this string? str, double defaultValue = 0)
     {
         return double.TryParse(str, out var value) ? value : defaultValue;
     }

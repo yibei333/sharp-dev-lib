@@ -1,4 +1,4 @@
-﻿using System.Web;
+﻿using System.Net;
 
 namespace SharpDevLib;
 
@@ -8,16 +8,16 @@ namespace SharpDevLib;
 public static class UrlEncodeHelper
 {
     /// <summary>
-    /// 将字节数组编码为URL编码字符串
+    /// URL编码
     /// </summary>
-    /// <param name="bytes">要编码的字节数组</param>
+    /// <param name="url">要编码的字符串</param>
     /// <returns>URL编码后的字符串</returns>
-    public static string UrlEncode(this byte[] bytes) => HttpUtility.UrlEncode(bytes);
+    public static string UrlEncode(this string url) => WebUtility.UrlEncode(url);
 
     /// <summary>
-    /// 将URL编码字符串解码为原始字节数组
+    /// URL解码
     /// </summary>
     /// <param name="urlEncodedString">URL编码的字符串</param>
-    /// <returns>解码后的原始字节数组</returns>
-    public static byte[] UrlDecode(this string urlEncodedString) => HttpUtility.UrlDecodeToBytes(urlEncodedString);
+    /// <returns>解码后的原始字符串</returns>
+    public static string UrlDecode(this string urlEncodedString) => WebUtility.UrlDecode(urlEncodedString);
 }

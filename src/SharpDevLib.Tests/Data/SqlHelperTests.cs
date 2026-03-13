@@ -61,6 +61,7 @@ public class SqlHelperTests
         Assert.AreEqual(1, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [User] a INNER JOIN [UserFavorite] b ON a.Name=b.Name GROUP BY a.Name"));
         Assert.AreEqual("Program", sqlHelper.ExecuteScalar<string>("SELECT Favorite FROM [UserFavorite] WHERE [Name]='Bar'"));
         Assert.IsNull(sqlHelper.ExecuteScalar<string>("SELECT Favorite FROM [UserFavorite] WHERE [Name]='Baz'"));
+        Assert.Throws<InvalidCastException>(() => sqlHelper.ExecuteScalar<int>("SELECT NULL"));
     }
 
     [TestMethod]

@@ -22,7 +22,7 @@ public static class TreeHelper
         var items = source.Select(x => new { Id = id(x), ParentId = parentId(x) });
         if (items.Any(x => x.Id is null)) throw new InvalidDataException("列表中的Id不能为null");
 
-        List<TId> visited = [];
+        HashSet<TId> visited = [];
 
         foreach (var item in items)
         {
@@ -32,30 +32,25 @@ public static class TreeHelper
                 continue;
             }
 
-            List<TId> pIds = [];
+            HashSet<TId> pIds = [];
             var currentParentId = item.ParentId;
             while (true)
             {
-                if (visited.Any(x => x!.Equals(currentParentId)))
-                {
-                    visited.AddRange(pIds);
-                    break;
-                }
+                if (visited.Any(x => x!.Equals(currentParentId))) break;
                 else
                 {
                     pIds.Add(currentParentId!);
+                    visited.Add(currentParentId!);
                     if (pIds.Any(x => x!.Equals(item.Id)))
                     {
-                        pIds.Insert(0, item.Id);
-                        return (true, string.Join("->", pIds));
+                        return (true, $"{item.Id}->" + string.Join("->", pIds));
                     }
                     var next = items.FirstOrDefault(x => x.Id!.Equals(currentParentId));
                     if (next is null) break;
                     currentParentId = next.ParentId;
                 }
             }
-            pIds.Insert(0, item.Id);
-            visited.AddRange(pIds);
+            visited.Add(item.Id);
         }
         return (false, null);
     }
@@ -104,13 +99,14 @@ public static class TreeHelper
         var items = source.Select(x => new TreeItem<T>(x, idProperty, parentIdProperty, sortProperty));
         var repeateData = items.GroupBy(x => x.Id).Where(x => x.Count() > 1);
         if (repeateData.Any()) throw new InvalidDataException($"检测到重复数据:{string.Join(",", repeateData.Select(x => x.Key))}");
-        var parents = items.Where(x => x.ParentId is null || items.All(y => y.Id != x.ParentId));
+        var idSet = new HashSet<object>(items.Select(item => item.Id));
+        var parents = items.Where(item => item.ParentId is null || !idSet.Contains(item.ParentId)).ToList();
+        parents.ForEach(x => RecursiveBuild(items, x, childrenProperty, sortProperty, descending, setNullWhenHasNoChildren));
         if (sortProperty is not null)
         {
-            if (descending) parents = parents.OrderByDescending(x => x.SortValue);
-            else parents = parents.OrderBy(x => x.SortValue);
+            if (descending) parents = [.. parents.OrderByDescending(x => x.SortValue)];
+            else parents = [.. parents.OrderBy(x => x.SortValue)];
         }
-        parents.ForEach(x => RecursiveBuild(items, x, childrenProperty, sortProperty, descending, setNullWhenHasNoChildren));
         return [.. parents.Select(x => x.MetaData)];
     }
 

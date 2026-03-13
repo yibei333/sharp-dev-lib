@@ -83,13 +83,12 @@ public static class DataTableHelper
         var table = new DataTable();
         if (mappings.IsNullOrEmpty()) return table;
         var type = typeof(T);
-        var index = 0;
-        var properties = type
-            .GetProperties()
-            .Where(x => x.CanRead && (!x.PropertyType.IsClass || x.PropertyType.IsClass && x.PropertyType == typeof(string)))
-            .Select(x => new { Property = x, Index = index++ })
-            .GroupBy(x => x.Property.Name)//handle property with new keyword
-            .Select(x => x.OrderBy(x => x.Index).First().Property);
+        var properties = type.GetProperties()
+            .Where(p => p.CanRead && (!p.PropertyType.IsClass || p.PropertyType == typeof(string)))
+            .Select((p, index) => (Property: p, Index: index))
+            .GroupBy(t => t.Property.Name)
+            .Select(g => g.Aggregate((min, curr) => curr.Index < min.Index ? curr : min).Property)
+            .ToList();
         mappings.ForEach(x =>
         {
             x.Property = properties.FirstOrDefault(p => p.Name == x.Name) ?? throw new InvalidDataException($"在类型'{type.FullName}'找不到名称为'{x.Name}'的属性");
@@ -160,34 +159,22 @@ public static class DataTableHelper
         if (mappings.IsNullOrEmpty()) throw new InvalidDataException("至少应该有一个映射");
         var result = new List<T>();
         var type = typeof(T);
-        var index = 0;
-        var properties = type
-            .GetProperties()
-            .Where(x => x.CanRead && (!x.PropertyType.IsClass || x.PropertyType.IsClass && x.PropertyType == typeof(string)))
-            .Select(x => new { Property = x, Index = index++ })
-            .GroupBy(x => x.Property.Name)//handle property with new keyword
-            .Select(x => x.OrderBy(x => x.Index).First().Property);
+        var properties = type.GetProperties()
+           .Where(p => p.CanRead && (!p.PropertyType.IsClass || p.PropertyType == typeof(string)))
+           .Select((p, index) => (Property: p, Index: index))
+           .GroupBy(t => t.Property.Name)
+           .Select(g => g.Aggregate((min, curr) => curr.Index < min.Index ? curr : min).Property)
+           .ToList();
         mappings.ForEach(x =>
         {
             var propertyName = (x.NameConverter ?? TableToListMapping.InternalDefaultNameConventer).Invoke(x.Name);
             x.Property = properties.FirstOrDefault(p => p.Name == propertyName) ?? throw new InvalidDataException($"在类型'{type.FullName}'找不到名称为'{x.Name}'的属性");
         });
 
-        var hasNoParameterConstructor = typeof(T).GetConstructors().All(x => x.GetParameters().Count() != 0);
+        var hasDefaultConstructor = typeof(T).GetConstructors().Any(x => x.GetParameters().Count() == 0);
         foreach (DataRow row in table.Rows)
         {
-            if (hasNoParameterConstructor)
-            {
-                var args = new List<object?>();
-                foreach (var mapping in mappings)
-                {
-                    var value = (mapping.ValueConverter ?? TableToListMapping.InternalDefaultValueConverter).Invoke(row[mapping.Name], row);
-                    args.Add(value);
-                }
-                var instance = (T)Activator.CreateInstance(typeof(T), [.. args]);
-                result.Add(instance);
-            }
-            else
+            if (hasDefaultConstructor)
             {
                 var instance = Activator.CreateInstance<T>();
                 foreach (var mapping in mappings)
@@ -196,6 +183,17 @@ public static class DataTableHelper
                     value = ConvertRowValueToPropertyValue(mapping.Property.PropertyType, value);
                     mapping.Property.SetValue(instance, value);
                 }
+                result.Add(instance);
+            }
+            else
+            {
+                var args = new List<object?>();
+                foreach (var mapping in mappings)
+                {
+                    var value = (mapping.ValueConverter ?? TableToListMapping.InternalDefaultValueConverter).Invoke(row[mapping.Name], row);
+                    args.Add(value);
+                }
+                var instance = (T)Activator.CreateInstance(typeof(T), [.. args]);
                 result.Add(instance);
             }
         }
