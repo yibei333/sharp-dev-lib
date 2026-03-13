@@ -6,7 +6,7 @@ namespace SharpDevLib;
 /// Excel 单元格格式类
 /// 用于定义 Excel 单元格的字体、颜色、对齐方式、边框等样式属性
 /// </summary>
-public class CellStyle
+public class SpreadSheetCellStyle
 {
     /// <summary>
     /// 是否使用粗体字体

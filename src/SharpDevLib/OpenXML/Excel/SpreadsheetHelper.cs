@@ -641,7 +641,7 @@ public static class SpreadsheetHelper
     /// <param name="workbookPart">工作簿部件</param>
     /// <param name="style">单元格样式对象</param>
     /// <returns>样式索引</returns>
-    public static uint CreateStyle(this WorkbookPart workbookPart, CellStyle style)
+    public static uint CreateStyle(this WorkbookPart workbookPart, SpreadSheetCellStyle style)
     {
         var workbookStylesPart = workbookPart.GetPartsOfType<WorkbookStylesPart>()?.FirstOrDefault() ?? workbookPart.AddNewPart<WorkbookStylesPart>();
         workbookStylesPart.Stylesheet ??= new Stylesheet();
@@ -728,7 +728,7 @@ public static class SpreadsheetHelper
     /// <param name="mergeCell">合并单元格对象</param>
     /// <param name="style">单元格样式对象</param>
     /// <exception cref="Exception">当找不到 WorkbookPart 时引发异常</exception>
-    public static void UseStyle(this MergeCell mergeCell, CellStyle style)
+    public static void UseStyle(this MergeCell mergeCell, SpreadSheetCellStyle style)
     {
         var workbookPart = mergeCell.GetParent<WorkbookPart>() ?? throw new Exception("无法找到WorkbookPart");
         var cells = mergeCell.GetCells();

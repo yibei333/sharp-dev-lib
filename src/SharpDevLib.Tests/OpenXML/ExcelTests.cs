@@ -357,7 +357,7 @@ public class ExcelTests
         using var targetStream = CopySourceStream(sourceStream, "UpdateCellStyle", out var targetPath);
 
         using var doc = SpreadsheetDocument.Open(targetStream, true);
-        var styleIndex = doc.WorkbookPart!.CreateStyle(new SharpDevLib.CellStyle
+        var styleIndex = doc.WorkbookPart!.CreateStyle(new SharpDevLib.SpreadSheetCellStyle
         {
             BackgroundColor = "#0000FF",
             FontColor = "#FFFFFF",
@@ -383,7 +383,7 @@ public class ExcelTests
         using var doc = SpreadsheetDocument.Open(targetStream, true);
         var mergeCell = doc.WorkbookPart?.GetWorksheet("T2").MergeCells("h8", "d3");
         Assert.IsNotNull(mergeCell);
-        mergeCell.UseStyle(new SharpDevLib.CellStyle { HorizontalAlignment = HorizontalAlignmentValues.Center, VerticalAlignment = VerticalAlignmentValues.Center, BackgroundColor = "#bcd" });
+        mergeCell.UseStyle(new SharpDevLib.SpreadSheetCellStyle { HorizontalAlignment = HorizontalAlignmentValues.Center, VerticalAlignment = VerticalAlignmentValues.Center, BackgroundColor = "#bcd" });
 
         doc.Save();
         targetStream.Flush();
