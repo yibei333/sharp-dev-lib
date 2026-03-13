@@ -2,7 +2,7 @@
 
 提供 JWT 的生成和验证功能。
 
-#### 实例
+#### 示例
 
 ```csharp
 using System.Security.Cryptography;

@@ -2,7 +2,7 @@
 
 提供 Excel 文件的读取、写入、加密和解密功能。
 
-##### 实例
+##### 示例
 
 ```csharp
 using System.Data;

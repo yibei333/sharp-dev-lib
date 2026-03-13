@@ -9,14 +9,14 @@
 public class IdNameDataDto<TId, TData> : DataDto<TData>
 {
     /// <summary>
-    /// 实例化 IdNameDataDto 对象
+    /// 示例化 IdNameDataDto 对象
     /// </summary>
     public IdNameDataDto()
     {
     }
 
     /// <summary>
-    /// 实例化 IdNameDataDto 对象并初始化数据
+    /// 示例化 IdNameDataDto 对象并初始化数据
     /// </summary>
     /// <param name="data">要包装的数据对象</param>
     public IdNameDataDto(TData? data) : base(data)
@@ -24,7 +24,7 @@ public class IdNameDataDto<TId, TData> : DataDto<TData>
     }
 
     /// <summary>
-    /// 实例化 IdNameDataDto 对象并初始化标识符
+    /// 示例化 IdNameDataDto 对象并初始化标识符
     /// </summary>
     /// <param name="id">标识符</param>
     public IdNameDataDto(TId id)
@@ -33,7 +33,7 @@ public class IdNameDataDto<TId, TData> : DataDto<TData>
     }
 
     /// <summary>
-    /// 实例化 IdNameDataDto 对象并初始化名称
+    /// 示例化 IdNameDataDto 对象并初始化名称
     /// </summary>
     /// <param name="name">名称</param>
     public IdNameDataDto(string name)
@@ -42,7 +42,7 @@ public class IdNameDataDto<TId, TData> : DataDto<TData>
     }
 
     /// <summary>
-    /// 实例化 IdNameDataDto 对象并初始化标识符和数据
+    /// 示例化 IdNameDataDto 对象并初始化标识符和数据
     /// </summary>
     /// <param name="id">标识符</param>
     /// <param name="data">要包装的数据对象</param>
@@ -52,7 +52,7 @@ public class IdNameDataDto<TId, TData> : DataDto<TData>
     }
 
     /// <summary>
-    /// 实例化 IdNameDataDto 对象并初始化标识符和名称
+    /// 示例化 IdNameDataDto 对象并初始化标识符和名称
     /// </summary>
     /// <param name="id">标识符</param>
     /// <param name="name">名称</param>
@@ -63,7 +63,7 @@ public class IdNameDataDto<TId, TData> : DataDto<TData>
     }
 
     /// <summary>
-    /// 实例化 IdNameDataDto 对象并初始化名称和数据
+    /// 示例化 IdNameDataDto 对象并初始化名称和数据
     /// </summary>
     /// <param name="name">名称</param>
     /// <param name="data">要包装的数据对象</param>
@@ -73,7 +73,7 @@ public class IdNameDataDto<TId, TData> : DataDto<TData>
     }
 
     /// <summary>
-    /// 实例化 IdNameDataDto 对象并初始化标识符、名称和数据
+    /// 示例化 IdNameDataDto 对象并初始化标识符、名称和数据
     /// </summary>
     /// <param name="id">标识符</param>
     /// <param name="name">名称</param>

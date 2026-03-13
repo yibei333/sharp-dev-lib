@@ -2,7 +2,7 @@
 
 提供`Email`邮件发送功能。
 
-##### 实例
+##### 示例
 
 ```csharp
 using SharpDevLib;

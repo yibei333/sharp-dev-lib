@@ -1,9 +1,9 @@
 ﻿namespace SharpDevLib.Tests.TestData;
 
-public class User(string name, int age)
+public class User(string name, long age)
 {
     public string? Name { get; set; } = name;
-    public int Age { get; set; } = age;
+    public long Age { get; set; } = age;
 
     public override string ToString()
     {

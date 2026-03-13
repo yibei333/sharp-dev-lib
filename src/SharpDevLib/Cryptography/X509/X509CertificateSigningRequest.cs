@@ -26,7 +26,7 @@ public class X509CertificateSigningRequest
     //   }
 
     /// <summary>
-    /// 实例化证书签名请求
+    /// 示例化证书签名请求
     /// </summary>
     /// <param name="subject">subject</param>
     /// <param name="privateKey">私钥,当前仅支持RSA</param>

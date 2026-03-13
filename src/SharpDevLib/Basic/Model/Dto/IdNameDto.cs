@@ -8,7 +8,7 @@
 public class IdNameDto<TId> : IdDto<TId>
 {
     /// <summary>
-    /// 实例化 IdNameDto 对象
+    /// 示例化 IdNameDto 对象
     /// </summary>
     public IdNameDto()
     {
@@ -16,7 +16,7 @@ public class IdNameDto<TId> : IdDto<TId>
     }
 
     /// <summary>
-    /// 实例化 IdNameDto 对象并初始化标识符
+    /// 示例化 IdNameDto 对象并初始化标识符
     /// </summary>
     /// <param name="id">标识符</param>
     public IdNameDto(TId id) : base(id)
@@ -24,7 +24,7 @@ public class IdNameDto<TId> : IdDto<TId>
     }
 
     /// <summary>
-    /// 实例化 IdNameDto 对象并初始化名称
+    /// 示例化 IdNameDto 对象并初始化名称
     /// </summary>
     /// <param name="name">名称</param>
     public IdNameDto(string? name)
@@ -33,7 +33,7 @@ public class IdNameDto<TId> : IdDto<TId>
     }
 
     /// <summary>
-    /// 实例化 IdNameDto 对象并初始化标识符和名称
+    /// 示例化 IdNameDto 对象并初始化标识符和名称
     /// </summary>
     /// <param name="id">标识符</param>
     /// <param name="name">名称</param>

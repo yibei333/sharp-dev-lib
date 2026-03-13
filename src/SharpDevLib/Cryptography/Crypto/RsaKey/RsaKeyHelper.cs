@@ -27,7 +27,7 @@ public static class RsaKeyHelper
     /// <summary>
     /// 导入PEM格式的RSA密钥
     /// </summary>
-    /// <param name="rsa">RSA算法实例</param>
+    /// <param name="rsa">RSA算法示例</param>
     /// <param name="pem">PEM格式的密钥，支持的格式如下：
     /// <para>(1)PKCS#1私钥</para> 
     /// <para>(2)受密码保护的PKCS#1私钥</para> 
@@ -76,7 +76,7 @@ public static class RsaKeyHelper
     /// <summary>
     /// 导出PEM格式的RSA密钥
     /// </summary>
-    /// <param name="rsa">RSA算法实例</param>
+    /// <param name="rsa">RSA算法示例</param>
     /// <param name="pemType">PEM格式类型</param>
     /// <param name="password">密码（仅当PEM格式为受密码保护的私钥时适用）</param>
     /// <param name="encryptPkcs1PrivateKeyAlogorithm">加密算法（仅当PEM格式为受密码保护的PKCS#1私钥时适用），受支持的算法如下：

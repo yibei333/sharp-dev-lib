@@ -14,7 +14,7 @@ public class CellReference
     static readonly ConcurrentDictionary<uint, string> _columnNameCache = [];
 
     /// <summary>
-    /// 实例化单元格引用对象
+    /// 示例化单元格引用对象
     /// </summary>
     /// <param name="rowIndex">行号,从 1 开始</param>
     /// <param name="columnName">列名,如 A、B、C</param>
@@ -27,7 +27,7 @@ public class CellReference
     }
 
     /// <summary>
-    /// 实例化单元格引用对象
+    /// 示例化单元格引用对象
     /// </summary>
     /// <param name="rowIndex">行号,从 1 开始</param>
     /// <param name="columnIndex">列号,从 1 开始</param>
@@ -53,7 +53,7 @@ public class CellReference
     }
 
     /// <summary>
-    /// 实例化单元格引用对象
+    /// 示例化单元格引用对象
     /// </summary>
     /// <param name="reference">单元格引用字符串,如 A1、B2</param>
     /// <exception cref="ArgumentNullException">当参数 reference 为 null 或空白字符时引发异常</exception>

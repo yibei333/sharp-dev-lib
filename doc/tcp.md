@@ -2,7 +2,7 @@
 
 提供`TCP`网络通信功能。
 
-##### 模拟通讯实例
+##### 模拟通讯示例
 
 ```csharp
 using System.Net;

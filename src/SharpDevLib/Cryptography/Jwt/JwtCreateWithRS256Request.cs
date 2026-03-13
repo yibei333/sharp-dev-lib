@@ -9,7 +9,7 @@ namespace SharpDevLib;
 public class JwtCreateWithRS256Request : JwtCreateRequest
 {
     /// <summary>
-    /// 初始化请求模型实例
+    /// 初始化请求模型示例
     /// </summary>
     /// <param name="payload">JWT负载数据，将被序列化为JSON字符串</param>
     /// <param name="pemKey">PEM格式的RSA私钥</param>

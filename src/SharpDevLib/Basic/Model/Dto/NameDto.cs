@@ -7,7 +7,7 @@
 public class NameDto : BaseDto
 {
     /// <summary>
-    /// 实例化 NameDto 对象
+    /// 示例化 NameDto 对象
     /// </summary>
     public NameDto()
     {
@@ -15,7 +15,7 @@ public class NameDto : BaseDto
     }
 
     /// <summary>
-    /// 实例化 NameDto 对象并初始化名称
+    /// 示例化 NameDto 对象并初始化名称
     /// </summary>
     /// <param name="name">名称</param>
     public NameDto(string? name)

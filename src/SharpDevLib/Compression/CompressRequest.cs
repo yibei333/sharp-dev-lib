@@ -6,7 +6,7 @@ namespace SharpDevLib;
 /// 压缩请求，用于配置文件或目录的压缩操作
 /// </summary>
 /// <remarks>
-/// 使用源路径和目标路径实例化压缩请求
+/// 使用源路径和目标路径示例化压缩请求
 /// </remarks>
 /// <param name="sourcePaths">要压缩的文件或目录路径集合</param>
 /// <param name="targetPath">保存压缩文件的目标路径</param>

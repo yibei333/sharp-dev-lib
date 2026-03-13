@@ -6,7 +6,7 @@ namespace SharpDevLib;
 /// HTTP请求
 /// </summary>
 /// <remarks>
-/// 实例化HTTP请求
+/// 示例化HTTP请求
 /// </remarks>
 /// <param name="url">请求URL地址</param>
 public class HttpRequest(string url)

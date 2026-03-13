@@ -8,7 +8,7 @@
 public class IdDto<TId> : BaseDto
 {
     /// <summary>
-    /// 实例化 IdDto 对象
+    /// 示例化 IdDto 对象
     /// </summary>
     public IdDto()
     {
@@ -16,7 +16,7 @@ public class IdDto<TId> : BaseDto
     }
 
     /// <summary>
-    /// 实例化 IdDto 对象并初始化标识符
+    /// 示例化 IdDto 对象并初始化标识符
     /// </summary>
     /// <param name="id">标识符</param>
     public IdDto(TId id)

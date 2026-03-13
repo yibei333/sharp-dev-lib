@@ -4,7 +4,7 @@
 /// 压缩/解压请求基类，定义压缩和解压操作的通用配置
 /// </summary>
 /// <remarks>
-/// 使用指定目标路径实例化压缩/解压请求
+/// 使用指定目标路径示例化压缩/解压请求
 /// </remarks>
 /// <param name="targetPath">保存压缩文件或解压文件的目标路径</param>
 public abstract class CompressionRequest(string targetPath)

@@ -6,7 +6,7 @@
 public class HttpFormFile
 {
     /// <summary>
-    /// 从字节数组实例化表单文件
+    /// 从字节数组示例化表单文件
     /// </summary>
     /// <param name="parameterName">表单参数名称</param>
     /// <param name="fileName">文件名</param>
@@ -20,7 +20,7 @@ public class HttpFormFile
     }
 
     /// <summary>
-    /// 从文件流实例化表单文件
+    /// 从文件流示例化表单文件
     /// </summary>
     /// <param name="parameterName">表单参数名称</param>
     /// <param name="fileName">文件名</param>

@@ -8,14 +8,14 @@
 public class DataDto<TData> : BaseDto
 {
     /// <summary>
-    /// 实例化 DataDto 对象
+    /// 示例化 DataDto 对象
     /// </summary>
     public DataDto()
     {
     }
 
     /// <summary>
-    /// 实例化 DataDto 对象并初始化数据
+    /// 示例化 DataDto 对象并初始化数据
     /// </summary>
     /// <param name="data">要包装的数据对象</param>
     public DataDto(TData? data)

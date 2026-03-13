@@ -2,7 +2,7 @@
 
 提供`RSA`密钥的导入导出。
 
-##### 实例
+##### 示例
 
 ```csharp
 using SharpDevLib;

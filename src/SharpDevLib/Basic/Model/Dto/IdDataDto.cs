@@ -9,14 +9,14 @@
 public class IdDataDto<TId, TData> : DataDto<TData>
 {
     /// <summary>
-    /// 实例化 IdDataDto 对象
+    /// 示例化 IdDataDto 对象
     /// </summary>
     public IdDataDto()
     {
     }
 
     /// <summary>
-    /// 实例化 IdDataDto 对象并初始化数据
+    /// 示例化 IdDataDto 对象并初始化数据
     /// </summary>
     /// <param name="data">要包装的数据对象</param>
     public IdDataDto(TData? data) : base(data)
@@ -24,7 +24,7 @@ public class IdDataDto<TId, TData> : DataDto<TData>
     }
 
     /// <summary>
-    /// 实例化 IdDataDto 对象并初始化标识符
+    /// 示例化 IdDataDto 对象并初始化标识符
     /// </summary>
     /// <param name="id">标识符</param>
     public IdDataDto(TId id)
@@ -33,7 +33,7 @@ public class IdDataDto<TId, TData> : DataDto<TData>
     }
 
     /// <summary>
-    /// 实例化 IdDataDto 对象并初始化标识符和数据
+    /// 示例化 IdDataDto 对象并初始化标识符和数据
     /// </summary>
     /// <param name="id">标识符</param>
     /// <param name="data">要包装的数据对象</param>

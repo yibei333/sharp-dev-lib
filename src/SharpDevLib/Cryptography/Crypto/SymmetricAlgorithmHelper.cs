@@ -12,7 +12,7 @@ public static class SymmetricAlgorithmHelper
     /// <summary>
     /// 将加密的字节数组解密为原始数据
     /// </summary>
-    /// <param name="algorithm">对称加密算法实例</param>
+    /// <param name="algorithm">对称加密算法示例</param>
     /// <param name="data">已加密的字节数组</param>
     /// <returns>解密后的原始字节数组</returns>
     /// <exception cref="ArgumentNullException">当data参数为null或空数组时抛出</exception>
@@ -29,7 +29,7 @@ public static class SymmetricAlgorithmHelper
     /// <summary>
     /// 将加密的流解密到目标流
     /// </summary>
-    /// <param name="algorithm">对称加密算法实例</param>
+    /// <param name="algorithm">对称加密算法示例</param>
     /// <param name="inputStream">已加密的输入流</param>
     /// <param name="outputStream">解密后的输出流</param>
     public static void Decrypt(this SymmetricAlgorithm algorithm, Stream inputStream, Stream outputStream)
@@ -50,7 +50,7 @@ public static class SymmetricAlgorithmHelper
     /// <summary>
     /// 将原始字节数组加密为密文
     /// </summary>
-    /// <param name="algorithm">对称加密算法实例</param>
+    /// <param name="algorithm">对称加密算法示例</param>
     /// <param name="data">需要加密的原始字节数组</param>
     /// <returns>加密后的密文字节数组</returns>
     /// <exception cref="ArgumentNullException">当data参数为null或空数组时抛出</exception>
@@ -67,7 +67,7 @@ public static class SymmetricAlgorithmHelper
     /// <summary>
     /// 将原始流加密到目标流
     /// </summary>
-    /// <param name="algorithm">对称加密算法实例</param>
+    /// <param name="algorithm">对称加密算法示例</param>
     /// <param name="inputStream">需要加密的原始输入流</param>
     /// <param name="outputStream">加密后的输出流</param>
     public static void Encrypt(this SymmetricAlgorithm algorithm, Stream inputStream, Stream outputStream)
@@ -94,7 +94,7 @@ public static class SymmetricAlgorithmHelper
     /// <para>4.如果不是最后一次循环，则进入下一轮，否则返回key的前Li个字节</para>
     /// <para>支持算法：AES(16/24/32字节)、DES(8字节)、TripleDES(16/24字节)</para>
     /// </summary>
-    /// <param name="algorithm">对称加密算法实例</param>
+    /// <param name="algorithm">对称加密算法示例</param>
     /// <param name="key">要设置的密钥字节数组</param>
     /// <exception cref="NotImplementedException">当算法不支持时抛出</exception>
     public static void SetKeyAutoPad(this SymmetricAlgorithm algorithm, byte[] key)
@@ -122,7 +122,7 @@ public static class SymmetricAlgorithmHelper
     /// <para>4.如果IV长度大于L，返回iv的前L个字节</para>
     /// <para>支持算法：AES(16字节)、DES(8字节)、TripleDES(8字节)</para>
     /// </summary>
-    /// <param name="algorithm">对称加密算法实例</param>
+    /// <param name="algorithm">对称加密算法示例</param>
     /// <param name="iv">要设置的初始化向量字节数组</param>
     /// <exception cref="NotImplementedException">当算法不支持时抛出</exception>
     public static void SetIVAutoPad(this SymmetricAlgorithm algorithm, byte[] iv)

@@ -93,7 +93,8 @@ public static class DataTableHelper
         mappings.ForEach(x =>
         {
             x.Property = properties.FirstOrDefault(p => p.Name == x.Name) ?? throw new InvalidDataException($"在类型'{type.FullName}'找不到名称为'{x.Name}'的属性");
-            table.Columns.Add(new DataColumn((x.NameConverter ?? ListToTableMapping.InternalDefaultNameConventer).Invoke(x.Name)));
+            x.ColumnName = (x.NameConverter ?? ListToTableMapping.InternalDefaultNameConventer).Invoke(x.Name);
+            table.Columns.Add(new DataColumn(x.ColumnName));
         });
 
         //values
@@ -104,7 +105,7 @@ public static class DataTableHelper
             {
                 var value = (x.ValueConverter ?? ListToTableMapping.InternalValueConventer).Invoke(x.Property.GetValue(item), item);
                 value ??= DBNull.Value;
-                row[x.Name] = value;
+                row[x.ColumnName] = value;
             });
             table.Rows.Add(row);
         }

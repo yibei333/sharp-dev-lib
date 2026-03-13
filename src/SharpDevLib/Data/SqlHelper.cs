@@ -36,7 +36,7 @@ public sealed class SqlHelper : IDisposable
     #endregion
 
     /// <summary>
-    /// 初始化SQL帮助类实例，使用指定的数据库提供商工厂和连接字符串
+    /// 初始化SQL帮助类示例，使用指定的数据库提供商工厂和连接字符串
     /// </summary>
     /// <param name="dbProviderFactory">数据库提供商工厂，支持的工厂如下：
     /// <para>1. 引用Microsoft.Data.Sqlite，则用SqliteFactory.Instance</para>
@@ -57,7 +57,7 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 初始化SQL帮助类实例，使用全局配置的数据库提供商工厂和连接字符串
+    /// 初始化SQL帮助类示例，使用全局配置的数据库提供商工厂和连接字符串
     /// </summary>
     /// <exception cref="Exception">当未调用SqlHelper.Config()方法设置全局配置时抛出异常</exception>
     public SqlHelper()
@@ -71,9 +71,9 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// 初始化SQL帮助类实例，使用现有的DbContext
+    /// 初始化SQL帮助类示例，使用现有的DbContext
     /// </summary>
-    /// <param name="dbContext">Entity Framework的DbContext实例</param>
+    /// <param name="dbContext">Entity Framework的DbContext示例</param>
     /// <exception cref="Exception">当无法从DbConnection获取DbProviderFactory时抛出异常</exception>
     public SqlHelper(DbContext dbContext)
     {

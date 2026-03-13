@@ -11,7 +11,7 @@ public class SimpleConsoleLogger(string categoryName, LogLevel minLevel = LogLev
     readonly LogLevel _minLevel = minLevel;
 
     /// <summary>
-    /// 开始日志作用域，返回一个空的作用域实例
+    /// 开始日志作用域，返回一个空的作用域示例
     /// </summary>
     /// <typeparam name="TState">作用域状态类型</typeparam>
     /// <param name="state">作用域状态数据</param>
@@ -68,7 +68,7 @@ public class SimpleConsoleLogger(string categoryName, LogLevel minLevel = LogLev
     class NullScope : IDisposable
     {
         /// <summary>
-        /// 获取空作用域的单例实例
+        /// 获取空作用域的单例示例
         /// </summary>
         public static NullScope Instance { get; } = new NullScope();
 

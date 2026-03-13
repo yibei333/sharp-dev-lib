@@ -7,14 +7,14 @@
 public class PageRequest : BaseRequest
 {
     /// <summary>
-    /// 实例化 PageRequest 对象,使用默认参数(index=0, size=20)
+    /// 示例化 PageRequest 对象,使用默认参数(index=0, size=20)
     /// </summary>
     public PageRequest() : this(0, 20)
     {
     }
 
     /// <summary>
-    /// 实例化 PageRequest 对象
+    /// 示例化 PageRequest 对象
     /// </summary>
     /// <param name="index">当前页索引,从 0 开始,默认为 0</param>
     /// <param name="size">每页数据条数,必须大于等于 0</param>

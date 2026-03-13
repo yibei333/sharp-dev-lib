@@ -19,7 +19,7 @@ SqlHelper.Config(MySqlConnectorFactory.Instance, "server=localhost;user=root;pas
 ```
 
 
-##### 实例
+##### 示例
 
 ```csharp
 using Microsoft.Data.Sqlite;
@@ -31,7 +31,7 @@ using SharpDevLib;
 SqlHelper.Config(SqliteFactory.Instance, "data source=test.db");
 
 //1.如果没有调用SqlHelper.Config配置，则需每次传入，否则引发异常
-//2.如果使用DbContext，可以传入DbContext实例化
+//2.如果使用DbContext，可以传入DbContext示例化
 var sqlHelper=new SqlHelper();
 var initSql=$@"
     CREATE TABLE [Users](Id INTEGER,[Name] TEXT,Age INTEGER);

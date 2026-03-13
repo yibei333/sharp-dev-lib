@@ -11,7 +11,7 @@ public class EmailContent
     EmailContent() { }
 
     /// <summary>
-    /// 实例化邮件内容
+    /// 示例化邮件内容
     /// </summary>
     /// <param name="receivers">收件人邮箱地址列表</param>
     /// <param name="subject">邮件主题</param>

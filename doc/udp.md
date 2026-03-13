@@ -2,7 +2,7 @@
 
 提供`UDP`网络通信功能。
 
-##### 文件传输实例,只是演示,实际TCP用得较多
+##### 文件传输示例,只是演示,实际TCP用得较多
 
 ```csharp
 using System.Collections.Concurrent;

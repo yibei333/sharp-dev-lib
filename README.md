@@ -33,6 +33,7 @@ dotnet add package SharpDevLib
   - [空值断言](doc/nullcheck.md)
   - [随机数](doc/random.md)
   - [DataTable](doc/datatable.md)
+  - [树形结构](doc/tree.md)
   - **模型**
     - [DTO](doc/dto.md)
     - [请求模型](doc/request.md)

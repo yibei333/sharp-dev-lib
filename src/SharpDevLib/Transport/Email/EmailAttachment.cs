@@ -8,7 +8,7 @@ public class EmailAttachment
     EmailAttachment() { }
 
     /// <summary>
-    /// 从文件路径实例化邮件附件
+    /// 从文件路径示例化邮件附件
     /// </summary>
     /// <param name="path">文件路径，必须存在</param>
     /// <exception cref="FileNotFoundException">当文件不存在时引发异常</exception>
@@ -21,7 +21,7 @@ public class EmailAttachment
     }
 
     /// <summary>
-    /// 从字节数组实例化邮件附件
+    /// 从字节数组示例化邮件附件
     /// </summary>
     /// <param name="name">文件名</param>
     /// <param name="bytes">文件字节数组</param>

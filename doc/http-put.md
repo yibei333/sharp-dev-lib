@@ -2,7 +2,7 @@
 
 提供`HTTP` PUT 请求功能。
 
-##### 简单实例
+##### 简单示例
 ``` csharp
 using SharpDevLib;
 
@@ -57,7 +57,7 @@ Console.WriteLine(response);
 //}
 ```
 
-##### 完整实例
+##### 完整示例
 
 ```csharp
 using System.Net;

@@ -8,14 +8,14 @@
 public class IdNameRequest<TId> : IdRequest<TId>
 {
     /// <summary>
-    /// 实例化 IdNameRequest 对象
+    /// 示例化 IdNameRequest 对象
     /// </summary>
     public IdNameRequest()
     {
     }
 
     /// <summary>
-    /// 实例化 IdNameRequest 对象并初始化标识符
+    /// 示例化 IdNameRequest 对象并初始化标识符
     /// </summary>
     /// <param name="id">标识符</param>
     public IdNameRequest(TId id) : base(id)
@@ -23,7 +23,7 @@ public class IdNameRequest<TId> : IdRequest<TId>
     }
 
     /// <summary>
-    /// 实例化 IdNameRequest 对象并初始化名称
+    /// 示例化 IdNameRequest 对象并初始化名称
     /// </summary>
     /// <param name="name">名称</param>
     public IdNameRequest(string? name)
@@ -32,7 +32,7 @@ public class IdNameRequest<TId> : IdRequest<TId>
     }
 
     /// <summary>
-    /// 实例化 IdNameRequest 对象并初始化标识符和名称
+    /// 示例化 IdNameRequest 对象并初始化标识符和名称
     /// </summary>
     /// <param name="id">标识符</param>
     /// <param name="name">名称</param>

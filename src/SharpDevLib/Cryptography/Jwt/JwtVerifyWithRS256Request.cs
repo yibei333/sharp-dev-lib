@@ -9,7 +9,7 @@ namespace SharpDevLib;
 public class JwtVerifyWithRS256Request : JwtVerifyRequest
 {
     /// <summary>
-    /// 初始化请求模型实例
+    /// 初始化请求模型示例
     /// </summary>
     /// <param name="token">要验证的JWT令牌字符串</param>
     /// <param name="pemKey">PEM格式的RSA公钥</param>

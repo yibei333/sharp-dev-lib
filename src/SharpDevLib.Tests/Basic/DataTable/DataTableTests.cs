@@ -106,4 +106,51 @@ public class DataTableExtensionTests
         Console.WriteLine(listString);
         Assert.AreEqual(TestData.Serialize(new JsonOption { FormatJson = true }), listString);
     }
+
+    [TestMethod]
+    public void ListToTableWithMapping()
+    {
+        var users = new List<User>
+        {
+            new() { Id = 1, Name = "张三", Age = 25, IsActive = true, CreateTime = DateTime.Now },
+            new() { Id = 2, Name = "李四", Age = 30, IsActive = false, CreateTime = DateTime.Now.AddDays(-1) },
+            new() { Id = 3, Name = "王五", Age = 28, IsActive = true, CreateTime = DateTime.Now.AddDays(-2) }
+        };
+
+        var table1 = users.ToDataTable(["Id", "Name", "CreateTime"]);
+        Console.WriteLine(table1.Serialize());
+
+        ListToTableMapping.DefaultNameConventer = (name) => name.GetTranslate();
+        var table2 = users.ToDataTable([
+            new ListToTableMapping("Id"),
+            new ListToTableMapping("Name"),
+            new ListToTableMapping("CreateTime")
+            {
+                NameConverter=(name)=>$"自定义列名_{name}*",
+                ValueConverter=(value,user)=>(user as User)?.CreateTime.ToTimeString()
+            },
+        ]);
+        Console.WriteLine(table2.Serialize());
+    }
+
+    class User
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public int Age { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime CreateTime { get; set; }
+    }
+}
+
+public static class I18NService
+{
+    static readonly Dictionary<string, string> _translates = new()
+    {
+        {"Id","标识"},
+        {"Name","姓名"},
+        {"CreateTime","创建时间"},
+    };
+
+    public static string GetTranslate(this string key) => _translates.TryGetValue(key, out var value) ? value : key;
 }

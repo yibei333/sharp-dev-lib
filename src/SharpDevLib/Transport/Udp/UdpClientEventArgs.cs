@@ -5,11 +5,11 @@ namespace SharpDevLib;
 /// <summary>
 /// UDP客户端事件参数
 /// </summary>
-/// <param name="client">UDP客户端实例</param>
+/// <param name="client">UDP客户端示例</param>
 public class UdpClientEventArgs(UdpClient client)
 {
     /// <summary>
-    /// UDP客户端实例
+    /// UDP客户端示例
     /// </summary>
     public UdpClient Client { get; } = client;
 

@@ -8,14 +8,14 @@
 public class IdRequest<TId> : BaseRequest
 {
     /// <summary>
-    /// 实例化 IdRequest 对象
+    /// 示例化 IdRequest 对象
     /// </summary>
     public IdRequest()
     {
     }
 
     /// <summary>
-    /// 实例化 IdRequest 对象并初始化标识符
+    /// 示例化 IdRequest 对象并初始化标识符
     /// </summary>
     /// <param name="id">标识符</param>
     public IdRequest(TId id)

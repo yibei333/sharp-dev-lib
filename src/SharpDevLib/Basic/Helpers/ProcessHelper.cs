@@ -17,7 +17,7 @@ public static class ProcessHelper
     /// <summary>
     /// 启动进程并等待其退出
     /// </summary>
-    /// <param name="process">要启动的进程实例</param>
+    /// <param name="process">要启动的进程示例</param>
     /// <param name="request">进程启动请求配置</param>
     /// <returns>进程执行结果</returns>
     public static async Task<ProcessResult> StartAndWaitForExitAsync(this Process process, ProcessStartRequest request)

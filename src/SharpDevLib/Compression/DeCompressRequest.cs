@@ -6,7 +6,7 @@ namespace SharpDevLib;
 /// 解压请求，用于配置压缩文件的解压操作
 /// </summary>
 /// <remarks>
-/// 使用源压缩文件和目标路径实例化解压请求
+/// 使用源压缩文件和目标路径示例化解压请求
 /// </remarks>
 /// <param name="sourceFile">要解压的压缩文件路径</param>
 /// <param name="targetPath">解压文件保存的目标路径</param>

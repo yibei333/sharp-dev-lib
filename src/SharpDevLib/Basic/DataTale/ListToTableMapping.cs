@@ -44,4 +44,5 @@ public class ListToTableMapping(string name)
     public Func<string, string>? NameConverter { get; set; } = DefaultNameConventer;
 
     internal PropertyInfo Property { get; set; } = null!;
+    internal string ColumnName { get; set; } = null!;
 }
