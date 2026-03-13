@@ -30,7 +30,7 @@
  *******************************************************************************/
 using System.Text;
 
-namespace SharpDevLib.OpenXML.References.ExcelEncryption;
+namespace SharpDevLib.OpenXML.Excel.ExcelEncryption;
 
 internal class CompoundDocumentItem : IComparable<CompoundDocumentItem>
 {

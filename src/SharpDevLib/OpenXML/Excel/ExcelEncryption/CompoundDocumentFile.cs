@@ -28,7 +28,7 @@
  *******************************************************************************
  * Jan Källman		Added		28-MAR-2017
  *******************************************************************************/
-namespace SharpDevLib.OpenXML.References.ExcelEncryption;
+namespace SharpDevLib.OpenXML.Excel.ExcelEncryption;
 
 /// <summary>
 /// Read and write a compound document.

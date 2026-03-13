@@ -38,7 +38,7 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
 
-namespace SharpDevLib.OpenXML.References.ExcelEncryption;
+namespace SharpDevLib.OpenXML.Excel.ExcelEncryption;
 
 /// <summary>
 /// Encryption Algorithm

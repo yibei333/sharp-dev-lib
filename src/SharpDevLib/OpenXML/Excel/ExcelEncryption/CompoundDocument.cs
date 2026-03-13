@@ -31,7 +31,7 @@
  * Jan Källman      Native support for compound documents 2017-04-10
  *******************************************************************************/
 
-namespace SharpDevLib.OpenXML.References.ExcelEncryption;
+namespace SharpDevLib.OpenXML.Excel.ExcelEncryption;
 
 internal class CompoundDocument
 {

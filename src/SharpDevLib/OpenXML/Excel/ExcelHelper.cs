@@ -1,7 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using SharpDevLib.OpenXML.References.ExcelEncryption;
+using SharpDevLib.OpenXML.Excel.ExcelEncryption;
 using System.Data;
 
 namespace SharpDevLib;

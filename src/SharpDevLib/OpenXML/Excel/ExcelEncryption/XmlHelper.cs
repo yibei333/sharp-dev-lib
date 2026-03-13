@@ -35,7 +35,7 @@
 using System.Globalization;
 using System.Text;
 using System.Xml;
-namespace SharpDevLib.OpenXML.References.ExcelEncryption;
+namespace SharpDevLib.OpenXML.Excel.ExcelEncryption;
 /// <summary>
 /// Help class containing XML functions. 
 /// Can be Inherited 

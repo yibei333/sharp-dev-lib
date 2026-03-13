@@ -30,7 +30,7 @@
  *******************************************************************************/
 using ICSharpCode.SharpZipLib.Zip;
 
-namespace SharpDevLib.OpenXML.References.ExcelEncryption;
+namespace SharpDevLib.OpenXML.Excel.ExcelEncryption;
 
 internal class ZipPackagePart : ZipPackageRelationshipBase, IDisposable
 {

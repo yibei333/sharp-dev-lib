@@ -32,7 +32,7 @@ using ICSharpCode.SharpZipLib.Zip;
 using System.Text;
 using System.Xml;
 
-namespace SharpDevLib.OpenXML.References.ExcelEncryption;
+namespace SharpDevLib.OpenXML.Excel.ExcelEncryption;
 
 /// <summary>
 /// Specifies whether the target is inside or outside the System.IO.Packaging.Package.

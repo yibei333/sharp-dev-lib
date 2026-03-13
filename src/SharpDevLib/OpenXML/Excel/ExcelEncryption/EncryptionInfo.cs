@@ -31,7 +31,7 @@
 using System.Text;
 using System.Xml;
 
-namespace SharpDevLib.OpenXML.References.ExcelEncryption;
+namespace SharpDevLib.OpenXML.Excel.ExcelEncryption;
 
 internal abstract class EncryptionInfo
 {

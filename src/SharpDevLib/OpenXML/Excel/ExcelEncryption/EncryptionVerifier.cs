@@ -29,7 +29,7 @@
  * Jan Källman		    Added       		        2013-01-05
  *******************************************************************************/
 
-namespace SharpDevLib.OpenXML.References.ExcelEncryption;
+namespace SharpDevLib.OpenXML.Excel.ExcelEncryption;
 
 /// <summary>
 /// Encryption verifier inside the EncryptionInfo stream
