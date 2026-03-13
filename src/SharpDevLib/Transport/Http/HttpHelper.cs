@@ -131,9 +131,8 @@ public static class HttpHelper
         var totalStartTime = DateTime.Now;
         HttpResponseMessage? response = null;
         Exception? exception = null;
-        TimeSpan last;
+        TimeSpan last = TimeSpan.Zero;
         TimeSpan total = TimeSpan.Zero;
-        string url = string.Empty;
 
         do
         {
@@ -168,7 +167,7 @@ public static class HttpHelper
                 {
                     continue;
                 }
-                return new ResponseMonitor(url, request, null, retryIndex, last, endTime - totalStartTime, response);
+                return new ResponseMonitor(request, null, retryIndex, last, endTime - totalStartTime, response);
             }
             catch (Exception ex)
             {
@@ -177,13 +176,11 @@ public static class HttpHelper
                 exception = ex;
             }
         } while (retryIndex < retryCount);
-        return new ResponseMonitor(url, request, exception, retryIndex, last, total, response);
+        return new ResponseMonitor(request, exception, retryIndex, last, total, response);
     }
 
-    class ResponseMonitor(string url, HttpRequest request, Exception? exception, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming, HttpResponseMessage? responseMessage)
+    class ResponseMonitor(HttpRequest request, Exception? exception, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming, HttpResponseMessage? responseMessage)
     {
-        public string Url { get; } = url;
-
         public Exception? Exception { get; } = exception;
 
         public int RetryCount { get; } = retryCount;

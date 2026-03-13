@@ -29,7 +29,7 @@ public static class StringHelper
     public static string TrimEnd(this string source, string target)
     {
         if (source.IsNullOrWhiteSpace() || target.IsNullOrWhiteSpace()) return source;
-        if (source.EndsWith(target)) return source.Substring(0, source.IndexOf(target));
+        if (source.EndsWith(target)) return source.Substring(0, source.Length - target.Length);
         return source;
     }
 

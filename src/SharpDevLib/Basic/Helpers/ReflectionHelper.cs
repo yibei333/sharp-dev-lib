@@ -24,7 +24,6 @@ public static class ReflectionHelper
         {
             names.Add(GetTypeDefinitionName(item, isFullName));
         }
-        ;
         var typeName = type.GetTypeName(isFullName);
         return $"{typeName.Split('`')[0]}<{string.Join(", ", names)}>";
     }

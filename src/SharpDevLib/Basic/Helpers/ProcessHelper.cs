@@ -63,13 +63,13 @@ public static class ProcessHelper
             EventHandler exitedHandler = null!;
             exitedHandler = (s, e) =>
             {
-                process.Exited -= exitedHandler;
                 result.ExitCode = process.ExitCode;
                 result.Output = outputBuilder.ToString();
                 result.Error = errorBuilder.ToString();
                 tcs.TrySetResult(result);
             };
             process.EnableRaisingEvents = true;
+            process.Exited += exitedHandler;
 
             if (request.CancellationToken.HasValue)
             {
@@ -96,7 +96,6 @@ public static class ProcessHelper
                     }
                 });
             }
-            else process.Exited += exitedHandler;
 
             if (request.CancellationToken.HasValue && request.CancellationToken.Value.IsCancellationRequested)
             {
@@ -107,14 +106,6 @@ public static class ProcessHelper
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
 
-            if (process.HasExited)
-            {
-                process.Exited -= exitedHandler;
-                result.ExitCode = process.ExitCode;
-                result.Output = outputBuilder.ToString();
-                result.Error = errorBuilder.ToString();
-                tcs.TrySetResult(result);
-            }
             return await tcs.Task.ConfigureAwait(false);
         }
         catch (Exception ex)

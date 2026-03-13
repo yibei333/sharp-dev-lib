@@ -19,38 +19,39 @@ public static class TreeHelper
     public static (bool, string?) HasCycleReference<T, TId>(this IEnumerable<T> source, Func<T, TId> id, Func<T, TId?> parentId)
     {
         if (source.IsNullOrEmpty()) return (false, null);
-        var items = source.Select(x => new { Id = id(x), ParentId = parentId(x) });
-        if (items.Any(x => x.Id is null)) throw new InvalidDataException("列表中的Id不能为null");
-
+        Dictionary<TId, TId?> items = [];
+        source.ForEach(x =>
+        {
+            items.Add(id(x) ?? throw new InvalidDataException("列表中的Id不能为null"), parentId(x));
+        });
         HashSet<TId> visited = [];
 
         foreach (var item in items)
         {
-            if (item.ParentId is null)
+            if (item.Value is null)
             {
-                visited.Add(item.Id);
+                visited.Add(item.Key);
                 continue;
             }
 
             HashSet<TId> pIds = [];
-            var currentParentId = item.ParentId;
+            var currentParentId = item.Value;
             while (true)
             {
-                if (visited.Any(x => x!.Equals(currentParentId))) break;
+                if (visited.Contains(currentParentId)) break;
                 else
                 {
                     pIds.Add(currentParentId!);
                     visited.Add(currentParentId!);
-                    if (pIds.Any(x => x!.Equals(item.Id)))
+                    if (pIds.Contains(item.Key))
                     {
-                        return (true, $"{item.Id}->" + string.Join("->", pIds));
+                        return (true, $"{item.Key}->" + string.Join("->", pIds));
                     }
-                    var next = items.FirstOrDefault(x => x.Id!.Equals(currentParentId));
-                    if (next is null) break;
-                    currentParentId = next.ParentId;
+                    if (!items.TryGetValue(currentParentId!, out var nextItem) || nextItem is null) break;
+                    currentParentId = nextItem;
                 }
             }
-            visited.Add(item.Id);
+            visited.Add(item.Key);
         }
         return (false, null);
     }
@@ -101,12 +102,12 @@ public static class TreeHelper
         if (repeateData.Any()) throw new InvalidDataException($"检测到重复数据:{string.Join(",", repeateData.Select(x => x.Key))}");
         var idSet = new HashSet<object>(items.Select(item => item.Id));
         var parents = items.Where(item => item.ParentId is null || !idSet.Contains(item.ParentId)).ToList();
-        parents.ForEach(x => RecursiveBuild(items, x, childrenProperty, sortProperty, descending, setNullWhenHasNoChildren));
         if (sortProperty is not null)
         {
             if (descending) parents = [.. parents.OrderByDescending(x => x.SortValue)];
             else parents = [.. parents.OrderBy(x => x.SortValue)];
         }
+        parents.ForEach(x => RecursiveBuild(items, x, childrenProperty, sortProperty, descending, setNullWhenHasNoChildren));
         return [.. parents.Select(x => x.MetaData)];
     }
 

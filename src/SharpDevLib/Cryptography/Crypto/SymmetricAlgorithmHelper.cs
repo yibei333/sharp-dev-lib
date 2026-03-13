@@ -144,8 +144,7 @@ public static class SymmetricAlgorithmHelper
         if (bytes.Length == length) return bytes;
         if (bytes.Length > length) return [.. bytes.Take(length)];
 
-        var paddingBytes = new byte[length - bytes.Length];
-        return [.. bytes, .. paddingBytes];
+        return bytes.CreatePaddingBytes(length);
     }
 
     static byte[] PaddingBytes(this byte[] bytes, int[] allowedLength, out int usedLength)
@@ -156,10 +155,19 @@ public static class SymmetricAlgorithmHelper
         {
             usedLength = allowedLength[i];
             if (bytes.Length == allowedLength[i]) return bytes;
-            if (bytes.Length < allowedLength[i]) return bytes.PaddingBytes(allowedLength[i]);
+            if (bytes.Length < allowedLength[i]) return bytes.CreatePaddingBytes(allowedLength[i]);
 
             if (i == allowedLength.Length - 1) return [.. bytes.Take(allowedLength[i])];
         }
         return bytes;
+    }
+
+    static byte[] CreatePaddingBytes(this byte[] bytes, int length)
+    {
+        if (bytes.Length == length) return bytes;
+        if (bytes.Length > length) return [.. bytes.Take(length)];
+
+        var paddingBytes = new byte[length - bytes.Length];
+        return [.. bytes, .. paddingBytes];
     }
 }

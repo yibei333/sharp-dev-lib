@@ -29,7 +29,8 @@ internal static class InternalExtension
 
     internal static void WriteIntegerValue(this AsnWriter writer, byte[] bytes)
     {
-        if (bytes.First() < 128)
+        if (bytes.Length == 0) throw new ArgumentException("字节数组不能为空", nameof(bytes));
+        if (bytes[0] < 128)
         {
             while (bytes.Length > 1 && bytes[0] == 0 && bytes[1] < 128)
             {

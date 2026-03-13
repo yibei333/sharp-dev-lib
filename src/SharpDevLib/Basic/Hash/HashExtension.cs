@@ -6,12 +6,15 @@ internal static class HashExtension
 {
     public static HashAlgorithm GetHashAlgorithm(string algorithmName)
     {
-        if (algorithmName.Equals(nameof(MD5))) return MD5.Create();
-        if (algorithmName.Equals(nameof(SHA1))) return SHA1.Create();
-        if (algorithmName.Equals(nameof(SHA256))) return SHA256.Create();
-        if (algorithmName.Equals(nameof(SHA384))) return SHA384.Create();
-        if (algorithmName.Equals(nameof(SHA512))) return SHA512.Create();
-        throw new NotSupportedException();
+        return algorithmName switch
+        {
+            nameof(MD5) => MD5.Create(),
+            nameof(SHA1) => SHA1.Create(),
+            nameof(SHA256) => SHA256.Create(),
+            nameof(SHA384) => SHA384.Create(),
+            nameof(SHA512) => SHA512.Create(),
+            _ => throw new NotSupportedException()
+        };
     }
 
     public static string Hash(string algorithmName, byte[] bytes)
@@ -29,12 +32,15 @@ internal static class HashExtension
 
     public static HashAlgorithm GetHMacHashAlgorithm(string algorithmName, byte[] secret)
     {
-        if (algorithmName.Equals(nameof(HMACMD5))) return new HMACMD5(secret);
-        if (algorithmName.Equals(nameof(HMACSHA1))) return new HMACSHA1(secret);
-        if (algorithmName.Equals(nameof(HMACSHA256))) return new HMACSHA256(secret);
-        if (algorithmName.Equals(nameof(HMACSHA384))) return new HMACSHA384(secret);
-        if (algorithmName.Equals(nameof(HMACSHA512))) return new HMACSHA512(secret);
-        throw new NotSupportedException();
+        return algorithmName switch
+        {
+            nameof(HMACMD5) => new HMACMD5(secret),
+            nameof(HMACSHA1) => new HMACSHA1(secret),
+            nameof(HMACSHA256) => new HMACSHA256(secret),
+            nameof(HMACSHA384) => new HMACSHA384(secret),
+            nameof(HMACSHA512) => new HMACSHA512(secret),
+            _ => throw new NotSupportedException()
+        };
     }
 
     public static string HMacHash(string algorithmName, byte[] secret, byte[] bytes)
