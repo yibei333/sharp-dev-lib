@@ -63,20 +63,21 @@ Console.WriteLine(response);
 using System.Net;
 using SharpDevLib;
 
-//配置，可以全局设置一次，也可以每次传入
-HttpConfig.Default.Timeout = TimeSpan.FromSeconds(10);
-HttpConfig.Default.RetryCount = 5;
-HttpConfig.Default.OnSendProgress = (p) =>
+HttpHelper.SetConfig("some id", new HttpConfig
 {
-    Console.WriteLine($"进度: {p.ProgressString}");
-    Console.WriteLine($"速度: {p.Speed}");
-};
-HttpConfig.Default.UserAgent = null;
+    Timeout = TimeSpan.FromSeconds(10),
+    RetryCount = 5,
+    OnSendProgress = (p) =>
+    {
+        Console.WriteLine($"进度: {p.ProgressString}");
+        Console.WriteLine($"速度: {p.Speed}");
+    },
+    UserAgent = null
+});
 
 var json = new { id = 1, userId = 1, title = "foo", body = "bar" }.Serialize();
 var response = await new HttpRequest("https://jsonplaceholder.typicode.com/posts/1")
                 .UseClientId("some id")
-                .SetConfig(new HttpConfig { RetryCount = 1 })
                 .AddHeader("Authorization", ["Bearer token123"])
                 .AddCookie(new Cookie("foo", "bar", "/", "jsonplaceholder.typicode.com"))
                 .AddJson(json)

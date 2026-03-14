@@ -63,20 +63,20 @@ Console.WriteLine(response.ToString());
 using SharpDevLib;
 using System.Net;
 
-//配置，可以全局设置一次，也可以每次传入
-HttpConfig.Default.Timeout = TimeSpan.FromSeconds(10);
-HttpConfig.Default.RetryCount = 5;
-//仅当响应头有Content-Length并且调用ReadAsStreamAsync才会起作用
-HttpConfig.Default.OnReceiveProgress = (p) =>
+HttpHelper.SetConfig("some id", new HttpConfig
 {
-    Console.WriteLine($"进度: {p.ProgressString}");
-    Console.WriteLine($"速度: {p.Speed}");
-};
-HttpConfig.Default.UserAgent = null;
+    Timeout = TimeSpan.FromSeconds(10),
+    RetryCount = 5,
+    OnReceiveProgress = (p) =>
+    {
+        Console.WriteLine($"进度: {p.ProgressString}");
+        Console.WriteLine($"速度: {p.Speed}");
+    },
+    UserAgent = null
+});
 
 var response = await new HttpRequest("https://jsonplaceholder.typicode.com/comments")
                 .UseClientId("some id")
-                .SetConfig(new HttpConfig { RetryCount = 1 })
                 .AddHeader("Authorization", ["Bearer token123"])
                 .AddCookie(new Cookie("foo", "bar", "/", "jsonplaceholder.typicode.com"))
                 .AddParameter("postId", "1")
@@ -126,18 +126,18 @@ Console.WriteLine(posts.Count);
 //5
 
 //下载并保存到文件
-using var stream=await response.ReadAsStreamAsync();
-using var fileStream=new FileStream("1.txt",FileMode.OpenOrCreate,FileAccess.ReadWrite);
+using var stream = await response.ReadAsStreamAsync();
+using var fileStream = new FileStream("1.txt", FileMode.OpenOrCreate, FileAccess.ReadWrite);
 await stream.CopyToAsync(fileStream);
 await fileStream.FlushAsync();
 
 class PostInfo
 {
-    public int PostId{get;set;}
-    public int Id{get;set;}
-    public string? Name{get;set;}
-    public string? Email{get;set;}
-    public string? Body{get;set;}
+    public int PostId { get; set; }
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public string? Email { get; set; }
+    public string? Body { get; set; }
 }
 ```
 
