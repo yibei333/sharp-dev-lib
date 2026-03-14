@@ -2,6 +2,7 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace SharpDevLib;
 
@@ -56,6 +57,7 @@ public class JsonOption
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             PropertyNameCaseInsensitive = CaseInsensitive,
             PropertyNamingPolicy = namePolicy,
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver()
         };
         var addResult = _cache.TryAdd(key, optoins);
         if (!addResult) throw new Exception($"添加JSON选项键'{key}'失败");

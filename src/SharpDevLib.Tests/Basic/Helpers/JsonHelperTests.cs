@@ -25,6 +25,8 @@ public class JsonHelperTests
 
         var formatedJson = _user.Serialize(FormatJsonOption);
         Assert.AreEqual(_formatedJson, formatedJson);
+
+        Console.WriteLine(new { Id="foo" }.Serialize());
     }
 
     [TestMethod]
