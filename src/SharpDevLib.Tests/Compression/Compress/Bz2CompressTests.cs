@@ -2,6 +2,7 @@
 using SharpDevLib.Tests.Basic.Helpers;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace SharpDevLib.Tests.Compression.Compress;
 
@@ -9,7 +10,7 @@ namespace SharpDevLib.Tests.Compression.Compress;
 public class Bz2CompressTests
 {
     [TestMethod]
-    public void TarCompressTest()
+    public async Task TarCompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/bz2-create.tar.bz2");
         var option = new CompressRequest([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
@@ -17,13 +18,13 @@ public class Bz2CompressTests
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonHelperTests.FormatJsonOption)),
             IncludeSourceDiretory = true
         };
-        option.CompressAsync().GetAwaiter().GetResult();
+        await option.CompressAsync();
         Assert.IsTrue(File.Exists(targetPath));
         Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
 
     [TestMethod]
-    public void CompressTest()
+    public async Task CompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/bz2-create.bz2");
         var option = new CompressRequest([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root/foo.txt")], targetPath)
@@ -31,7 +32,7 @@ public class Bz2CompressTests
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonHelperTests.FormatJsonOption)),
             IncludeSourceDiretory = true
         };
-        option.CompressAsync().GetAwaiter().GetResult();
+        await option.CompressAsync();
         Assert.IsTrue(File.Exists(targetPath));
         Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
@@ -47,6 +48,6 @@ public class Bz2CompressTests
             IncludeSourceDiretory = true,
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonHelperTests.FormatJsonOption)),
         };
-        Assert.ThrowsExactly<InvalidDataException>(() => option.CompressAsync().GetAwaiter().GetResult());
+        Assert.ThrowsAsync<InvalidDataException>(option.CompressAsync);
     }
 }

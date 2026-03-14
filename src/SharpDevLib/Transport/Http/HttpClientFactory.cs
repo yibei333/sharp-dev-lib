@@ -2,35 +2,49 @@
 
 internal class HttpClientFactory
 {
-    static readonly List<HttpClientInfo> _clients = [];
-
-    public static HttpClientInfo GetClient(HttpRequest request)
+    static HttpClientFactory()
     {
-        var clientId = request.ClientId.IsNullOrWhiteSpace() ? string.Empty : request.ClientId;
-        var baseUrl = request.Config?.BaseUrl ?? HttpConfig.Default.BaseUrl;
-        if (baseUrl.IsNullOrWhiteSpace()) baseUrl = string.Empty;
-        var timeout = request.Config?.Timeout ?? HttpConfig.Default.Timeout;
-        var clientInfo = _clients.FirstOrDefault(x => x.ClientId == clientId && x.BaseUrl == baseUrl && x.Timeout == timeout);
-        if (clientInfo is null)
+        SetConfig(_internalDefaultClientId, new HttpConfig()
         {
+            Logger = new SimpleConsoleLogger(nameof(HttpHelper)),
+            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0"
+        });
+    }
+    static readonly List<HttpClientInfo> _clients = [];
+    static readonly object _locker = new();
+    static readonly string _defaultClientId = Guid.NewGuid().ToString();
+    static readonly string _internalDefaultClientId = Guid.NewGuid().ToString();
+
+    public static HttpClientInfo GetClient(string? clientId)
+    {
+        if (clientId.IsNullOrWhiteSpace()) return _clients.FirstOrDefault(x => x.ClientId == _defaultClientId) ?? _clients.FirstOrDefault(x => x.ClientId == _internalDefaultClientId);
+        return _clients.FirstOrDefault(x => x.ClientId == clientId) ?? throw new Exception($"找不到Id为'{clientId}'的客户端,请先调用HttpHelper.SetConfig设置");
+    }
+
+    public static void SetConfig(string clientId, HttpConfig config)
+    {
+        if (clientId.IsNullOrWhiteSpace()) throw new Exception("HTTP客户端Id不能为空");
+        if (config is null) throw new Exception("配置不能为空");
+
+        lock (_locker)
+        {
+            if (_clients.Any(x => x.ClientId == clientId)) throw new Exception($"HTTP客户端Id:{clientId}已经设置过了,只能设置一次");
             var httpHandler = new HttpClientHandler { CookieContainer = new() };
             var client = new HttpClient(httpHandler);
-            if (baseUrl.NotNullOrWhiteSpace()) client.BaseAddress = new Uri(baseUrl);
-            if (timeout is not null) client.Timeout = timeout.Value;
-            clientInfo = new HttpClientInfo(clientId, baseUrl, timeout, client, httpHandler);
+            if (config.BaseUrl.NotNullOrWhiteSpace()) client.BaseAddress = new Uri(config.BaseUrl);
+            if (config.Timeout is not null) client.Timeout = config.Timeout.Value;
+            var clientInfo = new HttpClientInfo(clientId, config, client, httpHandler);
             _clients.Add(clientInfo);
-            if (_clients.Count > 100) throw new Exception("HttpClient缓存数量已达上限100个,请重新规划HttpClient参数");
         }
-        request.Cookies?.ForEach(clientInfo.ClientHandler.CookieContainer.Add);
-        return clientInfo;
     }
+
+    public static void SetDefaultConfig(HttpConfig config) => SetConfig(_defaultClientId, config);
 }
 
-internal class HttpClientInfo(string clientId, string? baseUrl, TimeSpan? timeout, HttpClient client, HttpClientHandler clientHandler)
+internal class HttpClientInfo(string clientId, HttpConfig config, HttpClient client, HttpClientHandler clientHandler)
 {
     public string ClientId { get; } = clientId;
-    public string? BaseUrl { get; } = baseUrl;
-    public TimeSpan? Timeout { get; } = timeout;
+    public HttpConfig Config { get; } = config;
     public HttpClient Client { get; } = client;
     public HttpClientHandler ClientHandler { get; } = clientHandler;
 }

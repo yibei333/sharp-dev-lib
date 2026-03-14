@@ -15,6 +15,19 @@ public static class HttpHelper
     public static string ToQueryString(this IEnumerable<KeyValuePair<string, string?>>? parameters) => parameters.IsNullOrEmpty() ? string.Empty : string.Join("&", parameters.Select(x => $"{x.Key}={x.Value}"));
 
     /// <summary>
+    /// 设置HTTP客户端配置
+    /// </summary>
+    /// <param name="clientId">HTTP客户端Id</param>
+    /// <param name="config">配置</param>
+    public static void SetConfig(string clientId, HttpConfig config) => HttpClientFactory.SetConfig(clientId, config);
+
+    /// <summary>
+    /// 设置默认HTTP客户端配置
+    /// </summary>
+    /// <param name="config">配置</param>
+    public static void SetDefaultConfig(HttpConfig config) => HttpClientFactory.SetDefaultConfig(config);
+
+    /// <summary>
     /// 异步发送GET请求
     /// </summary>
     /// <param name="request">HTTP请求对象</param>
@@ -79,7 +92,8 @@ public static class HttpHelper
                 url = $"{url}{prefix}{request.Parameters.ToQueryString()}";
             }
         }
-        var client = HttpClientFactory.GetClient(request);
+        var client = HttpClientFactory.GetClient(request.ClientId);
+        request.Cookies?.ForEach(client.ClientHandler.CookieContainer.Add);
 
         HttpRequestMessage CreateRequestMessage()
         {
@@ -126,7 +140,7 @@ public static class HttpHelper
 
     static async Task<ResponseMonitor> RetryAsync(HttpClient client, HttpRequest request, Func<HttpRequestMessage> createRequestMessage, CancellationToken? cancellationToken = null)
     {
-        var retryCount = request.Config?.RetryCount ?? HttpConfig.Default?.RetryCount ?? 0;
+        var retryCount = HttpClientFactory.GetClient(request.ClientId).Config.RetryCount;
         var retryIndex = -1;
         var totalStartTime = DateTime.Now;
         HttpResponseMessage? response = null;
@@ -144,7 +158,8 @@ public static class HttpHelper
             {
                 var message = createRequestMessage();
                 request.Message = message;
-                var ua = request.Config?.UserAgent ?? HttpConfig.Default?.UserAgent;
+                var clientInfo = HttpClientFactory.GetClient(request.ClientId);
+                var ua = clientInfo.Config.UserAgent;
                 if (ua.NotNullOrWhiteSpace() && !(request.Headers?.ContainsKey("User-Agent") ?? false))
                 {
                     request.Headers ??= [];
@@ -158,7 +173,7 @@ public static class HttpHelper
                         if (header.Value.NotNullOrEmpty()) message.Headers.Add(header.Key, header.Value);
                     }
                 }
-                response = await client.SendAsync(HttpProgressContent.Convert(request, message), request.Config?.HttpCompletionOption ?? HttpConfig.Default!.HttpCompletionOption, cancellationToken ?? CancellationToken.None);
+                response = await client.SendAsync(HttpProgressContent.Convert(request, message), clientInfo.Config.HttpCompletionOption, cancellationToken ?? CancellationToken.None);
                 var endTime = DateTime.Now;
                 last = endTime - startTime;
                 total += last;

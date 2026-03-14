@@ -24,11 +24,6 @@ public class HttpRequest(string url)
     public string? ClientId { get; internal set; }
 
     /// <summary>
-    /// HTTP配置
-    /// </summary>
-    public HttpConfig? Config { get; internal set; }
-
-    /// <summary>
     /// 请求参数字典
     /// </summary>
     /// <remarks>用于GET/DELETE请求的查询参数，或POST/PUT请求的表单参数</remarks>
@@ -73,18 +68,6 @@ public static class HttpRequestExtension
     }
 
     /// <summary>
-    /// 添加配置
-    /// </summary>
-    /// <param name="request">请求</param>
-    /// <param name="config">配置</param>
-    /// <returns>当前请求对象，支持链式调用</returns>
-    public static HttpRequest SetConfig(this HttpRequest request, HttpConfig config)
-    {
-        request.Config = config;
-        return request;
-    }
-
-    /// <summary>
     /// 添加JSON参数
     /// </summary>
     /// <param name="request">请求</param>
@@ -111,6 +94,22 @@ public static class HttpRequestExtension
     }
 
     /// <summary>
+    /// 添加请求参数集合
+    /// </summary>
+    /// <param name="request">请求</param>
+    /// <param name="parameters">参数集合</param>
+    /// <returns>当前请求对象，支持链式调用</returns>
+    public static HttpRequest AddParameters(this HttpRequest request, Dictionary<string, string?> parameters)
+    {
+        if (request.Parameters.IsNullOrEmpty()) request.Parameters = parameters;
+        else
+        {
+            parameters.ForEach(item => request.Parameters.Add(item.Key, item.Value));
+        }
+        return request;
+    }
+
+    /// <summary>
     /// 添加HTTP请求头
     /// </summary>
     /// <param name="request">请求</param>
@@ -121,6 +120,22 @@ public static class HttpRequestExtension
     {
         request.Headers ??= [];
         request.Headers[key] = value;
+        return request;
+    }
+
+    /// <summary>
+    /// 添加HTTP请求头集合
+    /// </summary>
+    /// <param name="request">请求</param>
+    /// <param name="headers">请求头集合</param>
+    /// <returns>当前请求对象，支持链式调用</returns>
+    public static HttpRequest AddHeaders(this HttpRequest request, Dictionary<string, string[]> headers)
+    {
+        if (request.Headers.IsNullOrEmpty()) request.Headers = headers;
+        else
+        {
+            headers.ForEach(item => request.Headers.Add(item.Key, item.Value));
+        }
         return request;
     }
 
@@ -138,6 +153,22 @@ public static class HttpRequestExtension
     }
 
     /// <summary>
+    /// 添加Cookie集合,一般不会调用,内置了CookieContainer会自动处理Cookie
+    /// </summary>
+    /// <param name="request">请求</param>
+    /// <param name="cookies">Cookie对象集合</param>
+    /// <returns>当前请求对象，支持链式调用</returns>
+    public static HttpRequest AddCookies(this HttpRequest request, List<Cookie> cookies)
+    {
+        if (request.Cookies.IsNullOrEmpty()) request.Cookies = cookies;
+        else
+        {
+            cookies.ForEach(item => request.Cookies.Add(item));
+        }
+        return request;
+    }
+
+    /// <summary>
     /// 添加表单文件
     /// </summary>
     /// <param name="request">请求</param>
@@ -147,6 +178,22 @@ public static class HttpRequestExtension
     {
         request.Files ??= [];
         request.Files.Add(file);
+        return request;
+    }
+
+    /// <summary>
+    /// 添加表单文件集合
+    /// </summary>
+    /// <param name="request">请求</param>
+    /// <param name="files">表单文件对象集合</param>
+    /// <returns>当前请求对象，支持链式调用</returns>
+    public static HttpRequest AddFiles(this HttpRequest request, List<HttpFormFile> files)
+    {
+        if (request.Files.IsNullOrEmpty()) request.Files = files;
+        else
+        {
+            files.ForEach(item => request.Files.Add(item));
+        }
         return request;
     }
 }

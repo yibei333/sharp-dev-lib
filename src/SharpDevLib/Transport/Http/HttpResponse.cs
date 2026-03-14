@@ -118,7 +118,7 @@ public class HttpResponse
     {
         var sourceStream = await HttpResponseMessage.Content.ReadAsStreamAsync();
         var progress = new HttpProgress { RequestUrl = Request.Message?.RequestUri.ToString() ?? string.Empty, Total = HttpResponseMessage.Content?.Headers?.ContentLength ?? 0 };
-        var onProgress = Request.Config?.OnReceiveProgress ?? HttpConfig.Default.OnReceiveProgress;
+        var onProgress = HttpClientFactory.GetClient(Request.ClientId).Config.OnReceiveProgress;
         var lastProgress = progress.Progress;
         return new HttpProgressStream(sourceStream, (p) =>
         {
@@ -140,7 +140,7 @@ public class HttpResponse
     {
         if (!IsSuccess)
         {
-            (Request.Config ?? HttpConfig.Default).Logger?.LogInformation(ToString());
+            HttpClientFactory.GetClient(Request.ClientId).Config.Logger?.LogInformation(ToString());
             throw new Exception("HTTP请求失败,请检查响应状态码和错误信息");
         }
         return this;
@@ -238,6 +238,7 @@ public class HttpResponse
     void BuildRequestInfo(StringBuilder builder)
     {
         builder.AppendLine($"****request****");
+        builder.AppendLine($"clientId:{Request.ClientId}");
         builder.AppendLine($"url:{Request.Message?.RequestUri}");
         builder.AppendLine($"method:{Request.Message?.Method}");
 
@@ -252,7 +253,8 @@ public class HttpResponse
         });
         if (Request.Message?.RequestUri?.ToString().NotNullOrWhiteSpace() ?? false)
         {
-            var cookies = HttpClientFactory.GetClient(Request).ClientHandler.CookieContainer.GetCookies(Request.Message.RequestUri);
+            var clientInfo = HttpClientFactory.GetClient(Request.ClientId);
+            var cookies = clientInfo.ClientHandler.CookieContainer.GetCookies(Request.Message.RequestUri);
             if (cookies.Count > 0)
             {
                 if (!headers.Any(x => x.Key.Equals("Cookie")))
@@ -261,7 +263,7 @@ public class HttpResponse
                 }
                 var cookie = headers.First(x => x.Key.Equals("Cookie"));
                 var cookieValue = cookie.Value.First();
-                foreach (Cookie item in HttpClientFactory.GetClient(Request).ClientHandler.CookieContainer.GetCookies(Request.Message.RequestUri))
+                foreach (Cookie item in clientInfo.ClientHandler.CookieContainer.GetCookies(Request.Message.RequestUri))
                 {
                     cookieValue += $"{item.Name}={item.Value};";
                 }

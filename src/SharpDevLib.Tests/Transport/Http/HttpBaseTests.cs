@@ -7,16 +7,6 @@ namespace SharpDevLib.Tests.Transport.Http;
 public class HttpConfigTests
 {
     [TestMethod]
-    public void DefaultConfigTest()
-    {
-        var config = HttpConfig.Default;
-        Assert.IsNotNull(config);
-        Assert.IsNotNull(config.Logger);
-        Assert.AreEqual(0, config.RetryCount);
-        Assert.IsNull(config.Timeout);
-    }
-
-    [TestMethod]
     public void CustomConfigTest()
     {
         var config = new HttpConfig
@@ -46,12 +36,6 @@ public class HttpConfigTests
     {
         var config = new HttpConfig { Timeout = TimeSpan.FromSeconds(timeout) };
         Assert.AreEqual(TimeSpan.FromSeconds(timeout), config.Timeout);
-    }
-
-    [TestMethod]
-    public void LoggerPropertyTest()
-    {
-        Assert.IsNotNull(HttpConfig.Default.Logger);
     }
 }
 

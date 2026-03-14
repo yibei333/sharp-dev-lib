@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SharpDevLib.Tests.Basic.Helpers;
 
@@ -9,22 +10,22 @@ namespace SharpDevLib.Tests.Basic.Helpers;
 public class ProcessHelperTests
 {
     [TestMethod]
-    public void StartAndWaitForExitAsyncWithEmptyFilenameTest()
+    public async Task StartAndWaitForExitAsyncWithEmptyFilenameTest()
     {
         using var process = new Process();
         var request = new ProcessStartRequest("", "");
-        var result = process.StartAndWaitForExitAsync(request).GetAwaiter().GetResult();
+        var result = await process.StartAndWaitForExitAsync(request);
         Assert.IsFalse(result.IsSuccess);
         Assert.AreEqual(-1, result.ExitCode);
         Assert.Contains("filename is empty", result.Error);
     }
 
     [TestMethod]
-    public void StartAndWaitForExitAsyncWithNullFilenameTest()
+    public async Task StartAndWaitForExitAsyncWithNullFilenameTest()
     {
         using var process = new Process();
         var request = new ProcessStartRequest(null!, "");
-        var result = process.StartAndWaitForExitAsync(request).GetAwaiter().GetResult();
+        var result = await process.StartAndWaitForExitAsync(request);
         Assert.IsFalse(result.IsSuccess);
         Assert.AreEqual(-1, result.ExitCode);
         Assert.Contains("filename is empty", result.Error);
@@ -33,11 +34,11 @@ public class ProcessHelperTests
     [TestMethod]
     [DataRow("cmd.exe", "/c echo Hello World")]
     [DataRow("powershell.exe", "-Command Write-Host 'Hello World'")]
-    public void StartAndWaitForExitAsyncSuccessTest(string filename, string args)
+    public async Task StartAndWaitForExitAsyncSuccessTest(string filename, string args)
     {
         using var process = new Process();
         var request = new ProcessStartRequest(filename, args);
-        var result = process.StartAndWaitForExitAsync(request).GetAwaiter().GetResult();
+        var result = await process.StartAndWaitForExitAsync(request);
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(0, result.ExitCode);
         Assert.IsTrue(result.Error.IsNullOrWhiteSpace());
@@ -45,33 +46,33 @@ public class ProcessHelperTests
     }
 
     [TestMethod]
-    public void StartAndWaitForExitAsyncWithWorkingDirectoryTest()
+    public async Task StartAndWaitForExitAsyncWithWorkingDirectoryTest()
     {
         using var process = new Process();
         var request = new ProcessStartRequest("cmd.exe", "/c cd")
         {
             WorkingDirectory = Environment.SystemDirectory,
         };
-        var result = process.StartAndWaitForExitAsync(request).GetAwaiter().GetResult();
+        var result = await process.StartAndWaitForExitAsync(request);
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(0, result.ExitCode);
         Assert.IsFalse(result.Output.IsNullOrWhiteSpace());
     }
 
     [TestMethod]
-    public void StartAndWaitForExitAsyncWithEnvironmentVariablesTest()
+    public async Task StartAndWaitForExitAsyncWithEnvironmentVariablesTest()
     {
         using var process = new Process();
         Environment.SetEnvironmentVariable("TEST_VAR", "TestValue123");
         var request = new ProcessStartRequest("cmd.exe", "/c echo %TEST_VAR%");
-        var result = process.StartAndWaitForExitAsync(request).GetAwaiter().GetResult();
+        var result = await process.StartAndWaitForExitAsync(request);
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(0, result.ExitCode);
         Assert.Contains("TestValue123", result.Output);
     }
 
     [TestMethod]
-    public void StartAndWaitForExitAsyncWithTimeoutTest()
+    public async Task StartAndWaitForExitAsyncWithTimeoutTest()
     {
         using var process = new Process();
         var cancellationTokenSource = new CancellationTokenSource();
@@ -80,18 +81,18 @@ public class ProcessHelperTests
         {
             CancellationToken = cancellationTokenSource.Token,
         };
-        var result = process.StartAndWaitForExitAsync(request).GetAwaiter().GetResult();
+        var result = await process.StartAndWaitForExitAsync(request);
         Console.WriteLine(result.IsSuccess);
         Assert.IsFalse(result.IsSuccess);
         Assert.IsFalse(result.Error.IsNullOrWhiteSpace());
     }
 
     [TestMethod]
-    public void StartAndWaitForExitAsyncWithInvalidCommandTest()
+    public async Task StartAndWaitForExitAsyncWithInvalidCommandTest()
     {
         using var process = new Process();
         var request = new ProcessStartRequest("nonexistentcommand12345.exe", "");
-        var result = process.StartAndWaitForExitAsync(request).GetAwaiter().GetResult();
+        var result = await process.StartAndWaitForExitAsync(request);
         Assert.IsFalse(result.IsSuccess);
         Assert.AreNotEqual(0, result.ExitCode);
     }

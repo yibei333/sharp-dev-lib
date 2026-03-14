@@ -6,6 +6,7 @@ using SharpDevLib.Tests.Transport.Email.EmailHost.Service;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SharpDevLib.Tests.Transport.Email;
 
@@ -50,7 +51,7 @@ public class EmailTests
     }
 
     [TestMethod]
-    public void SendTest()
+    public async Task SendTest()
     {
         var options = new EmailConfig
         {
@@ -69,7 +70,7 @@ public class EmailTests
             CC = ["baz@localhost"],
             BCC = ["qux@localhost"]
         };
-        EmailHelper.SendAsync(content).GetAwaiter().GetResult();
+        await EmailHelper.SendAsync(content);
 
         Assert.IsNotNull(_emailUserService);
         Assert.IsNotNull(_emailService);

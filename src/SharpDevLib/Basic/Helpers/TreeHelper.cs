@@ -18,6 +18,8 @@ public static class TreeHelper
     /// <returns>返回是否包含循环引用及具体的Id</returns>
     public static (bool, string?) HasCycleReference<T, TId>(this IEnumerable<T> source, Func<T, TId> id, Func<T, TId?> parentId)
     {
+        var type = typeof(TId);
+        if (!type.IsValueType && type != typeof(string)) throw new Exception($"TId当前只支持值类型和string类型");
         if (source.IsNullOrEmpty()) return (false, null);
         Dictionary<TId, TId?> items = [];
         source.ForEach(x =>
@@ -93,6 +95,7 @@ public static class TreeHelper
             .Select(x => x.OrderBy(x => x.Index).First().Property);
         var idProperty = properties.GetProperty(type, idPropertyName);
         var parentIdProperty = properties.GetProperty(type, parentIdPropertyName);
+        if ((!idProperty.PropertyType.IsValueType && idProperty.PropertyType != typeof(string)) || (!parentIdProperty.PropertyType.IsValueType && parentIdProperty.PropertyType != typeof(string))) throw new Exception($"'{idPropertyName}'和'{parentIdPropertyName}'当前只支持值类型和string类型");
         var childrenProperty = properties.GetProperty(type, childrenPropertyName);
         var sortProperty = sortPropertyName.IsNullOrWhiteSpace() ? null : properties.GetProperty(type, sortPropertyName);
         if (childrenProperty.PropertyType != typeof(List<T>)) throw new InvalidDataException($"'{childrenPropertyName}'属性类型应该为List<{type.Name}>");

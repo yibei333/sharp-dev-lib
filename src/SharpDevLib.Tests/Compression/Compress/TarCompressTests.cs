@@ -2,6 +2,7 @@
 using SharpDevLib.Tests.Basic.Helpers;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace SharpDevLib.Tests.Compression.Compress;
 
@@ -9,14 +10,14 @@ namespace SharpDevLib.Tests.Compression.Compress;
 public class TarCompressTests
 {
     [TestMethod]
-    public void CompressTest()
+    public async Task CompressTest()
     {
         var targetPath = AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/tar-create.tar");
         var option = new CompressRequest([AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Compression/Root")], targetPath)
         {
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonHelperTests.FormatJsonOption)),
         };
-        option.CompressAsync().GetAwaiter().GetResult();
+        await option.CompressAsync();
         Assert.IsTrue(File.Exists(targetPath));
         Assert.IsGreaterThan(0, new FileInfo(targetPath).Length);
     }
@@ -32,6 +33,6 @@ public class TarCompressTests
             IncludeSourceDiretory = true,
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonHelperTests.FormatJsonOption)),
         };
-        Assert.ThrowsExactly<InvalidDataException>(() => option.CompressAsync().GetAwaiter().GetResult());
+        Assert.ThrowsExactlyAsync<InvalidDataException>(option.CompressAsync);
     }
 }
