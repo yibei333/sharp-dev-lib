@@ -7,9 +7,9 @@ namespace SharpDevLib;
 /// <summary>
 /// HTTP响应，封装HTTP请求的响应信息
 /// </summary>
-public class HttpResponse
+public class HttpResponseModel//改名为HttpResponseModel,防止和Microsoft.AspNetCore.Http.HttpResponse命名冲突
 {
-    internal HttpResponse(HttpRequest request, HttpResponseMessage? httpResponseMessage, string? errorMessage, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming)
+    internal HttpResponseModel(HttpRequestModel request, HttpResponseMessage? httpResponseMessage, string? errorMessage, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming)
     {
         _httpResponseMessage = httpResponseMessage;
         Code = _httpResponseMessage?.StatusCode ?? HttpStatusCode.Unused;
@@ -25,7 +25,7 @@ public class HttpResponse
     /// <summary>
     /// 获取对应的HTTP请求
     /// </summary>
-    HttpRequest Request { get; }
+    HttpRequestModel Request { get; }
 
     readonly HttpResponseMessage? _httpResponseMessage;
 
@@ -136,7 +136,7 @@ public class HttpResponse
     /// </summary>
     /// <returns>当前响应对象</returns>
     /// <exception cref="Exception">当响应不成功时抛出异常</exception>
-    public HttpResponse EnsureSuccessStatusCode()
+    public HttpResponseModel EnsureSuccessStatusCode()
     {
         if (!IsSuccess)
         {

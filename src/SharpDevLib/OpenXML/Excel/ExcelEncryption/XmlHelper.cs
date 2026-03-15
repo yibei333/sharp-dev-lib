@@ -45,7 +45,7 @@ internal abstract class XmlHelper
     internal XmlHelper(XmlNamespaceManager nameSpaceManager)
     {
         NameSpaceManager = nameSpaceManager;
-        SchemaNodeOrder = Array.Empty<string>();
+        SchemaNodeOrder = [];
     }
 
     internal XmlHelper(XmlNamespaceManager nameSpaceManager, XmlNode topNode) : this(nameSpaceManager)

@@ -72,7 +72,7 @@ internal class CompoundDocumentFile : IDisposable
     const int FAT_SECTOR = -3;   //0xFFFFFFFD;
     const int END_OF_CHAIN = -2; //0xFFFFFFFE;
 
-    static readonly byte[] header = new byte[] { 0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1 };
+    static readonly byte[] header = [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1];
     #endregion
 
     #region Private Fields
@@ -400,7 +400,7 @@ internal class CompoundDocumentFile : IDisposable
 
         bw.Write(new byte[512 * 4]);            //Allocate for Header and first FAT, Directory och MiniFAT sectors
         WritePosition(bw, 0, ref _currentDIFATSectorPos, false);
-        WritePosition(bw, new int[] { FAT_SECTOR, END_OF_CHAIN, END_OF_CHAIN }, ref _currentFATSectorPos);  //First sector is first FAT sector, second is First Dir sector, thirs is first Mini FAT sector.
+        WritePosition(bw, [FAT_SECTOR, END_OF_CHAIN, END_OF_CHAIN], ref _currentFATSectorPos);  //First sector is first FAT sector, second is First Dir sector, thirs is first Mini FAT sector.
 
         var dirs = FlattenDirs();
 

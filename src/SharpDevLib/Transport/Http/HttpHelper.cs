@@ -28,13 +28,66 @@ public static class HttpHelper
     public static void SetDefaultConfig(HttpConfig config) => HttpClientFactory.SetDefaultConfig(config);
 
     /// <summary>
+    /// 确保响应状态码表示成功，否则抛出异常
+    /// </summary>
+    /// <returns>当前响应对象</returns>
+    /// <exception cref="Exception">当响应不成功时抛出异常</exception>
+    public static async Task<HttpResponseModel> EnsureSuccessStatusCode(this Task<HttpResponseModel> httpResponseTask)
+    {
+        var response = await httpResponseTask;
+        return response.EnsureSuccessStatusCode();
+    }
+
+    /// <summary>
+    /// 读取字符串
+    /// </summary>
+    /// <returns>字符串</returns>
+    public static async Task<string> ReadAsStringAsync(this Task<HttpResponseModel> responseTask)
+    {
+        var response = await responseTask;
+        return await response.ReadAsStringAsync();
+    }
+
+    /// <summary>
+    /// 读取字节数组
+    /// </summary>
+    /// <returns>字节数组</returns>
+    public static async Task<byte[]> ReadAsByteArrayAsync(this Task<HttpResponseModel> responseTask)
+    {
+        var response = await responseTask;
+        return await response.ReadAsByteArrayAsync();
+    }
+
+    /// <summary>
+    /// 读取流
+    /// </summary>
+    /// <returns>流</returns>
+    public static async Task<Stream> ReadAsStreamAsync(this Task<HttpResponseModel> responseTask)
+    {
+        var response = await responseTask;
+        return await response.ReadAsStreamAsync();
+    }
+
+    /// <summary>
+    /// 异步获取响应数据并反序列化为指定类型
+    /// </summary>
+    /// <typeparam name="T">目标数据类型</typeparam>
+    /// <returns>反序列化后的响应数据</returns>
+    public static async Task<T> GetResponseDataAsync<T>(this Task<HttpResponseModel> responseTask, JsonOption? option = null)
+    {
+        var response = await responseTask;
+        return await response.GetResponseDataAsync<T>(option);
+    }
+
+
+    /// <summary>
     /// 异步发送GET请求
     /// </summary>
     /// <param name="request">HTTP请求对象</param>
     /// <param name="cancellationToken">取消令牌</param>
     /// <returns>HTTP响应对象</returns>
     /// <exception cref="InvalidOperationException">当URL为空时引发异常</exception>
-    public static async Task<HttpResponse> GetAsync(this HttpRequest request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Get, cancellationToken);
+    public static async Task<HttpResponseModel> GetAsync(this HttpRequestModel request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Get, cancellationToken);
 
     /// <summary>
     /// 异步发送GET请求并获取响应流
@@ -44,7 +97,7 @@ public static class HttpHelper
     /// <returns>响应流</returns>
     /// <exception cref="InvalidOperationException">当URL为空时引发异常</exception>
     /// <exception cref="Exception">当HTTP响应状态码不成功时抛出</exception>
-    public static async Task<Stream> GetStreamAsync(this HttpRequest request, CancellationToken? cancellationToken = null)
+    public static async Task<Stream> GetStreamAsync(this HttpRequestModel request, CancellationToken? cancellationToken = null)
     {
         var response = await request.GetAsync(cancellationToken);
         response.EnsureSuccessStatusCode();
@@ -58,7 +111,7 @@ public static class HttpHelper
     /// <param name="cancellationToken">取消令牌</param>
     /// <returns>HTTP响应对象</returns>
     /// <exception cref="InvalidOperationException">当URL为空时引发异常</exception>
-    public static async Task<HttpResponse> PostAsync(this HttpRequest request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Post, cancellationToken);
+    public static async Task<HttpResponseModel> PostAsync(this HttpRequestModel request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Post, cancellationToken);
 
     /// <summary>
     /// 异步发送PUT请求
@@ -67,7 +120,7 @@ public static class HttpHelper
     /// <param name="cancellationToken">取消令牌</param>
     /// <returns>HTTP响应对象</returns>
     /// <exception cref="InvalidOperationException">当URL为空时引发异常</exception>
-    public static async Task<HttpResponse> PutAsync(this HttpRequest request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Put, cancellationToken);
+    public static async Task<HttpResponseModel> PutAsync(this HttpRequestModel request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Put, cancellationToken);
 
     /// <summary>
     /// 异步发送DELETE请求
@@ -76,10 +129,10 @@ public static class HttpHelper
     /// <param name="cancellationToken">取消令牌</param>
     /// <returns>HTTP响应对象</returns>
     /// <exception cref="InvalidOperationException">当URL为空时引发异常</exception>
-    public static async Task<HttpResponse> DeleteAsync(this HttpRequest request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Delete, cancellationToken);
+    public static async Task<HttpResponseModel> DeleteAsync(this HttpRequestModel request, CancellationToken? cancellationToken = null) => await request.SendAsync(HttpMethod.Delete, cancellationToken);
 
     #region Private
-    static async Task<HttpResponse> SendAsync(this HttpRequest request, HttpMethod method, CancellationToken? cancellationToken = null)
+    static async Task<HttpResponseModel> SendAsync(this HttpRequestModel request, HttpMethod method, CancellationToken? cancellationToken = null)
     {
         if (request.Url.IsNullOrWhiteSpace()) throw new InvalidOperationException("URL不能为空");
         var url = request.Url;
@@ -138,7 +191,7 @@ public static class HttpHelper
         return responseMonitor.BuildResponse();
     }
 
-    static async Task<ResponseMonitor> RetryAsync(HttpClient client, HttpRequest request, Func<HttpRequestMessage> createRequestMessage, CancellationToken? cancellationToken = null)
+    static async Task<ResponseMonitor> RetryAsync(HttpClient client, HttpRequestModel request, Func<HttpRequestMessage> createRequestMessage, CancellationToken? cancellationToken = null)
     {
         var retryCount = HttpClientFactory.GetClient(request.ClientId).Config.RetryCount;
         var retryIndex = -1;
@@ -194,7 +247,7 @@ public static class HttpHelper
         return new ResponseMonitor(request, exception, retryIndex, last, total, response);
     }
 
-    class ResponseMonitor(HttpRequest request, Exception? exception, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming, HttpResponseMessage? responseMessage)
+    class ResponseMonitor(HttpRequestModel request, Exception? exception, int retryCount, TimeSpan lastTimeConsuming, TimeSpan totalTimeConsuming, HttpResponseMessage? responseMessage)
     {
         public Exception? Exception { get; } = exception;
 
@@ -206,12 +259,12 @@ public static class HttpHelper
 
         public HttpResponseMessage? ResponseMessage { get; } = responseMessage;
 
-        public HttpRequest Request { get; } = request;
+        public HttpRequestModel Request { get; } = request;
 
-        public HttpResponse BuildResponse()
+        public HttpResponseModel BuildResponse()
         {
             var message = (ResponseMessage?.IsSuccessStatusCode ?? false) ? null : Exception?.Message ?? ResponseMessage?.ReasonPhrase;
-            return new HttpResponse(Request, ResponseMessage, message, RetryCount, LastTimeConsuming, TotalTimeConsuming);
+            return new HttpResponseModel(Request, ResponseMessage, message, RetryCount, LastTimeConsuming, TotalTimeConsuming);
         }
     }
     #endregion

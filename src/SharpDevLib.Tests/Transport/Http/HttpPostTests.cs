@@ -15,10 +15,10 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public async Task PostJsonTest()
     {
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/post"))
+        await new HttpRequestModel(BaseUrl.CombinePath("/api/post"))
             .AddJson(_userJson)
-            .PostAsync();
-        Assert.IsTrue(response.IsSuccess);
+            .PostAsync()
+            .EnsureSuccessStatusCode();
     }
 
     [TestMethod]
@@ -29,73 +29,73 @@ public class HttpPostTests : HttpBaseTests
         {
             OnSendProgress = Console.WriteLine
         });
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/post/int"))
+        var actual = await new HttpRequestModel(BaseUrl.CombinePath("/api/post/int"))
             .UseClientId("PostJsonIntTest")
             .AddJson(_userJson)
-            .PostAsync();
-        Assert.IsTrue(response.IsSuccess);
-        Assert.AreEqual(10, await response.GetResponseDataAsync<int>());
+            .PostAsync()
+            .EnsureSuccessStatusCode()
+            .GetResponseDataAsync<int>();
+        Assert.AreEqual(10, actual);
     }
 
     [TestMethod]
     public async Task PostJsonStringTest()
     {
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/post/string"))
+        var actual = await new HttpRequestModel(BaseUrl.CombinePath("/api/post/string"))
             .AddJson(_userJson)
-            .PostAsync();
-        Assert.IsTrue(response.IsSuccess);
-        Assert.AreEqual("foo", await response.GetResponseDataAsync<string>());
+            .PostAsync()
+            .EnsureSuccessStatusCode()
+            .GetResponseDataAsync<string>();
+        Assert.AreEqual("foo", actual);
     }
 
     [TestMethod]
     public async Task PostJsonObjectTest()
     {
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/post/object"))
+        var data = await new HttpRequestModel(BaseUrl.CombinePath("/api/post/object"))
             .AddJson(_userJson)
-            .PostAsync();
-        Assert.IsTrue(response.IsSuccess);
-        var data = await response.GetResponseDataAsync<User>();
+            .PostAsync()
+            .EnsureSuccessStatusCode()
+            .GetResponseDataAsync<User>();
         Assert.IsNotNull(data);
         Assert.AreEqual(10, data.Age);
         Assert.AreEqual("foo", data.Name);
-        Console.WriteLine(response.ToString());
     }
 
     [TestMethod]
     public async Task PostUrlEncodedFormTest()
     {
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/post/form"))
+        await new HttpRequestModel(BaseUrl.CombinePath("/api/post/form"))
             .AddParameter("Name", "foo")
             .AddParameter("Age", "10")
-            .PostAsync();
-        Assert.IsTrue(response.IsSuccess);
+            .PostAsync()
+            .EnsureSuccessStatusCode();
     }
 
     [TestMethod]
     public async Task PostUrlEncodedFormObjectTest()
     {
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/post/form/object"))
+        var data = await new HttpRequestModel(BaseUrl.CombinePath("/api/post/form/object"))
             .AddParameter("Name", "foo")
             .AddParameter("Age", "10")
-            .PostAsync();
-        Assert.IsTrue(response.IsSuccess);
-        var data = await response.GetResponseDataAsync<User>();
+            .PostAsync()
+            .EnsureSuccessStatusCode()
+            .GetResponseDataAsync<User>();
         Assert.IsNotNull(data);
         Assert.AreEqual(10, data.Age);
         Assert.AreEqual("foo", data.Name);
-        Console.WriteLine(response.ToString());
     }
 
     [TestMethod]
     public async Task PostMultiPartFormTest()
     {
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/post/form/multi"))
+        await new HttpRequestModel(BaseUrl.CombinePath("/api/post/form/multi"))
             .AddParameter("Name", "foo")
             .AddParameter("Age", "10")
             .AddFile(new HttpFormFile("file", "TestFile.txt", File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))))
             .AddFile(new HttpFormFile("file", "Foo.txt", File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Foo.txt"))))
-            .PostAsync();
-        Assert.IsTrue(response.IsSuccess);
+            .PostAsync()
+            .EnsureSuccessStatusCode();
     }
 
     [TestMethod]
@@ -111,16 +111,16 @@ public class HttpPostTests : HttpBaseTests
             }
         };
         HttpHelper.SetConfig("PostMultiPartFormObjectTest", config);
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/post/form/multi/object"))
+        var data = await new HttpRequestModel(BaseUrl.CombinePath("/api/post/form/multi/object"))
             .UseClientId("PostMultiPartFormObjectTest")
             .AddParameter("Name", "foo")
             .AddParameter("Age", "10")
             .AddFile(new HttpFormFile("file", "TestFile.txt", File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))))
             .AddFile(new HttpFormFile("file", "Foo.txt", File.OpenRead(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Foo.txt"))))
-            .PostAsync();
-        Assert.IsTrue(response.IsSuccess);
+            .PostAsync()
+            .EnsureSuccessStatusCode()
+            .GetResponseDataAsync<User>();
         Assert.IsGreaterThan(0, sendCount);
-        var data = await response.GetResponseDataAsync<User>();
         Assert.IsNotNull(data);
         Assert.AreEqual(10, data.Age);
         Assert.AreEqual("foo", data.Name);
@@ -128,6 +128,5 @@ public class HttpPostTests : HttpBaseTests
         Assert.AreEqual("Hello,World!", File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/PostTestFile.txt")));
         Assert.IsTrue(File.Exists(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/PostFoo.txt")));
         Assert.AreEqual("foo", File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/Tests/PostFoo.txt")));
-        Console.WriteLine(response.ToString());
     }
 }

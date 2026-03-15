@@ -9,7 +9,7 @@ namespace SharpDevLib;
 /// 示例化HTTP请求
 /// </remarks>
 /// <param name="url">请求URL地址</param>
-public class HttpRequest(string url)
+public class HttpRequestModel(string url)//改名为HttpRequestModel,防止和Microsoft.AspNetCore.Http.HttpRequest命名冲突
 {
     internal HttpRequestMessage? Message { get; set; }
 
@@ -61,7 +61,7 @@ public static class HttpRequestExtension
     /// <param name="request">请求</param>
     /// <param name="clientId">HTTP客户端Id</param>
     /// <returns>当前请求对象，支持链式调用</returns>
-    public static HttpRequest UseClientId(this HttpRequest request, string clientId)
+    public static HttpRequestModel UseClientId(this HttpRequestModel request, string clientId)
     {
         request.ClientId = clientId;
         return request;
@@ -73,7 +73,7 @@ public static class HttpRequestExtension
     /// <param name="request">请求</param>
     /// <param name="json">JSON参数</param>
     /// <returns>当前请求对象，支持链式调用</returns>
-    public static HttpRequest AddJson(this HttpRequest request, string json)
+    public static HttpRequestModel AddJson(this HttpRequestModel request, string json)
     {
         request.Json = json;
         return request;
@@ -86,7 +86,7 @@ public static class HttpRequestExtension
     /// <param name="key">参数键</param>
     /// <param name="value">参数值</param>
     /// <returns>当前请求对象，支持链式调用</returns>
-    public static HttpRequest AddParameter(this HttpRequest request, string key, string? value)
+    public static HttpRequestModel AddParameter(this HttpRequestModel request, string key, string? value)
     {
         request.Parameters ??= [];
         request.Parameters[key] = value;
@@ -99,7 +99,7 @@ public static class HttpRequestExtension
     /// <param name="request">请求</param>
     /// <param name="parameters">参数集合</param>
     /// <returns>当前请求对象，支持链式调用</returns>
-    public static HttpRequest AddParameters(this HttpRequest request, Dictionary<string, string?> parameters)
+    public static HttpRequestModel AddParameters(this HttpRequestModel request, Dictionary<string, string?> parameters)
     {
         if (request.Parameters.IsNullOrEmpty()) request.Parameters = parameters;
         else
@@ -116,7 +116,7 @@ public static class HttpRequestExtension
     /// <param name="key">请求头名称</param>
     /// <param name="value">请求头值数组</param>
     /// <returns>当前请求对象，支持链式调用</returns>
-    public static HttpRequest AddHeader(this HttpRequest request, string key, string[] value)
+    public static HttpRequestModel AddHeader(this HttpRequestModel request, string key, string[] value)
     {
         request.Headers ??= [];
         request.Headers[key] = value;
@@ -129,7 +129,7 @@ public static class HttpRequestExtension
     /// <param name="request">请求</param>
     /// <param name="headers">请求头集合</param>
     /// <returns>当前请求对象，支持链式调用</returns>
-    public static HttpRequest AddHeaders(this HttpRequest request, Dictionary<string, string[]> headers)
+    public static HttpRequestModel AddHeaders(this HttpRequestModel request, Dictionary<string, string[]> headers)
     {
         if (request.Headers.IsNullOrEmpty()) request.Headers = headers;
         else
@@ -145,7 +145,7 @@ public static class HttpRequestExtension
     /// <param name="request">请求</param>
     /// <param name="cookie">Cookie对象</param>
     /// <returns>当前请求对象，支持链式调用</returns>
-    public static HttpRequest AddCookie(this HttpRequest request, Cookie cookie)
+    public static HttpRequestModel AddCookie(this HttpRequestModel request, Cookie cookie)
     {
         request.Cookies ??= [];
         request.Cookies.Add(cookie);
@@ -158,7 +158,7 @@ public static class HttpRequestExtension
     /// <param name="request">请求</param>
     /// <param name="cookies">Cookie对象集合</param>
     /// <returns>当前请求对象，支持链式调用</returns>
-    public static HttpRequest AddCookies(this HttpRequest request, List<Cookie> cookies)
+    public static HttpRequestModel AddCookies(this HttpRequestModel request, List<Cookie> cookies)
     {
         if (request.Cookies.IsNullOrEmpty()) request.Cookies = cookies;
         else
@@ -174,7 +174,7 @@ public static class HttpRequestExtension
     /// <param name="request">请求</param>
     /// <param name="file">表单文件对象</param>
     /// <returns>当前请求对象，支持链式调用</returns>
-    public static HttpRequest AddFile(this HttpRequest request, HttpFormFile file)
+    public static HttpRequestModel AddFile(this HttpRequestModel request, HttpFormFile file)
     {
         request.Files ??= [];
         request.Files.Add(file);
@@ -187,7 +187,7 @@ public static class HttpRequestExtension
     /// <param name="request">请求</param>
     /// <param name="files">表单文件对象集合</param>
     /// <returns>当前请求对象，支持链式调用</returns>
-    public static HttpRequest AddFiles(this HttpRequest request, List<HttpFormFile> files)
+    public static HttpRequestModel AddFiles(this HttpRequestModel request, List<HttpFormFile> files)
     {
         if (request.Files.IsNullOrEmpty()) request.Files = files;
         else

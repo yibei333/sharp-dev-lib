@@ -4,7 +4,7 @@ namespace SharpDevLib;
 
 internal class HttpProgressContent : HttpContent
 {
-    public static HttpRequestMessage Convert(HttpRequest request, HttpRequestMessage requestMessage)
+    public static HttpRequestMessage Convert(HttpRequestModel request, HttpRequestMessage requestMessage)
     {
         requestMessage.Content = new HttpProgressContent(request, requestMessage);
         return requestMessage;
@@ -14,7 +14,7 @@ internal class HttpProgressContent : HttpContent
     readonly HttpContent? _innerContent;
     readonly Action<HttpProgress>? _onProgress;
 
-    HttpProgressContent(HttpRequest request, HttpRequestMessage requestMessage)
+    HttpProgressContent(HttpRequestModel request, HttpRequestMessage requestMessage)
     {
         _innerContent = requestMessage.Content;
         _progress = new HttpProgress { RequestUrl = request.Message?.RequestUri?.ToString() ?? string.Empty, Total = requestMessage.Content?.Headers?.ContentLength ?? 0 };

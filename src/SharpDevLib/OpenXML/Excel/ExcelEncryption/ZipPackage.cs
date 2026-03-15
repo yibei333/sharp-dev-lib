@@ -53,17 +53,11 @@ internal enum TargetMode
 /// </summary>
 internal class ZipPackage : ZipPackageRelationshipBase
 {
-    internal class ContentType
+    internal class ContentType(string name, bool isExtension, string match)
     {
-        internal string Name;
-        internal bool IsExtension;
-        internal string Match;
-        public ContentType(string name, bool isExtension, string match)
-        {
-            Name = name;
-            IsExtension = isExtension;
-            Match = match;
-        }
+        internal string Name = name;
+        internal bool IsExtension = isExtension;
+        internal string Match = match;
     }
     readonly Dictionary<string, ZipPackagePart> Parts = new(StringComparer.OrdinalIgnoreCase);
     internal Dictionary<string, ContentType> _contentTypes = new(StringComparer.OrdinalIgnoreCase);

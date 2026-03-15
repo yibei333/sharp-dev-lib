@@ -16,7 +16,7 @@ public class HttpGetTests : HttpBaseTests
     [TestMethod]
     public async Task GetTest()
     {
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/get")).GetAsync();
+        var response = await new HttpRequestModel(BaseUrl.CombinePath("/api/get")).GetAsync();
         Console.WriteLine(response.ToString());
         Assert.IsTrue(response.IsSuccess);
     }
@@ -24,19 +24,18 @@ public class HttpGetTests : HttpBaseTests
     [TestMethod]
     public async Task GetIntTest()
     {
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/get/int"))
+        var actual = await new HttpRequestModel(BaseUrl.CombinePath("/api/get/int"))
             .AddParameter("seed", "1")
-            .GetAsync();
-        Console.WriteLine(response);
-        Assert.IsTrue(response.IsSuccess);
-        var actual = await response.GetResponseDataAsync<int>();
+            .GetAsync()
+            .EnsureSuccessStatusCode()
+            .GetResponseDataAsync<int>();
         Assert.AreEqual(2, actual);
     }
 
     [TestMethod]
     public async Task GetStringTest()
     {
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/get/string"))
+        var response = await new HttpRequestModel(BaseUrl.CombinePath("/api/get/string"))
             .AddParameter("foo", "foo")
             .AddParameter("bar", "bar")
             .GetAsync();
@@ -48,10 +47,10 @@ public class HttpGetTests : HttpBaseTests
     [TestMethod]
     public async Task GetUserTest()
     {
-        var request = new HttpRequest(BaseUrl.CombinePath("/api/get/user"));
-        var response = await request.GetAsync();
-        Assert.IsTrue(response.IsSuccess);
-        var data = await response.GetResponseDataAsync<User>();
+        var data = await new HttpRequestModel(BaseUrl.CombinePath("/api/get/user"))
+            .GetAsync()
+            .EnsureSuccessStatusCode()
+            .GetResponseDataAsync<User>();
         Assert.IsNotNull(data);
         Assert.AreEqual("foo", data.Name);
         Assert.AreEqual(10, data.Age);
@@ -60,9 +59,10 @@ public class HttpGetTests : HttpBaseTests
     [TestMethod]
     public async Task GetUsersTest()
     {
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/get/users")).GetAsync();
-        Assert.IsTrue(response.IsSuccess);
-        var data = await response.GetResponseDataAsync<List<User>>(new JsonOption { NameFormat = JsonNameFormat.KebabCaseUpper });
+        var data = await new HttpRequestModel(BaseUrl.CombinePath("/api/get/users"))
+            .GetAsync()
+            .EnsureSuccessStatusCode()
+            .GetResponseDataAsync<List<User>>(new JsonOption { NameFormat = JsonNameFormat.KebabCaseUpper });
         Console.WriteLine(data.Serialize(JsonHelperTests.FormatJsonOption));
 
         Assert.IsNotNull(data);
@@ -71,7 +71,6 @@ public class HttpGetTests : HttpBaseTests
         Assert.AreEqual(10, data.First().Age);
         Assert.AreEqual("bar", data.Last().Name);
         Assert.AreEqual(20, data.Last().Age);
-        Console.WriteLine(response.ToString());
     }
 
     [TestMethod]
@@ -88,7 +87,7 @@ public class HttpGetTests : HttpBaseTests
             }
         };
         HttpHelper.SetConfig("Default", config);
-        using var stream = await new HttpRequest(BaseUrl.CombinePath("/statics/TestFile.txt"))
+        using var stream = await new HttpRequestModel(BaseUrl.CombinePath("/statics/TestFile.txt"))
                         .UseClientId("Default")
                         .GetStreamAsync();
         using var memoryStream = new MemoryStream();
@@ -102,11 +101,11 @@ public class HttpGetTests : HttpBaseTests
     public async Task GetCookieTest()
     {
         var url = "/api/get/cookie";
-        var response = await new HttpRequest(BaseUrl.CombinePath(url))
+        var cookies = await new HttpRequestModel(BaseUrl.CombinePath(url))
             .AddCookie(new System.Net.Cookie("foo", "bar", "/", "localhost"))
-            .GetAsync();
-        Assert.IsTrue(response.IsSuccess);
-        var cookies = await response.GetResponseDataAsync<string>();
+            .GetAsync()
+            .EnsureSuccessStatusCode()
+            .GetResponseDataAsync<string>();
         Console.WriteLine(cookies);
         Assert.Contains("bar", cookies);
     }
@@ -114,25 +113,21 @@ public class HttpGetTests : HttpBaseTests
     [TestMethod]
     public async Task SetCookieTestAsync()
     {
-        var url = "/api/get/cookie/set";
-        var response = await new HttpRequest(BaseUrl.CombinePath(url)).GetAsync();
-        Console.WriteLine(response);
-        Assert.IsTrue(response.IsSuccess);
+        await new HttpRequestModel(BaseUrl.CombinePath("/api/get/cookie/set")).GetAsync().EnsureSuccessStatusCode();
 
-        url = "/api/get/cookie";
-        var response1 = await new HttpRequest(BaseUrl.CombinePath(url)).AddCookie(new System.Net.Cookie("foo", "bar", "/", "localhost")).GetAsync();
-        Assert.IsTrue(response1.IsSuccess);
-        Console.WriteLine(response1);
-        var cookies1 = await response1.GetResponseDataAsync<string>();
-        Assert.Contains("bar", cookies1);
-        Assert.Contains("baz", cookies1);
+        var cookies = await new HttpRequestModel(BaseUrl.CombinePath("/api/get/cookie"))
+            .AddCookie(new System.Net.Cookie("foo", "bar", "/", "localhost"))
+            .GetAsync()
+            .EnsureSuccessStatusCode()
+            .GetResponseDataAsync<string>();
+        Assert.Contains("bar", cookies);
+        Assert.Contains("baz", cookies);
     }
 
     [TestMethod]
     public async Task ErrorTest()
     {
-        var url = "/api/get/error";
-        var response = await new HttpRequest(BaseUrl.CombinePath(url)).GetAsync();
+        var response = await new HttpRequestModel(BaseUrl.CombinePath("/api/get/error")).GetAsync();
         Assert.IsFalse(response.IsSuccess);
         Console.WriteLine(response.ToString());
     }
@@ -143,21 +138,21 @@ public class HttpGetTests : HttpBaseTests
         var count = 5;
         HttpHelper.SetConfig("RetryTestDefault", new HttpConfig { Timeout = TimeSpan.FromSeconds(2), RetryCount = count });
         var url = BaseUrl.CombinePath("/api/get/retry");
-        var response = await new HttpRequest(url)
+        var response = await new HttpRequestModel(url)
             .UseClientId("RetryTestDefault")
             .AddParameter("count", count.ToString())
             .AddParameter("id", Guid.NewGuid().ToString())
             .GetAsync();
         Assert.IsTrue(response.IsSuccess);
 
-        response = await new HttpRequest(url)
+        response = await new HttpRequestModel(url)
             .AddParameter("count", "6")
             .AddParameter("id", Guid.NewGuid().ToString())
             .GetAsync();
         Assert.IsFalse(response.IsSuccess);
 
         HttpHelper.SetConfig("RetryTestClient1", new HttpConfig { RetryCount = 3 });
-        response = await new HttpRequest(url)
+        response = await new HttpRequestModel(url)
             .UseClientId("RetryTestClient1")
             .AddParameter("count", "6")
             .AddParameter("id", Guid.NewGuid().ToString())
@@ -165,7 +160,7 @@ public class HttpGetTests : HttpBaseTests
         Assert.IsFalse(response.IsSuccess);
 
         HttpHelper.SetConfig("RetryTestClient2", new HttpConfig { RetryCount = 10 });
-        response = await new HttpRequest(url)
+        response = await new HttpRequestModel(url)
             .UseClientId("RetryTestClient2")
             .AddParameter("count", "6")
             .AddParameter("id", Guid.NewGuid().ToString())
@@ -178,25 +173,25 @@ public class HttpGetTests : HttpBaseTests
     {
         HttpHelper.SetConfig("TimeoutTestDefault", new HttpConfig { Timeout = TimeSpan.FromSeconds(2) });
         var url = BaseUrl.CombinePath("/api/get/timeout");
-        var response = await new HttpRequest(url)
+        var response = await new HttpRequestModel(url)
             .UseClientId("Default")
             .GetAsync();
         Assert.IsTrue(response.IsSuccess);
 
         HttpHelper.SetConfig("TimeoutTestClient1", new HttpConfig { Timeout = TimeSpan.FromSeconds(1) });
-        response = await new HttpRequest(url)
+        response = await new HttpRequestModel(url)
             .UseClientId("TimeoutTestClient1")
             .GetAsync();
         Assert.IsFalse(response.IsSuccess);
 
         HttpHelper.SetConfig("TimeoutTestClient2", new HttpConfig { Timeout = TimeSpan.FromSeconds(2) });
-        response = await new HttpRequest(url)
+        response = await new HttpRequestModel(url)
             .UseClientId("TimeoutTestClient2")
             .GetAsync();
         Assert.IsTrue(response.IsSuccess);
 
         HttpHelper.SetConfig("TimeoutTestClient3", new HttpConfig { Timeout = TimeSpan.FromSeconds(1) });
-        response = await new HttpRequest(url)
+        response = await new HttpRequestModel(url)
             .UseClientId("TimeoutTestClient3")
             .GetAsync();
         Assert.IsFalse(response.IsSuccess);

@@ -144,16 +144,15 @@ internal class EncryptionInfoAgile : EncryptionInfo
         _nsm.AddNamespace("p", "http://schemas.microsoft.com/office/2006/keyEncryptor/password");
         KeyEncryptors = [];
     }
-    internal class EncryptionKeyData : XmlHelper
+    internal class EncryptionKeyData(XmlNamespaceManager nsm, XmlNode topNode) : XmlHelper(nsm, topNode)
     {
-        public EncryptionKeyData(XmlNamespaceManager nsm, XmlNode topNode) : base(nsm, topNode) { }
         internal byte[] SaltValue
         {
             get
             {
                 var s = GetXmlNodeString("@saltValue");
                 if (!string.IsNullOrEmpty(s)) return Convert.FromBase64String(s);
-                return Array.Empty<byte>();
+                return [];
             }
             set => SetXmlNodeString("@saltValue", Convert.ToBase64String(value));
         }
@@ -228,16 +227,15 @@ internal class EncryptionInfoAgile : EncryptionInfo
             set => SetXmlNodeString("@saltSize", value.ToString());
         }
     }
-    internal class EncryptionDataIntegrity : XmlHelper
+    internal class EncryptionDataIntegrity(XmlNamespaceManager nsm, XmlNode topNode) : XmlHelper(nsm, topNode)
     {
-        public EncryptionDataIntegrity(XmlNamespaceManager nsm, XmlNode topNode) : base(nsm, topNode) { }
         internal byte[] EncryptedHmacValue
         {
             get
             {
                 var s = GetXmlNodeString("@encryptedHmacValue");
                 if (!string.IsNullOrEmpty(s)) return Convert.FromBase64String(s);
-                return Array.Empty<byte>();
+                return [];
             }
             set => SetXmlNodeString("@encryptedHmacValue", Convert.ToBase64String(value));
         }
@@ -247,26 +245,20 @@ internal class EncryptionInfoAgile : EncryptionInfo
             {
                 var s = GetXmlNodeString("@encryptedHmacKey");
                 if (!string.IsNullOrEmpty(s)) return Convert.FromBase64String(s);
-                return Array.Empty<byte>();
+                return [];
             }
             set => SetXmlNodeString("@encryptedHmacKey", Convert.ToBase64String(value));
         }
     }
-    internal class EncryptionKeyEncryptor : EncryptionKeyData
+    internal class EncryptionKeyEncryptor(XmlNamespaceManager nsm, XmlNode topNode) : EncryptionKeyData(nsm, topNode)
     {
-        public EncryptionKeyEncryptor(XmlNamespaceManager nsm, XmlNode topNode) : base(nsm, topNode)
-        {
-            VerifierHashInput = Array.Empty<byte>();
-            VerifierHash = Array.Empty<byte>();
-            KeyValue = Array.Empty<byte>();
-        }
         internal byte[] EncryptedKeyValue
         {
             get
             {
                 var s = GetXmlNodeString("@encryptedKeyValue");
                 if (!string.IsNullOrEmpty(s)) return Convert.FromBase64String(s);
-                return Array.Empty<byte>();
+                return [];
             }
             set => SetXmlNodeString("@encryptedKeyValue", Convert.ToBase64String(value));
         }
@@ -276,7 +268,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
             {
                 var s = GetXmlNodeString("@encryptedVerifierHashValue");
                 if (!string.IsNullOrEmpty(s)) return Convert.FromBase64String(s);
-                return Array.Empty<byte>();
+                return [];
             }
             set => SetXmlNodeString("@encryptedVerifierHashValue", Convert.ToBase64String(value));
         }
@@ -286,13 +278,13 @@ internal class EncryptionInfoAgile : EncryptionInfo
             {
                 var s = GetXmlNodeString("@encryptedVerifierHashInput");
                 if (!string.IsNullOrEmpty(s)) return Convert.FromBase64String(s);
-                return Array.Empty<byte>();
+                return [];
             }
             set => SetXmlNodeString("@encryptedVerifierHashInput", Convert.ToBase64String(value));
         }
-        internal byte[] VerifierHashInput { get; set; }
-        internal byte[] VerifierHash { get; set; }
-        internal byte[] KeyValue { get; set; }
+        internal byte[] VerifierHashInput { get; set; } = [];
+        internal byte[] VerifierHash { get; set; } = [];
+        internal byte[] KeyValue { get; set; } = [];
         internal int SpinCount
         {
             get => GetXmlNodeInt("@spinCount");

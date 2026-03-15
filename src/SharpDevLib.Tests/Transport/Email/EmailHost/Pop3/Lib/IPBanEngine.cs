@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 
 namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib;
 
@@ -32,7 +33,7 @@ public class ThreeStrikesBanEngine : IIPBanEngine
         }
     }
 
-    readonly object mutex;
+    readonly Lock mutex;
     readonly Dictionary<IPAddress, Entry> banned;
     int failedAttemptThreshold;
     int attemptExpirySeconds;
@@ -40,7 +41,7 @@ public class ThreeStrikesBanEngine : IIPBanEngine
 
     public ThreeStrikesBanEngine()
     {
-        mutex = new object();
+        mutex = new();
         banned = [];
         failedAttemptThreshold = 3;
         attemptExpirySeconds = 10000;

@@ -8,7 +8,7 @@ namespace SharpDevLib.Tests.Transport.Email.EmailHost.Pop3.Lib;
 
 public class POP3Listener : IDisposable
 {
-    readonly object mutex;
+    readonly Lock mutex;
     readonly List<System.Net.Sockets.TcpListener> listeners;
     readonly List<POP3ServerSession> connections;
     public IIPBanEngine IPBanEngine { get; set; } = new ThreeStrikesBanEngine();
@@ -22,7 +22,7 @@ public class POP3Listener : IDisposable
 
     public POP3Listener()
     {
-        mutex = new object();
+        mutex = new();
         stopService = new ManualResetEvent(false);
         listeners = [];
         connections = [];

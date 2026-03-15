@@ -111,7 +111,7 @@ internal class EncryptedPackageHandler
 
         xml = encryptionInfo.Xml?.OuterXml;
 
-        var byXml = xml == null ? Array.Empty<byte>() : Encoding.UTF8.GetBytes(xml);
+        var byXml = xml == null ? [] : Encoding.UTF8.GetBytes(xml);
 
         using var ms3 = new MemoryStream();
         ms3.Write(BitConverter.GetBytes((ushort)4), 0, 2); //Major Version
@@ -153,7 +153,7 @@ internal class EncryptedPackageHandler
             var segmentSize = (int)(data.Length - pos > 4096 ? 4096 : data.Length - pos);
 
             var ivTmp = new byte[4 + (encryptionInfo.KeyData?.SaltSize ?? 0)];
-            Array.Copy(encryptionInfo.KeyData?.SaltValue ?? Array.Empty<byte>(), 0, ivTmp, 0, encryptionInfo.KeyData?.SaltSize ?? 0);
+            Array.Copy(encryptionInfo.KeyData?.SaltValue ?? [], 0, ivTmp, 0, encryptionInfo.KeyData?.SaltSize ?? 0);
             Array.Copy(BitConverter.GetBytes(segment), 0, ivTmp, encryptionInfo.KeyData?.SaltSize ?? 0, 4);
             var iv = hashProvider.ComputeHash(ivTmp);
 
@@ -168,7 +168,7 @@ internal class EncryptedPackageHandler
     // Set the dataintegrity
     void SetHMAC(EncryptionInfoAgile ei, HashAlgorithm hashProvider, byte[] salt, byte[] data)
     {
-        var iv = GetFinalHash(hashProvider, BlockKey_HmacKey, ei.KeyData?.SaltValue ?? Array.Empty<byte>());
+        var iv = GetFinalHash(hashProvider, BlockKey_HmacKey, ei.KeyData?.SaltValue ?? []);
         using var ms = new MemoryStream();
         EncryptAgileFromKey(ei.KeyEncryptors[0], ei.KeyEncryptors[0].KeyValue, salt, 0L, salt.Length, iv, ms);
         if (ei.DataIntegrity != null) ei.DataIntegrity.EncryptedHmacKey = ms.ToArray();
@@ -177,7 +177,7 @@ internal class EncryptedPackageHandler
         var hmacValue = h.ComputeHash(data);
 
         using var msOther = new MemoryStream();
-        iv = GetFinalHash(hashProvider, BlockKey_HmacValue, ei.KeyData?.SaltValue ?? Array.Empty<byte>());
+        iv = GetFinalHash(hashProvider, BlockKey_HmacValue, ei.KeyData?.SaltValue ?? []);
         EncryptAgileFromKey(ei.KeyEncryptors[0], ei.KeyEncryptors[0].KeyValue, hmacValue, 0L, hmacValue.Length, iv, msOther);
         if (ei.DataIntegrity != null) ei.DataIntegrity.EncryptedHmacValue = msOther.ToArray();
     }
@@ -410,11 +410,11 @@ internal class EncryptedPackageHandler
         return encryptionInfo is EncryptionInfoBinary binary ? DecryptBinary(binary, password, size, encryptedData) : DecryptAgile((EncryptionInfoAgile)encryptionInfo, password, size, encryptedData, data);
     }
 
-    readonly byte[] BlockKey_HashInput = new byte[] { 0xfe, 0xa7, 0xd2, 0x76, 0x3b, 0x4b, 0x9e, 0x79 };
-    readonly byte[] BlockKey_HashValue = new byte[] { 0xd7, 0xaa, 0x0f, 0x6d, 0x30, 0x61, 0x34, 0x4e };
-    readonly byte[] BlockKey_KeyValue = new byte[] { 0x14, 0x6e, 0x0b, 0xe7, 0xab, 0xac, 0xd0, 0xd6 };
-    readonly byte[] BlockKey_HmacKey = new byte[] { 0x5f, 0xb2, 0xad, 0x01, 0x0c, 0xb9, 0xe1, 0xf6 };//MSOFFCRYPTO 2.3.4.14 section 3
-    readonly byte[] BlockKey_HmacValue = new byte[] { 0xa0, 0x67, 0x7f, 0x02, 0xb2, 0x2c, 0x84, 0x33 };//MSOFFCRYPTO 2.3.4.14 section 5
+    readonly byte[] BlockKey_HashInput = [0xfe, 0xa7, 0xd2, 0x76, 0x3b, 0x4b, 0x9e, 0x79];
+    readonly byte[] BlockKey_HashValue = [0xd7, 0xaa, 0x0f, 0x6d, 0x30, 0x61, 0x34, 0x4e];
+    readonly byte[] BlockKey_KeyValue = [0x14, 0x6e, 0x0b, 0xe7, 0xab, 0xac, 0xd0, 0xd6];
+    readonly byte[] BlockKey_HmacKey = [0x5f, 0xb2, 0xad, 0x01, 0x0c, 0xb9, 0xe1, 0xf6];//MSOFFCRYPTO 2.3.4.14 section 3
+    readonly byte[] BlockKey_HmacValue = [0xa0, 0x67, 0x7f, 0x02, 0xb2, 0x2c, 0x84, 0x33];//MSOFFCRYPTO 2.3.4.14 section 5
 
     MemoryStream DecryptAgile(EncryptionInfoAgile encryptionInfo, string password, long size, byte[] encryptedData, byte[] data)
     {
@@ -439,10 +439,10 @@ internal class EncryptedPackageHandler
         if (!IsPasswordValid(hashProvider, encr)) throw (new SecurityException("Invalid password"));
 
         var ivhmac = GetFinalHash(hashProviderDataKey, BlockKey_HmacKey, encryptionInfo.KeyData.SaltValue);
-        var key = DecryptAgileFromKey(encryptionInfo.KeyData, encr.KeyValue, encryptionInfo.DataIntegrity?.EncryptedHmacKey ?? Array.Empty<byte>(), encryptionInfo.KeyData.HashSize, ivhmac);
+        var key = DecryptAgileFromKey(encryptionInfo.KeyData, encr.KeyValue, encryptionInfo.DataIntegrity?.EncryptedHmacKey ?? [], encryptionInfo.KeyData.HashSize, ivhmac);
 
         ivhmac = GetFinalHash(hashProviderDataKey, BlockKey_HmacValue, encryptionInfo.KeyData.SaltValue);
-        var value = DecryptAgileFromKey(encryptionInfo.KeyData, encr.KeyValue, encryptionInfo.DataIntegrity?.EncryptedHmacValue ?? Array.Empty<byte>(), encryptionInfo.KeyData.HashSize, ivhmac);
+        var value = DecryptAgileFromKey(encryptionInfo.KeyData, encr.KeyValue, encryptionInfo.DataIntegrity?.EncryptedHmacValue ?? [], encryptionInfo.KeyData.HashSize, ivhmac);
 
         using var hmca = GetHmacProvider(encryptionInfo.KeyData, key);
         var v2 = hmca.ComputeHash(data);
@@ -522,12 +522,12 @@ internal class EncryptedPackageHandler
 
         using var decryptor = decryptKey.CreateDecryptor(key, null);
         //Decrypt the verifier
-        using var dataStream = new MemoryStream(encryptionInfo.Verifier?.EncryptedVerifier ?? Array.Empty<byte>());
+        using var dataStream = new MemoryStream(encryptionInfo.Verifier?.EncryptedVerifier ?? []);
         using var cryptoStream = new CryptoStream(dataStream, decryptor, CryptoStreamMode.Read);
         var decryptedVerifier = new byte[16];
         cryptoStream.Read(decryptedVerifier, 0, 16);
 
-        using var dataStream1 = new MemoryStream(encryptionInfo.Verifier?.EncryptedVerifierHash ?? Array.Empty<byte>());
+        using var dataStream1 = new MemoryStream(encryptionInfo.Verifier?.EncryptedVerifierHash ?? []);
         using var cryptoStream1 = new CryptoStream(dataStream1, decryptor, CryptoStreamMode.Read);
 
         //Decrypt the verifier hash
@@ -624,7 +624,7 @@ internal class EncryptedPackageHandler
                 throw new NotSupportedException("Hash provider is invalid. Must be SHA1(AlgIDHash == 0x8004)");
             }
 
-            var hash = GetPasswordHash(hashProvider, encryptionInfo.Verifier?.Salt ?? Array.Empty<byte>(), password, 50000, 20);
+            var hash = GetPasswordHash(hashProvider, encryptionInfo.Verifier?.Salt ?? [], password, 50000, 20);
 
             // Append "block" (0)
             Array.Copy(hash, tempHash, hash.Length);

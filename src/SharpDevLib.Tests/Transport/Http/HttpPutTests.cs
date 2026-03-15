@@ -14,41 +14,43 @@ public class HttpPutTests : HttpBaseTests
     public async Task PutTest()
     {
         HttpHelper.SetConfig("PutTest", new HttpConfig { UserAgent = null });
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/put"))
+        await new HttpRequestModel(BaseUrl.CombinePath("/api/put"))
             .UseClientId("PutTest")
             .AddJson(_userJson)
-            .PutAsync();
-        Assert.IsTrue(response.IsSuccess);
+            .PutAsync()
+            .EnsureSuccessStatusCode();
     }
 
     [TestMethod]
     public async Task PutIntTest()
     {
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/put/int"))
+        var actual = await new HttpRequestModel(BaseUrl.CombinePath("/api/put/int"))
             .AddJson(_userJson)
-            .PutAsync();
-        Assert.IsTrue(response.IsSuccess);
-        Assert.AreEqual(10, await response.GetResponseDataAsync<int>());
+            .PutAsync()
+            .EnsureSuccessStatusCode()
+            .GetResponseDataAsync<int>();
+        Assert.AreEqual(10, actual);
     }
 
     [TestMethod]
     public async Task PutStringTest()
     {
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/put/string"))
+        var actual = await new HttpRequestModel(BaseUrl.CombinePath("/api/put/string"))
             .AddJson(_userJson)
-            .PutAsync();
-        Assert.IsTrue(response.IsSuccess);
-        Assert.AreEqual("foo", await response.GetResponseDataAsync<string>());
+            .PutAsync()
+            .EnsureSuccessStatusCode()
+            .GetResponseDataAsync<string>();
+        Assert.AreEqual("foo", actual);
     }
 
     [TestMethod]
     public async Task PutObjectTest()
     {
-        var response = await new HttpRequest(BaseUrl.CombinePath("/api/put/object"))
+        var data = await new HttpRequestModel(BaseUrl.CombinePath("/api/put/object"))
             .AddJson(_userJson)
-            .PutAsync();
-        Assert.IsTrue(response.IsSuccess);
-        var data = await response.GetResponseDataAsync<User>();
+            .PutAsync()
+            .EnsureSuccessStatusCode()
+            .GetResponseDataAsync<User>();
         Assert.IsNotNull(data);
         Assert.AreEqual(10, data.Age);
         Assert.AreEqual("foo", data.Name);
