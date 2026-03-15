@@ -15,7 +15,7 @@ public class HttpConfig
     /// <summary>
     /// 日志记录器
     /// </summary>
-    public ILogger? Logger { get; set; }
+    public ILogger? Logger { get; set; } = new SimpleConsoleLogger(nameof(HttpHelper));
 
     /// <summary>
     /// 基础地址
@@ -35,7 +35,7 @@ public class HttpConfig
     /// <summary>
     /// User-Agent请求头
     /// </summary>
-    public string? UserAgent { get; set; }
+    public string? UserAgent { get; set; } = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0";
 
     /// <summary>
     /// 接收数据进度回调事件,需要响应头中包含Content-Length,一般适用于下载文件

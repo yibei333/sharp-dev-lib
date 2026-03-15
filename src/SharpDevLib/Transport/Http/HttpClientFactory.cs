@@ -4,11 +4,7 @@ internal class HttpClientFactory
 {
     static HttpClientFactory()
     {
-        SetConfig(_internalDefaultClientId, new HttpConfig()
-        {
-            Logger = new SimpleConsoleLogger(nameof(HttpHelper)),
-            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0"
-        });
+        SetConfig(_internalDefaultClientId, new HttpConfig());
     }
     static readonly List<HttpClientInfo> _clients = [];
     static readonly object _locker = new();
