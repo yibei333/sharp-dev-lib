@@ -8,7 +8,7 @@
 //简单示例
 using SharpDevLib;
 
-var response = await new HttpRequest("https://jsonplaceholder.typicode.com/posts/1").GetAsync();
+var response = await new HttpRequestModel("https://jsonplaceholder.typicode.com/posts/1").GetAsync();
 Console.WriteLine(response.ToString());
 //****request****
 //url:https://jsonplaceholder.typicode.com/posts/1
@@ -75,14 +75,15 @@ HttpHelper.SetConfig("some id", new HttpConfig
     UserAgent = null
 });
 
-var response = await new HttpRequest("https://jsonplaceholder.typicode.com/comments")
+var response = await new HttpRequestModel("https://jsonplaceholder.typicode.com/comments")
                 .UseClientId("some id")
                 .AddHeader("Authorization", ["Bearer token123"])
                 .AddCookie(new Cookie("foo", "bar", "/", "jsonplaceholder.typicode.com"))
                 .AddParameter("postId", "1")
                 .AddParameter("someParameter", "test")
-                .GetAsync();
-var text = await response.EnsureSuccessStatusCode().ReadAsStringAsync();
+                .GetAsync()
+                .EnsureSuccessStatusCode();
+var text = await response.ReadAsStringAsync();
 Console.WriteLine(text);
 //[
 //  {
@@ -121,7 +122,7 @@ Console.WriteLine(text);
 //    "body": "harum non quasi et ratione\ntempore iure ex voluptates in ratione\nharum architecto fugit inventore cupiditate\nvoluptates magni quo et"
 //  }
 //]
-var posts = await response.EnsureSuccessStatusCode().GetResponseDataAsync<List<PostInfo>>();
+var posts = await response.GetResponseDataAsync<List<PostInfo>>();
 Console.WriteLine(posts.Count);
 //5
 

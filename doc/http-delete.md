@@ -7,7 +7,7 @@
 ``` csharp
 using SharpDevLib;
 
-var response = await new HttpRequest("https://jsonplaceholder.typicode.com/posts/1")
+var response = await new HttpRequestModel("https://jsonplaceholder.typicode.com/posts/1")
                 .DeleteAsync();
 Console.WriteLine(response);
 //****request****
@@ -65,7 +65,7 @@ HttpHelper.SetConfig("some id", new HttpConfig
     UserAgent = null
 });
 
-var response = await new HttpRequest("https://jsonplaceholder.typicode.com/posts/1")
+var response = await new HttpRequestModel("https://jsonplaceholder.typicode.com/posts/1")
                 .UseClientId("some id")
                 .AddHeader("Authorization", ["Bearer token123"])
                 .AddCookie(new Cookie("foo", "bar", "/", "jsonplaceholder.typicode.com"))

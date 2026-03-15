@@ -7,7 +7,7 @@
 using SharpDevLib;
 
 var json = new { id = 1, userId = 1, title = "foo", body = "bar" }.Serialize();
-var response = await new HttpRequest("https://jsonplaceholder.typicode.com/posts/1")
+var response = await new HttpRequestModel("https://jsonplaceholder.typicode.com/posts/1")
                     .AddJson(json)
                     .PutAsync();
 Console.WriteLine(response);
@@ -76,7 +76,7 @@ HttpHelper.SetConfig("some id", new HttpConfig
 });
 
 var json = new { id = 1, userId = 1, title = "foo", body = "bar" }.Serialize();
-var response = await new HttpRequest("https://jsonplaceholder.typicode.com/posts/1")
+var response = await new HttpRequestModel("https://jsonplaceholder.typicode.com/posts/1")
                 .UseClientId("some id")
                 .AddHeader("Authorization", ["Bearer token123"])
                 .AddCookie(new Cookie("foo", "bar", "/", "jsonplaceholder.typicode.com"))
