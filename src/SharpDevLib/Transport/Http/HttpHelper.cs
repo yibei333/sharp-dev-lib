@@ -8,6 +8,13 @@ namespace SharpDevLib;
 public static class HttpHelper
 {
     /// <summary>
+    /// 创建HttpRequest
+    /// </summary>
+    /// <param name="url">请求地址</param>
+    /// <returns>HttpRequestModel</returns>
+    public static HttpRequestModel NewRequest(string url) => new(url);
+
+    /// <summary>
     /// 将键值对集合转换为查询字符串格式
     /// </summary>
     /// <param name="parameters">键值对集合</param>

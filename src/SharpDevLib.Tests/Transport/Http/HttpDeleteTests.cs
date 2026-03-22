@@ -11,7 +11,8 @@ public class HttpDeleteTests : HttpBaseTests
     [TestMethod]
     public async Task DeleteTest()
     {
-        await new HttpRequestModel(BaseUrl.CombinePath("/api/delete"))
+        await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/delete"))
             .AddParameter("name", "foo")
             .AddParameter("age", "10")
             .DeleteAsync()
@@ -21,7 +22,8 @@ public class HttpDeleteTests : HttpBaseTests
     [TestMethod]
     public async Task DeleteIntTest()
     {
-        var actual = await new HttpRequestModel(BaseUrl.CombinePath("/api/delete/int"))
+        var actual = await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/delete/int"))
             .AddParameter("name", "foo")
             .AddParameter("age", "10")
             .DeleteAsync()
@@ -33,7 +35,8 @@ public class HttpDeleteTests : HttpBaseTests
     [TestMethod]
     public async Task DeleteStringTest()
     {
-        var actual = await new HttpRequestModel(BaseUrl.CombinePath("/api/delete/string"))
+        var actual = await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/delete/string"))
             .AddParameter("name", "foo")
             .AddParameter("age", "10")
             .DeleteAsync()
@@ -45,7 +48,8 @@ public class HttpDeleteTests : HttpBaseTests
     [TestMethod]
     public async Task DeleteObjectTest()
     {
-        var data = await new HttpRequestModel(BaseUrl.CombinePath("/api/delete/object"))
+        var data = await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/delete/object"))
             .AddParameter("name", "foo")
             .AddParameter("age", "10")
             .DeleteAsync()

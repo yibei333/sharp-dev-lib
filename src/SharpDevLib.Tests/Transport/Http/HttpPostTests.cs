@@ -15,7 +15,8 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public async Task PostJsonTest()
     {
-        await new HttpRequestModel(BaseUrl.CombinePath("/api/post"))
+        await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/post"))
             .AddJson(_userJson)
             .PostAsync()
             .EnsureSuccessStatusCode();
@@ -29,7 +30,8 @@ public class HttpPostTests : HttpBaseTests
         {
             OnSendProgress = Console.WriteLine
         });
-        var actual = await new HttpRequestModel(BaseUrl.CombinePath("/api/post/int"))
+        var actual = await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/post/int"))
             .UseClientId("PostJsonIntTest")
             .AddJson(_userJson)
             .PostAsync()
@@ -41,7 +43,8 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public async Task PostJsonStringTest()
     {
-        var actual = await new HttpRequestModel(BaseUrl.CombinePath("/api/post/string"))
+        var actual = await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/post/string"))
             .AddJson(_userJson)
             .PostAsync()
             .EnsureSuccessStatusCode()
@@ -52,7 +55,8 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public async Task PostJsonObjectTest()
     {
-        var data = await new HttpRequestModel(BaseUrl.CombinePath("/api/post/object"))
+        var data = await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/post/object"))
             .AddJson(_userJson)
             .PostAsync()
             .EnsureSuccessStatusCode()
@@ -65,7 +69,8 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public async Task PostUrlEncodedFormTest()
     {
-        await new HttpRequestModel(BaseUrl.CombinePath("/api/post/form"))
+        await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/post/form"))
             .AddParameter("Name", "foo")
             .AddParameter("Age", "10")
             .PostAsync()
@@ -75,7 +80,8 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public async Task PostUrlEncodedFormObjectTest()
     {
-        var data = await new HttpRequestModel(BaseUrl.CombinePath("/api/post/form/object"))
+        var data = await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/post/form/object"))
             .AddParameter("Name", "foo")
             .AddParameter("Age", "10")
             .PostAsync()
@@ -89,7 +95,8 @@ public class HttpPostTests : HttpBaseTests
     [TestMethod]
     public async Task PostMultiPartFormTest()
     {
-        await new HttpRequestModel(BaseUrl.CombinePath("/api/post/form/multi"))
+        await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/post/form/multi"))
             .AddParameter("Name", "foo")
             .AddParameter("Age", "10")
             .AddFile(new HttpFormFile("file", "TestFile.txt", File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory.CombinePath("TestData/TestFile.txt"))))
@@ -111,7 +118,8 @@ public class HttpPostTests : HttpBaseTests
             }
         };
         HttpHelper.SetConfig("PostMultiPartFormObjectTest", config);
-        var data = await new HttpRequestModel(BaseUrl.CombinePath("/api/post/form/multi/object"))
+        var data = await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/post/form/multi/object"))
             .UseClientId("PostMultiPartFormObjectTest")
             .AddParameter("Name", "foo")
             .AddParameter("Age", "10")

@@ -12,7 +12,7 @@ public class EmptyReplyTests
     {
         var reply = new EmptyReply();
         Assert.IsFalse(reply.Success);
-        Assert.IsNull(reply.Description);
+        Assert.IsNull(reply.Message);
     }
 
     [TestMethod]
@@ -20,7 +20,7 @@ public class EmptyReplyTests
     {
         var reply = EmptyReply.Succeed("操作成功");
         Assert.IsTrue(reply.Success);
-        Assert.AreEqual("操作成功", reply.Description);
+        Assert.AreEqual("操作成功", reply.Message);
     }
 
     [TestMethod]
@@ -28,7 +28,7 @@ public class EmptyReplyTests
     {
         var reply = EmptyReply.Succeed();
         Assert.IsTrue(reply.Success);
-        Assert.IsNull(reply.Description);
+        Assert.IsNull(reply.Message);
     }
 
     [TestMethod]
@@ -36,7 +36,7 @@ public class EmptyReplyTests
     {
         var reply = EmptyReply.Failed("操作失败");
         Assert.IsFalse(reply.Success);
-        Assert.AreEqual("操作失败", reply.Description);
+        Assert.AreEqual("操作失败", reply.Message);
     }
 
     [TestMethod]
@@ -44,7 +44,7 @@ public class EmptyReplyTests
     {
         var reply = EmptyReply.Failed();
         Assert.IsFalse(reply.Success);
-        Assert.IsNull(reply.Description);
+        Assert.IsNull(reply.Message);
     }
 
     [TestMethod]
@@ -53,10 +53,10 @@ public class EmptyReplyTests
         var reply = new EmptyReply
         {
             Success = true,
-            Description = "自定义描述"
+            Message = "自定义描述"
         };
         Assert.IsTrue(reply.Success);
-        Assert.AreEqual("自定义描述", reply.Description);
+        Assert.AreEqual("自定义描述", reply.Message);
     }
 }
 
@@ -68,7 +68,7 @@ public class DataReplyTests
     {
         var reply = new DataReply<User>();
         Assert.IsFalse(reply.Success);
-        Assert.IsNull(reply.Description);
+        Assert.IsNull(reply.Message);
         Assert.IsNull(reply.Data);
     }
 
@@ -78,7 +78,7 @@ public class DataReplyTests
         var user = new User("Alice", 30);
         var reply = DataReply.Succeed(user, "获取成功");
         Assert.IsTrue(reply.Success);
-        Assert.AreEqual("获取成功", reply.Description);
+        Assert.AreEqual("获取成功", reply.Message);
         Assert.IsNotNull(reply.Data);
         Assert.AreEqual("Alice", reply.Data.Name);
         Assert.AreEqual(30, reply.Data.Age);
@@ -90,7 +90,7 @@ public class DataReplyTests
         var user = new User("Bob", 25);
         var reply = DataReply.Succeed(user);
         Assert.IsTrue(reply.Success);
-        Assert.IsNull(reply.Description);
+        Assert.IsNull(reply.Message);
         Assert.IsNotNull(reply.Data);
         Assert.AreEqual("Bob", reply.Data.Name);
         Assert.AreEqual(25, reply.Data.Age);
@@ -101,7 +101,7 @@ public class DataReplyTests
     {
         var reply = DataReply.Failed<User>("获取失败");
         Assert.IsFalse(reply.Success);
-        Assert.AreEqual("获取失败", reply.Description);
+        Assert.AreEqual("获取失败", reply.Message);
         Assert.IsNull(reply.Data);
     }
 
@@ -110,7 +110,7 @@ public class DataReplyTests
     {
         var reply = DataReply.Failed<User>();
         Assert.IsFalse(reply.Success);
-        Assert.IsNull(reply.Description);
+        Assert.IsNull(reply.Message);
         Assert.IsNull(reply.Data);
     }
 
@@ -121,11 +121,11 @@ public class DataReplyTests
         var reply = new DataReply<User>
         {
             Success = true,
-            Description = "自定义描述",
+            Message = "自定义描述",
             Data = user
         };
         Assert.IsTrue(reply.Success);
-        Assert.AreEqual("自定义描述", reply.Description);
+        Assert.AreEqual("自定义描述", reply.Message);
         Assert.IsNotNull(reply.Data);
         Assert.AreEqual("Charlie", reply.Data.Name);
         Assert.AreEqual(35, reply.Data.Age);
@@ -147,7 +147,7 @@ public class PageReplyTests
     {
         var reply = new PageReply<User>();
         Assert.IsFalse(reply.Success);
-        Assert.IsNull(reply.Description);
+        Assert.IsNull(reply.Message);
         Assert.IsNull(reply.Data);
         Assert.AreEqual(0, reply.TotalCount);
         Assert.AreEqual(0, reply.Index);
@@ -166,7 +166,7 @@ public class PageReplyTests
         var request = new GetUsersRequest { Index = 0, Size = 10 };
         var reply = PageReply.Succeed<User>(data, 100, request, "获取成功");
         Assert.IsTrue(reply.Success);
-        Assert.AreEqual("获取成功", reply.Description);
+        Assert.AreEqual("获取成功", reply.Message);
         Assert.IsNotNull(reply.Data);
         Assert.HasCount(3, reply.Data);
         Assert.AreEqual(100, reply.TotalCount);
@@ -181,7 +181,7 @@ public class PageReplyTests
         var request = new GetUsersRequest { Index = 0, Size = 10 };
         var reply = PageReply.Succeed<User>(data, 10, request);
         Assert.IsTrue(reply.Success);
-        Assert.IsNull(reply.Description);
+        Assert.IsNull(reply.Message);
         Assert.IsNotNull(reply.Data);
         Assert.HasCount(1, reply.Data);
         Assert.AreEqual(10, reply.TotalCount);
@@ -203,7 +203,7 @@ public class PageReplyTests
     {
         var reply = PageReply.Failed<User>("查询失败");
         Assert.IsFalse(reply.Success);
-        Assert.AreEqual("查询失败", reply.Description);
+        Assert.AreEqual("查询失败", reply.Message);
         Assert.IsNull(reply.Data);
     }
 
@@ -212,7 +212,7 @@ public class PageReplyTests
     {
         var reply = PageReply.Failed<User>();
         Assert.IsFalse(reply.Success);
-        Assert.IsNull(reply.Description);
+        Assert.IsNull(reply.Message);
         Assert.IsNull(reply.Data);
     }
 
@@ -223,14 +223,14 @@ public class PageReplyTests
         var reply = new PageReply<User>
         {
             Success = true,
-            Description = "自定义描述",
+            Message = "自定义描述",
             Data = data,
             TotalCount = 50,
             Index = 2,
             Size = 20
         };
         Assert.IsTrue(reply.Success);
-        Assert.AreEqual("自定义描述", reply.Description);
+        Assert.AreEqual("自定义描述", reply.Message);
         Assert.IsNotNull(reply.Data);
         Assert.HasCount(1, reply.Data);
         Assert.AreEqual(50, reply.TotalCount);

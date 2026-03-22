@@ -7,9 +7,10 @@
 using SharpDevLib;
 
 var json = new { id = 1, userId = 1, title = "foo", body = "bar" }.Serialize();
-var response = await new HttpRequestModel("https://jsonplaceholder.typicode.com/posts/1")
-                    .AddJson(json)
-                    .PutAsync();
+var response = await HttpHelper
+    .NewRequest("https://jsonplaceholder.typicode.com/posts/1")
+    .AddJson(json)
+    .PutAsync();
 Console.WriteLine(response);
 //****request****
 //url:https://jsonplaceholder.typicode.com/posts/1
@@ -76,13 +77,15 @@ HttpHelper.SetConfig("some id", new HttpConfig
 });
 
 var json = new { id = 1, userId = 1, title = "foo", body = "bar" }.Serialize();
-var response = await new HttpRequestModel("https://jsonplaceholder.typicode.com/posts/1")
-                .UseClientId("some id")
-                .AddHeader("Authorization", ["Bearer token123"])
-                .AddCookie(new Cookie("foo", "bar", "/", "jsonplaceholder.typicode.com"))
-                .AddJson(json)
-                .PutAsync();
-var text = await response.EnsureSuccessStatusCode().ReadAsStringAsync();
+var text = await HttpHelper
+    .NewRequest("https://jsonplaceholder.typicode.com/posts/1")
+    .UseClientId("some id")
+    .AddHeader("Authorization", ["Bearer token123"])
+    .AddCookie(new Cookie("foo", "bar", "/", jsonplaceholder.typicode.com"))
+    .AddJson(json)
+    .PutAsync()
+    .EnsureSuccessStatusCode()
+    .ReadAsStringAsync();
 Console.WriteLine(text);
 //{
 //  "id": 1,

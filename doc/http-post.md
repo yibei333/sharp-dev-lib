@@ -7,9 +7,10 @@
 using SharpDevLib;
 
 var json = new { userId = 1, title = "foo", body = "bar" }.Serialize();
-var response=await new HttpRequestModel("https://jsonplaceholder.typicode.com/posts")
-                    .AddJson(json)
-                    .PostAsync();
+var response=await HttpHelper
+    .NewRequest("https://jsonplaceholder.typicode.com/posts")
+    .AddJson(json)
+    .PostAsync();
 Console.WriteLine(response);
 //****request****
 //url:https://jsonplaceholder.typicode.com/posts
@@ -76,17 +77,19 @@ HttpHelper.SetConfig("some id", new HttpConfig
     UserAgent = null
 });
 
-var response = await new HttpRequestModel("https://jsonplaceholder.typicode.com/posts")
-                .UseClientId("some id")
-                .AddHeader("Authorization", ["Bearer token123"])
-                .AddCookie(new Cookie("foo", "bar", "/", "jsonplaceholder.typicode.com"))
-                .AddJson("{\"postId\":1}")
-                //form-data
-                //.AddParameter("postId", "1")
-                //multi-part form data
-                //.AddFile(new HttpFormFile("file","test.txt","hello,world".Utf8Decode()))
-                .PostAsync();
-var text = await response.EnsureSuccessStatusCode().ReadAsStringAsync();
+var text = await HttpHelper
+    .NewRequest("https://jsonplaceholder.typicode.com/posts")
+    .UseClientId("some id")
+    .AddHeader("Authorization", ["Bearer token123"])
+    .AddCookie(new Cookie("foo", "bar", "/", jsonplaceholder.typicode.com"))
+    .AddJson("{\"postId\":1}")
+    //form-data
+    //.AddParameter("postId", "1")
+    //multi-part form data
+    //.AddFile(new HttpFormFile("file","test.txt",hello,world".Utf8Decode()))
+    .PostAsync()
+    .EnsureSuccessStatusCode()
+    .ReadAsStringAsync();
 Console.WriteLine(text);
 //{
 //  "postId": 10,

@@ -29,6 +29,14 @@ var request2 = new DataRequest<string>("foo");
 Console.WriteLine(request2.Data); // 输出: foo
 ```
 
+##### 使用 NameDataRequest
+
+```csharp
+var request = new NameDataRequest<int>("foo",10);
+Console.WriteLine(request.Name); // 输出: foo
+Console.WriteLine(request.Data); // 输出: 10
+```
+
 ##### 使用 IdNameRequest
 
 ```csharp

@@ -8,7 +8,9 @@
 //简单示例
 using SharpDevLib;
 
-var response = await new HttpRequestModel("https://jsonplaceholder.typicode.com/posts/1").GetAsync();
+var response = await HttpHelper
+    .NewRequest("https://jsonplaceholder.typicode.com/posts/1")
+    .GetAsync();
 Console.WriteLine(response.ToString());
 //****request****
 //url:https://jsonplaceholder.typicode.com/posts/1
@@ -75,14 +77,15 @@ HttpHelper.SetConfig("some id", new HttpConfig
     UserAgent = null
 });
 
-var response = await new HttpRequestModel("https://jsonplaceholder.typicode.com/comments")
-                .UseClientId("some id")
-                .AddHeader("Authorization", ["Bearer token123"])
-                .AddCookie(new Cookie("foo", "bar", "/", "jsonplaceholder.typicode.com"))
-                .AddParameter("postId", "1")
-                .AddParameter("someParameter", "test")
-                .GetAsync()
-                .EnsureSuccessStatusCode();
+var response = await HttpHelper
+    .NewRequest("https://jsonplaceholder.typicode.com/comments")
+    .UseClientId("some id")
+    .AddHeader("Authorization", ["Bearer token123"])
+    .AddCookie(new Cookie("foo", "bar", "/", jsonplaceholder.typicode.com"))
+    .AddParameter("postId", "1")
+    .AddParameter("someParameter", "test")
+    .GetAsync()
+    .EnsureSuccessStatusCode();
 var text = await response.ReadAsStringAsync();
 Console.WriteLine(text);
 //[

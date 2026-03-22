@@ -15,7 +15,7 @@ public abstract class BaseReply
     /// <summary>
     /// 描述信息,用于说明操作结果或错误原因
     /// </summary>
-    public string? Description { get; set; }
+    public string? Message { get; set; }
 
     /// <summary>
     /// 额外数据,用于传递非结构化的额外信息

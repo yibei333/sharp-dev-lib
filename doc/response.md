@@ -11,7 +11,7 @@ Console.WriteLine(reply1.Success); // 输出: True
 
 var reply2 = EmptyReply.Succeed("操作成功");
 Console.WriteLine(reply2.Success); // 输出: True
-Console.WriteLine(reply2.Description); // 输出: 操作成功
+Console.WriteLine(reply2.Message); // 输出: 操作成功
 
 // 构建失败的空响应
 var reply3 = EmptyReply.Failed();
@@ -19,7 +19,7 @@ Console.WriteLine(reply3.Success); // 输出: False
 
 var reply4 = EmptyReply.Failed("操作失败");
 Console.WriteLine(reply4.Success); // 输出: False
-Console.WriteLine(reply4.Description); // 输出: 操作失败
+Console.WriteLine(reply4.Message); // 输出: 操作失败
 
 // 使用 ExtraData
 var reply5 = EmptyReply.Succeed("操作成功");
@@ -39,13 +39,13 @@ Console.WriteLine(reply1.Data.Name); // 输出: 张三
 
 var reply2 = DataReply<User>.Succeed(user, "查询成功");
 Console.WriteLine(reply2.Success); // 输出: True
-Console.WriteLine(reply2.Description); // 输出: 查询成功
+Console.WriteLine(reply2.Message); // 输出: 查询成功
 Console.WriteLine(reply2.Data.Name); // 输出: 张三
 
 // 构建失败的数据响应
 var reply3 = DataReply<User>.Failed("用户不存在");
 Console.WriteLine(reply3.Success); // 输出: False
-Console.WriteLine(reply3.Description); // 输出: 用户不存在
+Console.WriteLine(reply3.Message); // 输出: 用户不存在
 Console.WriteLine(reply3.Data); // 输出: (null)
 
 // 使用 ExtraData
@@ -74,7 +74,7 @@ Console.WriteLine(reply1.Data.Count); // 输出: 2
 
 var reply2 = PageReply.Succeed(data, 100, 0, 20, "查询成功");
 Console.WriteLine(reply2.Success); // 输出: True
-Console.WriteLine(reply2.Description); // 输出: 查询成功
+Console.WriteLine(reply2.Message); // 输出: 查询成功
 
 // 构建成功的分页响应（使用 PageRequest）
 var request = new PageRequest(0, 20);
@@ -86,7 +86,7 @@ Console.WriteLine(reply3.Size); // 输出: 20
 // 构建失败的分页响应
 var reply4 = PageReply.Failed<NameDto>("查询失败");
 Console.WriteLine(reply4.Success); // 输出: False
-Console.WriteLine(reply4.Description); // 输出: 查询失败
+Console.WriteLine(reply4.Message); // 输出: 查询失败
 
 // 使用 ExtraData
 var reply5 = PageReply.Succeed(data, 100, 0, 20);

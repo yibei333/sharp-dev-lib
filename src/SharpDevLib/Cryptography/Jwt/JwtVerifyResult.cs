@@ -43,4 +43,14 @@ public class JwtVerifyResult
     /// JWT签名部分的Base64Url解码字符串
     /// </summary>
     public string? Signature { get; }
+
+    /// <summary>
+    /// 确保验证通过
+    /// </summary>
+    /// <returns></returns>
+    public JwtVerifyResult EnsureVerified()
+    {
+        if (!IsVerified) throw new Exception("JWT验证未通过");
+        return this;
+    }
 }

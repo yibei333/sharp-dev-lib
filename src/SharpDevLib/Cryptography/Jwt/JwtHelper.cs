@@ -12,30 +12,37 @@ public static class JwtHelper
     /// <summary>
     /// 使用HMACSHA256算法创建JWT
     /// </summary>
-    /// <param name="request">使用HMACSHA256算法创建JWT的请求配置</param>
+    /// <param name="payload">JWT负载数据，将被序列化为JSON字符串</param>
+    /// <param name="secret">HMAC算法使用的密钥</param>
     /// <returns>JWT令牌字符串</returns>
-    public static string Create(this JwtCreateWithHMACSHA256Request request) => InternalCreate(request);
+    public static string CreateWithHmacSha256(object payload, byte[] secret) => InternalCreate(new JwtCreateRequest(JwtAlgorithm.HS256, payload, secret.HexStringEncode(), null, null));
 
     /// <summary>
     /// 使用RSA SHA256算法创建JWT
     /// </summary>
-    /// <param name="request">使用RSA SHA256算法创建JWT的请求配置</param>
+    /// <param name="payload">JWT负载数据，将被序列化为JSON字符串</param>
+    /// <param name="pemKey">PEM格式的RSA私钥</param>
+    /// <param name="keyPassword">私钥密码，仅当私钥受密码保护时需要提供</param>
+    /// <param name="padding">RSA签名填充方式，默认使用Pkcs1</param>
     /// <returns>JWT令牌字符串</returns>
-    public static string Create(this JwtCreateWithRS256Request request) => InternalCreate(request);
+    public static string CreateWithRsaSha256(object payload, string pemKey, byte[]? keyPassword = null, RSASignaturePadding? padding = null) => InternalCreate(new JwtCreateRequest(JwtAlgorithm.RS256, payload, pemKey, keyPassword, padding));
 
     /// <summary>
     /// 使用HMACSHA256算法验证JWT
     /// </summary>
-    /// <param name="request">使用HMACSHA256算法验证JWT的请求配置</param>
+    /// <param name="token">要验证的JWT令牌字符串</param>
+    /// <param name="secret">HMAC算法使用的密钥</param>
     /// <returns>JWT验证结果，包含验证状态和相关信息</returns>
-    public static JwtVerifyResult Verify(this JwtVerifyWithHMACSHA256Request request) => InternalVerify(request);
+    public static JwtVerifyResult VerifyWithHmacSha256(string token, byte[] secret) => InternalVerify(new JwtVerifyRequest(JwtAlgorithm.HS256, token, secret.HexStringEncode(), null));
 
     /// <summary>
     /// 使用RSA SHA256算法验证JWT
     /// </summary>
-    /// <param name="request">使用RSA SHA256算法验证JWT的请求配置</param>
+    /// <param name="token">要验证的JWT令牌字符串</param>
+    /// <param name="pemKey">PEM格式的RSA公钥</param>
+    /// <param name="padding">RSA签名填充方式，默认使用Pkcs1</param>
     /// <returns>JWT验证结果，包含验证状态和相关信息</returns>
-    public static JwtVerifyResult Verify(this JwtVerifyWithRS256Request request) => InternalVerify(request);
+    public static JwtVerifyResult VerifyWithRsaSha256(string token, string pemKey, RSASignaturePadding? padding = null) => InternalVerify(new JwtVerifyRequest(JwtAlgorithm.RS256, token, pemKey, padding));
 
     static string InternalCreate(JwtCreateRequest request)
     {

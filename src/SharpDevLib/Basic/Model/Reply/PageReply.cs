@@ -48,7 +48,7 @@ public static class PageReply
     /// <param name="size">每页数据条数</param>
     /// <param name="description">可选的成功描述信息</param>
     /// <returns>Success 为 true 的分页响应对象</returns>
-    public static PageReply<TData> Succeed<TData>(List<TData> data, long total, int index, int size, string? description = null) => new() { Success = true, Description = description, Data = data, TotalCount = total, Index = index, Size = size };
+    public static PageReply<TData> Succeed<TData>(List<TData> data, long total, int index, int size, string? description = null) => new() { Success = true, Message = description, Data = data, TotalCount = total, Index = index, Size = size };
 
     /// <summary>
     /// 构建成功的分页响应
@@ -67,5 +67,5 @@ public static class PageReply
     /// <typeparam name="TData">数据类型</typeparam>
     /// <param name="description">可选的失败描述信息</param>
     /// <returns>Success 为 false 的分页响应对象</returns>
-    public static PageReply<TData> Failed<TData>(string? description = null) => new() { Success = false, Description = description };
+    public static PageReply<TData> Failed<TData>(string? description = null) => new() { Success = false, Message = description };
 }

@@ -15,13 +15,82 @@ public static class ProcessHelper
     public static ILogger? Logger { get; set; } = new SimpleConsoleLogger(nameof(ProcessHelper));
 
     /// <summary>
+    /// 启动进程
+    /// </summary>
+    /// <param name="process">要启动的进程示例</param>
+    /// <param name="fileName">可执行文件名</param>
+    /// <param name="args">命令行参数</param>
+    /// <param name="workingDirectory">工作目录</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="onStandardOutput">标准输出</param>
+    /// <param name="onErrotOutput">错误输出</param>
+    /// <returns>进程执行结果</returns>
+    public static async void Start
+    (
+        this Process process,
+        string fileName,
+        string? args = null,
+        string? workingDirectory = null,
+        CancellationToken? cancellationToken = null,
+        Action<string>? onStandardOutput = null,
+        Action<string>? onErrotOutput = null
+    )
+    {
+        await process.StartAndWaitForExitAsync(fileName, args, workingDirectory, cancellationToken, onStandardOutput, onErrotOutput);
+    }
+
+    /// <summary>
+    /// 启动进程
+    /// </summary>
+    /// <param name="fileName">可执行文件名</param>
+    /// <param name="args">命令行参数</param>
+    /// <param name="workingDirectory">工作目录</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="onStandardOutput">标准输出</param>
+    /// <param name="onErrotOutput">错误输出</param>
+    /// <returns>进程执行结果</returns>
+    public static async void Start
+    (
+        string fileName,
+        string? args = null,
+        string? workingDirectory = null,
+        CancellationToken? cancellationToken = null,
+        Action<string>? onStandardOutput = null,
+        Action<string>? onErrotOutput = null
+    )
+    {
+        await StartAndWaitForExitAsync(fileName, args, workingDirectory, cancellationToken, onStandardOutput, onErrotOutput);
+    }
+
+    /// <summary>
     /// 启动进程并等待其退出
     /// </summary>
     /// <param name="process">要启动的进程示例</param>
-    /// <param name="request">进程启动请求配置</param>
+    /// <param name="fileName">可执行文件名</param>
+    /// <param name="args">命令行参数</param>
+    /// <param name="workingDirectory">工作目录</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="onStandardOutput">标准输出</param>
+    /// <param name="onErrotOutput">错误输出</param>
     /// <returns>进程执行结果</returns>
-    public static async Task<ProcessResult> StartAndWaitForExitAsync(this Process process, ProcessStartRequest request)
+    public static async Task<ProcessResult> StartAndWaitForExitAsync
+    (
+        this Process process,
+        string fileName,
+        string? args = null,
+        string? workingDirectory = null,
+        CancellationToken? cancellationToken = null,
+        Action<string>? onStandardOutput = null,
+        Action<string>? onErrotOutput = null
+    )
     {
+        var request = new ProcessStartRequest(fileName, args)
+        {
+            WorkingDirectory = workingDirectory,
+            CancellationToken = cancellationToken,
+            OnStandardOutput = onStandardOutput,
+            OnErrotOutput = onErrotOutput
+        };
         if (request.Filename.IsNullOrWhiteSpace()) return new ProcessResult { Request = request, Error = $"filename is empty", ExitCode = -1 };
         var tcs = new TaskCompletionSource<ProcessResult>();
         var result = new ProcessResult { Request = request };
@@ -34,7 +103,7 @@ public static class ProcessHelper
             if (args.Data.NotNullOrWhiteSpace())
             {
                 lock (lockObj) outputBuilder.AppendLine(args.Data);
-                if (request.LogInfo) Logger?.LogInformation("{Output}", args.Data);
+                onStandardOutput?.Invoke(args.Data);
             }
         }
         void OnErrorData(object sender, DataReceivedEventArgs args)
@@ -42,7 +111,7 @@ public static class ProcessHelper
             if (args.Data.NotNullOrWhiteSpace())
             {
                 lock (lockObj) errorBuilder.AppendLine(args.Data);
-                if (request.LogInfo) Logger?.LogInformation("{Output}", args.Data);
+                onErrotOutput?.Invoke(args.Data);
             }
         }
 
@@ -112,7 +181,6 @@ public static class ProcessHelper
         {
             result.ExitCode = -1;
             result.Error = ex.Message;
-            if (request.LogError) Logger?.LogError(ex, "启动并运行进程失败:{Path} {Args}", request.Filename, request.Args);
             return result;
         }
         finally
@@ -126,12 +194,25 @@ public static class ProcessHelper
     /// <summary>
     /// 启动进程并等待退出
     /// </summary>
-    /// <param name="request">进程启动请求</param>
+    /// <param name="fileName">可执行文件名</param>
+    /// <param name="args">命令行参数</param>
+    /// <param name="workingDirectory">工作目录</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="onStandardOutput">标准输出</param>
+    /// <param name="onErrotOutput">错误输出</param>
     /// <returns>进程执行结果</returns>
-    public static async Task<ProcessResult> StartAndWaitForExitAsync(this ProcessStartRequest request)
+    public static async Task<ProcessResult> StartAndWaitForExitAsync
+    (
+        string fileName,
+        string? args = null,
+        string? workingDirectory = null,
+        CancellationToken? cancellationToken = null,
+        Action<string>? onStandardOutput = null,
+        Action<string>? onErrotOutput = null
+    )
     {
         using var process = new Process();
-        return await process.StartAndWaitForExitAsync(request);
+        return await process.StartAndWaitForExitAsync(fileName, args, workingDirectory, cancellationToken, onStandardOutput, onErrotOutput);
     }
 }
 
@@ -140,7 +221,7 @@ public static class ProcessHelper
 /// </summary>
 /// <param name="fileName">可执行文件名</param>
 /// <param name="args">命令行参数</param>
-public class ProcessStartRequest(string fileName, string? args = null)
+internal class ProcessStartRequest(string fileName, string? args = null)
 {
     /// <summary>
     /// 可执行文件名
@@ -163,14 +244,14 @@ public class ProcessStartRequest(string fileName, string? args = null)
     public CancellationToken? CancellationToken { get; set; }
 
     /// <summary>
-    /// 是否记录信息日志
+    /// 标准输出
     /// </summary>
-    public bool LogInfo { get; set; }
+    public Action<string>? OnStandardOutput { get; set; }
 
     /// <summary>
-    /// 是否记录错误日志
+    /// 错误输出
     /// </summary>
-    public bool LogError { get; set; } = true;
+    public Action<string>? OnErrotOutput { get; set; }
 }
 
 /// <summary>
@@ -206,12 +287,29 @@ public class ProcessResult
     {
         if (!IsSuccess)
         {
-            if (Request.LogError) ProcessHelper.Logger?.LogError("run process failed:{Path} {Args}", Request.Filename, Request.Args);
-            if (Request.LogInfo && Output.NotNullOrWhiteSpace()) ProcessHelper.Logger?.LogInformation("output:\r\n{Output}\r\n", Output);
-            if (Request.LogError && Error.NotNullOrWhiteSpace()) ProcessHelper.Logger?.LogError("error:\r\n{Error}\r\n", Error);
+            ProcessHelper.Logger?.LogError("run process failed:{Path} {Args}", Request.Filename, Request.Args);
+            if (Output.NotNullOrWhiteSpace()) ProcessHelper.Logger?.LogInformation("output:\r\n{Output}\r\n", Output);
+            if (Error.NotNullOrWhiteSpace()) ProcessHelper.Logger?.LogError("error:\r\n{Error}\r\n", Error);
             throw new Exception(Error);
         }
     }
 
     internal ProcessStartRequest Request { get; set; } = null!;
+}
+
+/// <summary>
+/// 进程扩展
+/// </summary>
+public static class ProcessExtensions
+{
+    /// <summary>
+    /// 确保成功
+    /// </summary>
+    /// <exception cref="Exception">失败时抛出异常</exception>
+    public static async Task<ProcessResult> EnsureSucceed(this Task<ProcessResult> processResult)
+    {
+        var result = await processResult;
+        result.EnsureSucceed();
+        return result;
+    }
 }

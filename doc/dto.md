@@ -29,6 +29,14 @@ var dataDto2 = new DataDto<string>("foo");
 Console.WriteLine(dataDto2.Data); // 输出: foo
 ```
 
+##### 使用 NameDataDto
+
+```csharp
+var dataDto = new NameDataDto<int>("张三",1);
+Console.WriteLine(dataDto.Name); // 输出: 张三
+Console.WriteLine(dataDto.Data); // 输出: 1
+```
+
 ##### 使用 IdNameDto
 ```csharp
 var idNameDto = new IdNameDto<int>(1, "张三");

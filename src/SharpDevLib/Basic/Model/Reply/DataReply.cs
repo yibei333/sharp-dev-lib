@@ -25,12 +25,12 @@ public static class DataReply
     /// <param name="data">要返回的数据对象</param>
     /// <param name="description">可选的成功描述信息</param>
     /// <returns>Success 为 true 且包含数据的数据响应对象</returns>
-    public static DataReply<TData> Succeed<TData>(TData data, string? description = null) => new() { Success = true, Description = description, Data = data };
+    public static DataReply<TData> Succeed<TData>(TData data, string? description = null) => new() { Success = true, Message = description, Data = data };
     /// <summary>
     /// 构建失败的数据响应
     /// </summary>
     /// <typeparam name="TData">数据类型</typeparam>
     /// <param name="description">可选的失败描述信息</param>
     /// <returns>Success 为 false 的数据响应对象</returns>
-    public static DataReply<TData> Failed<TData>(string? description = null) => new() { Success = false, Description = description };
+    public static DataReply<TData> Failed<TData>(string? description = null) => new() { Success = false, Message = description };
 }

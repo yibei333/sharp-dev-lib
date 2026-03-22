@@ -14,7 +14,8 @@ public class HttpPutTests : HttpBaseTests
     public async Task PutTest()
     {
         HttpHelper.SetConfig("PutTest", new HttpConfig { UserAgent = null });
-        await new HttpRequestModel(BaseUrl.CombinePath("/api/put"))
+        await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/put"))
             .UseClientId("PutTest")
             .AddJson(_userJson)
             .PutAsync()
@@ -24,7 +25,8 @@ public class HttpPutTests : HttpBaseTests
     [TestMethod]
     public async Task PutIntTest()
     {
-        var actual = await new HttpRequestModel(BaseUrl.CombinePath("/api/put/int"))
+        var actual = await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/put/int"))
             .AddJson(_userJson)
             .PutAsync()
             .EnsureSuccessStatusCode()
@@ -35,7 +37,8 @@ public class HttpPutTests : HttpBaseTests
     [TestMethod]
     public async Task PutStringTest()
     {
-        var actual = await new HttpRequestModel(BaseUrl.CombinePath("/api/put/string"))
+        var actual = await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/put/string"))
             .AddJson(_userJson)
             .PutAsync()
             .EnsureSuccessStatusCode()
@@ -46,7 +49,8 @@ public class HttpPutTests : HttpBaseTests
     [TestMethod]
     public async Task PutObjectTest()
     {
-        var data = await new HttpRequestModel(BaseUrl.CombinePath("/api/put/object"))
+        var data = await HttpHelper
+            .NewRequest(BaseUrl.CombinePath("/api/put/object"))
             .AddJson(_userJson)
             .PutAsync()
             .EnsureSuccessStatusCode()
