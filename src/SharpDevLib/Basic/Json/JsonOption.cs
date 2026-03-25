@@ -59,8 +59,7 @@ public class JsonOption
             PropertyNamingPolicy = namePolicy,
             TypeInfoResolver = new DefaultJsonTypeInfoResolver()
         };
-        var addResult = _cache.TryAdd(key, optoins);
-        if (!addResult) throw new Exception($"添加JSON选项键'{key}'失败");
+        _cache.TryAdd(key, optoins);
         return optoins;
     }
 
