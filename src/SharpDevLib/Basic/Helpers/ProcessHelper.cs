@@ -18,9 +18,6 @@ public static class ProcessHelper
     /// 启动进程
     /// </summary>
     /// <param name="process">要启动的进程示例</param>
-    /// <param name="fileName">可执行文件名</param>
-    /// <param name="args">命令行参数</param>
-    /// <param name="workingDirectory">工作目录</param>
     /// <param name="cancellationToken">取消令牌</param>
     /// <param name="onStandardOutput">标准输出</param>
     /// <param name="onErrotOutput">错误输出</param>
@@ -28,15 +25,12 @@ public static class ProcessHelper
     public static async void Start
     (
         this Process process,
-        string fileName,
-        string? args = null,
-        string? workingDirectory = null,
         CancellationToken? cancellationToken = null,
         Action<string>? onStandardOutput = null,
         Action<string>? onErrotOutput = null
     )
     {
-        await process.StartAndWaitForExitAsync(fileName, args, workingDirectory, cancellationToken, onStandardOutput, onErrotOutput);
+        await process.StartAndWaitForExitAsync(cancellationToken, onStandardOutput, onErrotOutput);
     }
 
     /// <summary>
@@ -45,7 +39,8 @@ public static class ProcessHelper
     /// <param name="fileName">可执行文件名</param>
     /// <param name="args">命令行参数</param>
     /// <param name="workingDirectory">工作目录</param>
-    /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="cancellationToken">取消令牌</param>    
+    /// <param name="encoding">输出编码</param>
     /// <param name="onStandardOutput">标准输出</param>
     /// <param name="onErrotOutput">错误输出</param>
     /// <returns>进程执行结果</returns>
@@ -54,21 +49,19 @@ public static class ProcessHelper
         string fileName,
         string? args = null,
         string? workingDirectory = null,
+        Encoding? encoding = null,
         CancellationToken? cancellationToken = null,
         Action<string>? onStandardOutput = null,
         Action<string>? onErrotOutput = null
     )
     {
-        await StartAndWaitForExitAsync(fileName, args, workingDirectory, cancellationToken, onStandardOutput, onErrotOutput);
+        await StartAndWaitForExitAsync(fileName, args, workingDirectory, encoding, cancellationToken, onStandardOutput, onErrotOutput);
     }
 
     /// <summary>
     /// 启动进程并等待其退出
     /// </summary>
     /// <param name="process">要启动的进程示例</param>
-    /// <param name="fileName">可执行文件名</param>
-    /// <param name="args">命令行参数</param>
-    /// <param name="workingDirectory">工作目录</param>
     /// <param name="cancellationToken">取消令牌</param>
     /// <param name="onStandardOutput">标准输出</param>
     /// <param name="onErrotOutput">错误输出</param>
@@ -76,17 +69,15 @@ public static class ProcessHelper
     public static async Task<ProcessResult> StartAndWaitForExitAsync
     (
         this Process process,
-        string fileName,
-        string? args = null,
-        string? workingDirectory = null,
         CancellationToken? cancellationToken = null,
         Action<string>? onStandardOutput = null,
         Action<string>? onErrotOutput = null
     )
     {
-        var request = new ProcessStartRequest(fileName, args)
+        if (process.StartInfo is null || process.StartInfo.FileName.IsNullOrWhiteSpace()) throw new ArgumentException("StartInfo not set yet");
+        var request = new ProcessStartRequest(process.StartInfo.FileName, process.StartInfo.Arguments)
         {
-            WorkingDirectory = workingDirectory,
+            WorkingDirectory = process.StartInfo.WorkingDirectory,
             CancellationToken = cancellationToken,
             OnStandardOutput = onStandardOutput,
             OnErrotOutput = onErrotOutput
@@ -117,15 +108,8 @@ public static class ProcessHelper
 
         try
         {
-            process.StartInfo = new ProcessStartInfo(request.Filename, request.Args ?? "")
-            {
-                WorkingDirectory = request.WorkingDirectory,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                StandardErrorEncoding = Encoding.UTF8,
-                StandardOutputEncoding = Encoding.UTF8
-            };
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
             process.OutputDataReceived += OnOutputData;
             process.ErrorDataReceived += OnErrorData;
 
@@ -198,6 +182,7 @@ public static class ProcessHelper
     /// <param name="args">命令行参数</param>
     /// <param name="workingDirectory">工作目录</param>
     /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="encoding">输出编码</param>
     /// <param name="onStandardOutput">标准输出</param>
     /// <param name="onErrotOutput">错误输出</param>
     /// <returns>进程执行结果</returns>
@@ -206,13 +191,28 @@ public static class ProcessHelper
         string fileName,
         string? args = null,
         string? workingDirectory = null,
+        Encoding? encoding = null,
         CancellationToken? cancellationToken = null,
         Action<string>? onStandardOutput = null,
         Action<string>? onErrotOutput = null
     )
     {
-        using var process = new Process();
-        return await process.StartAndWaitForExitAsync(fileName, args, workingDirectory, cancellationToken, onStandardOutput, onErrotOutput);
+        using var process = new Process
+        {
+            StartInfo = new ProcessStartInfo(fileName, args ?? "")
+            {
+                WorkingDirectory = workingDirectory,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            }
+        };
+        if (encoding is not null)
+        {
+            process.StartInfo.StandardOutputEncoding = encoding;
+            process.StartInfo.StandardErrorEncoding = encoding;
+        }
+        return await process.StartAndWaitForExitAsync(cancellationToken, onStandardOutput, onErrotOutput);
     }
 }
 
