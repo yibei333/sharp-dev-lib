@@ -1,4 +1,6 @@
-﻿namespace SharpDevLib;
+﻿using System.Net;
+
+namespace SharpDevLib;
 
 internal class HttpClientFactory
 {
@@ -26,6 +28,11 @@ internal class HttpClientFactory
         {
             if (_clients.Any(x => x.ClientId == clientId)) throw new Exception($"HTTP客户端Id:{clientId}已经设置过了,只能设置一次");
             var httpHandler = new HttpClientHandler { CookieContainer = new() };
+            if(config.Proxy is not null)
+            {
+                httpHandler.Proxy = config.Proxy;
+                httpHandler.UseProxy = true;
+            }
             var client = new HttpClient(httpHandler);
             if (config.BaseUrl.NotNullOrWhiteSpace()) client.BaseAddress = new Uri(config.BaseUrl);
             if (config.Timeout is not null) client.Timeout = config.Timeout.Value;

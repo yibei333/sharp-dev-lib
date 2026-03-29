@@ -33,7 +33,19 @@ public class HttpResponseModel//改名为HttpResponseModel,防止和Microsoft.As
     /// 获取HTTP响应消息
     /// </summary>
     /// <exception cref="Exception">当无法获取响应消息时抛出异常</exception>
-    HttpResponseMessage HttpResponseMessage => _httpResponseMessage ?? throw new Exception("无法获取响应消息,可能是请求任务在完成前被取消");
+    HttpResponseMessage HttpResponseMessage
+    {
+        get
+        {
+            if (_httpResponseMessage is not null) return _httpResponseMessage;
+            var builder = new StringBuilder();
+            BuildRequestInfo(builder);
+            builder.AppendLine($"****response****");
+            if(ErrorMessage.IsNullOrWhiteSpace()) builder.AppendLine("无法获取响应消息,可能是请求任务在完成前被取消");
+            else builder.AppendLine(ErrorMessage);
+            throw new Exception(builder.ToString());
+        }
+    }
 
     /// <summary>
     /// 获取请求是否成功
