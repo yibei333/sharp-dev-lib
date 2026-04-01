@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace SharpDevLib;
 
@@ -46,4 +47,9 @@ public class HttpConfig
     /// 发送数据进度回调事件,需要请求头中包含Content-Length,一般适用于上传文件
     /// </summary>
     public Action<HttpProgress>? OnSendProgress { get; set; }
+
+    /// <summary>
+    /// 设置代理
+    /// </summary>
+    public WebProxy? Proxy { get; set; }
 }

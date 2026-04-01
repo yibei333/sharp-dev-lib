@@ -215,4 +215,27 @@ public class HttpGetTests : HttpBaseTests
             .GetAsync();
         Assert.IsFalse(response.IsSuccess);
     }
+
+    //[TestMethod]
+    //public async Task ProxyTest()
+    //{
+    //    HttpHelper.SetConfig("proxy", new HttpConfig
+    //    {
+    //        Timeout=TimeSpan.FromSeconds(10),
+    //        Proxy = new System.Net.WebProxy
+    //        {
+    //            Address = new Uri("http://127.0.0.1:7890"),
+    //            BypassProxyOnLocal = false,
+    //            UseDefaultCredentials = false,
+    //        }
+    //    });
+
+    //    var response = await HttpHelper
+    //        .NewRequest("https://api.binance.com")
+    //        .UseClientId("proxy")
+    //        .GetAsync();
+    //    Console.WriteLine(response.ToString());
+    //    Console.WriteLine(await response.ReadAsStringAsync());
+    //    Assert.IsTrue(response.IsSuccess);
+    //}
 }
