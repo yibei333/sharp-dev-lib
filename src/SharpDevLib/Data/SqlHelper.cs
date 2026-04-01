@@ -341,6 +341,30 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
+    /// 开启事务
+    /// </summary>
+    public DbTransaction BeginTransaction()
+    {
+        CurrentTransaction = Connection.BeginTransaction();
+        return CurrentTransaction;
+    }
+
+    /// <summary>
+    /// 使用事务
+    /// </summary>
+    /// <param name="transaction">事务</param>
+    public void UseTransaction(DbTransaction transaction)
+    {
+        if (transaction.Connection != Connection) throw new Exception("事务不属于当前连接");
+        CurrentTransaction = transaction;
+    }
+
+    /// <summary>
+    /// 获取当前事务
+    /// </summary>
+    public DbTransaction? CurrentTransaction { get; private set; }
+
+    /// <summary>
     /// 释放数据库连接资源
     /// </summary>
     public void Dispose()
@@ -351,6 +375,7 @@ public sealed class SqlHelper : IDisposable
     DbCommand CreateCommand(string sql, params DbParameter[] parameters)
     {
         var command = Connection.CreateCommand();
+        if (CurrentTransaction is not null && CurrentTransaction.Connection == Connection) command.Transaction = CurrentTransaction;
         command.CommandText = sql;
         command.Parameters.AddRange(parameters);
         return command;

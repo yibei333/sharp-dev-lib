@@ -160,8 +160,10 @@ public class SqlHelperTests
         var path = GetFileConnectionString("transaction-rollback");
         SqlHelper.Config(SqliteFactory.Instance, path);
         using var sqlHelper = new SqlHelper();
+        Console.WriteLine(sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [User]"));
+        Console.WriteLine(sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [UserFavorite]"));
 
-        using var fooTransaction = sqlHelper.Connection.BeginTransaction();
+        using var fooTransaction = sqlHelper.BeginTransaction();
         try
         {
             sqlHelper.ExecuteNonQuery("INSERT INTO [User]([Name],Age) Values('Baz',30),('Qux',40);");
@@ -169,8 +171,9 @@ public class SqlHelperTests
             sqlHelper.ExecuteNonQuery("INSERT INTO [UserFavorite]([Name],Favorite) Values('Baz','Game');");
             fooTransaction.Commit();
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             fooTransaction.Rollback();
         }
 
@@ -184,16 +187,19 @@ public class SqlHelperTests
         var path = GetFileConnectionString("transaction-commit");
         SqlHelper.Config(SqliteFactory.Instance, path);
         using var sqlHelper = new SqlHelper();
+        Console.WriteLine(sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [User]"));
+        Console.WriteLine(sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [UserFavorite]"));
 
-        using var fooTransaction = sqlHelper.Connection.BeginTransaction();
+        using var fooTransaction = sqlHelper.BeginTransaction();
         try
         {
             sqlHelper.ExecuteNonQuery("INSERT INTO [User]([Name],Age) Values('Baz',30),('Qux',40);");
             sqlHelper.ExecuteNonQuery("INSERT INTO [UserFavorite]([Name],Favorite) Values('Baz','Game');");
             fooTransaction.Commit();
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             fooTransaction.Rollback();
         }
 
@@ -212,7 +218,7 @@ public class SqlHelperTests
         using var sqlHelper = new SqlHelper(dbContext);
         SqlHelper.Config(SqliteFactory.Instance, path);
 
-        using var fooTransaction = sqlHelper.Connection.BeginTransaction();
+        using var fooTransaction = sqlHelper.BeginTransaction();
         try
         {
             dbContext.User.Add(new User("Baz", 30));
@@ -248,7 +254,7 @@ public class SqlHelperTests
         using var sqlHelper = new SqlHelper(dbContext);
         SqlHelper.Config(SqliteFactory.Instance, path);
 
-        using var fooTransaction = sqlHelper.Connection.BeginTransaction();
+        using var fooTransaction = sqlHelper.BeginTransaction();
         try
         {
             dbContext.User.Add(new User("Baz", 30));
