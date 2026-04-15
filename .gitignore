@@ -3,3 +3,4 @@ obj
 TestResults
 /src/.vs
 /.vscode
+.codebuddy
