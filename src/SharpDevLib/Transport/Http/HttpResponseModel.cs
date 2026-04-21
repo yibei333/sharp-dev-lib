@@ -41,7 +41,7 @@ public class HttpResponseModel//改名为HttpResponseModel,防止和Microsoft.As
             var builder = new StringBuilder();
             BuildRequestInfo(builder);
             builder.AppendLine($"****response****");
-            if(ErrorMessage.IsNullOrWhiteSpace()) builder.AppendLine("无法获取响应消息,可能是请求任务在完成前被取消");
+            if (ErrorMessage.IsNullOrWhiteSpace()) builder.AppendLine("无法获取响应消息,可能是请求任务在完成前被取消");
             else builder.AppendLine(ErrorMessage);
             throw new Exception(builder.ToString());
         }

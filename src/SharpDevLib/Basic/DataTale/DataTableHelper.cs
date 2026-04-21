@@ -201,7 +201,6 @@ public static class DataTableHelper
     }
     #endregion
 
-
     static Type GetNonGenericPropertyTypeToColumnType(Type propertyType)
     {
         if (propertyType.IsGenericType)
