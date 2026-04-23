@@ -42,6 +42,7 @@ public static class RsaKeyHelper
     /// <exception cref="NotImplementedException">X509Certificate和X509CertificateSigningRequest格式未实现</exception>
     public static void ImportPem(this RSA rsa, string pem, byte[]? password = null)
     {
+        if (pem.IsNullOrWhiteSpace()) throw new Exception("密钥不能为空");
         var pemObject = PemObject.Read(pem);
         if (pemObject.PemType == PemType.UnKnown) throw new NotSupportedException("不支持的PEM格式");
         if (pemObject.PemType == PemType.Pkcs1PrivateKey)
