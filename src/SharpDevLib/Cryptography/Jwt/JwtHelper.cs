@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -93,20 +94,22 @@ public static class JwtHelper
         var headerSegment = str[0];
         var payloadSegment = str[1];
         var signatureSegment = str[2];
+        var header = headerSegment.Base64UrlDecode().Utf8Encode();
+        var payload = payloadSegment.Base64UrlDecode().Utf8Encode();
 
         var headerObject = JsonSerializer.Deserialize<JwtHeader>(headerSegment.Base64UrlDecode()) ?? throw new NullReferenceException($"无法反序列化JWT头部");
         if (headerObject.JwtAlgorithm == JwtAlgorithm.HS256)
         {
             var signatureToVerify = new HMACSHA256(request.Key.HexStringDecode()).ComputeHash($"{headerSegment}.{payloadSegment}".Utf8Decode()).Base64UrlEncode();
             var verified = signatureToVerify == signatureSegment;
-            return verified ? new JwtVerifyResult(true, headerObject.JwtAlgorithm, headerSegment.Base64UrlDecode().Utf8Encode(), payloadSegment.Base64UrlDecode().Utf8Encode(), signatureSegment) : new JwtVerifyResult(false);
+            return new JwtVerifyResult(verified, JwtAlgorithm.HS256, header, payload, signatureSegment);
         }
         else if (headerObject.JwtAlgorithm == JwtAlgorithm.RS256)
         {
             using var rsa = RSA.Create();
             rsa.ImportPem(request.Key);
-            var isVerified = rsa.VerifyData($"{headerSegment}.{payloadSegment}".Utf8Decode(), signatureSegment.Base64UrlDecode(), HashAlgorithmName.SHA256, request.Padding ?? RSASignaturePadding.Pkcs1);
-            return isVerified ? new JwtVerifyResult(true, headerObject.JwtAlgorithm, headerSegment.Base64UrlDecode().Utf8Encode(), payloadSegment.Base64UrlDecode().Utf8Encode(), signatureSegment) : new JwtVerifyResult(false);
+            var verified = rsa.VerifyData($"{headerSegment}.{payloadSegment}".Utf8Decode(), signatureSegment.Base64UrlDecode(), HashAlgorithmName.SHA256, request.Padding ?? RSASignaturePadding.Pkcs1);
+            return new JwtVerifyResult(verified, JwtAlgorithm.RS256, header, payload, signatureSegment);
         }
         else
         {

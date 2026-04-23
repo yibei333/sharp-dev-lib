@@ -94,6 +94,19 @@ nQIDAQAB
         var result = JwtHelper
             .VerifyWithRsaSha256(token, key)
             .EnsureVerified();
+        Console.WriteLine(result.Header);
+        Console.WriteLine(result.Payload);
+    }
+
+    [TestMethod]
+    public void JwtVerifyWithHMACSHA256Test1()
+    {
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJqYXJ2YW4iLCJleHAiOjE2NDMzMzU0NDMsInN1YiI6MTIzLCJuYW1lIjoibGVlIn0.3-k3ooDm1tFi1odWiI2p7UqNL56vc7JeeJ3h-5OSgFo";
+        var key = "12345678901234567890123456789012x";
+        var result = JwtHelper
+            .VerifyWithHmacSha256(token, key.Utf8Decode());
+        Assert.IsFalse(result.IsVerified);
+        Console.WriteLine(result.Header);
         Console.WriteLine(result.Payload);
     }
 }
