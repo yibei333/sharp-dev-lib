@@ -17,7 +17,7 @@ internal class HttpProgressContent : HttpContent
     HttpProgressContent(HttpRequestModel request, HttpRequestMessage requestMessage)
     {
         _innerContent = requestMessage.Content;
-        _progress = new HttpProgress { RequestUrl = request.Message?.RequestUri?.ToString() ?? string.Empty, Total = requestMessage.Content?.Headers?.ContentLength ?? 0 };
+        _progress = new HttpProgress { RequestMessage = requestMessage, RequestUrl = request.Message?.RequestUri?.ToString() ?? string.Empty, Total = requestMessage.Content?.Headers?.ContentLength ?? 0 };
         CopyHeaders();
         _onProgress = HttpClientFactory.GetClient(request.ClientId).Config.OnSendProgress;
     }

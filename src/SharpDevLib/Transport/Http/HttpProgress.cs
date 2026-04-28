@@ -11,6 +11,16 @@ public class HttpProgress
     DateTime? _lastTransferTime;
 
     /// <summary>
+    /// HttpRequestMessage
+    /// </summary>
+    public HttpRequestMessage? RequestMessage { get; internal set; }
+
+    /// <summary>
+    /// ResponseMessage
+    /// </summary>
+    public HttpResponseMessage? ResponseMessage { get; internal set; }
+
+    /// <summary>
     /// 总字节数
     /// </summary>
     /// <remarks>某些情况下可能为0，表示未知总大小</remarks>

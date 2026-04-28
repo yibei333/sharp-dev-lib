@@ -129,7 +129,7 @@ public class HttpResponseModel//改名为HttpResponseModel,防止和Microsoft.As
     public async Task<Stream> ReadAsStreamAsync()
     {
         var sourceStream = await HttpResponseMessage.Content.ReadAsStreamAsync();
-        var progress = new HttpProgress { RequestUrl = Request.Message?.RequestUri.ToString() ?? string.Empty, Total = HttpResponseMessage.Content?.Headers?.ContentLength ?? 0 };
+        var progress = new HttpProgress { RequestMessage = Request.Message, ResponseMessage = HttpResponseMessage, RequestUrl = Request.Message?.RequestUri.ToString() ?? string.Empty, Total = HttpResponseMessage.Content?.Headers?.ContentLength ?? 0 };
         var onProgress = HttpClientFactory.GetClient(Request.ClientId).Config.OnReceiveProgress;
         var lastProgress = progress.Progress;
         return new HttpProgressStream(sourceStream, (p) =>
