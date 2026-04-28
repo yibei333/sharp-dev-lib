@@ -9,6 +9,7 @@ public class HttpProgress
 {
     long _transfered;
     DateTime? _lastTransferTime;
+    long? _lastTransfer;
 
     /// <summary>
     /// HttpRequestMessage
@@ -39,17 +40,19 @@ public class HttpProgress
         get => _transfered;
         internal set
         {
-            _lastTransferTime ??= DateTime.Now;
-            var singleTransfered = value - _transfered;
+            _lastTransferTime ??= DateTime.UtcNow;
+            _lastTransfer ??= 0;
+            var singleTransfered = value - _lastTransfer;
             _transfered = value;
             if (_transfered <= 0) return;
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             var time = now - (_lastTransferTime ?? now);
-            _lastTransferTime = now;
-            if (time.TotalMilliseconds <= 0) return;
-            var count = (long)Math.Round(singleTransfered * 1000 / time.TotalMilliseconds, 2);
+            if (time.TotalSeconds <= 1) return;
+            var count = (long)(singleTransfered / time.TotalSeconds);
             Speed = $"{count.ToFileSizeString()}/s";
+            _lastTransferTime = now;
+            _lastTransfer = value;
         }
     }
 
