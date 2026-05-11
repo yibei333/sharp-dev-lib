@@ -31,7 +31,7 @@ public class TcpFixedHeaderAdapter : ITcpAdapter
         var sizeBuffer = new byte[4];
         socket.BeginReceive(sizeBuffer, 0, 4, SocketFlags.None, (r) =>
         {
-            var b = (byte[])r.AsyncState;
+            var b = (byte[])(r.AsyncState ?? Array.Empty<byte>());
             var l = socket.EndReceive(r);
             if (l != b.Length) throw new InvalidDataException("固定头长度应为4字节");
             var size = BitConverter.ToInt32(sizeBuffer, 0);
@@ -48,7 +48,7 @@ public class TcpFixedHeaderAdapter : ITcpAdapter
     /// <returns>接收到的字节数组</returns>
     public byte[] EndReceive(Socket socket, IAsyncResult result)
     {
-        var buffer = (byte[])result.AsyncState;
+        var buffer = (byte[])(result.AsyncState ?? Array.Empty<byte>());
         var length = socket.EndReceive(result);
         return [.. buffer.Take(length)];
     }

@@ -24,7 +24,7 @@ public static class DataTableHelper
         rows = rows.Take((int)takeCount);
         foreach (DataRow row in rows)
         {
-            builder.AppendLine(string.Join("|", row.ItemArray.Select(x => x.ToString())));
+            builder.AppendLine(string.Join("|", row.ItemArray.Select(x => x?.ToString())));
         }
         return builder.ToString();
     }
@@ -171,7 +171,7 @@ public static class DataTableHelper
             x.Property = properties.FirstOrDefault(p => p.Name == propertyName) ?? throw new InvalidDataException($"在类型'{type.FullName}'找不到名称为'{x.Name}'的属性");
         });
 
-        var hasDefaultConstructor = typeof(T).GetConstructors().Any(x => x.GetParameters().Count() == 0);
+        var hasDefaultConstructor = typeof(T).GetConstructors().Any(x => x.GetParameters().Length == 0);
         foreach (DataRow row in table.Rows)
         {
             if (hasDefaultConstructor)
@@ -193,7 +193,7 @@ public static class DataTableHelper
                     var value = (mapping.ValueConverter ?? TableToListMapping.InternalDefaultValueConverter).Invoke(row[mapping.Name], row);
                     args.Add(value);
                 }
-                var instance = (T)Activator.CreateInstance(typeof(T), [.. args]);
+                var instance = (T)Activator.CreateInstance(typeof(T), [.. args])!;
                 result.Add(instance);
             }
         }
@@ -228,7 +228,7 @@ public static class DataTableHelper
             }
             else
             {
-                return Enum.Parse(type, rowValue.ToString());
+                return Enum.Parse(type, rowValue?.ToString() ?? string.Empty);
             }
         }
         else if (type == typeof(bool))

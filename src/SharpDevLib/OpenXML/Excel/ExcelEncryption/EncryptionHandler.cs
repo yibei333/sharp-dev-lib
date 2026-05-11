@@ -354,8 +354,7 @@ internal class EncryptedPackageHandler
 
         //AES = 32 Bits
         encryptionInfo.Verifier.VerifierHashSize = 0x20;
-        using var sha = SHA1.Create();
-        var verifierHash = sha.ComputeHash(verifier);
+        var verifierHash = SHA1.HashData(verifier);
 
         encryptionInfo.Verifier.EncryptedVerifierHash = EncryptData(key, verifierHash, false);
 
@@ -507,7 +506,7 @@ internal class EncryptedPackageHandler
 
             var decryptedData = new byte[size];
 
-            cryptoStream.Read(decryptedData, 0, (int)size);
+            cryptoStream.ReadExactly(decryptedData, 0, (int)size);
             doc.Write(decryptedData, 0, (int)size);
         }
         return doc;
@@ -525,18 +524,17 @@ internal class EncryptedPackageHandler
         using var dataStream = new MemoryStream(encryptionInfo.Verifier?.EncryptedVerifier ?? []);
         using var cryptoStream = new CryptoStream(dataStream, decryptor, CryptoStreamMode.Read);
         var decryptedVerifier = new byte[16];
-        cryptoStream.Read(decryptedVerifier, 0, 16);
+        cryptoStream.ReadExactly(decryptedVerifier, 0, 16);
 
         using var dataStream1 = new MemoryStream(encryptionInfo.Verifier?.EncryptedVerifierHash ?? []);
         using var cryptoStream1 = new CryptoStream(dataStream1, decryptor, CryptoStreamMode.Read);
 
         //Decrypt the verifier hash
         var decryptedVerifierHash = new byte[16];
-        cryptoStream1.Read(decryptedVerifierHash, 0, (int)16);
+        cryptoStream1.ReadExactly(decryptedVerifierHash, 0, (int)16);
 
         //Get the hash for the decrypted verifier
-        using var sha = SHA1.Create();
-        var hash = sha.ComputeHash(decryptedVerifier);
+        var hash = SHA1.HashData(decryptedVerifier);
 
         //Equal?
         for (int i = 0; i < 16; i++)
@@ -569,7 +567,7 @@ internal class EncryptedPackageHandler
         using var cryptoStream = new CryptoStream(dataStream, decryptor, CryptoStreamMode.Read);
 
         var decryptedData = new byte[size];
-        cryptoStream.Read(decryptedData, 0, (int)size);
+        cryptoStream.ReadExactly(decryptedData, 0, (int)size);
         return decryptedData;
     }
 

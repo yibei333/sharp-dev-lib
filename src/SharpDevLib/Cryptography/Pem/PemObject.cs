@@ -61,7 +61,7 @@ internal class PemObject
             {
                 var length = line.Length % 64;
                 if (length == 0) length = 64;
-                builder.Append(line.Substring(i * 64, length));
+                builder.Append(line.AsSpan(i * 64, length));
             }
             else builder.AppendLineWithLFTerminator(line.Substring(i * 64, 64));
         }
@@ -72,17 +72,17 @@ internal class PemObject
     {
         key = key.Trim();
         var reader = new StringReader(key);
-        var header = reader.ReadLine();
+        var header = reader.ReadLine() ?? string.Empty;
 
         //pkcs1 private key
         if (header.Equals(PemStatics.RsaPkcs1PrivateStart))
         {
             if (!key.EndsWith(PemStatics.RsaPkcs1PrivateEnd)) throw new InvalidDataException($"key should ends with '{PemStatics.RsaPkcs1PrivateEnd}'");
-            var procType = reader.ReadLine();
+            var procType = reader.ReadLine() ?? string.Empty;
             // encrypted pkcs1 private key
             if (procType.StartsWith("Proc-Type: 4,ENCRYPTED"))
             {
-                var dekInfo = reader.ReadLine();
+                var dekInfo = reader.ReadLine() ?? string.Empty;
                 var body = key.Replace(header, "").Replace(PemStatics.RsaPkcs1PrivateEnd, "").Replace(procType, "").Replace(dekInfo, "");
                 return new PemObject(header, new PemHeaderFields(procType, dekInfo), RemoveWrapLineAndTrim(body), PemStatics.RsaPkcs1PrivateEnd, PemType.EncryptedPkcs1PrivateKey);
             }

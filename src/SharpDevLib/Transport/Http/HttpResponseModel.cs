@@ -99,9 +99,9 @@ public class HttpResponseModel//改名为HttpResponseModel,防止和Microsoft.As
     public List<Cookie?>? GetResponseCookies()
     {
         var headers = GetResponseHeaders();
-        if (headers.IsNullOrEmpty() || !headers.ContainsKey("Set-Cookie")) return null;
+        if (headers.IsNullOrEmpty() || !headers.TryGetValue("Set-Cookie", out string[]? value)) return null;
         var host = new Uri(Request.Url).Host;
-        return [.. headers["Set-Cookie"].Select(x => ParseCookie(x, host))];
+        return [.. value.Select(x => ParseCookie(x, host))];
     }
 
     /// <summary>
@@ -129,7 +129,7 @@ public class HttpResponseModel//改名为HttpResponseModel,防止和Microsoft.As
     public async Task<Stream> ReadAsStreamAsync()
     {
         var sourceStream = await HttpResponseMessage.Content.ReadAsStreamAsync();
-        var progress = new HttpProgress { RequestMessage = Request.Message, ResponseMessage = HttpResponseMessage, RequestUrl = Request.Message?.RequestUri.ToString() ?? string.Empty, Total = HttpResponseMessage.Content?.Headers?.ContentLength ?? 0 };
+        var progress = new HttpProgress { RequestMessage = Request.Message, ResponseMessage = HttpResponseMessage, RequestUrl = Request.Message?.RequestUri?.ToString() ?? string.Empty, Total = HttpResponseMessage.Content?.Headers?.ContentLength ?? 0 };
         var onProgress = HttpClientFactory.GetClient(Request.ClientId).Config.OnReceiveProgress;
         var lastProgress = progress.Progress;
         return new HttpProgressStream(sourceStream, (p) =>
@@ -152,7 +152,8 @@ public class HttpResponseModel//改名为HttpResponseModel,防止和Microsoft.As
     {
         if (!IsSuccess)
         {
-            HttpClientFactory.GetClient(Request.ClientId).Config.Logger?.LogInformation(ToString());
+            var logger = HttpClientFactory.GetClient(Request.ClientId).Config.Logger;
+            if (logger is not null && logger.IsEnabled(LogLevel.Information)) logger.LogInformation("{OUTPUT}", ToString());
             throw new Exception("HTTP请求失败,请检查响应状态码和错误信息");
         }
         return this;
@@ -242,8 +243,8 @@ public class HttpResponseModel//改名为HttpResponseModel,防止和Microsoft.As
         var index = valuePair.IndexOf('=');
         if (index < 0) return new KeyValuePair<string, string?>(valuePair, null);
 
-        var name = valuePair.Substring(0, index);
-        var value = valuePair.Substring(index + 1);
+        var name = valuePair[..index];
+        var value = valuePair[(index + 1)..];
         return new KeyValuePair<string, string?>(name, value);
     }
 

@@ -30,9 +30,16 @@ internal class HttpProgressStream(Stream innerStream, Action<long> onProgress) :
         return byteRead;
     }
 
+    public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        int readCount = await _innerStream.ReadAsync(buffer, cancellationToken);
+        ReportBytesTransfered(readCount);
+        return readCount;
+    }
+
     public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
-        int readCount = await _innerStream.ReadAsync(buffer, offset, count, cancellationToken);
+        int readCount = await _innerStream.ReadAsync(buffer.AsMemory(offset, count), cancellationToken);
         ReportBytesTransfered(readCount);
         return readCount;
     }
@@ -49,9 +56,15 @@ internal class HttpProgressStream(Stream innerStream, Action<long> onProgress) :
         ReportBytesTransfered(1);
     }
 
+    public override async ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        await _innerStream.WriteAsync(buffer, cancellationToken);
+        ReportBytesTransfered(buffer.Length);
+    }
+
     public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
-        await _innerStream.WriteAsync(buffer, offset, count, cancellationToken);
+        await _innerStream.WriteAsync(buffer.AsMemory(offset, count), cancellationToken);
         ReportBytesTransfered(count);
     }
 

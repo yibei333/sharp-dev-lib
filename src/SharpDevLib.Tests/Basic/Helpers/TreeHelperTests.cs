@@ -17,7 +17,7 @@ public class TreeHelperTests
             new() { Id=2,Name="bar",ParentId=1 },
             new() { Id=3,Name="baz",ParentId=2 },
         };
-        var (result, ids) = users.HasCycleReference(x => x.Id, x => x.ParentId);
+        var (result, ids) = users.HasCycleReference(x => x.Id, x => x.ParentId ?? 0);
         Assert.IsFalse(result);
         Assert.IsNull(ids);
         Console.WriteLine(result);
@@ -33,7 +33,7 @@ public class TreeHelperTests
             new() { Id=2,Name="bar",ParentId=1 },
             new() { Id=3,Name="baz",ParentId=2 },
         };
-        var (result, ids) = users.HasCycleReference(x => x.Id, x => x.ParentId);
+        var (result, ids) = users.HasCycleReference(x => x.Id, x => x.ParentId ?? 0);
         Assert.IsTrue(result);
         Assert.IsNotNull(ids);
         Console.WriteLine(result);
@@ -49,7 +49,7 @@ public class TreeHelperTests
             new() { Id=2,Name="bar",ParentId=1 },
             new() { Id=3,Name="baz",ParentId=2 },
         };
-        var (result, ids) = users.HasCycleReference(x => x.Id, x => x.ParentId);
+        var (result, ids) = users.HasCycleReference(x => x.Id, x => x.ParentId ?? 0);
         Assert.IsTrue(result);
         Assert.IsNotNull(ids);
         Console.WriteLine(result);

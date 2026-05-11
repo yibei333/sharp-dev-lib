@@ -104,7 +104,7 @@ public static class SpreadsheetHelper
 
         sharedStringTable.AppendChild(new SharedStringItem(new Text(text)));
         sharedStringTable.Save();
-        return items.Count();
+        return items.Length;
     }
     #endregion
 
@@ -317,7 +317,7 @@ public static class SpreadsheetHelper
     /// <returns>单元格的值,如果单元格为空则返回 null</returns>
     public static string? GetValue(this Cell cell, IEnumerable<SharedStringItem> sharedStringItems)
     {
-        var text = cell.CellValue?.Text;
+        var text = cell.CellValue?.Text ?? string.Empty;
         var dataType = cell.DataType;
         if (dataType is null) return text;
         else if (dataType == CellValues.SharedString)
@@ -350,23 +350,23 @@ public static class SpreadsheetHelper
         if (type.IsNumericDatatype())
         {
             cell.DataType = CellValues.Number;
-            cell.CellValue = new CellValue(value.ToString());
+            cell.CellValue = new CellValue(value.ToString() ?? string.Empty);
         }
         else if (type == typeof(bool))
         {
-            cell.CellValue = new CellValue(bool.Parse(value.ToString()));
+            cell.CellValue = new CellValue(bool.Parse(value.ToString() ?? string.Empty));
             cell.DataType = CellValues.Boolean;
         }
         else
         {
             if (sharedStringTable is null)
             {
-                cell.CellValue = new CellValue(value.ToString());
+                cell.CellValue = new CellValue(value.ToString() ?? string.Empty);
                 cell.DataType = CellValues.String;
             }
             else
             {
-                var index = sharedStringTable.SetSharedStringItem(value.ToString());
+                var index = sharedStringTable.SetSharedStringItem(value.ToString() ?? string.Empty);
                 cell.CellValue = new CellValue(index);
                 cell.DataType = CellValues.SharedString;
             }
@@ -386,23 +386,23 @@ public static class SpreadsheetHelper
         if (type.IsNumericDatatype())
         {
             cell.DataType = CellValues.Number;
-            cell.CellValue = new CellValue(value.ToString());
+            cell.CellValue = new CellValue(value.ToString() ?? string.Empty);
         }
         else if (type == typeof(bool))
         {
-            cell.CellValue = new CellValue(bool.Parse(value.ToString()));
+            cell.CellValue = new CellValue(bool.Parse(value.ToString() ?? string.Empty));
             cell.DataType = CellValues.Boolean;
         }
         else
         {
             if (sharedStringCache is null)
             {
-                cell.CellValue = new CellValue(value.ToString());
+                cell.CellValue = new CellValue(value.ToString() ?? string.Empty);
                 cell.DataType = CellValues.String;
             }
             else
             {
-                var text = value.ToString();
+                var text = value.ToString() ?? string.Empty;
                 if (!sharedStringCache.TryGetValue(text, out var index))
                 {
                     index = sharedStringCache.Count;
@@ -431,7 +431,7 @@ public static class SpreadsheetHelper
         CreateCellIfNotExist(worksheet, cellReference2);
 
         MergeCells mergeCells;
-        if (worksheet.Elements<MergeCells>().Count() > 0)
+        if (worksheet.Elements<MergeCells>().Any())
         {
             mergeCells = worksheet.Elements<MergeCells>().First();
         }
@@ -440,35 +440,35 @@ public static class SpreadsheetHelper
             mergeCells = new MergeCells();
 
             // Insert a MergeCells object into the specified position.
-            if (worksheet.Elements<CustomSheetView>().Count() > 0)
+            if (worksheet.Elements<CustomSheetView>().Any())
             {
                 worksheet.InsertAfter(mergeCells, worksheet.Elements<CustomSheetView>().First());
             }
-            else if (worksheet.Elements<DataConsolidate>().Count() > 0)
+            else if (worksheet.Elements<DataConsolidate>().Any())
             {
                 worksheet.InsertAfter(mergeCells, worksheet.Elements<DataConsolidate>().First());
             }
-            else if (worksheet.Elements<SortState>().Count() > 0)
+            else if (worksheet.Elements<SortState>().Any())
             {
                 worksheet.InsertAfter(mergeCells, worksheet.Elements<SortState>().First());
             }
-            else if (worksheet.Elements<AutoFilter>().Count() > 0)
+            else if (worksheet.Elements<AutoFilter>().Any())
             {
                 worksheet.InsertAfter(mergeCells, worksheet.Elements<AutoFilter>().First());
             }
-            else if (worksheet.Elements<Scenarios>().Count() > 0)
+            else if (worksheet.Elements<Scenarios>().Any())
             {
                 worksheet.InsertAfter(mergeCells, worksheet.Elements<Scenarios>().First());
             }
-            else if (worksheet.Elements<ProtectedRanges>().Count() > 0)
+            else if (worksheet.Elements<ProtectedRanges>().Any())
             {
                 worksheet.InsertAfter(mergeCells, worksheet.Elements<ProtectedRanges>().First());
             }
-            else if (worksheet.Elements<SheetProtection>().Count() > 0)
+            else if (worksheet.Elements<SheetProtection>().Any())
             {
                 worksheet.InsertAfter(mergeCells, worksheet.Elements<SheetProtection>().First());
             }
-            else if (worksheet.Elements<SheetCalculationProperties>().Count() > 0)
+            else if (worksheet.Elements<SheetCalculationProperties>().Any())
             {
                 worksheet.InsertAfter(mergeCells, worksheet.Elements<SheetCalculationProperties>().First());
             }
@@ -778,7 +778,7 @@ public static class SpreadsheetHelper
         if (color.Length == 6) return HexBinaryValue.FromString($"FF{color}");
         else if (color.Length == 8)
         {
-            if (color.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) return HexBinaryValue.FromString($"00{color.Substring(2)}");
+            if (color.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) return HexBinaryValue.FromString($"00{color[2..]}");
             return HexBinaryValue.FromString(color);
         }
         else return HexBinaryValue.FromString(color);

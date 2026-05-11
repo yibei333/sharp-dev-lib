@@ -117,7 +117,7 @@ public static class ExcelHelper
         var dataSet = new DataSet();
 
         var sheetIndex = -1;
-        if (columnNames.NotNullOrEmpty() && columnNames.Count() != workbookPart.GetPartsOfType<WorksheetPart>().Count()) throw new ArgumentException($"参数'{nameof(columnNames)}'的数量与工作表数量不匹配");
+        if (columnNames.NotNullOrEmpty() && columnNames.Length != workbookPart.GetPartsOfType<WorksheetPart>().Count()) throw new ArgumentException($"参数'{nameof(columnNames)}'的数量与工作表数量不匹配");
         foreach (var worksheetPart in workbookPart.GetPartsOfType<WorksheetPart>())
         {
             sheetIndex++;
@@ -198,14 +198,14 @@ public static class ExcelHelper
         var rid = workbookPart.GetIdOfPart(worksheetPart);
         var tableName = workbookPart.Workbook?.Descendants<Sheet>().FirstOrDefault(x => x.Id == rid)?.Name ?? throw new Exception($"通过rid('{rid}')获取工作表失败");
         var table = new DataTable(tableName);
-        var rows = worksheetPart.Worksheet?.Descendants<Row>();
+        var rows = worksheetPart.Worksheet?.Descendants<Row>() ?? [];
         var sharedStringItems = workbookPart.GetPartsOfType<SharedStringTablePart>()?.FirstOrDefault()?.SharedStringTable?.Elements<SharedStringItem>()?.ToList() ?? [];
 
         //header
         var headerNameMap = new Dictionary<string, string>();
         var headerRow = rows.ElementAt(0);
         if (headerRow is null) return table;
-        if (columnNames.NotNullOrEmpty() && headerRow.Elements<Cell>().Count() != columnNames.Count()) throw new ArgumentException($"工作表'{tableName}'的列数量不匹配");
+        if (columnNames.NotNullOrEmpty() && headerRow.Elements<Cell>().Count() != columnNames.Length) throw new ArgumentException($"工作表'{tableName}'的列数量不匹配");
         var index = 0;
         foreach (Cell headerCell in headerRow.Elements<Cell>())
         {
@@ -247,7 +247,7 @@ public static class ExcelHelper
         var headerRow = new Row { RowIndex = 1 };
         sheetData.AppendChild(headerRow);
         uint headerColumnIndex = 1;
-        if (columnNames.NotNullOrEmpty() && columnNames.Count() != table.Columns.Count) throw new ArgumentException($"column count not match");
+        if (columnNames.NotNullOrEmpty() && columnNames.Length != table.Columns.Count) throw new ArgumentException($"column count not match");
         var columnNameIndex = -1;
 
         foreach (DataColumn item in table.Columns)

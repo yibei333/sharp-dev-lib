@@ -13,7 +13,7 @@ internal class HttpClientFactory
 
     public static HttpClientInfo GetClient(string? clientId)
     {
-        if (clientId.IsNullOrWhiteSpace()) return _clients.FirstOrDefault(x => x.ClientId == _defaultClientId) ?? _clients.FirstOrDefault(x => x.ClientId == _internalDefaultClientId);
+        if (clientId.IsNullOrWhiteSpace()) return _clients.FirstOrDefault(x => x.ClientId == _defaultClientId) ?? _clients.FirstOrDefault(x => x.ClientId == _internalDefaultClientId)!;
         return _clients.FirstOrDefault(x => x.ClientId == clientId) ?? throw new Exception($"找不到Id为'{clientId}'的客户端,请先调用HttpHelper.SetConfig设置");
     }
 

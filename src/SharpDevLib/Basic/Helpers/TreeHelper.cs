@@ -16,12 +16,12 @@ public static class TreeHelper
     /// <param name="id">获取Id</param>
     /// <param name="parentId">获取ParentId</param>
     /// <returns>返回是否包含循环引用及具体的Id</returns>
-    public static (bool, string?) HasCycleReference<T, TId>(this IEnumerable<T> source, Func<T, TId> id, Func<T, TId?> parentId)
+    public static (bool, string?) HasCycleReference<T, TId>(this IEnumerable<T> source, Func<T, TId> id, Func<T, TId> parentId) where TId : notnull
     {
         var type = typeof(TId);
         if (!type.IsValueType && type != typeof(string)) throw new Exception($"TId当前只支持值类型和string类型");
         if (source.IsNullOrEmpty()) return (false, null);
-        Dictionary<TId, TId?> items = [];
+        Dictionary<TId, TId> items = [];
         source.ForEach(x =>
         {
             items.Add(id(x) ?? throw new InvalidDataException("列表中的Id不能为null"), parentId(x));

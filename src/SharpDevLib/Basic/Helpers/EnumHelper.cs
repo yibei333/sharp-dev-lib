@@ -50,7 +50,7 @@ public static class EnumHelper
         var values = Enum.GetValues(typeof(TEnum));
         foreach (TEnum value in values)
         {
-            yield return new KeyValuePair<string, int>(value.ToString(), Convert.ToInt32(value));
+            yield return new KeyValuePair<string, int>(value.ToString() ?? string.Empty, Convert.ToInt32(value));
         }
     }
 }

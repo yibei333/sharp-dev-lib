@@ -18,11 +18,12 @@ internal abstract class DeCompressHandler(DeCompressRequest request)
             Password = Request.Password,
             LeaveStreamOpen = true,
         };
-        using var reader = ReaderFactory.Open(sourceStream, options);
+        using var reader = ReaderFactory.OpenReader(sourceStream, options);
         while (reader.MoveToNextEntry())
         {
             if (Request.CancellationToken?.IsCancellationRequested ?? false) throw new OperationCanceledException(Request.CancellationToken.Value);
             if (reader.Entry.IsDirectory) continue;
+            ArgumentNullException.ThrowIfNull(reader.Entry.Key);
 
             using var entryStream = reader.OpenEntryStream();
             string targetFile = Path.Combine(Request.TargetPath, reader.Entry.Key);
@@ -46,13 +47,13 @@ internal abstract class DeCompressHandler(DeCompressRequest request)
         try
         {
             sourceStream.Seek(0, SeekOrigin.Begin);
-            using var archive = ArchiveFactory.Open(sourceStream);
-            Request.Total = archive.TotalUncompressSize;
+            using var archive = ArchiveFactory.OpenArchive(sourceStream);
+            Request.Total = archive.TotalUncompressedSize;
         }
         catch
         {
             sourceStream.Seek(0, SeekOrigin.Begin);
-            using var reader = ReaderFactory.Open(sourceStream, new ReaderOptions { Password = Request.Password, LeaveStreamOpen = true });
+            using var reader = ReaderFactory.OpenReader(sourceStream, new ReaderOptions { Password = Request.Password, LeaveStreamOpen = true });
             while (reader.MoveToNextEntry())
             {
                 Request.Total += reader.Entry?.Size ?? 0;

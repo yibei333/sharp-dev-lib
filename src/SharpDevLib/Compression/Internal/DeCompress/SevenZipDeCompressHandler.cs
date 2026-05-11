@@ -8,12 +8,13 @@ internal class SevenZipDeCompressHandler(DeCompressRequest request) : DeCompress
     public override async Task HandleAsync()
     {
         Request.TargetPath.CreateDirectoryIfNotExist();
-        using var archive = SevenZipArchive.Open(Request.SourceFile, new ReaderOptions { Password = Request.Password });
-        var progress = Request.OnProgress is null ? null : new CompressionProgressArgs { Total = archive.TotalUncompressSize };
+        using var archive = SevenZipArchive.OpenArchive(Request.SourceFile, new ReaderOptions { Password = Request.Password });
+        var progress = Request.OnProgress is null ? null : new CompressionProgressArgs { Total = archive.TotalUncompressedSize };
 
         foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
         {
             if (Request.CancellationToken?.IsCancellationRequested ?? false) throw new OperationCanceledException(Request.CancellationToken.Value);
+            if (entry.Key.IsNullOrWhiteSpace()) continue;
             using var entryStream = entry.OpenEntryStream();
             string targetFile = Path.Combine(Request.TargetPath, entry.Key);
             targetFile.GetFileDirectory().CreateDirectoryIfNotExist();
@@ -24,7 +25,7 @@ internal class SevenZipDeCompressHandler(DeCompressRequest request) : DeCompress
             if (progress is not null)
             {
                 progress.CurrentName = entry.Key;
-                progress.Trasnsfed += entry.Size;
+                progress.Transferred += entry.Size;
                 Request.OnProgress!.Invoke(progress);
             }
         }

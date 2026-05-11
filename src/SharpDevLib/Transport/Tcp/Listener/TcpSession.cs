@@ -120,12 +120,12 @@ public class TcpSession<TMetadata> : IDisposable
         {
             Close();
             NotifyError(ex);
-            if (throwIfException) throw ex;
+            if (throwIfException) throw;
         }
         catch (Exception ex)
         {
             NotifyError(ex);
-            if (throwIfException) throw ex;
+            if (throwIfException) throw;
         }
     }
 
@@ -193,5 +193,6 @@ public class TcpSession<TMetadata> : IDisposable
     public void Dispose()
     {
         Close();
+        GC.SuppressFinalize(this);
     }
 }

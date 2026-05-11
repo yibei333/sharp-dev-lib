@@ -44,7 +44,7 @@ public class GzDeCompressTests
             OnProgress = (p) => Console.WriteLine(p.Serialize(JsonHelperTests.FormatJsonOption))
         };
         await option.DeCompressAsync();
-        Assert.IsTrue(File.Exists(targetPath.CombinePath("foo.txt")));
-        Assert.AreEqual("foo text", File.ReadAllText(targetPath.CombinePath("foo.txt")));
+        Assert.IsTrue(File.Exists(targetPath.CombinePath("gz")));
+        Assert.AreEqual("foo text", File.ReadAllText(targetPath.CombinePath("gz")));
     }
 }

@@ -9,13 +9,13 @@ public class RsaKeyParameters
 {
     internal RsaKeyParameters(RSAParameters parameters)
     {
-        Modulus = parameters.Modulus.HexStringEncode();
-        Exponent = parameters.Exponent.HexStringEncode();
+        Modulus = parameters.Modulus?.HexStringEncode() ?? string.Empty;
+        Exponent = parameters.Exponent?.HexStringEncode() ?? string.Empty;
         D = parameters.D.IsNullOrEmpty() ? null : parameters.D.HexStringEncode();
-        P = parameters.D.IsNullOrEmpty() ? null : parameters.P.HexStringEncode();
-        DP = parameters.D.IsNullOrEmpty() ? null : parameters.DP.HexStringEncode();
-        DQ = parameters.D.IsNullOrEmpty() ? null : parameters.DQ.HexStringEncode();
-        InverseQ = parameters.D.IsNullOrEmpty() ? null : parameters.InverseQ.HexStringEncode();
+        P = parameters.D.IsNullOrEmpty() ? null : parameters.P?.HexStringEncode() ?? string.Empty;
+        DP = parameters.D.IsNullOrEmpty() ? null : parameters.DP?.HexStringEncode() ?? string.Empty;
+        DQ = parameters.D.IsNullOrEmpty() ? null : parameters.DQ?.HexStringEncode() ?? string.Empty;
+        InverseQ = parameters.D.IsNullOrEmpty() ? null : parameters.InverseQ?.HexStringEncode() ?? string.Empty;
     }
 
     /// <summary>

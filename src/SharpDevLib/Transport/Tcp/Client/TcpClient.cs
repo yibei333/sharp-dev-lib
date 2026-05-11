@@ -234,12 +234,12 @@ public class TcpClient : IDisposable
         {
             Close();
             NotifyError(ex);
-            if (throwIfException) throw ex;
+            if (throwIfException) throw;
         }
         catch (Exception ex)
         {
             NotifyError(ex);
-            if (throwIfException) throw ex;
+            if (throwIfException) throw;
         }
     }
 
@@ -258,5 +258,6 @@ public class TcpClient : IDisposable
     public void Dispose()
     {
         Close();
+        GC.SuppressFinalize(this);
     }
 }

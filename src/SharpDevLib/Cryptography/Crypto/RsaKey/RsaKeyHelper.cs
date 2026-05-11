@@ -241,13 +241,13 @@ public static class RsaKeyHelper
         {
             var aes = Aes.Create();
             aes.KeySize = int.Parse(fields.DEKInfoAlgorithmFileds[1]);
-            aes.Mode = (CipherMode)Enum.Parse(typeof(CipherMode), fields.DEKInfoAlgorithmFileds[2]);
+            aes.Mode = Enum.Parse<CipherMode>(fields.DEKInfoAlgorithmFileds[2]);
             algorithm = aes;
         }
         else if (fields.DEKInfoAlgorithmFileds[0].Equals(nameof(DES), StringComparison.OrdinalIgnoreCase) && fields.DEKInfoAlgorithmFileds[1].Equals("EDE3", StringComparison.OrdinalIgnoreCase))
         {
             var tripleDES = TripleDES.Create();
-            tripleDES.Mode = (CipherMode)Enum.Parse(typeof(CipherMode), fields.DEKInfoAlgorithmFileds[2]);
+            tripleDES.Mode = Enum.Parse<CipherMode>(fields.DEKInfoAlgorithmFileds[2]);
             algorithm = tripleDES;
         }
         else throw new NotSupportedException($"暂不支持的算法: '{fields.DEKInfoAlgorithm}'");

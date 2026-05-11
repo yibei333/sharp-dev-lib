@@ -31,7 +31,7 @@ internal class HttpProgressContent : HttpContent
         }
     }
 
-    protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
+    protected override Task SerializeToStreamAsync(Stream stream, TransportContext? context)
     {
         if (_innerContent is null) return Task.CompletedTask;
         var lastProgress = _progress.Progress;

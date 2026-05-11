@@ -14,10 +14,8 @@ SqlHelper.Config(SqliteFactory.Instance, "data source=mydb.db");
 SqlHelper.Config(SqlClientFactory.Instance, "Server=localhost;Database=mydb;User Id=sa;Password=yourPassword;");
 
 // MySQL
-//依赖包Pomelo.EntityFrameworkCore.MySql
-SqlHelper.Config(MySqlConnectorFactory.Instance, "server=localhost;user=root;password=password;database=mydb");
-```
-
+//依赖包MySql.EntityFrameworkCore
+SqlHelper.Config(MySql.Data.MySqlClient.MySqlClientFactory.Instance, "server=localhost;user=root;password=password;database=mydb"); 
 
 ##### 示例
 

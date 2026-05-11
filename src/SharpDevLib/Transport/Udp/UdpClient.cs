@@ -123,7 +123,7 @@ public class UdpClient : IDisposable
         EndPoint endPoint = new IPEndPoint(IPAddress.Any, 0);
         try
         {
-            var buffer = (byte[])result.AsyncState;
+            var buffer = (byte[])(result.AsyncState ?? Array.Empty<byte>());
             EndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
             var length = Socket.EndReceiveFrom(result, ref remoteEndPoint);
             var bytes = buffer.Take(length).ToArray();
@@ -154,7 +154,7 @@ public class UdpClient : IDisposable
         var remoteEndPoint = new IPEndPoint(remoteAdress, remotePort);
         try
         {
-            if (_isDisposed) throw new ObjectDisposedException("无法访问已释放的UDP客户端");
+            ObjectDisposedException.ThrowIf(_isDisposed, this);
             if (bytes.Length > maxLength) throw new NotSupportedException($"数据长度超出限制{maxLength},请分段传输数据");
             Socket.SendTo(bytes, remoteEndPoint);
             NotifySended(bytes, remoteEndPoint);
@@ -162,7 +162,7 @@ public class UdpClient : IDisposable
         catch (Exception ex)
         {
             NotifyError(ex, remoteEndPoint);
-            if (throwIfException) throw ex;
+            if (throwIfException) throw;
         }
     }
 
@@ -173,5 +173,6 @@ public class UdpClient : IDisposable
     {
         _isDisposed = true;
         Socket.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

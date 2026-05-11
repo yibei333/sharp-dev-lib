@@ -38,7 +38,7 @@ public class TcpDefaultAdapter : ITcpAdapter
     /// <returns>接收到的字节数组</returns>
     public byte[] EndReceive(Socket socket, IAsyncResult result)
     {
-        var buffer = (byte[])result.AsyncState;
+        var buffer = (byte[])(result.AsyncState ?? Array.Empty<byte>());
         var length = socket.EndReceive(result);
         return [.. buffer.Take(length)];
     }

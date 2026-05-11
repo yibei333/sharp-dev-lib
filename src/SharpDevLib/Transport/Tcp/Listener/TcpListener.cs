@@ -137,7 +137,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
         }
         catch (Exception ex)
         {
-            TcpHelper.Logger?.LogError(ex, ex.Message);
+            TcpHelper.Logger?.LogError(ex, "{Message}", ex.Message);
             Close();
         }
     }
@@ -186,7 +186,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
     public void Close()
     {
         if (State == TcpListnerStates.Closed) return;
-        while (Sessions.Any()) Sessions.First().Close();
+        while (Sessions.Count != 0) Sessions.First().Close();
         Socket.Dispose();
         State = TcpListnerStates.Closed;
     }
@@ -197,6 +197,7 @@ public class TcpListener<TSessionMetadata> : IDisposable
     public void Dispose()
     {
         Close();
+        GC.SuppressFinalize(this);
     }
 }
 

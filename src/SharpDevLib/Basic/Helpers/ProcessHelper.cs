@@ -288,8 +288,8 @@ public class ProcessResult
         if (!IsSuccess)
         {
             ProcessHelper.Logger?.LogError("run process failed:{Path} {Args}", Request.Filename, Request.Args);
-            if (Output.NotNullOrWhiteSpace()) ProcessHelper.Logger?.LogInformation("output:\r\n{Output}\r\n", Output);
-            if (Error.NotNullOrWhiteSpace()) ProcessHelper.Logger?.LogError("error:\r\n{Error}\r\n", Error);
+            if (Output.NotNullOrWhiteSpace() && ProcessHelper.Logger is not null && ProcessHelper.Logger.IsEnabled(LogLevel.Information)) ProcessHelper.Logger?.LogInformation("output:\r\n{Output}\r\n", Output);
+            if (Error.NotNullOrWhiteSpace() && ProcessHelper.Logger is not null && ProcessHelper.Logger.IsEnabled(LogLevel.Error)) ProcessHelper.Logger?.LogError("error:\r\n{Error}\r\n", Error);
             throw new Exception(Error);
         }
     }

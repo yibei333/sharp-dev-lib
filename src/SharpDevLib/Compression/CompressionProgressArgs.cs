@@ -23,12 +23,12 @@ public class CompressionProgressArgs
     /// <summary>
     /// 获取已处理的字节数
     /// </summary>
-    public double Trasnsfed { get; internal set; }
+    public double Transferred { get; internal set; }
 
     /// <summary>
     /// 获取进度百分比，范围从0到100
     /// </summary>
-    public double Progress => Total <= 0 ? 0 : (Trasnsfed >= Total ? 100 : Math.Round(Trasnsfed * 1.0 / Total * 100, 2));
+    public double Progress => Total <= 0 ? 0 : (Transferred >= Total ? 100 : Math.Round(Transferred * 1.0 / Total * 100, 2));
 
     /// <summary>
     /// 获取进度文本，包含百分号

@@ -54,7 +54,7 @@ public static class JwtHelper
 
     static string CreateHeader(JwtAlgorithm algorithm)
     {
-        if (!Enum.IsDefined(typeof(JwtAlgorithm), algorithm)) throw new NotSupportedException($"暂不支持的算法: {algorithm}");
+        if (!Enum.IsDefined(algorithm)) throw new NotSupportedException($"暂不支持的算法: {algorithm}");
         var header = new JwtHeader(algorithm.ToString(), "JWT");
         var headerSegment = JsonSerializer.Serialize(header).Utf8Decode().Base64UrlEncode();
         return headerSegment;
@@ -62,7 +62,7 @@ public static class JwtHelper
 
     static string CreatePayload(object payload)
     {
-        if (payload is null) throw new ArgumentNullException(nameof(payload));
+        ArgumentNullException.ThrowIfNull(payload);
         return JsonSerializer.Serialize(payload).Utf8Decode().Base64UrlEncode();
     }
 

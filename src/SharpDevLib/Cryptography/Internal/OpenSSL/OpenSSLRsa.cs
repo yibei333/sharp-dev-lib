@@ -13,7 +13,7 @@ internal class OpenSSLRsa
         var hashAlgorithm = MD5.Create();
         int dkLen = GetDkLength(fields);
         int hLen = 16;//md5 digist length
-        var salt = fields.DEKInfoIVBytes.Take(8).ToArray();//The salt parameter is used as a salt in the derivation: it should point to an 8 byte buffer or NULL if no salt is used
+        var salt = fields.DEKInfoIVBytes?.Take(8).ToArray() ?? [];//The salt parameter is used as a salt in the derivation: it should point to an 8 byte buffer or NULL if no salt is used
 
         //If the total key and IV length is less than the digest length and MD5 is used
         //then the derivation algorithm is compatible with PKCS#5 v1.5(PKCS#5 v2.0 PBKDF1 is compatible with the key derivation process in PKCS #5 v1.5)

@@ -21,7 +21,7 @@ public sealed class SqlHelper : IDisposable
     /// <param name="dbProviderFactory">数据库提供商工厂，支持的工厂如下：
     /// <para>1. 引用Microsoft.Data.Sqlite，则用SqliteFactory.Instance</para>
     /// <para>2. 引用Microsoft.Data.SqlClient，则用SqlClientFactory.Instance</para>
-    /// <para>3. 引用Pomelo.EntityFrameworkCore.MySql，则用MySqlConnectorFactory.Instance</para>
+    /// <para>3. 引用MySql.EntityFrameworkCore，则用MySql.Data.MySqlClient.MySqlClientFactory.Instance</para>
     /// </param>
     /// <param name="connectionString">数据库连接字符串，格式如下：
     /// <para>1. SQLite："data source=dbFilePath"</para>
@@ -41,7 +41,7 @@ public sealed class SqlHelper : IDisposable
     /// <param name="dbProviderFactory">数据库提供商工厂，支持的工厂如下：
     /// <para>1. 引用Microsoft.Data.Sqlite，则用SqliteFactory.Instance</para>
     /// <para>2. 引用Microsoft.Data.SqlClient，则用SqlClientFactory.Instance</para>
-    /// <para>3. 引用Pomelo.EntityFrameworkCore.MySql，则用MySqlConnectorFactory.Instance</para>
+    /// <para>3. 引用MySql.EntityFrameworkCore，则用MySql.Data.MySqlClient.MySqlClientFactory.Instance</para>
     /// </param>
     /// <param name="connectionString">数据库连接字符串，格式如下：
     /// <para>1. SQLite："data source=dbFilePath"</para>
@@ -51,7 +51,7 @@ public sealed class SqlHelper : IDisposable
     public SqlHelper(DbProviderFactory dbProviderFactory, string connectionString)
     {
         DbProviderFactory = dbProviderFactory;
-        Connection = DbProviderFactory.CreateConnection();
+        Connection = DbProviderFactory.CreateConnection() ?? throw new Exception("create connection failed");
         Connection.ConnectionString = connectionString;
         Connection.Open();
     }
@@ -65,7 +65,7 @@ public sealed class SqlHelper : IDisposable
         if (GlobalDbProviderFactory is null || GlobalConnectionString.IsNullOrWhiteSpace()) throw new Exception($"please call SqlHelper.Config() method first or provide parameters");
 
         DbProviderFactory = GlobalDbProviderFactory;
-        Connection = DbProviderFactory.CreateConnection();
+        Connection = DbProviderFactory.CreateConnection() ?? throw new Exception("create connection failed");
         Connection.ConnectionString = GlobalConnectionString;
         Connection.Open();
     }
@@ -101,15 +101,15 @@ public sealed class SqlHelper : IDisposable
     /// <returns>查询结果的单个值</returns>
     /// <exception cref="Exception">当T的类型为引用类型（排除string类型）时抛出异常</exception>
     /// <exception cref="InvalidCastException">当T的类型为值类型且返回结果为null时抛出异常</exception>
-    public T ExecuteScalar<T>(string sql, params DbParameter[] parameters)
+    public T ExecuteScalar<T>(string sql, DbParameter[]? parameters = null)
     {
         var type = typeof(T);
         if (!type.IsValueType && type != typeof(string)) throw new Exception($"当前只支持值类型和string类型");
 
-        using var command = CreateCommand(sql, parameters);
+        using var command = CreateCommand(sql, parameters ?? []);
         var result = command.ExecuteScalar();
         if ((result is null || result == DBNull.Value) && type.IsValueType) throw new InvalidCastException($"不能将NULL转换为类型'{type.FullName}'");
-        return (T)Convert.ChangeType(result, type);
+        return (T)Convert.ChangeType(result, type)!;
     }
 
     /// <summary>
@@ -121,30 +121,30 @@ public sealed class SqlHelper : IDisposable
     /// <returns>查询结果的单个值</returns>
     /// <exception cref="Exception">当T的类型为引用类型（排除string类型）时抛出异常</exception>
     /// <exception cref="InvalidCastException">当T的类型为值类型且返回结果为null时抛出异常</exception>
-    public async Task<T> ExecuteScalarAsync<T>(string sql, params DbParameter[] parameters)
+    public async Task<T> ExecuteScalarAsync<T>(string sql, DbParameter[] parameters)
     {
-        return await ExecuteScalarAsync<T>(CancellationToken.None, sql, parameters);
+        return await ExecuteScalarAsync<T>(sql, parameters);
     }
 
     /// <summary>
     /// 异步执行SQL查询并返回单个值，支持取消操作
     /// </summary>
     /// <typeparam name="T">返回值的类型，必须是值类型或String</typeparam>
-    /// <param name="cancellationToken">取消令牌</param>
     /// <param name="sql">SQL查询语句</param>
     /// <param name="parameters">SQL参数数组</param>
+    /// <param name="cancellationToken">取消令牌</param>
     /// <returns>查询结果的单个值</returns>
     /// <exception cref="Exception">当T的类型为引用类型（排除string类型）时抛出异常</exception>
     /// <exception cref="InvalidCastException">当T的类型为值类型且返回结果为null时抛出异常</exception>
-    public async Task<T> ExecuteScalarAsync<T>(CancellationToken cancellationToken, string sql, params DbParameter[] parameters)
+    public async Task<T> ExecuteScalarAsync<T>(string sql, DbParameter[]? parameters = null, CancellationToken cancellationToken = default)
     {
         var type = typeof(T);
         if (!type.IsValueType && type != typeof(string)) throw new Exception($"当前只支持值类型和string类型");
 
-        using var command = CreateCommand(sql, parameters);
+        using var command = CreateCommand(sql, parameters ?? []);
         var result = await command.ExecuteScalarAsync(cancellationToken);
         if ((result is null || result == DBNull.Value) && type.IsValueType) throw new InvalidCastException($"不能将NULL转换为类型'{type.FullName}'");
-        return (T)Convert.ChangeType(result, type);
+        return (T)Convert.ChangeType(result, type)!;
     }
 
     /// <summary>
@@ -154,7 +154,7 @@ public sealed class SqlHelper : IDisposable
     /// <param name="sql">SQL查询语句</param>
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>查询结果的对象集合</returns>
-    public IEnumerable<T> Query<T>(string sql, params DbParameter[] parameters) where T : class
+    public IEnumerable<T> Query<T>(string sql, DbParameter[]? parameters = null) where T : class
     {
         var table = ExecuteDataTable(sql, parameters);
         return table.ToList<T>();
@@ -167,7 +167,7 @@ public sealed class SqlHelper : IDisposable
     /// <param name="sql">SQL查询语句</param>
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>查询结果的对象集合</returns>
-    public async Task<IEnumerable<T>> QueryAsync<T>(string sql, params DbParameter[] parameters) where T : class
+    public async Task<IEnumerable<T>> QueryAsync<T>(string sql, DbParameter[] parameters) where T : class
     {
         var table = await ExecuteDataTableAsync(sql, parameters);
         return table.ToList<T>();
@@ -181,9 +181,9 @@ public sealed class SqlHelper : IDisposable
     /// <param name="sql">SQL查询语句</param>
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>查询结果的对象集合</returns>
-    public async Task<IEnumerable<T>> QueryAsync<T>(CancellationToken cancellationToken, string sql, params DbParameter[] parameters) where T : class
+    public async Task<IEnumerable<T>> QueryAsync<T>(string sql, DbParameter[]? parameters = null, CancellationToken cancellationToken = default) where T : class
     {
-        var table = await ExecuteDataTableAsync(cancellationToken, sql, parameters);
+        var table = await ExecuteDataTableAsync(sql, parameters, cancellationToken);
         return table.ToList<T>();
     }
 
@@ -193,9 +193,9 @@ public sealed class SqlHelper : IDisposable
     /// <param name="sql">SQL查询语句</param>
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>包含查询结果的数据集</returns>
-    public DataSet ExecuteDataSet(string sql, params DbParameter[] parameters)
+    public DataSet ExecuteDataSet(string sql, DbParameter[]? parameters = null)
     {
-        using var command = CreateCommand(sql, parameters);
+        using var command = CreateCommand(sql, parameters ?? []);
         using var adapter = DbProviderFactory.CreateDataAdapter();
         var dataset = new DataSet();
 
@@ -225,7 +225,7 @@ public sealed class SqlHelper : IDisposable
 
                 foreach (var item in columns)
                 {
-                    dataTable.Columns.Add(new DataColumn(item.ColumnName, item.DataType));
+                    dataTable.Columns.Add(new DataColumn(item.ColumnName, item.DataType!));
                 }
 
                 while (reader.Read())
@@ -249,7 +249,7 @@ public sealed class SqlHelper : IDisposable
     /// <param name="sql">SQL查询语句</param>
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>包含查询结果的数据集</returns>
-    public async Task<DataSet> ExecuteDataSetAsync(string sql, params DbParameter[] parameters)
+    public async Task<DataSet> ExecuteDataSetAsync(string sql, DbParameter[] parameters)
     {
         return await Task.Run(() => ExecuteDataSet(sql, parameters));
     }
@@ -261,7 +261,7 @@ public sealed class SqlHelper : IDisposable
     /// <param name="sql">SQL查询语句</param>
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>包含查询结果的数据集</returns>
-    public async Task<DataSet> ExecuteDataSetAsync(CancellationToken cancellationToken, string sql, params DbParameter[] parameters)
+    public async Task<DataSet> ExecuteDataSetAsync(string sql, DbParameter[]? parameters = null, CancellationToken cancellationToken = default)
     {
         return await Task.Run(() => ExecuteDataSet(sql, parameters), cancellationToken);
     }
@@ -272,7 +272,7 @@ public sealed class SqlHelper : IDisposable
     /// <param name="sql">SQL查询语句</param>
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>包含查询结果的数据表</returns>
-    public DataTable ExecuteDataTable(string sql, params DbParameter[] parameters)
+    public DataTable ExecuteDataTable(string sql, DbParameter[]? parameters = null)
     {
         var set = ExecuteDataSet(sql, parameters);
         var table = set.Tables[0];
@@ -286,7 +286,7 @@ public sealed class SqlHelper : IDisposable
     /// <param name="sql">SQL查询语句</param>
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>包含查询结果的数据表</returns>
-    public async Task<DataTable> ExecuteDataTableAsync(string sql, params DbParameter[] parameters)
+    public async Task<DataTable> ExecuteDataTableAsync(string sql, DbParameter[] parameters)
     {
         return await Task.Run(() => ExecuteDataTable(sql, parameters));
     }
@@ -298,7 +298,7 @@ public sealed class SqlHelper : IDisposable
     /// <param name="sql">SQL查询语句</param>
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>包含查询结果的数据表</returns>
-    public async Task<DataTable> ExecuteDataTableAsync(CancellationToken cancellationToken, string sql, params DbParameter[] parameters)
+    public async Task<DataTable> ExecuteDataTableAsync(string sql, DbParameter[]? parameters = null, CancellationToken cancellationToken = default)
     {
         return await Task.Run(() => ExecuteDataTable(sql, parameters), cancellationToken);
     }
@@ -309,9 +309,9 @@ public sealed class SqlHelper : IDisposable
     /// <param name="sql">SQL语句</param>
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>受影响的行数</returns>
-    public int ExecuteNonQuery(string sql, params DbParameter[] parameters)
+    public int ExecuteNonQuery(string sql, DbParameter[]? parameters = null)
     {
-        using var command = CreateCommand(sql, parameters);
+        using var command = CreateCommand(sql, parameters ?? []);
         return command.ExecuteNonQuery();
     }
 
@@ -321,9 +321,9 @@ public sealed class SqlHelper : IDisposable
     /// <param name="sql">SQL语句</param>
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>受影响的行数</returns>
-    public async Task<int> ExecuteNonQueryAsync(string sql, params DbParameter[] parameters)
+    public async Task<int> ExecuteNonQueryAsync(string sql, DbParameter[] parameters)
     {
-        using var command = CreateCommand(sql, parameters);
+        using var command = CreateCommand(sql, parameters ?? []);
         return await command.ExecuteNonQueryAsync();
     }
 
@@ -334,9 +334,9 @@ public sealed class SqlHelper : IDisposable
     /// <param name="sql">SQL语句</param>
     /// <param name="parameters">SQL参数数组</param>
     /// <returns>受影响的行数</returns>
-    public async Task<int> ExecuteNonQueryAsync(CancellationToken cancellationToken, string sql, params DbParameter[] parameters)
+    public async Task<int> ExecuteNonQueryAsync(string sql, DbParameter[]? parameters = null, CancellationToken cancellationToken = default)
     {
-        using var command = CreateCommand(sql, parameters);
+        using var command = CreateCommand(sql, parameters ?? []);
         return await command.ExecuteNonQueryAsync(cancellationToken);
     }
 

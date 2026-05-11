@@ -148,7 +148,7 @@ public static class HttpHelper
             if (request.Parameters.NotNullOrEmpty())
             {
                 url = request.Url.TrimEnd("?");
-                var prefix = url.Contains("?") ? "&" : "?";
+                var prefix = url.Contains('?') ? "&" : "?";
                 url = $"{url}{prefix}{request.Parameters.ToQueryString()}";
             }
         }
@@ -171,7 +171,7 @@ public static class HttpHelper
                 {
                     foreach (var item in request.Parameters)
                     {
-                        multipartFormDataContent.Add(new StringContent(item.Value), item.Key);
+                        multipartFormDataContent.Add(new StringContent(item.Value ?? string.Empty), item.Key);
                     }
                 }
                 foreach (var file in request.Files)

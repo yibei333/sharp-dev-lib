@@ -111,7 +111,7 @@ internal class TBSCertificate
             Extensions.ForEach(extension =>
             {
                 writer.PushSequence();
-                writer.WriteObjectIdentifier(extension.Oid.Value);
+                writer.WriteObjectIdentifier(extension.Oid?.Value ?? string.Empty);
                 if (extension.Critical) writer.WriteBoolean(true);
                 writer.PushOctetString();
                 writer.WriteEncodedValue(extension.RawData);

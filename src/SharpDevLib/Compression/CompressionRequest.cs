@@ -26,7 +26,7 @@ public abstract class CompressionRequest(string targetPath)
                 progress ??= new CompressionProgressArgs { Total = Total };
                 progress.CurrentName = CurrentName;
                 var lastProcess = progress.Progress;
-                progress.Trasnsfed = _transfered;
+                progress.Transferred = _transfered;
                 if ((progress.Progress - lastProcess) > 5) OnProgress.Invoke(progress);
             }
         }

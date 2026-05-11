@@ -1,6 +1,7 @@
 ﻿using SharpDevLib.Cryptography.Internal;
 using SharpDevLib.Cryptography.Pem;
 using System.Formats.Asn1;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -45,9 +46,7 @@ public class X509CertificateSigningRequest
         writer.WriteNull(new Asn1Tag(TagClass.ContextSpecific, 0));
         writer.PopSequence();
         CertificationRequestInfo = writer.Encode();
-
-        var hashAlgorithm = SHA256.Create();
-        var hash = hashAlgorithm.ComputeHash(CertificationRequestInfo);
+        var hash = SHA256.HashData(CertificationRequestInfo);
         Signature = rsa.SignHash(hash, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
     }
 
@@ -141,8 +140,7 @@ public class X509CertificateSigningRequest
     {
         var tbsCertificate = new TBSCertificate(serialNumber, issuer, days, Subject, PublicKey, extensions);
         var tbsCertificateBytes = tbsCertificate.Encode();
-        using var hashAlgorithm = SHA256.Create();
-        var hash = hashAlgorithm.ComputeHash(tbsCertificateBytes);
+        var hash = SHA256.HashData(tbsCertificateBytes);
         using var rsa = RSA.Create();
         rsa.ImportPem(issuerPrivateKey);
         var signature = rsa.SignHash(hash, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
@@ -161,8 +159,8 @@ public class X509CertificateSigningRequest
         writer.WriteBitString(signature, 0);
         writer.PopSequence();
         var rawData = writer.Encode();
-        var cert = new X509Certificate2(rawData);
-        if (friendlyName.NotNullOrWhiteSpace()) cert.FriendlyName = friendlyName;
+        var cert = X509CertificateLoader.LoadCertificate(rawData);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && friendlyName.NotNullOrWhiteSpace()) cert.FriendlyName = friendlyName;
         return cert;
     }
 

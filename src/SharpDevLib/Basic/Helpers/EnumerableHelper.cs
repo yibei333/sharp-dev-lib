@@ -44,7 +44,7 @@ public static class EnumerableHelper
     /// <param name="value">要添加的值</param>
     /// <returns>添加键值对后的原字典，用于链式调用</returns>
     /// <exception cref="ArgumentException">当字典中已存在相同键时抛出</exception>
-    public static Dictionary<TKey, TValue> AddItem<TKey, TValue>(this Dictionary<TKey, TValue> source, TKey key, TValue value)
+    public static Dictionary<TKey, TValue> AddItem<TKey, TValue>(this Dictionary<TKey, TValue> source, TKey key, TValue value) where TKey : notnull
 
     {
         source.Add(key, value);
@@ -59,7 +59,7 @@ public static class EnumerableHelper
     /// <param name="source">源字典</param>
     /// <param name="key">要删除的键</param>
     /// <returns>删除键后的原字典，用于链式调用</returns>
-    public static Dictionary<TKey, TValue> RemoveItem<TKey, TValue>(this Dictionary<TKey, TValue> source, TKey key)
+    public static Dictionary<TKey, TValue> RemoveItem<TKey, TValue>(this Dictionary<TKey, TValue> source, TKey key) where TKey : notnull
     {
         source.Remove(key);
         return source;
@@ -122,8 +122,9 @@ public static class EnumerableHelper
 
     internal static IEnumerable<T> OrderByDynamic<T>(this IEnumerable<T> query, PropertyInfo sortProperty, bool descending = false) where T : class => query.AsQueryable().OrderByDynamic(sortProperty, descending).AsEnumerable();
 
-    internal static IQueryable<T> OrderByDynamic<T>(this IQueryable<T> query, PropertyInfo sortProperty, bool descending = false) where T : class
+    internal static IQueryable<T> OrderByDynamic<T>(this IQueryable<T> query, PropertyInfo? sortProperty, bool descending = false) where T : class
     {
+        if (sortProperty is null) return query;
         var parameter = Expression.Parameter(typeof(T), "x");
         string command = descending ? "OrderByDescending" : "OrderBy";
         var propertyAccess = Expression.MakeMemberAccess(parameter, sortProperty);

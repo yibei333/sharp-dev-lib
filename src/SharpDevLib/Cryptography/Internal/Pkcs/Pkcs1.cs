@@ -75,14 +75,14 @@ internal static class Pkcs1
 
         writer.PushSequence();
         writer.WriteIntegerValue(0);//version
-        writer.WriteIntegerValue(parameters.Modulus);//module
-        writer.WriteIntegerValue(parameters.Exponent);//publicExponent
-        writer.WriteIntegerValue(parameters.D);//privateExponent
-        writer.WriteIntegerValue(parameters.P);//prime1
-        writer.WriteIntegerValue(parameters.Q);//prime2
-        writer.WriteIntegerValue(parameters.DP);//exponent1
-        writer.WriteIntegerValue(parameters.DQ);//exponent2
-        writer.WriteIntegerValue(parameters.InverseQ);//coefficient
+        writer.WriteIntegerValue(parameters.Modulus ?? []);//module
+        writer.WriteIntegerValue(parameters.Exponent ?? []);//publicExponent
+        writer.WriteIntegerValue(parameters.D ?? []);//privateExponent
+        writer.WriteIntegerValue(parameters.P ?? []);//prime1
+        writer.WriteIntegerValue(parameters.Q ?? []);//prime2
+        writer.WriteIntegerValue(parameters.DP ?? []);//exponent1
+        writer.WriteIntegerValue(parameters.DQ ?? []);//exponent2
+        writer.WriteIntegerValue(parameters.InverseQ ?? []);//coefficient
         writer.PopSequence();
 
         var length = writer.GetEncodedLength();
@@ -118,8 +118,8 @@ internal static class Pkcs1
         var writer = new AsnWriter(AsnEncodingRules.DER);
 
         writer.PushSequence();
-        writer.WriteIntegerValue(parameters.Modulus);//module
-        writer.WriteIntegerValue(parameters.Exponent);//publicExponent
+        writer.WriteIntegerValue(parameters.Modulus ?? []);//module
+        writer.WriteIntegerValue(parameters.Exponent ?? []);//publicExponent
         writer.PopSequence();
 
         var length = writer.GetEncodedLength();

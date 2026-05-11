@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace SharpDevLib.Tests.Data;
@@ -70,12 +69,12 @@ public class SqlHelperTests
         SqlHelper.Config(SqliteFactory.Instance, SourceConnectionString);
         using var sqlHelper = new SqlHelper();
 
-        Assert.AreEqual(2, await sqlHelper.ExecuteScalarAsync<int>("SELECT COUNT(1) FROM [User]"));
-        Assert.AreEqual(5, await sqlHelper.ExecuteScalarAsync<int>("SELECT COUNT(1) FROM [UserFavorite]"));
-        Assert.AreEqual(5, await sqlHelper.ExecuteScalarAsync<int>("SELECT COUNT(1) FROM [User] a INNER JOIN [UserFavorite] b ON a.Name=b.Name"));
-        Assert.AreEqual(1, await sqlHelper.ExecuteScalarAsync<int>("SELECT COUNT(1) FROM [User] a INNER JOIN [UserFavorite] b ON a.Name=b.Name GROUP BY a.Name"));
-        Assert.AreEqual("Program", await sqlHelper.ExecuteScalarAsync<string>("SELECT Favorite FROM [UserFavorite] WHERE [Name]='Bar'"));
-        Assert.IsNull(await sqlHelper.ExecuteScalarAsync<string>("SELECT Favorite FROM [UserFavorite] WHERE [Name]='Baz'"));
+        Assert.AreEqual(2, await sqlHelper.ExecuteScalarAsync<int>("SELECT COUNT(1) FROM [User]", cancellationToken: TestContext.CancellationToken));
+        Assert.AreEqual(5, await sqlHelper.ExecuteScalarAsync<int>("SELECT COUNT(1) FROM [UserFavorite]", cancellationToken: TestContext.CancellationToken));
+        Assert.AreEqual(5, await sqlHelper.ExecuteScalarAsync<int>("SELECT COUNT(1) FROM [User] a INNER JOIN [UserFavorite] b ON a.Name=b.Name", cancellationToken: TestContext.CancellationToken));
+        Assert.AreEqual(1, await sqlHelper.ExecuteScalarAsync<int>("SELECT COUNT(1) FROM [User] a INNER JOIN [UserFavorite] b ON a.Name=b.Name GROUP BY a.Name", cancellationToken: TestContext.CancellationToken));
+        Assert.AreEqual("Program", await sqlHelper.ExecuteScalarAsync<string>("SELECT Favorite FROM [UserFavorite] WHERE [Name]='Bar'", cancellationToken: TestContext.CancellationToken));
+        Assert.IsNull(await sqlHelper.ExecuteScalarAsync<string>("SELECT Favorite FROM [UserFavorite] WHERE [Name]='Baz'", cancellationToken: TestContext.CancellationToken));
     }
 
     [TestMethod]
@@ -106,7 +105,7 @@ public class SqlHelperTests
             SELECT [Name],Favorite FROM [UserFavorite];
             SELECT a.[Name],a.Age,b.Favorite FROM [User] a INNER JOIN [UserFavorite] b ON a.Name=b.Name;
         ";
-        var dataSet = await sqlHelper.ExecuteDataSetAsync(sql);
+        var dataSet = await sqlHelper.ExecuteDataSetAsync(sql, cancellationToken: TestContext.CancellationToken);
         Assert.HasCount(3, dataSet.Tables);
         Assert.AreEqual(Users.Serialize(), dataSet.Tables[0].ToList<User>().Serialize());
         Assert.AreEqual(UserFavorites.Serialize(), dataSet.Tables[1].ToList<UserFavorite>().Serialize());
@@ -123,7 +122,7 @@ public class SqlHelperTests
             SELECT [Name],Favorite FROM [UserFavorite];
             SELECT a.[Name],a.Age,b.Favorite FROM [User] a INNER JOIN [UserFavorite] b ON a.Name=b.Name;
         ";
-        var table = await sqlHelper.ExecuteDataTableAsync(sql);
+        var table = await sqlHelper.ExecuteDataTableAsync(sql, cancellationToken: TestContext.CancellationToken);
         table.TableName = "xx";
         var set = new DataSet();
         set.Tables.Add(table);
@@ -148,7 +147,7 @@ public class SqlHelperTests
         SqlHelper.Config(SqliteFactory.Instance, path);
         using var sqlHelper = new SqlHelper();
 
-        var affectRowsCount = await sqlHelper.ExecuteNonQueryAsync($"INSERT INTO [User]([Name],Age) Values('Baz',30),('Qux',40);INSERT INTO [UserFavorite]([Name],Favorite) Values('Baz','Game');");
+        var affectRowsCount = await sqlHelper.ExecuteNonQueryAsync($"INSERT INTO [User]([Name],Age) Values('Baz',30),('Qux',40);INSERT INTO [UserFavorite]([Name],Favorite) Values('Baz','Game');", cancellationToken: TestContext.CancellationToken);
         Assert.AreEqual(4, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [User]"));
         Assert.AreEqual(6, sqlHelper.ExecuteScalar<int>("SELECT COUNT(1) FROM [UserFavorite]"));
         Assert.AreEqual(3, affectRowsCount);
@@ -280,7 +279,7 @@ public class SqlHelperTests
         //temptable
         sqlHelper.ExecuteNonQuery("CREATE TEMP TABLE TempTable([Name] TEXT,Age INT);INSERT INTO TempTable VALUES('foo',10),('bar',70)");
         var table = sqlHelper.ExecuteDataSet("SELECT * FROM TempTable").Tables[0];
-        var users = dbContext.Database.SqlQuery<User>(FormattableStringFactory.Create("SELECT * FROM TempTable")).ToList();
+        var users = dbContext.User.FromSqlRaw("SELECT * FROM TempTable").ToList();
         Console.WriteLine(users.Serialize());
     }
 
@@ -294,4 +293,6 @@ public class SqlHelperTests
         Assert.HasCount(2, users);
         Console.WriteLine(users.Serialize(new JsonOption { FormatJson = true }));
     }
+
+    public TestContext TestContext { get; set; }
 }

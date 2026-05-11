@@ -30,13 +30,13 @@ internal abstract class CompressHandler(CompressRequest request)
             else
             {
                 var fileInfo = new FileInfo(path);
-                rootPath = Request.IncludeSourceDiretory ? fileInfo.Directory.Parent.FullName ?? string.Empty : fileInfo.Directory.FullName;
+                rootPath = Request.IncludeSourceDiretory ? fileInfo.Directory?.Parent?.FullName ?? string.Empty : fileInfo.Directory?.FullName??string.Empty;
             }
             return GetPathList(path, rootPath);
         })];
     }
 
-    List<FilePathInfo> GetPathList(string path, string rootPath)
+    static List<FilePathInfo> GetPathList(string path, string rootPath)
     {
         var directoryInfo = new DirectoryInfo(path);
         if (directoryInfo.Exists)
@@ -52,7 +52,7 @@ internal abstract class CompressHandler(CompressRequest request)
         }
     }
 
-    string FormatPath(string path)
+    static string FormatPath(string path)
     {
         return path.Replace("\\", "/").Replace("//", "/").TrimEnd("/");
     }
@@ -82,7 +82,7 @@ internal abstract class CompressHandler<TOutputStream, TEntry>(CompressRequest r
         }
 
         if (Request.CancellationToken?.IsCancellationRequested ?? false) throw new OperationCanceledException(Request.CancellationToken.Value);
-        await outputStream.FlushAsync(Request.CancellationToken ?? System.Threading.CancellationToken.None);
+        await outputStream.FlushAsync(Request.CancellationToken ?? CancellationToken.None);
     }
 }
 

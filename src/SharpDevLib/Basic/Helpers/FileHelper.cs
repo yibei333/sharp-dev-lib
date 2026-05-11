@@ -86,7 +86,7 @@ public static class FileHelper
         }
         fileInfo.CreateFileIfNotExist();
         using var stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-        await stream.WriteAsync(bytes, 0, bytes.Length, cancellationToken ?? CancellationToken.None);
+        await stream.WriteAsync(bytes, cancellationToken ?? CancellationToken.None);
         await stream.FlushAsync(cancellationToken ?? CancellationToken.None);
     }
 
@@ -100,7 +100,7 @@ public static class FileHelper
     /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时抛出</exception>
     public static void SaveToFile(this Stream stream, string filePath, bool throwIfFileExist = false)
     {
-        if (stream is null) throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream);
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
         if (File.Exists(filePath))
         {
@@ -126,7 +126,7 @@ public static class FileHelper
     /// <exception cref="InvalidOperationException">当文件已存在且throwIfFileExist为true时抛出</exception>
     public static async Task SaveToFileAsync(this Stream stream, string filePath, CancellationToken? cancellationToken, bool throwIfFileExist = false)
     {
-        if (stream is null) throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream);
         if (filePath.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(filePath));
         if (File.Exists(filePath))
         {
@@ -161,7 +161,7 @@ public static class FileHelper
     /// <exception cref="Exception">当文件夹不存在时抛出异常</exception>
     public static void ThrowIfDirectoryNotExist([NotNull] this DirectoryInfo? directory)
     {
-        if (directory is null) throw new ArgumentNullException(nameof(directory));
+        ArgumentNullException.ThrowIfNull(directory);
         if (!directory.Exists) throw new Exception($"directory '{directory}' not exist");
     }
 
@@ -185,7 +185,7 @@ public static class FileHelper
     /// <exception cref="FileNotFoundException">当文件不存在时抛出异常</exception>
     public static void ThrowIfFileNotExist([NotNull] this FileInfo? fileInfo)
     {
-        if (fileInfo is null) throw new ArgumentNullException(nameof(fileInfo));
+        ArgumentNullException.ThrowIfNull(fileInfo);
         if (!fileInfo.Exists) throw new FileNotFoundException(null, fileInfo.FullName);
     }
 
@@ -207,7 +207,7 @@ public static class FileHelper
     /// <exception cref="ArgumentNullException">当directory参数为空时引发异常</exception>
     public static void CreateDirectoryIfNotExist([NotNull] this DirectoryInfo? directory)
     {
-        if (directory is null) throw new ArgumentNullException(nameof(directory));
+        ArgumentNullException.ThrowIfNull(directory);
         if (!directory.Exists) Directory.CreateDirectory(directory.FullName);
     }
 
@@ -229,7 +229,7 @@ public static class FileHelper
     /// <exception cref="ArgumentNullException">当fileInfo参数为null时抛出</exception>
     public static void CreateFileIfNotExist([NotNull] this FileInfo? fileInfo)
     {
-        if (fileInfo is null) throw new ArgumentNullException(nameof(fileInfo));
+        ArgumentNullException.ThrowIfNull(fileInfo);
         if (!fileInfo.Exists)
         {
             fileInfo.DirectoryName.CreateDirectoryIfNotExist();
@@ -335,9 +335,9 @@ public static class FileHelper
     {
         if (path.IsNullOrWhiteSpace()) return string.Empty;
         var formated = path.FormatPath();
-        var lastSplit = formated.LastIndexOf("/");
+        var lastSplit = formated.LastIndexOf('/');
         if (lastSplit < 0) return string.Empty;
-        return formated.Substring(0, lastSplit).FormatPath();
+        return formated[..lastSplit].FormatPath();
     }
 
     /// <summary>
@@ -367,8 +367,8 @@ public static class FileHelper
 
         while ((length = source.Read(buffer, 0, buffer.Length)) > 0)
         {
-            if (cancellationToken.IsCancellationRequested) throw new OperationCanceledException(cancellationToken);
-            await target.WriteAsync(buffer, 0, length, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            await target.WriteAsync(buffer.AsMemory(0, length), cancellationToken);
             transfered?.Invoke(length);
         }
     }
