@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using DocumentFormat.OpenXml.Bibliography;
 
 namespace SharpDevLib;
 
@@ -157,6 +158,7 @@ public static class HttpHelper
 
         HttpRequestMessage CreateRequestMessage()
         {
+            if(url.FormatPath().StartsWith('/')) url=url.FormatPath().TrimStart('/');
             //query string
             if (method == HttpMethod.Get || method == HttpMethod.Delete) return new HttpRequestMessage(method, url);
 

@@ -32,7 +32,10 @@ internal class HttpClientFactory
                 httpHandler.UseProxy = true;
             }
             var client = new HttpClient(httpHandler);
-            if (config.BaseUrl.NotNullOrWhiteSpace()) client.BaseAddress = new Uri(config.BaseUrl);
+            if (config.BaseUrl.NotNullOrWhiteSpace())
+            {
+                client.BaseAddress = new Uri(config.BaseUrl.FormatPath().TrimEnd("/")+"/");
+            }
             if (config.Timeout is not null) client.Timeout = config.Timeout.Value;
             var clientInfo = new HttpClientInfo(clientId, config, client, httpHandler);
             _clients.Add(clientInfo);

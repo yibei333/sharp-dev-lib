@@ -15,7 +15,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>2.1.4</Version>
+		<Version>2.1.5</Version>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 		<PackageReadmeFile>nuget.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -37,11 +37,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.7" />
-		<PackageReference Include="SharpCompress" Version="0.48.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
+		<PackageReference Include="SharpCompress" Version="0.49.1" />
 		<PackageReference Include="SharpZipLib" Version="1.4.2" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.7" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.9" />
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
 	</ItemGroup>
 </Project>

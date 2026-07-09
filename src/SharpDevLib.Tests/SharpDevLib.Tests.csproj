@@ -10,19 +10,19 @@
 		<PackageReference Include="EmailReplyParser" Version="2.0.1" />
 		<PackageReference Include="EmbedIO" Version="3.5.2" />
 		<PackageReference Include="HttpMultipartParser" Version="10.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.7" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
 		<PackageReference Include="MySql.EntityFrameworkCore" Version="10.0.7" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
-		<PackageReference Include="MSTest.TestAdapter" Version="4.2.2" />
-		<PackageReference Include="MSTest.TestFramework" Version="4.2.2" />
-		<PackageReference Include="coverlet.collector" Version="10.0.0">
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.7.0" />
+		<PackageReference Include="MSTest.TestAdapter" Version="4.3.0" />
+		<PackageReference Include="MSTest.TestFramework" Version="4.3.0" />
+		<PackageReference Include="coverlet.collector" Version="10.0.1">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="OpenPop.Core" Version="1.0.0" />
 		<PackageReference Include="SmtpServer" Version="11.1.0" />
-		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.7" />
+		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.9" />
 	</ItemGroup>
 
 	<ItemGroup>
