@@ -154,7 +154,7 @@ public class HttpResponseModel//改名为HttpResponseModel,防止和Microsoft.As
         {
             var logger = HttpClientFactory.GetClient(Request.ClientId).Config.Logger;
             if (logger is not null && logger.IsEnabled(LogLevel.Information)) logger.LogInformation("{OUTPUT}", ToString());
-            throw new Exception("HTTP请求失败,请检查响应状态码和错误信息");
+            throw new Exception("HTTP请求失败,请检查响应状态码和错误信息",new Exception(HttpResponseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult().RegexUnescape()));
         }
         return this;
     }
