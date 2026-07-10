@@ -37,6 +37,7 @@ internal class HttpClientFactory
                 client.BaseAddress = new Uri(config.BaseUrl.FormatPath().TrimEnd("/")+"/");
             }
             if (config.Timeout is not null) client.Timeout = config.Timeout.Value;
+            else client.Timeout = Timeout.InfiniteTimeSpan;
             var clientInfo = new HttpClientInfo(clientId, config, client, httpHandler);
             _clients.Add(clientInfo);
         }
